@@ -68,32 +68,48 @@ const htmlResults = function(response) {
 
 let response;
 
+
+const contentIdSearchButtonClicked = async function() {
+  const input = id('contentid').value;
+  const contentIds = input.split(/[^a-zA-Z0-9-]+/).filter(d=>d.length>0).map(s => s.toLowerCase());
+  const whereStatement = contentIds.map(cid => `n.contentID="${cid}" `).join(' OR ');
+  const query = `match (n:Cid) where ${whereStatement} return
+    "https://www.gov.uk"+n.name AS url,
+    n.name AS slug,
+    n.title,
+    n.documentType,
+    n.contentID,
+    n.publishing_app,
+    n.first_published_at AS first_published_at,
+    n.public_updated_at AS last_updated`;
+  console.log(query);
+  response = await (neo4jSession.run(query));
+  console.log(response)
+  id('results-contentid').innerHTML = htmlResults(response);
+};
+
 const searchButtonClicked = async function() {
   const keyword = id('keyword').value;
   const excludedKeyword = id('excluded-keyword').value;
-
   const mode = id('and-or').selectedIndex == 0 ? 'AND' : 'OR';
-
   const keywords = keyword.split(/[,;\s]+/).filter(d=>d.length>0).map(s => s.toLowerCase());
   const excludedKeywords = excludedKeyword.split(/[,;\s]+/).filter(d=>d.length>0).map(s => s.toLowerCase());
-
   if (keyword.length < 3) {
     status('Word too short');
     return;
   }
-
   const query = buildQuery(keywords, excludedKeywords, mode);
-
-  console.log(query);
-
   response = await (neo4jSession.run(query));
-
   id('results').innerHTML = htmlResults(response);
   id('show-fields-wrapper').style.display = 'block';
 };
 
 const clearButtonClicked = function() {
   id('results').innerHTML = '';
+};
+
+const contentIdClearButtonClicked = function() {
+  id('results-contentid').innerHTML = '';
 };
 
 
@@ -121,6 +137,9 @@ const clearButtonClicked = function() {
   id('keyword-clear-button').addEventListener('click', clearButtonClicked);
   id('show-fields').
     addEventListener('click', () => id('results').innerHTML = htmlResults(response));
+  id('contentid-search-button').addEventListener('click', contentIdSearchButtonClicked);
+  id('contentid-clear-button').addEventListener('click', contentIdClearButtonClicked);
+
 
   // First, look if there's a file with params
   status('Looking for credentials file');
