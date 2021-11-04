@@ -1,0 +1,28 @@
+body {
+  font-family: arial, sans-serif;
+}
+
+#status {
+  font-weight: bold;
+  color: red;
+}
+
+svg {
+  border: 1px solid black;
+}
+
+pre {
+  background: #ddd;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+table td {
+  border: 1px solid black;
+}
+
+#results {
+  background: #eee;
+}

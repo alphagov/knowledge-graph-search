@@ -1,0 +1,63 @@
+<html>
+  <head>
+    <title>neo4j</title>
+    <script src="https://unpkg.com/neo4j-driver-lite@4.3.0/lib/browser/neo4j-lite-web.min.js"></script>
+    <link rel=stylesheet href="main.css"/>
+    <link rel=stylesheet href="graph.css"/>
+  </head>
+  <body>
+    <h1>KGviz</h1>
+
+    <div><span>Status: </span><span id="status"></span></div>
+
+    <details>
+      <summary>Keyword search</summary>
+
+      <p>Type keywords to find pages with title containing:</p>
+
+      <div id="keyword-search">
+        <select id="and-or">
+          <option name="and">all the words</option>
+          <option name="or">any of the words</option>
+        </select>
+        <input id="keyword"/>, but not
+        <input id="excluded-keyword" placeholder="leave blank if no exclusions"/>
+        <button id="keyword-search-button">Search</button>
+        <button id="keyword-clear-button">Clear</button>
+        <div>
+          Show:
+          <ul id="show-fields">
+            <li><input type="checkbox" id="show-contentid"/> content ID</li>
+            <li><input type="checkbox" id="show-doctype"/> document type</li>
+          </ul>
+      </div>
+
+      <div id="results"></div>
+    </details>
+
+    <details>
+      <summary>Explore</summary>
+      <svg id=graph width=500 height=500></svg>
+    </details>
+
+
+    <details>
+      <summary>Settings</summary>
+
+      <div>
+        <span>Server URI:</span>
+        <input id="uri"/>
+      </div>
+      <div>
+        user: <input id="user"/><br/>
+        password: <input id="password" type="password"/><br/>
+        <button id="connect-button">Connect</button>
+      </div>
+    </details>
+
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="main.js"></script>
+    <script src="viz.js"></script>
+  </body>
+</html>

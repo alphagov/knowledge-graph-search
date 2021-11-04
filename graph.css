@@ -1,0 +1,13 @@
+.links line {
+  stroke: #999;
+}
+
+.nodes circle {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+text {
+  color: blue;
+  text-decoration: underline;
+}
