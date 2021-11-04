@@ -43,20 +43,20 @@ ORDER BY n.pagerank DESC;`
 
 
 const htmlResults = function(response) {
-  const html = ['<table>'];
-  html.push(`<thead>${response.records.length} results</thead><tbody>`);
-  html.push(`<tr><th>Title</th>`);
-  if (id('show-contentid').checked) html.push('<th>ContentID</th>');
-  if (id('show-doctype').checked) html.push('<th>Type</th>');
+  const html = ['<table class="govuk-table">'];
+  html.push(`<thead class="govuk-table__head">${response.records.length} results</thead><tbody class="govuk-table__body">`);
+  html.push(`<tr class="govuk-table__row"><th scope="row" class="govuk-table__header">Title</th>`);
+  if (id('show-contentid').checked) html.push('<th scope="row" class="govuk-table__header">ContentID</th>');
+  if (id('show-doctype').checked) html.push('<th scope="row" class="govuk-table__header">Type</th>');
   html.push(`</tr>`);
 
   response.records.forEach(record => {
     let dict = {};
     record.keys.forEach((key, index) => dict[key] = record._fields[index]);
 
-    html.push(`<tr><td><a href="${dict.url}">${dict['n.title']}</a></td>`);
-    if (id('show-contentid').checked) html.push(`<td>${dict['n.contentID']}</td>`);
-    if (id('show-doctype').checked) html.push(`<td>${dict['n.documentType']}</td>`);
+    html.push(`<tr class="govuk-table__row"><td class="govuk-table__cell"><a href="${dict.url}">${dict['n.title']}</a></td>`);
+    if (id('show-contentid').checked) html.push(`<td class="govuk-table__cell">${dict['n.contentID']}</td>`);
+    if (id('show-doctype').checked) html.push(`<td class="govuk-table__cell">${dict['n.documentType']}</td>`);
     html.push('</th>');
   });
 
@@ -92,6 +92,7 @@ const searchButtonClicked = async function() {
   response = await (neo4jSession.run(query));
 
   id('results').innerHTML = htmlResults(response);
+  id('show-fields-wrapper').style.display = 'block';
 };
 
 const clearButtonClicked = function() {

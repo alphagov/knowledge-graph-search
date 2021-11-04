@@ -1,0 +1,22 @@
+@import "node_modules/govuk-frontend/govuk/all";
+
+body {
+  font-family: arial, sans-serif;
+}
+
+#status {
+  font-weight: bold;
+  color: red;
+}
+
+svg {
+  border: 1px solid black;
+}
+
+pre {
+  background: #ddd;
+}
+
+#show-fields-wrapper {
+  display: none;
+}

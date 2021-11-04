@@ -1,0 +1,22 @@
+{
+  "name": "knowledge-graph-search",
+  "version": "1.0.0",
+  "description": "Web app to make the Knowledge Graph simpler to search",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alphagov/knowledge-graph-search.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alphagov/knowledge-graph-search/issues"
+  },
+  "homepage": "https://github.com/alphagov/knowledge-graph-search#readme",
+  "dependencies": {
+    "govuk-frontend": "^3.14.0"
+  }
+}
