@@ -77,13 +77,10 @@ const searchButtonClicked = async function() {
   const keywords = keyword.split(/[,;\s]+/).filter(d=>d.length>0).map(s => s.toLowerCase());
   const excludedKeywords = excludedKeyword.split(/[,;\s]+/).filter(d=>d.length>0).map(s => s.toLowerCase());
 
-  if (Math.min(...(keywords.map(word => word.length))) < 3 ||
-      Math.min(...(excludedKeywords.map(word => word.length))) < 3) {
+  if (keyword.length < 3) {
     status('Word too short');
     return;
   }
-
-
 
   const query = buildQuery(keywords, excludedKeywords, mode);
 
