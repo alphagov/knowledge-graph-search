@@ -17,6 +17,13 @@ pre {
   background: #ddd;
 }
 
-#show-fields-wrapper {
-  display: none;
+.kg-checkboxes {
+  padding: 0;
+  display: inline;
+}
+
+.kg-checkboxes__item {
+  display: inline-block;
+  padding: 0 1em 0 0;
+  background: #ddd;
 }

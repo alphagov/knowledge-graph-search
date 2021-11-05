@@ -62,102 +62,7 @@
     </div>
   </header>
 
-  <div class="govuk-width-container ">
-    <main class="govuk-main-wrapper " id="main-content" role="main">
-      <h1 class="govuk-heading-xl">Search the Knowledge Graph</h1>
-
-      <p class="govuk-body"><span>Status: </span><span id="status"></span></p>
-
-      <details open class="govuk-details" data-module="govuk-details">
-        <summary class="govuk-details__summary">
-          <span class="govuk-details__summary-text">Keyword search</span>
-        </summary>
-
-        <div class="govuk-details__text">
-
-          <p>Type keywords to find pages with title containing:</p>
-
-          <div class="govuk-form-group" id="keyword-search">
-            <p class="govuk-body">
-              <select class="govuk-select" id="and-or">
-                <option name="and">all the words</option>
-                <option name="or">any of the words</option>
-              </select>
-              <input class="govuk-input govuk-input--width-10" id="keyword"/><br/>
-            </p>
-
-            but not:
-            <p class="govuk-body">
-              <input class="govuk-input govuk-input--width-10" id="excluded-keyword" placeholder="leave blank if no exclusions"/>
-            </p>
-            <p class="govuk-body">
-              <button class="govuk-button" id="keyword-search-button">Search</button>
-              <button class="govuk-button" id="keyword-clear-button">Clear</button>
-            </p>
-            <div id="show-fields-wrapper">
-              Show:
-              <ul class="govuk-checkboxes" id="show-fields">
-                <li class="govuk-checkboxes__item">
-                  <input class="govuk-checkboxes__input" type="checkbox" id="show-contentid"/>
-                  <label class="govuk-label govuk-checkboxes__label">content ID</label>
-                </li>
-                <li class="govuk-checkboxes__item">
-                  <input class="govuk-checkboxes__input" type="checkbox" id="show-doctype"/>
-                  <label class="govuk-label govuk-checkboxes__label">Document type</label>
-                </li>
-              </ul>
-            </div>
-            <div id="results"></div>
-          </div>
-        </div>
-      </details>
-
-      <details class="govuk-details" data-module="govuk-details">
-        <summary class="govuk-details__summary">
-          <span class="govuk-details__summary-text">Look up contentIDs</span>
-        </summary>
-        <div class="govuk-details__text">
-          <div class="govuk-form-group" id="contentid-search">
-            <p class="govuk-body">
-              <textarea class="govuk-textarea" rows="5" id="contentid"></textarea>
-            </p>
-            <p class="govuk-body">
-              <button class="govuk-button" id="contentid-search-button">Search</button>
-              <button class="govuk-button" id="contentid-clear-button">Clear</button>
-            </p>
-          </div>
-        </div>
-        <div id="results-contentid"></div>
-      </details>
-
-
-      <details class="govuk-details" data-module="govuk-details">
-        <summary class="govuk-details__summary">
-          <span class="govuk-details__summary-text">Explore</span>
-        </summary>
-        <div class="govuk-details__text">
-          <svg id=graph width=500 height=500></svg>
-        </div>
-      </details>
-
-
-      <details class="govuk-details" data-module="govuk-details">
-        <summary class="govuk-details__summary">
-          <span class="govuk-details__summary-text">Settings</span>
-        </summary>
-        <div class="govuk-details__text">
-          <p class="govuk-body">
-            <span>Server URI:</span>
-            <input class="govuk-input" id="uri"/>
-          </p>
-          <p class="govuk-body">user: <input class="govuk-input" id="user"/></p>
-          <p class="govuk-body">password: <input class="govuk-input" id="password" type="password"/></p>
-          <button class="govuk-button" id="connect-button">Connect</button>
-          </div>
-        </div>
-      </details>
-    </main>
-  </div>
+  <div class="govuk-width-container" id="page-content"></div>
 
   <footer class="govuk-footer " role="contentinfo">
     <div class="govuk-width-container ">
@@ -183,10 +88,12 @@
   <script src="https://unpkg.com/neo4j-driver-lite@4.3.0/lib/browser/neo4j-lite-web.min.js"></script>
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="main.js"></script>
-  <script src="viz.js"></script>
+<!-- <script src="viz.js"></script> -->
+<!--
   <script>
     window.GOVUKFrontend.initAll()
   </script>
+ -->
 </body>
 
 </html>
