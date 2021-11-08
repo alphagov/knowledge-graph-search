@@ -3,7 +3,7 @@
 const state = {
   user: '',
   password: '',
-  uri: '',
+  server: '',
   statusText: 'starting',
   neo4jSession: null,
   combinator: 'and', // or 'or'
@@ -14,7 +14,8 @@ const state = {
   showFields: {
     contentId: true,
     documentType: true
-  }
+  },
+  activeMode: 'keyword-search' // or 'contentid-search'
 };
 
 
@@ -81,6 +82,12 @@ const handleEvent = async function(e) {
   case "show-doctype":
     state.showFields.documentType = id('show-doctype').checked;
     break;
+  case 'button-select-keyword-search':
+    state.activeMode = 'keyword-search';
+    break;
+  case 'button-select-contentid-search':
+    state.activeMode = 'contentid-search';
+    break;
   default:
     console.log('unknown event received:', e);
   }
@@ -89,41 +96,47 @@ const handleEvent = async function(e) {
 
 
 const view = function() {
-  const html = `
+  const html = [];
+  html.push(`
     <main class="govuk-main-wrapper " id="main-content" role="main">
       <h1 class="govuk-heading-xl">Search the Knowledge Graph</h1>
       <p class="govuk-body"><span>Status: </span>${state.statusText}</p>
-      <details open class="govuk-details" data-module="govuk-details">
-        <summary class="govuk-details__summary">
-          <span class="govuk-details__summary-text">Keyword search</span>
-        </summary>
-        <div class="govuk-details__text">
-          <p>Type keywords to find pages with title containing:</p>
-          <div class="govuk-form-group" id="keyword-search">
+
+      <p class="govuk-body mode-buttons">
+        <button class="${state.activeMode==='keyword-search'?'search-active':''}"
+                id="button-select-keyword-search">Keyword search</button>
+        <button class="${state.activeMode==='contentid-search'?'search-active':''}"
+                id="button-select-contentid-search">Content ID search</button>
+      </p>
+      <div class="search-panel">`);
+
+  switch(state.activeMode) {
+    case 'keyword-search':
+    html.push(`
+          <div class="govuk-form-group" id="keyword-search-panel">
             <p class="govuk-body">
+             Type keywords to find pages with title containing<br/>
               <select class="govuk-select" id="and-or">
                 <option name="and" ${state.combinator === 'and' ? 'selected' : ''}>all the words</option>
                 <option name="or" ${state.combinator === 'or' ? 'selected' : ''}>any of the words</option>
               </select>
               <input class="govuk-input govuk-input--width-10" id="keyword" value="${state.selectedWords}"/>
-            <p>
-            but not:
-            <p class="govuk-body">
+
+            <br/>but not:
+
               <input class="govuk-input govuk-input--width-10" id="excluded-keyword" placeholder="leave blank if no exclusions" value="${state.excludedWords}"/>
-            </p>
-            <p class="govuk-body">
+
+
               <button class="govuk-button" id="keyword-search"
                 onclick="handleEvent">Search</button>
             </p>
           </div>
-        </div>
-      </details>
-      <details class="govuk-details" data-module="govuk-details">
-        <summary class="govuk-details__summary">
-          <span class="govuk-details__summary-text">Look up contentIDs</span>
-        </summary>
-        <div class="govuk-details__text">
-          <div class="govuk-form-group" id="contentid-search">
+    `);
+    break;
+    case 'contentid-search':
+    html.push(`
+          <p>Enter one of multiple contentIDs:</p>
+          <div class="govuk-form-group" id="contentid-search-panel">
             <p class="govuk-body">
               <textarea class="govuk-textarea" rows="5" id="contentid">${state.contentIds}</textarea>
             </p>
@@ -131,14 +144,16 @@ const view = function() {
               <button class="govuk-button" id="contentid-search" onclick="handleEvent">Search</button>
             </p>
           </div>
-        </div>
-      </details>
-      <button class="govuk-button" id="clear">Clear</button>
-      <div id="results">${viewSearchResults(state.searchResults)}</div>
+    `);
+    break;
+  }
 
+  html.push(`
+      </div>
+      <div id="results">${viewSearchResults(state.searchResults)}</div>
     </main>
-  `;
-  id('page-content').innerHTML = html;
+  `);
+  id('page-content').innerHTML = html.join('');
 
 
   // adding onclick doesn't work
@@ -183,6 +198,7 @@ ORDER BY n.pagerank DESC;`
 const viewSearchResults = function(results) {
   const html = [];
   if (results) {
+
     html.push('<table class="govuk-table">');
     html.push(`<thead class="govuk-table__head">
       ${results.records.length} results<br/>
@@ -202,6 +218,7 @@ const viewSearchResults = function(results) {
             <label class="kg-label kg-checkboxes__label">Document type</label>
           </li>
         </ul>
+        <button class="govuk-button" id="clear">Clear results</button>
       </div>
     </thead>
     <tbody class="govuk-table__body">`);
@@ -229,58 +246,29 @@ const viewSearchResults = function(results) {
 
 
 
-
-(async () => {
-
-  state.neo4jDriver = neo4j.driver(
-    state.uri,
-    neo4j.auth.basic(state.user, state.password)
-  );
-  state.neo4jSession = state.neo4jDriver.session();
-  state.statusText = 'ready';
-  view();
-})();
-
-/*
-  const startSession = async function () {
-    status('starting session');
-    state.neo4jSession = neo4jDriver.session();
-    await makeViz(state.neo4jSession);
-  };
-
-
-  id('connect-button').addEventListener('click', () => {
-    const user = id('user').value;
-    const password = id('password').value;
-    const uri = id('uri').value;
-    neo4jDriver = neo4j.driver(uri, neo4j.auth.basic(user, password));
-    status('connected');
-    startSession();
-  });
-
-  id('show-fields').
-    addEventListener('click', () => id('results').innerHTML = viewSearchResults(response));
-  id('contentid-search-button').addEventListener('click', contentIdSearchButtonClicked);
-
-
-  // First, look if there's a file with params
-  status('Looking for credentials file');
-  fetch('params.json')
+const init = async function() {
+  // First, look if there's a file with authentication params
+  await fetch('params.json')
     .then(async response => {
       const data = await response.json();
 
-      neo4jDriver = neo4j.driver(data.server, neo4j.auth.basic(data.user, data.password));
-      status('connected');
-      id('uri').value = data.server;
-      id('user').value = data.user;
-      id('password').value = data.password;
-      startSession();
-
+      state.server = data.server;
+      state.user = data.user;
+      state.password = data.password;
+      state.neo4jDriver = neo4j.driver(state.server, neo4j.auth.basic(state.user, state.password));
+      state.statusText = 'starting session';
+      state.neo4jSession = state.neo4jDriver.session();
+      state.statusText = 'ready';
     }).catch(error => {
       console.warn(error);
-      status('Enter parameters and click Connect');
-    })
+      state.statusText('failed to retrieve credentials');
+    });
+};
 
+(async () => {
+  await init();
+  view();
+})();
 
 
 /*

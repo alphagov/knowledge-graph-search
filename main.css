@@ -6577,3 +6577,41 @@ pre {
   padding: 0 1em 0 0;
   background: #ddd;
 }
+
+.mode-buttons {
+  margin-bottom: 0;
+}
+.mode-buttons button {
+  border: 1px solid black;
+  background: #ddd;
+}
+.mode-buttons button.search-active {
+  border-width: 3px;
+}
+
+.search-panel {
+  padding: 1em;
+  border: 1px solid black;
+}
+
+#keyword-search-panel input {
+  margin-top: 5px;
+}
+
+#keyword-search-panel, #contentid-search-panel {
+  padding: 0;
+  margin: 0;
+}
+#keyword-search-panel p, #contentid-search-panel p {
+  padding: 0;
+  margin: 0;
+}
+
+.govuk-button, .govuk-textarea {
+  margin-top: 3px;
+  margin-bottom: 0;
+}
+
+#clear {
+  padding: 0px 5px;
+}
