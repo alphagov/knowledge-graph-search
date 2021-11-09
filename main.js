@@ -15,11 +15,12 @@ const state = {
     contentId: true,
     documentType: true
   },
-  activeMode: 'keyword-search' // or 'contentid-search'
+  activeMode: 'keyword-search', // or 'contentid-search'
+  waiting: false // whether we're waiting for a request to return
 };
 
 
-const contentIdSearchButtonClicked = async function() {
+const contentIdSearchButtonClicked = function() {
   const contentIds = state.contentIds
     .split(/[^a-zA-Z0-9-]+/)
     .filter(d=>d.length>0)
@@ -35,11 +36,14 @@ const contentIdSearchButtonClicked = async function() {
     n.first_published_at AS first_published_at,
     n.public_updated_at AS last_updated`;
   console.log(query);
-  state.searchResults = await state.neo4jSession.run(query);
+  state.neo4jSession.run(query)
+    .then(async results => {
+      await handleEvent({type:'neo4j-callback-ok', data: results})
+    });
 };
 
 
-const searchButtonClicked = async function() {
+const searchButtonClicked = function() {
   if (state.selectedWords.length < 3) {
     state.statusText = 'Word too short';
     return;
@@ -56,40 +60,54 @@ const searchButtonClicked = async function() {
     .map(s => s.toLowerCase());
 
   const query = buildQuery(keywords, excludedKeywords, state.combinator);
-
-  state.searchResults = await state.neo4jSession.run(query);
+  state.neo4jSession.run(query)
+    .then(async results => {
+      await handleEvent({type:'neo4j-callback-ok', data: results})
+    });
 };
 
 
-const handleEvent = async function(e) {
-  switch(e.target.getAttribute('id')) {
-  case "keyword-search":
-    state.selectedWords = id('keyword').value;
-    state.excludedWords = id('excluded-keyword').value;
-    state.combinator = id('and-or').selectedIndex == 0 ? 'AND' : 'OR';
-    await searchButtonClicked();
+const handleEvent = async function(event) {
+  switch(event.type) {
+    case "dom":
+      switch(event.id) {
+      case "keyword-search":
+        state.selectedWords = id('keyword').value;
+        state.excludedWords = id('excluded-keyword').value;
+        state.combinator = id('and-or').selectedIndex == 0 ? 'AND' : 'OR';
+        state.waiting = true;
+        searchButtonClicked();
+        break;
+      case "contentid-search":
+        state.contentIds = id('contentid').value;
+        state.waiting = true;
+        contentIdSearchButtonClicked();
+        break;
+      case "clear":
+        state.searchResults = null;
+        break;
+      case "show-contentid":
+        state.showFields.contentId = id('show-contentid').checked;
+        break;
+      case "show-doctype":
+        state.showFields.documentType = id('show-doctype').checked;
+        break;
+      case 'button-select-keyword-search':
+        state.activeMode = 'keyword-search';
+        break;
+      case 'button-select-contentid-search':
+        state.activeMode = 'contentid-search';
+        break;
+      default:
+        console.log('unknown DOM event received:', event);
+      }
     break;
-  case "contentid-search":
-    state.contentIds = id('contentid').value;
-    await contentIdSearchButtonClicked();
-    break;
-  case "clear":
-    state.searchResults = null;
-    break;
-  case "show-contentid":
-    state.showFields.contentId = id('show-contentid').checked;
-    break;
-  case "show-doctype":
-    state.showFields.documentType = id('show-doctype').checked;
-    break;
-  case 'button-select-keyword-search':
-    state.activeMode = 'keyword-search';
-    break;
-  case 'button-select-contentid-search':
-    state.activeMode = 'contentid-search';
-    break;
+  case 'neo4j-callback-ok': // non-dom event
+    state.searchResults = event.data;
+    state.waiting = false;
+  break;
   default:
-    console.log('unknown event received:', e);
+    console.log('unknown event', event);
   }
   view();
 };
@@ -101,7 +119,6 @@ const view = function() {
     <main class="govuk-main-wrapper " id="main-content" role="main">
       <h1 class="govuk-heading-xl">Search the Knowledge Graph</h1>
       <p class="govuk-body"><span>Status: </span>${state.statusText}</p>
-
       <p class="govuk-body mode-buttons">
         <button class="${state.activeMode==='keyword-search'?'search-active':''}"
                 id="button-select-keyword-search">Keyword search</button>
@@ -126,9 +143,11 @@ const view = function() {
 
               <input class="govuk-input govuk-input--width-10" id="excluded-keyword" placeholder="leave blank if no exclusions" value="${state.excludedWords}"/>
 
-
-              <button class="govuk-button" id="keyword-search"
-                onclick="handleEvent">Search</button>
+              <button
+                  class="govuk-button ${state.waiting?'govuk-button--secondary':''}"
+                  id="keyword-search">
+                ${state.waiting?'Searching...':'Search'}
+              </button>
             </p>
           </div>
     `);
@@ -141,7 +160,11 @@ const view = function() {
               <textarea class="govuk-textarea" rows="5" id="contentid">${state.contentIds}</textarea>
             </p>
             <p class="govuk-body">
-              <button class="govuk-button" id="contentid-search" onclick="handleEvent">Search</button>
+              <button
+                  class="govuk-button ${state.waiting?'govuk-button--secondary':''}"
+                  id="contentid-search">
+                ${state.waiting?'Searching...':'Search'}
+              </button>
             </p>
           </div>
     `);
@@ -158,7 +181,9 @@ const view = function() {
 
   // adding onclick doesn't work
   document.querySelectorAll('button, input[type=checkbox]')
-    .forEach(input => input.addEventListener('click', handleEvent))
+    .forEach(input => input.addEventListener(
+      'click',
+      event => handleEvent({type: 'dom', id: event.target.getAttribute('id')})));
 };
 
 
