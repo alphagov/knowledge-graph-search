@@ -10,6 +10,7 @@ const state = {
   selectedWords: '',
   excludedWords: '',
   contentIds: '',
+  externalUrl: '',
   searchQuery: null,
   searchResults: null,
   showFields: {
@@ -22,18 +23,14 @@ const state = {
     text: false
   },
   caseSensitive: false,
-  activeMode: 'keyword-search', // or 'contentid-search'
+  activeMode: 'keyword-search', // or 'contentid-search', 'external-search'
   waiting: false // whether we're waiting for a request to return
 };
 
-
-const contentIdSearchButtonClicked = function() {
-  const contentIds = state.contentIds
-    .split(/[^a-zA-Z0-9-]+/)
-    .filter(d=>d.length>0)
-    .map(s => s.toLowerCase());
-  const whereStatement = contentIds.map(cid => `n.contentID="${cid}" `).join(' OR ');
-  state.searchQuery = `match (n:Cid) where ${whereStatement} return
+const externalSearchButtonClicked = function() {
+  state.searchQuery = `
+MATCH (n:Cid) -[:HYPERLINKS_TO]-> (e:ExternalPage)
+WHERE e.name CONTAINS "${state.externalUrl}" RETURN
     "https://www.gov.uk"+n.name AS url,
     n.name AS slug,
     n.title,
@@ -41,7 +38,30 @@ const contentIdSearchButtonClicked = function() {
     n.contentID,
     n.publishing_app,
     n.first_published_at AS first_published_at,
-    n.public_updated_at AS last_updated`;
+    n.public_updated_at AS last_updated
+    LIMIT 100`;
+  state.neo4jSession.run(state.searchQuery)
+    .then(async results => {
+      await handleEvent({type:'neo4j-callback-ok', data: results})
+    });
+};
+
+const contentIdSearchButtonClicked = function() {
+  const contentIds = state.contentIds
+    .split(/[^a-zA-Z0-9-]+/)
+    .filter(d=>d.length>0)
+    .map(s => s.toLowerCase());
+  const whereStatement = contentIds.map(cid => `n.contentID="${cid}" `).join(' OR ');
+  state.searchQuery = `MATCH (n:Cid) WHERE ${whereStatement} RETURN
+    "https://www.gov.uk"+n.name AS url,
+    n.name AS slug,
+    n.title,
+    n.documentType,
+    n.contentID,
+    n.publishing_app,
+    n.first_published_at AS first_published_at,
+    n.public_updated_at AS last_updated
+    LIMIT 100`;
   state.neo4jSession.run(state.searchQuery)
     .then(async results => {
       await handleEvent({type:'neo4j-callback-ok', data: results})
@@ -92,6 +112,11 @@ const handleEvent = async function(event) {
         state.waiting = true;
         contentIdSearchButtonClicked();
         break;
+      case "external-search":
+        state.externalUrl = id('external').value;
+        state.waiting = true;
+        externalSearchButtonClicked();
+        break;
       case "clear":
         state.searchResults = null;
         break;
@@ -106,6 +131,9 @@ const handleEvent = async function(event) {
         break;
       case 'button-select-contentid-search':
         state.activeMode = 'contentid-search';
+        break;
+      case 'button-select-external-search':
+        state.activeMode = 'external-search';
         break;
       default:
         console.log('unknown DOM event received:', event);
@@ -139,6 +167,8 @@ const view = function() {
                   id="button-select-keyword-search">Keyword search</button>
           <button class="${state.activeMode==='contentid-search'?'search-active':''}"
                   id="button-select-contentid-search">Content ID search</button>
+          <button class="${state.activeMode==='external-search'?'search-active':''}"
+                  id="button-select-external-search">External page search</button>
         </p>
         <div class="search-panel">`);
 
@@ -181,7 +211,6 @@ const view = function() {
                   </li>
                 </ul>
               </div>
-
               <div class="kg-checkboxes">
                 <div class="kg-checkboxes__item">
                   <input class="kg-checkboxes__input"
@@ -217,6 +246,27 @@ const view = function() {
             </div>
       `);
       break;
+      case 'external-search':
+      html.push(`
+            <p>Enter an external URL to find all pages linking to it</p>
+            <div class="govuk-form-group" id="external-search-panel">
+              <p class="govuk-body">
+                <input class="govuk-input govuk-input--width-20" id="external"
+                       value="${state.externalUrl}"
+                       placeholder="eg: youtu.be"/>
+              </p>
+              <p class="govuk-body">
+                <button
+                    class="govuk-button ${state.waiting?'govuk-button--secondary':''}"
+                    id="external-search">
+                  ${state.waiting?'Searching...':'Search'}
+                </button>
+              </p>
+            </div>
+      `);
+      break;
+      default:
+        console.log('invalid mode', state.activeMode);
     }
   } else {
   html.push(`
@@ -292,14 +342,16 @@ COLLECT
 (o.name) AS primary_organisation,
 COLLECT
 (o2.name) AS all_organisations, n.pagerank AS popularity
-ORDER BY n.pagerank DESC;`
+ORDER BY n.pagerank DESC
+LIMIT 100;`
 };
 
 
 const viewSearchResults = function(results) {
   const html = [];
-  if (results) {
-    html.push('<div><button class="govuk-button" id="clear">Back</button></div>');
+  html.push('<div><button class="govuk-button" id="clear">Back</button></div>');
+
+  if (results && results.records.length > 0) {
     html.push('<table class="govuk-table">');
     html.push(`<thead class="govuk-table__head">
       <h2 class="govuk-heading-m">${results.records.length} results</h2>
@@ -341,6 +393,8 @@ const viewSearchResults = function(results) {
     });
 
     html.push('</tbody></table>');
+  } else {
+    html.push('<h2 class="govuk-heading-m">No results</h2>');
   }
 
   if (state.searchQuery) {
