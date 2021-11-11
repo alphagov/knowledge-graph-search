@@ -126,98 +126,106 @@ const view = function() {
   const html = [];
   html.push(`
     <main class="govuk-main-wrapper " id="main-content" role="main">
-      <h1 class="govuk-heading-xl">Search the Knowledge Graph</h1>
-      <p class="govuk-body"><span>Status: </span>${state.statusText}</p>
-      <p class="govuk-body mode-buttons">
-        <button class="${state.activeMode==='keyword-search'?'search-active':''}"
-                id="button-select-keyword-search">Keyword search</button>
-        <button class="${state.activeMode==='contentid-search'?'search-active':''}"
-                id="button-select-contentid-search">Content ID search</button>
-      </p>
-      <div class="search-panel">`);
+      <h1 class="govuk-heading-xl">Search the Knowledge Graph</h1>`);
 
-  switch(state.activeMode) {
-    case 'keyword-search':
-    html.push(`
-          <div class="govuk-form-group" id="keyword-search-panel">
-            <p class="govuk-body">
-             Type keywords to find pages with title or content containing<br/>
-              <select class="govuk-select" id="and-or">
-                <option name="and" ${state.combinator === 'and' ? 'selected' : ''}>all the words</option>
-                <option name="or" ${state.combinator === 'or' ? 'selected' : ''}>any of the words</option>
-              </select>
-              <input class="govuk-input govuk-input--width-10" id="keyword" placeholder="eg: cat, dog, ferret" value="${state.selectedWords}"/>
-
-            <br/>but not:
-
-              <input class="govuk-input govuk-input--width-10" id="excluded-keyword" placeholder="leave blank if no exclusions" value="${state.excludedWords}"/>
-            </p>
-            <div id="search-locations-wrapper">
-              Search in:
-              <ul class="kg-checkboxes" id="search-locations">
-                <li class="kg-checkboxes__item">
-                  <input class="kg-checkboxes__input"
-                         type="checkbox" id="search-title"
-                         ${state.whereToSearch.title ? 'checked' : ''}/>
-                  <label class="kg-label kg-checkboxes__label">Title</label>
-                </li>
-                <li class="kg-checkboxes__item">
-                  <input class="kg-checkboxes__input"
-                         type="checkbox" id="search-description"
-                         ${state.whereToSearch.description ? 'checked' : ''}/>
-                  <label class="kg-label kg-checkboxes__label">Description</label>
-                </li>
-                <li class="kg-checkboxes__item">
-                  <input class="kg-checkboxes__input"
-                         type="checkbox" id="search-text"
-                         ${state.whereToSearch.text ? 'checked' : ''}/>
-                  <label class="kg-label kg-checkboxes__label">Text</label>
-                </li>
-              </ul>
-            </div>
-
-            <div class="kg-checkboxes">
-              <div class="kg-checkboxes__item">
-                <input class="kg-checkboxes__input"
-                       type="checkbox" id="case-sensitive"
-                       ${state.caseSensitive ? 'checked' : ''}/>
-                <label class="kg-label kg-checkboxes__label">case sensitive</label>
-              </div>
-            </div>
-            <p class="govuk-body">
-              <button
-                  class="govuk-button ${state.waiting?'govuk-button--secondary':''}"
-                  id="keyword-search">
-                ${state.waiting?'Searching...':'Search'}
-              </button>
-            </p>
-          </div>
-    `);
-    break;
-    case 'contentid-search':
-    html.push(`
-          <p>Enter one of multiple contentIDs:</p>
-          <div class="govuk-form-group" id="contentid-search-panel">
-            <p class="govuk-body">
-              <textarea class="govuk-textarea" rows="5" id="contentid">${state.contentIds}</textarea>
-            </p>
-            <p class="govuk-body">
-              <button
-                  class="govuk-button ${state.waiting?'govuk-button--secondary':''}"
-                  id="contentid-search">
-                ${state.waiting?'Searching...':'Search'}
-              </button>
-            </p>
-          </div>
-    `);
-    break;
+  if (state.statusText) {
+    html.push(`<p class="govuk-body"><span>Status: </span>${state.statusText}</p>`);
   }
 
+  if (state.searchResults === null) {
+    html.push(`
+        <p class="govuk-body mode-buttons">
+          <button class="${state.activeMode==='keyword-search'?'search-active':''}"
+                  id="button-select-keyword-search">Keyword search</button>
+          <button class="${state.activeMode==='contentid-search'?'search-active':''}"
+                  id="button-select-contentid-search">Content ID search</button>
+        </p>
+        <div class="search-panel">`);
+
+    switch(state.activeMode) {
+      case 'keyword-search':
+      html.push(`
+            <div class="govuk-form-group" id="keyword-search-panel">
+              <p class="govuk-body">
+               Type keywords to find pages with title or content containing<br/>
+                <select class="govuk-select" id="and-or">
+                  <option name="and" ${state.combinator === 'and' ? 'selected' : ''}>all the words:</option>
+                  <option name="or" ${state.combinator === 'or' ? 'selected' : ''}>any of the words:</option>
+                </select>
+                <input class="govuk-input govuk-input--width-20" id="keyword" placeholder="eg: cat dog ferret" value="${state.selectedWords}"/>
+
+              <br/>but not:
+
+                <input class="govuk-input govuk-input--width-20" id="excluded-keyword" placeholder="leave blank if no exclusions" value="${state.excludedWords}"/>
+              </p>
+              <div id="search-locations-wrapper">
+                Search in:
+                <ul class="kg-checkboxes" id="search-locations">
+                  <li class="kg-checkboxes__item">
+                    <input class="kg-checkboxes__input"
+                           type="checkbox" id="search-title"
+                           ${state.whereToSearch.title ? 'checked' : ''}/>
+                    <label class="kg-label kg-checkboxes__label">Title</label>
+                  </li>
+                  <li class="kg-checkboxes__item">
+                    <input class="kg-checkboxes__input"
+                           type="checkbox" id="search-description"
+                           ${state.whereToSearch.description ? 'checked' : ''}/>
+                    <label class="kg-label kg-checkboxes__label">Description</label>
+                  </li>
+                  <li class="kg-checkboxes__item">
+                    <input class="kg-checkboxes__input"
+                           type="checkbox" id="search-text"
+                           ${state.whereToSearch.text ? 'checked' : ''}/>
+                    <label class="kg-label kg-checkboxes__label">Text</label>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="kg-checkboxes">
+                <div class="kg-checkboxes__item">
+                  <input class="kg-checkboxes__input"
+                         type="checkbox" id="case-sensitive"
+                         ${state.caseSensitive ? 'checked' : ''}/>
+                  <label class="kg-label kg-checkboxes__label">case sensitive</label>
+                </div>
+              </div>
+              <p class="govuk-body">
+                <button
+                    class="govuk-button ${state.waiting?'govuk-button--secondary':''}"
+                    id="keyword-search">
+                  ${state.waiting?'Searching...':'Search'}
+                </button>
+              </p>
+            </div>
+      `);
+      break;
+      case 'contentid-search':
+      html.push(`
+            <p>Enter one of multiple contentIDs:</p>
+            <div class="govuk-form-group" id="contentid-search-panel">
+              <p class="govuk-body">
+                <textarea class="govuk-textarea" rows="5" id="contentid">${state.contentIds}</textarea>
+              </p>
+              <p class="govuk-body">
+                <button
+                    class="govuk-button ${state.waiting?'govuk-button--secondary':''}"
+                    id="contentid-search">
+                  ${state.waiting?'Searching...':'Search'}
+                </button>
+              </p>
+            </div>
+      `);
+      break;
+    }
+  } else {
   html.push(`
       </div>
       <div id="results">${viewSearchResults(state.searchResults)}</div>
     </main>
   `);
+  }
+
   id('page-content').innerHTML = html.join('');
 
 
@@ -291,10 +299,10 @@ ORDER BY n.pagerank DESC;`
 const viewSearchResults = function(results) {
   const html = [];
   if (results) {
-
+    html.push('<div><button class="govuk-button" id="clear">Back</button></div>');
     html.push('<table class="govuk-table">');
     html.push(`<thead class="govuk-table__head">
-      ${results.records.length} results<br/>
+      <h2 class="govuk-heading-m">${results.records.length} results</h2>
       <div id="show-fields-wrapper">
       Show:
         <ul class="kg-checkboxes" id="show-fields" onclick="handleEvent">
@@ -313,7 +321,6 @@ const viewSearchResults = function(results) {
             <label class="kg-label kg-checkboxes__label">Document type</label>
           </li>
         </ul>
-        <button class="govuk-button" id="clear">Clear results</button>
       </div>
     </thead>
     <tbody class="govuk-table__body">`);
@@ -337,7 +344,7 @@ const viewSearchResults = function(results) {
   }
 
   if (state.searchQuery) {
-    html.push('<h2 class="govuk-heading-s">Cypher query</h2>');
+    html.push('<h2 class="govuk-heading-s">Cypher query:</h2>');
     html.push(`<pre>${state.searchQuery}</pre>`);
   }
 
@@ -358,7 +365,7 @@ const init = async function() {
       state.neo4jDriver = neo4j.driver(state.server, neo4j.auth.basic(state.user, state.password));
       state.statusText = 'starting session';
       state.neo4jSession = state.neo4jDriver.session();
-      state.statusText = 'ready';
+      state.statusText = null;
     }).catch(error => {
       console.warn(error);
       state.statusText('failed to retrieve credentials');
