@@ -1,5 +1,13 @@
 /* global neo4j, makeViz */
 
+const id = x => document.getElementById(x);
+
+
+//==================================================
+// STATE
+//==================================================
+
+
 const state = {
   user: '',
   password: '',
@@ -27,6 +35,12 @@ const state = {
   waiting: false // whether we're waiting for a request to return
 };
 
+
+//==================================================
+// UPDATE
+//==================================================
+
+
 const externalSearchButtonClicked = function() {
   state.searchQuery = `
 MATCH (n:Cid) -[:HYPERLINKS_TO]-> (e:ExternalPage)
@@ -38,13 +52,15 @@ WHERE e.name CONTAINS "${state.externalUrl}" RETURN
     n.contentID,
     n.publishing_app,
     n.first_published_at AS first_published_at,
-    n.public_updated_at AS last_updated
+    n.public_updated_at AS last_updated,
+    e.name
     LIMIT 100`;
   state.neo4jSession.run(state.searchQuery)
     .then(async results => {
       await handleEvent({type:'neo4j-callback-ok', data: results})
     });
 };
+
 
 const contentIdSearchButtonClicked = function() {
   const contentIds = state.contentIds
@@ -149,6 +165,10 @@ const handleEvent = async function(event) {
   view();
 };
 
+
+//==================================================
+// VIEW functions
+//==================================================
 
 const view = function() {
   const html = [];
@@ -271,13 +291,12 @@ const view = function() {
   } else {
   html.push(`
       </div>
-      <div id="results">${viewSearchResults(state.searchResults)}</div>
+      <div id="results">${viewSearchResults(state.activeMode, state.searchResults, state.showFields)}</div>
     </main>
   `);
   }
 
   id('page-content').innerHTML = html.join('');
-
 
   // adding onclick doesn't work
   document.querySelectorAll('button, input[type=checkbox][data-interactive=true]')
@@ -287,9 +306,108 @@ const view = function() {
 };
 
 
+const viewExternalSearchResultsTable = function(records, showFields) {
+  const html = [];
+  html.push(`<table class="govuk-table">
+    <tbody class="govuk-table__body">`);
+  html.push(`<tr class="govuk-table__row"><th scope="row" class="govuk-table__header">Title</th>`);
+  if (showFields.documentType) html.push('<th scope="row" class="govuk-table__header">External URL</th>');
+  html.push(`</tr>`);
+
+  records.forEach(record => {
+    let dict = {};
+    record.keys.forEach((key, index) => dict[key] = record._fields[index]);
+
+    html.push(`<tr class="govuk-table__row">
+      <td class="govuk-table__cell"><a href="${dict.url}">${dict['n.title']}</a></td>
+      <td class="govuk-table__cell">${dict['e.name']}</td>
+    </tr>`);
+  });
+  html.push('</tbody></table>');
+  return html.join('');
+};
+
+const viewSearchResultsTable = function(records, showFields) {
+  const html = [];
+  html.push('<table class="govuk-table">');
+  html.push(`<thead class="govuk-table__head">
+      <div id="show-fields-wrapper">
+      Show:
+        <ul class="kg-checkboxes" id="show-fields" onclick="handleEvent">
+          <li class="kg-checkboxes__item">
+            <input class="kg-checkboxes__input"
+                   data-interactive="true"
+                   type="checkbox" id="show-contentid"
+                   ${showFields.contentId ? 'checked' : ''}/>
+            <label class="kg-label kg-checkboxes__label">content ID</label>
+          </li>
+          <li class="kg-checkboxes__item">
+            <input class="kg-checkboxes__input"
+                   data-interactive="true"
+                   type="checkbox" id="show-doctype"
+                   ${showFields.documentType ? 'checked' : ''}/>
+            <label class="kg-label kg-checkboxes__label">Document type</label>
+          </li>
+        </ul>
+      </div>
+    </thead>
+    <tbody class="govuk-table__body">`);
+  html.push(`<tr class="govuk-table__row"><th scope="row" class="govuk-table__header">Title</th>`);
+  if (showFields.contentId) html.push('<th scope="row" class="govuk-table__header">ContentID</th>');
+  if (showFields.documentType) html.push('<th scope="row" class="govuk-table__header">Type</th>');
+  html.push(`</tr>`);
+
+  records.forEach(record => {
+    let dict = {};
+    record.keys.forEach((key, index) => dict[key] = record._fields[index]);
+
+    html.push(`<tr class="govuk-table__row"><td class="govuk-table__cell"><a href="${dict.url}">${dict['n.title']}</a></td>`);
+    if (showFields.contentId) html.push(`<td class="govuk-table__cell">${dict['n.contentID']}</td>`);
+    if (showFields.documentType) html.push(`<td class="govuk-table__cell">${dict['n.documentType']}</td>`);
+    html.push('</tr>');
+  });
+  html.push('</tbody></table>');
+  return html.join('');
+}
 
 
-const id = x => document.getElementById(x);
+const viewSearchResults = function(mode, results, showFields) {
+  const html = [];
+  if (results && results.records.length > 0) {
+    html.push(`<h2 class="govuk-heading-m">${results.records.length} results found</h2>`);
+    html.push('<div><button class="govuk-button" id="clear">Back</button></div>');
+
+    switch(mode) {
+    case 'keyword-search':
+    case 'contentid-search':
+      html.push(viewSearchResultsTable(results.records, showFields));
+      break;
+    case 'external-search':
+      html.push(viewExternalSearchResultsTable(results.records, showFields));
+      break;
+    default:
+      console.log('unknown mode', mode);
+    }
+  } else {
+    html.push('<h2 class="govuk-heading-m">No results</h2>');
+    html.push('<div><button class="govuk-button" id="clear">Back</button></div>');
+  }
+
+  if (state.searchQuery) {
+    html.push(`
+      <div id="cypher-query">
+      <hr/><h2 class="govuk-heading-s">Cypher query used:</h2>
+      <pre>${state.searchQuery}</pre>
+    `);
+  }
+
+  return html.join('');
+};
+
+
+//==================================================
+// Cypher query methods
+//==================================================
 
 const containsClause = function(field, word, caseSensitive) {
   return caseSensitive ?
@@ -312,8 +430,6 @@ const buildQuery = function(fields, keywords, exclusions, operator, caseSensitiv
     fields.description?'description':null,
     fields.text?'text':null
   ].filter(item => item)
-
-  console.log(caseSensitive)
 
   const inclusionClause = 'WHERE\n' +
     keywords
@@ -347,68 +463,9 @@ LIMIT 100;`
 };
 
 
-const viewSearchResults = function(results) {
-  const html = [];
-  if (results && results.records.length > 0) {
-    html.push(`<h2 class="govuk-heading-m">${results.records.length} results found</h2>`);
-    html.push('<div><button class="govuk-button" id="clear">Back</button></div>');
-    html.push('<table class="govuk-table">');
-    html.push(`<thead class="govuk-table__head">
-      <div id="show-fields-wrapper">
-      Show:
-        <ul class="kg-checkboxes" id="show-fields" onclick="handleEvent">
-          <li class="kg-checkboxes__item">
-            <input class="kg-checkboxes__input"
-                   data-interactive="true"
-                   type="checkbox" id="show-contentid"
-                   ${state.showFields.contentId ? 'checked' : ''}/>
-            <label class="kg-label kg-checkboxes__label">content ID</label>
-          </li>
-          <li class="kg-checkboxes__item">
-            <input class="kg-checkboxes__input"
-                   data-interactive="true"
-                   type="checkbox" id="show-doctype"
-                   ${state.showFields.documentType ? 'checked' : ''}/>
-            <label class="kg-label kg-checkboxes__label">Document type</label>
-          </li>
-        </ul>
-      </div>
-    </thead>
-    <tbody class="govuk-table__body">`);
-    html.push(`<tr class="govuk-table__row"><th scope="row" class="govuk-table__header">Title</th>`);
-    if (state.showFields.contentId) html.push('<th scope="row" class="govuk-table__header">ContentID</th>');
-    if (state.showFields.documentType) html.push('<th scope="row" class="govuk-table__header">Type</th>');
-    html.push(`</tr>`);
-
-
-    results.records.forEach(record => {
-      let dict = {};
-      record.keys.forEach((key, index) => dict[key] = record._fields[index]);
-
-      html.push(`<tr class="govuk-table__row"><td class="govuk-table__cell"><a href="${dict.url}">${dict['n.title']}</a></td>`);
-      if (state.showFields.contentId) html.push(`<td class="govuk-table__cell">${dict['n.contentID']}</td>`);
-      if (state.showFields.documentType) html.push(`<td class="govuk-table__cell">${dict['n.documentType']}</td>`);
-      html.push('</th>');
-    });
-
-    html.push('</tbody></table>');
-  } else {
-    html.push('<h2 class="govuk-heading-m">No results</h2>');
-    html.push('<div><button class="govuk-button" id="clear">Back</button></div>');
-  }
-
-  if (state.searchQuery) {
-    html.push(`
-      <div id="cypher-query">
-      <hr/><h2 class="govuk-heading-s">Cypher query used:</h2>
-      <pre>${state.searchQuery}</pre>
-    `);
-  }
-
-  return html.join('');
-};
-
-
+//==================================================
+// INIT
+//==================================================
 
 const init = async function() {
   // First, look if there's a file with authentication params
@@ -428,6 +485,12 @@ const init = async function() {
       state.statusText('failed to retrieve credentials');
     });
 };
+
+
+//==================================================
+// START
+//==================================================
+
 
 (async () => {
   await init();
