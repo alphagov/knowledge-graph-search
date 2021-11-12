@@ -6607,9 +6607,17 @@ pre {
   margin: 0;
 }
 
+#show-fields-wrapper {
+  margin: 2em 0;
+}
+
 .govuk-button, .govuk-textarea {
-  margin-top: 3px;
+  margin-top: 10px;
   margin-bottom: 0;
+}
+
+#cypher-query {
+  margin-top: 2em;
 }
 
 #clear {

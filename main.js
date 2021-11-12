@@ -349,12 +349,11 @@ LIMIT 100;`
 
 const viewSearchResults = function(results) {
   const html = [];
-  html.push('<div><button class="govuk-button" id="clear">Back</button></div>');
-
   if (results && results.records.length > 0) {
+    html.push(`<h2 class="govuk-heading-m">${results.records.length} results found</h2>`);
+    html.push('<div><button class="govuk-button" id="clear">Back</button></div>');
     html.push('<table class="govuk-table">');
     html.push(`<thead class="govuk-table__head">
-      <h2 class="govuk-heading-m">${results.records.length} results</h2>
       <div id="show-fields-wrapper">
       Show:
         <ul class="kg-checkboxes" id="show-fields" onclick="handleEvent">
@@ -395,11 +394,15 @@ const viewSearchResults = function(results) {
     html.push('</tbody></table>');
   } else {
     html.push('<h2 class="govuk-heading-m">No results</h2>');
+    html.push('<div><button class="govuk-button" id="clear">Back</button></div>');
   }
 
   if (state.searchQuery) {
-    html.push('<h2 class="govuk-heading-s">Cypher query:</h2>');
-    html.push(`<pre>${state.searchQuery}</pre>`);
+    html.push(`
+      <div id="cypher-query">
+      <hr/><h2 class="govuk-heading-s">Cypher query used:</h2>
+      <pre>${state.searchQuery}</pre>
+    `);
   }
 
   return html.join('');
