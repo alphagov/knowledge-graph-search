@@ -371,11 +371,42 @@ const viewSearchResultsTable = function(records, showFields) {
 }
 
 
+const csvFromResults = function(searchResults) {
+
+  const csv = []
+  console.log(searchResults.records)
+
+  csv.push(searchResults.records[0].keys.join()); // heading
+
+  searchResults.records.forEach(record => {
+    const line = [];
+    record._fields.forEach(field => {
+      field = field.toString();
+      if (field.includes(',')) {
+        field = `"${field.replace('"', '""')}"`;
+      } else {
+        if (field.includes('"')) {
+          field = '"' + field.replace('"', '""') + '"';
+        }
+      }
+      line.push(field);
+    });
+    csv.push(line.join());
+  });
+  return csv.join('\n');
+};
+
+
 const viewSearchResults = function(mode, results, showFields) {
   const html = [];
   if (results && results.records.length > 0) {
     html.push(`<h2 class="govuk-heading-m">${results.records.length} results found</h2>`);
-    html.push('<div><button class="govuk-button" id="clear">Back</button></div>');
+    html.push('<div><button class="govuk-button" id="clear">Back</button> ');
+
+    const csv = csvFromResults(state.searchResults);
+    const file = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(file); // TODO: use window.URL.revokeObjectURL(url);  after
+    html.push(`<a class="govuk-link" href="${url}" download="export.csv">Export as CSV</a></div>`);
 
     switch(mode) {
     case 'keyword-search':
@@ -400,6 +431,14 @@ const viewSearchResults = function(mode, results, showFields) {
       <pre>${state.searchQuery}</pre>
     `);
   }
+
+  html.push(`
+    <div id="raw-results">
+      <hr/><h2 class="govuk-heading-s">Raw results:</h2>
+      <pre>${csvFromResults(state.searchResults)}</pre>
+    </div>
+  `);
+
 
   return html.join('');
 };
