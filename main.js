@@ -19,6 +19,7 @@ const state = {
   excludedWords: '',
   contentIds: '',
   externalUrl: '',
+  linkSearchUrl: '',
   searchQuery: null,
   searchResults: null,
   showFields: {
@@ -31,7 +32,8 @@ const state = {
     text: false
   },
   caseSensitive: false,
-  activeMode: 'keyword-search', // or 'contentid-search', 'external-search'
+  activeMode: 'keyword-search',
+  //  possible values: 'keyword-search', 'contentid-search', 'external-search', 'link-search'
   waiting: false // whether we're waiting for a request to return
 };
 
@@ -41,10 +43,30 @@ const state = {
 //==================================================
 
 
-const externalSearchButtonClicked = function() {
+const linkSearchButtonClicked = function(url) {
+  const justThePath = url.replace(/.*\.gov.uk/, '');
+  state.searchQuery = `
+    MATCH (t:Cid)<-[HYPERLINKS_TO]-(n:Cid) WHERE t.name="${justThePath}" RETURN
+    "https://www.gov.uk"+n.name AS url,
+    n.name AS slug,
+    n.title,
+    n.documentType,
+    n.contentID,
+    n.publishing_app,
+    n.first_published_at AS first_published_at,
+    n.public_updated_at AS last_updated
+    LIMIT 100`;
+  state.neo4jSession.run(state.searchQuery)
+    .then(async results => {
+      await handleEvent({type:'neo4j-callback-ok', data: results})
+    });
+};
+
+
+const externalSearchButtonClicked = function(url) {
   state.searchQuery = `
 MATCH (n:Cid) -[:HYPERLINKS_TO]-> (e:ExternalPage)
-WHERE e.name CONTAINS "${state.externalUrl}" RETURN
+WHERE e.name CONTAINS "${url}" RETURN
     "https://www.gov.uk"+n.name AS url,
     n.name AS slug,
     n.title,
@@ -131,7 +153,12 @@ const handleEvent = async function(event) {
       case "external-search":
         state.externalUrl = id('external').value;
         state.waiting = true;
-        externalSearchButtonClicked();
+        externalSearchButtonClicked(state.externalUrl);
+        break;
+      case "link-search":
+        state.linkSearchUrl = id('link-search').value;
+        state.waiting = true;
+        linkSearchButtonClicked(state.linkSearchUrl);
         break;
       case "clear":
         state.searchResults = null;
@@ -150,6 +177,9 @@ const handleEvent = async function(event) {
         break;
       case 'button-select-external-search':
         state.activeMode = 'external-search';
+        break;
+      case 'button-select-link-search':
+        state.activeMode = 'link-search';
         break;
       default:
         console.log('unknown DOM event received:', event);
@@ -189,6 +219,8 @@ const view = function() {
                   id="button-select-contentid-search">Content ID search</button>
           <button class="${state.activeMode==='external-search'?'search-active':''}"
                   id="button-select-external-search">External page search</button>
+          <button class="${state.activeMode==='link-search'?'search-active':''}"
+                  id="button-select-link-search">Link search</button>
         </p>
         <div class="search-panel">`);
 
@@ -285,6 +317,25 @@ const view = function() {
             </div>
       `);
       break;
+      case 'link-search':
+      html.push(`
+            <p>Enter a URL to find all pages linking to it</p>
+            <div class="govuk-form-group" id="link-search-panel">
+              <p class="govuk-body">
+                <input class="govuk-input" id="link-search"
+                       value="${state.linkSearchUrl}"
+                       placeholder="eg: /benefits"/>
+              </p>
+              <p class="govuk-body">
+                <button
+                    class="govuk-button ${state.waiting?'govuk-button--secondary':''}"
+                    id="link-search">
+                  ${state.waiting?'Searching...':'Search'}
+                </button>
+              </p>
+            </div>
+      `);
+      break;
       default:
         console.log('invalid mode', state.activeMode);
     }
@@ -326,6 +377,28 @@ const viewExternalSearchResultsTable = function(records, showFields) {
   html.push('</tbody></table>');
   return html.join('');
 };
+
+const viewLinkSearchResultsTable = function(records, showFields) {
+  const html = [];
+  html.push(`<table class="govuk-table">
+    <tbody class="govuk-table__body">`);
+  html.push(`<tr class="govuk-table__row"><th scope="row" class="govuk-table__header">Title</th>`);
+  if (showFields.documentType) html.push('<th scope="row" class="govuk-table__header">URL</th>');
+  html.push(`</tr>`);
+
+  records.forEach(record => {
+    let dict = {};
+    record.keys.forEach((key, index) => dict[key] = record._fields[index]);
+
+    html.push(`<tr class="govuk-table__row">
+      <td class="govuk-table__cell"><a href="${dict.url}">${dict['n.title']}</a></td>
+      <td class="govuk-table__cell">${dict.slug}</td>
+    </tr>`);
+  });
+  html.push('</tbody></table>');
+  return html.join('');
+};
+
 
 const viewSearchResultsTable = function(records, showFields) {
   const html = [];
@@ -415,6 +488,9 @@ const viewSearchResults = function(mode, results, showFields) {
       break;
     case 'external-search':
       html.push(viewExternalSearchResultsTable(results.records, showFields));
+      break;
+    case 'link-search':
+      html.push(viewLinkSearchResultsTable(results.records, showFields));
       break;
     default:
       console.log('unknown mode', mode);
