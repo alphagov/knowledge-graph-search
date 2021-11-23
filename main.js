@@ -23,8 +23,11 @@ const state = {
   searchQuery: null,
   searchResults: null,
   showFields: {
-    contentId: true,
-    documentType: true
+    contentId: false,
+    documentType: true,
+    publishingApp: true,
+    firstPublished: true,
+    lastUpdated: true
   },
   whereToSearch: {
     title: true,
@@ -46,15 +49,8 @@ const state = {
 const linkSearchButtonClicked = function(url) {
   const justThePath = url.replace(/.*\.gov.uk/, '');
   state.searchQuery = `
-    MATCH (t:Cid)<-[HYPERLINKS_TO]-(n:Cid) WHERE t.name="${justThePath}" RETURN
-    "https://www.gov.uk"+n.name AS url,
-    n.name AS slug,
-    n.title,
-    n.documentType,
-    n.contentID,
-    n.publishing_app,
-    n.first_published_at AS first_published_at,
-    n.public_updated_at AS last_updated
+    MATCH (t:Cid)<-[HYPERLINKS_TO]-(n:Cid) WHERE t.name="${justThePath}"
+    RETURN ${returnFields()}
     LIMIT 100`;
   state.neo4jSession.run(state.searchQuery)
     .then(async results => {
@@ -65,17 +61,11 @@ const linkSearchButtonClicked = function(url) {
 
 const externalSearchButtonClicked = function(url) {
   state.searchQuery = `
-MATCH (n:Cid) -[:HYPERLINKS_TO]-> (e:ExternalPage)
-WHERE e.name CONTAINS "${url}" RETURN
-    "https://www.gov.uk"+n.name AS url,
-    n.name AS slug,
-    n.title,
-    n.documentType,
-    n.contentID,
-    n.publishing_app,
-    n.first_published_at AS first_published_at,
-    n.public_updated_at AS last_updated,
-    e.name
+    MATCH (n:Cid) -[:HYPERLINKS_TO]-> (e:ExternalPage)
+    WHERE e.name CONTAINS "${url}"
+    RETURN
+    ${returnFields()},
+    e.name AS externalUrl
     LIMIT 100`;
   state.neo4jSession.run(state.searchQuery)
     .then(async results => {
@@ -90,15 +80,9 @@ const contentIdSearchButtonClicked = function() {
     .filter(d=>d.length>0)
     .map(s => s.toLowerCase());
   const whereStatement = contentIds.map(cid => `n.contentID="${cid}" `).join(' OR ');
-  state.searchQuery = `MATCH (n:Cid) WHERE ${whereStatement} RETURN
-    "https://www.gov.uk"+n.name AS url,
-    n.name AS slug,
-    n.title,
-    n.documentType,
-    n.contentID,
-    n.publishing_app,
-    n.first_published_at AS first_published_at,
-    n.public_updated_at AS last_updated
+  state.searchQuery = `MATCH (n:Cid) WHERE ${whereStatement}
+    RETURN
+    ${returnFields()}
     LIMIT 100`;
   state.neo4jSession.run(state.searchQuery)
     .then(async results => {
@@ -112,19 +96,17 @@ const searchButtonClicked = function() {
     state.statusText = 'Word too short';
     return;
   }
-
   const keywords = state.selectedWords
     .split(/[,;\s]+/)
     .filter(d=>d.length>0);
-
   const excludedKeywords = state.excludedWords
     .split(/[,;\s]+/)
     .filter(d=>d.length>0)
     .map(s => s.toLowerCase());
-
   state.searchQuery = buildQuery(state.whereToSearch, keywords, excludedKeywords, state.combinator, state.caseSensitive);
   state.neo4jSession.run(state.searchQuery)
     .then(async results => {
+      console.log(results);
       await handleEvent({type:'neo4j-callback-ok', data: results})
     });
 };
@@ -168,6 +150,15 @@ const handleEvent = async function(event) {
         break;
       case "show-doctype":
         state.showFields.documentType = id('show-doctype').checked;
+        break;
+      case "show-publishingapp":
+        state.showFields.publishingApp = id('show-publishingapp').checked;
+        break;
+      case "show-firstpublished":
+        state.showFields.firstPublished = id('show-firstpublished').checked;
+        break;
+      case "show-lastupdated":
+        state.showFields.lastUpdated = id('show-lastupdated').checked;
         break;
       case 'button-select-keyword-search':
         state.activeMode = 'keyword-search';
@@ -370,8 +361,8 @@ const viewExternalSearchResultsTable = function(records, showFields) {
     record.keys.forEach((key, index) => dict[key] = record._fields[index]);
 
     html.push(`<tr class="govuk-table__row">
-      <td class="govuk-table__cell"><a href="${dict.url}">${dict['n.title']}</a></td>
-      <td class="govuk-table__cell">${dict['e.name']}</td>
+      <td class="govuk-table__cell"><a href="${dict.url}">${dict.title}</a></td>
+      <td class="govuk-table__cell">${dict.externalUrl}</td>
     </tr>`);
   });
   html.push('</tbody></table>');
@@ -391,7 +382,7 @@ const viewLinkSearchResultsTable = function(records, showFields) {
     record.keys.forEach((key, index) => dict[key] = record._fields[index]);
 
     html.push(`<tr class="govuk-table__row">
-      <td class="govuk-table__cell"><a href="${dict.url}">${dict['n.title']}</a></td>
+      <td class="govuk-table__cell"><a href="${dict.url}">${dict.title}</a></td>
       <td class="govuk-table__cell">${dict.slug}</td>
     </tr>`);
   });
@@ -421,6 +412,27 @@ const viewSearchResultsTable = function(records, showFields) {
                    ${showFields.documentType ? 'checked' : ''}/>
             <label class="kg-label kg-checkboxes__label">Document type</label>
           </li>
+          <li class="kg-checkboxes__item">
+            <input class="kg-checkboxes__input"
+                   data-interactive="true"
+                   type="checkbox" id="show-publishingapp"
+                   ${showFields.publishingApp ? 'checked' : ''}/>
+            <label class="kg-label kg-checkboxes__label">Publishing app</label>
+          </li>
+          <li class="kg-checkboxes__item">
+            <input class="kg-checkboxes__input"
+                   data-interactive="true"
+                   type="checkbox" id="show-firstpublished"
+                   ${showFields.firstPublished ? 'checked' : ''}/>
+            <label class="kg-label kg-checkboxes__label">First published</label>
+          </li>
+          <li class="kg-checkboxes__item">
+            <input class="kg-checkboxes__input"
+                   data-interactive="true"
+                   type="checkbox" id="show-lastupdated"
+                   ${showFields.lastUpdated ? 'checked' : ''}/>
+            <label class="kg-label kg-checkboxes__label">Last Updated</label>
+          </li>
         </ul>
       </div>
     </thead>
@@ -428,15 +440,33 @@ const viewSearchResultsTable = function(records, showFields) {
   html.push(`<tr class="govuk-table__row"><th scope="row" class="govuk-table__header">Title</th>`);
   if (showFields.contentId) html.push('<th scope="row" class="govuk-table__header">ContentID</th>');
   if (showFields.documentType) html.push('<th scope="row" class="govuk-table__header">Type</th>');
+  if (showFields.publishingApp) html.push('<th scope="row" class="govuk-table__header">Publishing app</th>');
+  if (showFields.firstPublished) html.push(
+    '<th scope="row" class="govuk-table__header">First published</th>'
+  );
+  if (showFields.lastUpdated) html.push(
+    '<th scope="row" class="govuk-table__header">Last updated</th>'
+  );
   html.push(`</tr>`);
 
   records.forEach(record => {
     let dict = {};
     record.keys.forEach((key, index) => dict[key] = record._fields[index]);
 
-    html.push(`<tr class="govuk-table__row"><td class="govuk-table__cell"><a href="${dict.url}">${dict['n.title']}</a></td>`);
-    if (showFields.contentId) html.push(`<td class="govuk-table__cell">${dict['n.contentID']}</td>`);
-    if (showFields.documentType) html.push(`<td class="govuk-table__cell">${dict['n.documentType']}</td>`);
+    html.push(`<tr class="govuk-table__row"><td class="govuk-table__cell"><a href="${dict.url}">${dict.title}</a></td>`);
+    if (showFields.contentId) html.push(`<td class="govuk-table__cell">${dict.contentID}</td>`);
+    if (showFields.documentType) html.push(`<td class="govuk-table__cell">${dict.documentType}</td>`);
+    if (showFields.publishingApp) html.push(`<td class="govuk-table__cell">${dict.publishingApp}</td>`);
+    if (showFields.firstPublished) html.push(`
+      <td class="govuk-table__cell">
+        ${dict.firstPublished.slice(0,-7).replace(' ', '<br/>')}
+      </td>
+    `);
+    if (showFields.lastUpdated) html.push(`
+      <td class="govuk-table__cell">
+        ${dict.lastUpdated.slice(0,-7).replace(' ', '<br/>')}
+      </td>
+    `);
     html.push('</tr>');
   });
   html.push('</tbody></table>');
@@ -445,12 +475,8 @@ const viewSearchResultsTable = function(records, showFields) {
 
 
 const csvFromResults = function(searchResults) {
-
-  const csv = []
-  console.log(searchResults.records)
-
+  const csv = [];
   csv.push(searchResults.records[0].keys.join()); // heading
-
   searchResults.records.forEach(record => {
     const line = [];
     record._fields.forEach(field => {
@@ -539,6 +565,19 @@ const multiContainsClause = function(fields, word, caseSensitive) {
     .join(' OR ') + ')'
 }
 
+const returnFields = function() {
+  return `
+    "https://www.gov.uk"+n.name AS url,
+    n.name AS slug,
+    n.title AS title,
+    n.documentType AS documentType,
+    n.contentID AS contentID,
+    n.publishing_app AS publishingApp,
+    n.first_published_at AS firstPublished,
+    n.public_updated_at AS lastUpdated
+  `;
+};
+
 const buildQuery = function(fields, keywords, exclusions, operator, caseSensitive) {
   const fieldsToSearch = [
     fields.title?'title':null,
@@ -561,14 +600,7 @@ MATCH
 ${inclusionClause}
 ${exclusionClause}
 RETURN
-"https://www.gov.uk"+n.name AS url,
-n.name AS slug,
-n.title,
-n.documentType,
-n.contentID,
-n.publishing_app,
-n.first_published_at AS first_published_at,
-n.public_updated_at AS last_updated,
+${returnFields()},
 COLLECT
 (o.name) AS primary_organisation,
 COLLECT
