@@ -22,6 +22,7 @@ const state = {
   linkSearchUrl: '',
   searchQuery: null,
   searchResults: null,
+  maxNumberOfResultsRequested: 100,
   showFields: {
     contentId: false,
     documentType: true,
@@ -51,7 +52,7 @@ const linkSearchButtonClicked = function(url) {
   state.searchQuery = `
     MATCH (t:Cid)<-[HYPERLINKS_TO]-(n:Cid) WHERE t.name="${justThePath}"
     RETURN ${returnFields()}
-    LIMIT 100`;
+    LIMIT ${state.maxNumberOfResultsRequested}`;
   state.neo4jSession.run(state.searchQuery)
     .then(async results => {
       await handleEvent({type:'neo4j-callback-ok', data: results})
@@ -66,7 +67,7 @@ const externalSearchButtonClicked = function(url) {
     RETURN
     ${returnFields()},
     e.name AS externalUrl
-    LIMIT 100`;
+    LIMIT ${state.maxNumberOfResultsRequested}`;
   state.neo4jSession.run(state.searchQuery)
     .then(async results => {
       await handleEvent({type:'neo4j-callback-ok', data: results})
@@ -83,7 +84,7 @@ const contentIdSearchButtonClicked = function() {
   state.searchQuery = `MATCH (n:Cid) WHERE ${whereStatement}
     RETURN
     ${returnFields()}
-    LIMIT 100`;
+    LIMIT ${state.maxNumberOfResultsRequested}`;
   state.neo4jSession.run(state.searchQuery)
     .then(async results => {
       await handleEvent({type:'neo4j-callback-ok', data: results})
@@ -124,6 +125,7 @@ const handleEvent = async function(event) {
         state.whereToSearch.description = id('search-description').checked;
         state.whereToSearch.text = id('search-text').checked;
         state.caseSensitive = id('case-sensitive').checked;
+        state.maxNumberOfResultsRequested = id('nb-results').value;
         state.waiting = true;
         searchButtonClicked();
         break;
@@ -261,6 +263,10 @@ const view = function() {
                          ${state.caseSensitive ? 'checked' : ''}/>
                   <label class="kg-label kg-checkboxes__label">case sensitive</label>
                 </div>
+              </div>
+              <div>
+                Max number of results:
+                <input class="govuk-input govuk-input--width-10" id="nb-results" type="number" value="${state.maxNumberOfResultsRequested}"/>
               </div>
               <p class="govuk-body">
                 <button
@@ -606,7 +612,7 @@ COLLECT
 COLLECT
 (o2.name) AS all_organisations, n.pagerank AS popularity
 ORDER BY n.pagerank DESC
-LIMIT 100;`
+LIMIT ${state.maxNumberOfResultsRequested};`
 };
 
 
