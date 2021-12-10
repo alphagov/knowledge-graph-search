@@ -280,7 +280,7 @@ const view = function() {
       break;
       case 'contentid-search':
       html.push(`
-            <p>Enter one of multiple contentIDs:</p>
+            <p>Enter one or more contentIDs:</p>
             <div class="govuk-form-group" id="contentid-search-panel">
               <p class="govuk-body">
                 <textarea class="govuk-textarea" rows="5" id="contentid">${state.contentIds}</textarea>
