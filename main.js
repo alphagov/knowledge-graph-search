@@ -487,13 +487,17 @@ const csvFromResults = function(searchResults) {
     searchResults.records.forEach(record => {
       const line = [];
       record._fields.forEach(field => {
-        field = field.toString();
-        if (field.includes(',')) {
-          field = `"${field.replace('"', '""')}"`;
-        } else {
-          if (field.includes('"')) {
-            field = '"' + field.replace('"', '""') + '"';
+        if (field) {
+          field = field.toString();
+          if (field.includes(',')) {
+            field = `"${field.replace('"', '""')}"`;
+          } else {
+            if (field.includes('"')) {
+              field = '"' + field.replace('"', '""') + '"';
+            }
           }
+        } else {
+          field = '';
         }
         line.push(field);
       });
