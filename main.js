@@ -12,7 +12,7 @@ const state = {
   user: '',
   password: '',
   server: '',
-  statusText: 'starting',
+  errorText: null,
   neo4jSession: null,
   combinator: 'and', // or 'or'
   selectedWords: '',
@@ -94,21 +94,23 @@ const contentIdSearchButtonClicked = function() {
 
 const searchButtonClicked = function() {
   if (state.selectedWords.length < 3) {
-    state.statusText = 'Word too short';
-    return;
+    state.errorText = 'Please make your search terms longer to avoid returning too many results';
+    state.waiting = false;
+  } else {
+    state.errorText = null;
+    const keywords = state.selectedWords
+          .split(/[,;\s]+/)
+          .filter(d=>d.length>0);
+    const excludedKeywords = state.excludedWords
+          .split(/[,;\s]+/)
+          .filter(d=>d.length>0)
+          .map(s => s.toLowerCase());
+    state.searchQuery = buildQuery(state.whereToSearch, keywords, excludedKeywords, state.combinator, state.caseSensitive);
+    state.neo4jSession.run(state.searchQuery)
+      .then(async results => {
+        await handleEvent({type:'neo4j-callback-ok', data: results})
+      });
   }
-  const keywords = state.selectedWords
-    .split(/[,;\s]+/)
-    .filter(d=>d.length>0);
-  const excludedKeywords = state.excludedWords
-    .split(/[,;\s]+/)
-    .filter(d=>d.length>0)
-    .map(s => s.toLowerCase());
-  state.searchQuery = buildQuery(state.whereToSearch, keywords, excludedKeywords, state.combinator, state.caseSensitive);
-  state.neo4jSession.run(state.searchQuery)
-    .then(async results => {
-      await handleEvent({type:'neo4j-callback-ok', data: results})
-    });
 };
 
 
@@ -177,12 +179,15 @@ const handleEvent = async function(event) {
         console.log('unknown DOM event received:', event);
       }
     break;
-  case 'neo4j-callback-ok': // non-dom event
+
+  // non-dom events
+  case 'neo4j-callback-ok':
     state.searchResults = event.data;
     state.waiting = false;
+    state.errorText = null;
   break;
   default:
-    console.log('unknown event', event);
+    console.log('unknown event:', event);
   }
   view();
 };
@@ -199,8 +204,12 @@ const view = function() {
       <h1 class="govuk-heading-xl">Search the Knowledge Graph</h1>
       <h2 class="govuk-heading-s">Please note that you must be on the GDS VPN for searches to work</h2>`);
 
-  if (state.statusText) {
-    html.push(`<p class="govuk-body"><span>Status: </span>${state.statusText}</p>`);
+  if (state.errorText) {
+    html.push(`
+      <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+        <h2 class="govuk-error-summary__title" id="error-summary-title">Error</h2>
+        <p class="govuk-body">${state.errorText}</p>
+      </div>`)
   }
 
   if (state.searchResults === null) {
@@ -638,12 +647,11 @@ const init = async function() {
       state.user = data.user;
       state.password = data.password;
       state.neo4jDriver = neo4j.driver(state.server, neo4j.auth.basic(state.user, state.password));
-      state.statusText = 'starting session';
       state.neo4jSession = state.neo4jDriver.session();
-      state.statusText = null;
+      state.errorText = null;
     }).catch(error => {
       console.warn(error);
-      state.statusText('failed to retrieve credentials');
+      state.errorText('Failed to retrieve credentials to connect to the Knowledge Graph');
     });
 };
 
