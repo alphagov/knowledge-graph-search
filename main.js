@@ -92,17 +92,30 @@ const contentIdSearchButtonClicked = function() {
 };
 
 
+
+const splitKeywords = function(keywords) {
+  var regexp = /[^\s"]+|"([^"]*)"/gi;
+  var output = [];
+  let match;
+  do {
+    match = regexp.exec(keywords);
+    if (match) {
+        output.push(match[1] ? match[1] : match[0]);
+    }
+  } while (match);
+  return output;
+};
+
 const searchButtonClicked = function() {
   if (state.selectedWords.length < 3) {
     state.errorText = 'Please make your search terms longer to avoid returning too many results';
     state.waiting = false;
   } else {
     state.errorText = null;
-    const keywords = state.selectedWords
-          .split(/[,;\s]+/)
-          .filter(d=>d.length>0);
-    const excludedKeywords = state.excludedWords
-          .split(/[,;\s]+/)
+    const keywords = splitKeywords(state.selectedWords)
+          .filter(d=>d.length>0)
+          .map(s => s.toLowerCase());
+    const excludedKeywords = splitKeywords(state.excludedWords)
           .filter(d=>d.length>0)
           .map(s => s.toLowerCase());
     state.searchQuery = buildQuery(state.whereToSearch, keywords, excludedKeywords, state.combinator, state.caseSensitive);
@@ -236,11 +249,11 @@ const view = function() {
                   <option name="and" ${state.combinator === 'and' ? 'selected' : ''}>all the words:</option>
                   <option name="or" ${state.combinator === 'or' ? 'selected' : ''}>any of the words:</option>
                 </select>
-                <input class="govuk-input govuk-input--width-20" id="keyword" placeholder="eg: cat dog ferret" value="${state.selectedWords}"/>
+                <input class="govuk-input govuk-input--width-20" id="keyword" placeholder="eg: cat dog &quot;health certificate&quot;" value='${state.selectedWords}'/>
 
               <br/>but not:
 
-                <input class="govuk-input govuk-input--width-20" id="excluded-keyword" placeholder="leave blank if no exclusions" value="${state.excludedWords}"/>
+                <input class="govuk-input govuk-input--width-20" id="excluded-keyword" placeholder="leave blank if no exclusions" value='${state.excludedWords}'/>
               </p>
               <div id="search-locations-wrapper">
                 Search in:
