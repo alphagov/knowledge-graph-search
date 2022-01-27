@@ -1,6 +1,38 @@
-/* global neo4j, makeViz */
+/* global neo4j */
+
+
+//==================================================
+// Utils
+//==================================================
+
 
 const id = x => document.getElementById(x);
+
+
+const tagBody = '(?:[^"\'>]|"[^"]*"|\'[^\']*\')*';
+
+const tagOrComment = new RegExp(
+    '<(?:'
+    // Comment body.
+    + '!--(?:(?:-*[^->])*--+|-?)'
+    // Special "raw text" elements whose content should be elided.
+    + '|script\\b' + tagBody + '>[\\s\\S]*?</script\\s*'
+    + '|style\\b' + tagBody + '>[\\s\\S]*?</style\\s*'
+    // Regular name
+    + '|/?[a-z]'
+    + tagBody
+    + ')>',
+    'gi');
+
+const sanitise = function(text) {
+  let oldText;
+  do {
+    oldText = text;
+    text = text.replace(tagOrComment, '');
+  } while (text !== oldText);
+  return text.replace(/</g, '&lt;').replace('"', '&quot;');
+};
+
 
 
 //==================================================
@@ -132,14 +164,14 @@ const handleEvent = async function(event) {
     case "dom":
       switch(event.id) {
       case "keyword-search":
-        state.selectedWords = id('keyword').value;
-        state.excludedWords = id('excluded-keyword').value;
+        state.selectedWords = sanitise(id('keyword').value);
+        state.excludedWords = sanitise(id('excluded-keyword').value);
         state.combinator = id('and-or').selectedIndex == 0 ? 'AND' : 'OR';
         state.whereToSearch.title = id('search-title').checked;
         state.whereToSearch.description = id('search-description').checked;
         state.whereToSearch.text = id('search-text').checked;
         state.caseSensitive = id('case-sensitive').checked;
-        state.maxNumberOfResultsRequested = id('nb-results').value;
+        state.maxNumberOfResultsRequested = sanitise(id('nb-results').value);
         state.waiting = true;
         searchButtonClicked();
         break;
@@ -249,11 +281,11 @@ const view = function() {
                   <option name="and" ${state.combinator === 'and' ? 'selected' : ''}>all the words:</option>
                   <option name="or" ${state.combinator === 'or' ? 'selected' : ''}>any of the words:</option>
                 </select>
-                <input class="govuk-input govuk-input--width-20" id="keyword" placeholder="eg: cat dog &quot;health certificate&quot;" value='${state.selectedWords}'/>
+                <input class="govuk-input govuk-input--width-20" id="keyword" placeholder="eg: cat dog &quot;health certificate&quot;" value='${sanitise(state.selectedWords)}'/>
 
               <br/>but not:
 
-                <input class="govuk-input govuk-input--width-20" id="excluded-keyword" placeholder="leave blank if no exclusions" value='${state.excludedWords}'/>
+                <input class="govuk-input govuk-input--width-20" id="excluded-keyword" placeholder="leave blank if no exclusions" value='${sanitise(state.excludedWords)}'/>
               </p>
               <div id="search-locations-wrapper">
                 Search in:
