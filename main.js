@@ -60,7 +60,8 @@ const state = {
     documentType: true,
     publishingApp: true,
     firstPublished: true,
-    lastUpdated: true
+    lastUpdated: true,
+    taxons: false
   },
   whereToSearch: {
     title: true,
@@ -82,7 +83,9 @@ const state = {
 const linkSearchButtonClicked = async function(url) {
   const justThePath = url.replace(/.*\.gov.uk/, '');
   state.searchQuery = `
-    MATCH (t:Cid)<-[HYPERLINKS_TO]-(n:Cid) WHERE t.name="${justThePath}"
+    MATCH (t:Cid)<-[HYPERLINKS_TO]-(n:Cid)
+    MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
+    WHERE t.name="${justThePath}"
     RETURN ${returnFields()}
     LIMIT ${state.maxNumberOfResultsRequested}`;
   const queryResults = await state.neo4jSession.readTransaction(tx =>
@@ -94,6 +97,7 @@ const linkSearchButtonClicked = async function(url) {
 const externalSearchButtonClicked = async function(url) {
   state.searchQuery = `
     MATCH (n:Cid) -[:HYPERLINKS_TO]-> (e:ExternalPage)
+    MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
     WHERE e.name CONTAINS "${url}"
     RETURN
     ${returnFields()},
@@ -111,7 +115,10 @@ const contentIdSearchButtonClicked = async function() {
     .filter(d=>d.length>0)
     .map(s => s.toLowerCase());
   const whereStatement = contentIds.map(cid => `n.contentID="${cid}" `).join(' OR ');
-  state.searchQuery = `MATCH (n:Cid) WHERE ${whereStatement}
+  state.searchQuery = `
+    MATCH (n:Cid)
+    MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
+    WHERE ${whereStatement}
     RETURN
     ${returnFields()}
     LIMIT ${state.maxNumberOfResultsRequested}`;
@@ -203,6 +210,9 @@ const handleEvent = async function(event) {
         break;
       case "show-lastupdated":
         state.showFields.lastUpdated = id('show-lastupdated').checked;
+        break;
+      case "show-taxons":
+        state.showFields.taxons = id('show-taxons').checked;
         break;
       case 'button-select-keyword-search':
         state.activeMode = 'keyword-search';
@@ -489,6 +499,13 @@ const viewSearchResultsTable = function(records, showFields) {
                    ${showFields.lastUpdated ? 'checked' : ''}/>
             <label class="kg-label kg-checkboxes__label">Last Updated</label>
           </li>
+          <li class="kg-checkboxes__item">
+            <input class="kg-checkboxes__input"
+                   data-interactive="true"
+                   type="checkbox" id="show-taxons"
+                   ${showFields.taxons ? 'checked' : ''}/>
+            <label class="kg-label kg-checkboxes__label">Taxons</label>
+          </li>
         </ul>
       </div>
     </thead>
@@ -502,6 +519,9 @@ const viewSearchResultsTable = function(records, showFields) {
   );
   if (showFields.lastUpdated) html.push(
     '<th scope="row" class="govuk-table__header">Last updated</th>'
+  );
+  if (showFields.taxons) html.push(
+    '<th scope="row" class="govuk-table__header">Taxons</th>'
   );
   html.push(`</tr>`);
 
@@ -523,6 +543,7 @@ const viewSearchResultsTable = function(records, showFields) {
         ${dict.lastUpdated.slice(0,-7).replace(' ', '<br/>')}
       </td>
     `);
+    if (showFields.taxons) html.push(`<td class="govuk-table__cell">${dict.taxons.join()}</td>`);
     html.push('</tr>');
   });
   html.push('</tbody></table>');
@@ -638,7 +659,8 @@ const returnFields = function() {
     n.contentID AS contentID,
     n.publishing_app AS publishingApp,
     n.first_published_at AS firstPublished,
-    n.public_updated_at AS lastUpdated
+    n.public_updated_at AS lastUpdated,
+    COLLECT (taxon.name) AS taxons
   `;
 };
 
@@ -657,20 +679,17 @@ const buildQuery = function(fields, keywords, exclusions, operator, caseSensitiv
   const exclusionClause = exclusions.length ?
     ('WITH * WHERE NOT ' + exclusions.map(word => multiContainsClause(fieldsToSearch, word, caseSensitive)).join(`\n OR `)) : '';
 
-  return `MATCH
-(n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
-MATCH
-(n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
-${inclusionClause}
-${exclusionClause}
-RETURN
-${returnFields()},
-COLLECT
-(o.name) AS primary_organisation,
-COLLECT
-(o2.name) AS all_organisations, n.pagerank AS popularity
-ORDER BY n.pagerank DESC
-LIMIT ${state.maxNumberOfResultsRequested};`
+  return `
+    MATCH (n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
+    MATCH (n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
+    MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
+    ${inclusionClause}
+    ${exclusionClause}
+    RETURN ${returnFields()},
+    COLLECT (o.name) AS primary_organisation,
+    COLLECT (o2.name) AS all_organisations, n.pagerank AS popularity
+    ORDER BY n.pagerank DESC
+    LIMIT ${state.maxNumberOfResultsRequested};`
 };
 
 
