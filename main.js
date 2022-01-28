@@ -79,20 +79,19 @@ const state = {
 //==================================================
 
 
-const linkSearchButtonClicked = function(url) {
+const linkSearchButtonClicked = async function(url) {
   const justThePath = url.replace(/.*\.gov.uk/, '');
   state.searchQuery = `
     MATCH (t:Cid)<-[HYPERLINKS_TO]-(n:Cid) WHERE t.name="${justThePath}"
     RETURN ${returnFields()}
     LIMIT ${state.maxNumberOfResultsRequested}`;
-  state.neo4jSession.run(state.searchQuery)
-    .then(async results => {
-      await handleEvent({type:'neo4j-callback-ok', data: results})
-    });
+  const queryResults = await state.neo4jSession.readTransaction(tx =>
+    tx.run(state.searchQuery));
+  handleEvent({type:'neo4j-callback-ok', data: queryResults});
 };
 
 
-const externalSearchButtonClicked = function(url) {
+const externalSearchButtonClicked = async function(url) {
   state.searchQuery = `
     MATCH (n:Cid) -[:HYPERLINKS_TO]-> (e:ExternalPage)
     WHERE e.name CONTAINS "${url}"
@@ -100,14 +99,13 @@ const externalSearchButtonClicked = function(url) {
     ${returnFields()},
     e.name AS externalUrl
     LIMIT ${state.maxNumberOfResultsRequested}`;
-  state.neo4jSession.run(state.searchQuery)
-    .then(async results => {
-      await handleEvent({type:'neo4j-callback-ok', data: results})
-    });
+  const queryResults = await state.neo4jSession.readTransaction(tx =>
+    tx.run(state.searchQuery));
+  handleEvent({type:'neo4j-callback-ok', data: queryResults});
 };
 
 
-const contentIdSearchButtonClicked = function() {
+const contentIdSearchButtonClicked = async function() {
   const contentIds = state.contentIds
     .split(/[^a-zA-Z0-9-]+/)
     .filter(d=>d.length>0)
@@ -117,12 +115,10 @@ const contentIdSearchButtonClicked = function() {
     RETURN
     ${returnFields()}
     LIMIT ${state.maxNumberOfResultsRequested}`;
-  state.neo4jSession.run(state.searchQuery)
-    .then(async results => {
-      await handleEvent({type:'neo4j-callback-ok', data: results})
-    });
+  const queryResults = await state.neo4jSession.readTransaction(tx =>
+    tx.run(state.searchQuery));
+  handleEvent({type:'neo4j-callback-ok', data: queryResults});
 };
-
 
 
 const splitKeywords = function(keywords) {
