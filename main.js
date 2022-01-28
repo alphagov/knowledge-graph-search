@@ -30,7 +30,7 @@ const sanitise = function(text) {
     oldText = text;
     text = text.replace(tagOrComment, '');
   } while (text !== oldText);
-  return text.replace(/</g, '&lt;');
+  return text.replace(/</g, '&lt;').replace(/""*/g, '"');
 };
 
 
