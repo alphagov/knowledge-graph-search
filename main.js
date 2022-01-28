@@ -30,7 +30,7 @@ const sanitise = function(text) {
     oldText = text;
     text = text.replace(tagOrComment, '');
   } while (text !== oldText);
-  return text.replace(/</g, '&lt;').replace('"', '&quot;');
+  return text.replace(/</g, '&lt;');
 };
 
 
@@ -277,11 +277,11 @@ const view = function() {
                   <option name="and" ${state.combinator === 'and' ? 'selected' : ''}>all the words:</option>
                   <option name="or" ${state.combinator === 'or' ? 'selected' : ''}>any of the words:</option>
                 </select>
-                <input class="govuk-input govuk-input--width-20" id="keyword" placeholder="eg: cat dog &quot;health certificate&quot;" value='${sanitise(state.selectedWords)}'/>
+                <input class="govuk-input govuk-input--width-20" id="keyword" placeholder="eg: cat dog &quot;health certificate&quot;" value='${sanitise(state.selectedWords).replace('"', '&quot;')}'/>
 
               <br/>but not:
 
-                <input class="govuk-input govuk-input--width-20" id="excluded-keyword" placeholder="leave blank if no exclusions" value='${sanitise(state.excludedWords)}'/>
+                <input class="govuk-input govuk-input--width-20" id="excluded-keyword" placeholder="leave blank if no exclusions" value='${sanitise(state.excludedWords).replace('"', '&quot;')}'/>
               </p>
               <div id="search-locations-wrapper">
                 Search in:
