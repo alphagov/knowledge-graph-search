@@ -44,11 +44,13 @@ const state = {
   user: '',
   password: '',
   server: '',
+  taxons: [], // list of names of all the taxons
   errorText: null,
   neo4jSession: null,
   combinator: 'and', // or 'or'
   selectedWords: '',
   excludedWords: '',
+  selectedTaxon: '',
   contentIds: '',
   externalUrl: '',
   linkSearchUrl: '',
@@ -153,7 +155,7 @@ const searchButtonClicked = function() {
     const excludedKeywords = splitKeywords(state.excludedWords)
           .filter(d=>d.length>0)
           .map(s => s.toLowerCase());
-    state.searchQuery = buildQuery(state.whereToSearch, keywords, excludedKeywords, state.combinator, state.caseSensitive);
+    state.searchQuery = buildQuery(state, keywords, excludedKeywords);
     console.log('running', state.searchQuery)
     state.neo4jSession.run(state.searchQuery)
       .then(async results => {
@@ -171,6 +173,7 @@ const handleEvent = async function(event) {
         state.selectedWords = sanitise(id('keyword').value);
         state.excludedWords = sanitise(id('excluded-keyword').value);
         state.combinator = id('and-or').selectedIndex == 0 ? 'AND' : 'OR';
+        state.selectedTaxon = id('taxons').selectedIndex > 0 ? state.taxons[id('taxons').selectedIndex - 1] : '';
         state.whereToSearch.title = id('search-title').checked;
         state.whereToSearch.description = id('search-description').checked;
         state.whereToSearch.text = id('search-text').checked;
@@ -279,27 +282,29 @@ const returnFields = function() {
   `;
 };
 
-const buildQuery = function(fields, keywords, exclusions, operator, caseSensitive) {
+const buildQuery = function(state, keywords, exclusions) {
   const fieldsToSearch = [
-    fields.title?'title':null,
-    fields.description?'description':null,
-    fields.text?'text':null
+    state.whereToSearch.title?'title':null,
+    state.whereToSearch.description?'description':null,
+    state.whereToSearch.text?'text':null
   ].filter(item => item)
 
   const inclusionClause = 'WHERE\n' +
     keywords
-//      .map(word => `((n.title =~ '(?i).*\\\\b${word}\\\\b.*') OR (n.description =~ '(?i).*\\\\b${word}\\\\b.*') OR (n.text =~ '(?i).*\\\\b${word}\\\\b.*'))`)
-      .map(word => multiContainsClause(fieldsToSearch, word, caseSensitive))
-      .join(`\n ${operator} `);
+      .map(word => multiContainsClause(fieldsToSearch, word, state.caseSensitive))
+      .join(`\n ${state.combinator} `);
   const exclusionClause = exclusions.length ?
-    ('WITH * WHERE NOT ' + exclusions.map(word => multiContainsClause(fieldsToSearch, word, caseSensitive)).join(`\n OR `)) : '';
+    ('WITH * WHERE NOT ' + exclusions.map(word => multiContainsClause(fieldsToSearch, word, state.caseSensitive)).join(`\n OR `)) : '';
+
+  const taxon = state.selectedTaxon;
 
   return `
     MATCH (n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
     MATCH (n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
-    MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
+    MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)${taxon.length > 0 ? '<-[:HAS_PARENT*]-(c:Taxon)' : '' }
     ${inclusionClause}
     ${exclusionClause}
+    ${taxon.length > 0 ? `AND (taxon.name = "${taxon}" OR c.name = "${taxon}")` : ''}
     RETURN ${returnFields()},
     COLLECT (o.name) AS primary_organisation,
     COLLECT (o2.name) AS all_organisations, n.pagerank AS popularity
@@ -321,13 +326,26 @@ const init = async function() {
       state.server = data.server;
       state.user = data.user;
       state.password = data.password;
-      state.neo4jDriver = neo4j.driver(state.server, neo4j.auth.basic(state.user, state.password));
-      state.neo4jSession = state.neo4jDriver.session();
-      state.errorText = null;
     }).catch(error => {
       console.warn(error);
       state.errorText('Failed to retrieve credentials to connect to the Knowledge Graph');
     });
+
+  // Initialise neo4j
+  state.neo4jDriver = neo4j.driver(state.server, neo4j.auth.basic(state.user, state.password));
+  state.neo4jSession = state.neo4jDriver.session({ defaultAccessMode: neo4j.session.READ });
+  state.errorText = null;
+
+
+  // Get the list of all the taxons
+  const taxons = await state.neo4jSession.readTransaction(tx =>
+    tx.run('MATCH (t:Taxon) RETURN t.name'));
+  state.taxons = taxons.records.map(taxon => taxon._fields[0]).sort();
+
+
+
+
+
 };
 
 

@@ -82,6 +82,13 @@ const view = function() {
                 </div>
               </div>
               <div>
+                <p class="govuk-body">Search within taxon (and sub-taxons): <span class="experimental">EXPERIMENTAL</span></p>
+                <select class="govuk-select" id="taxons">
+                  <option name=""}>All taxons</option>
+                  ${state.taxons.map(taxon => `<option name="${taxon}" ${state.selectedTaxon === taxon ? 'selected' :''}>${taxon}</option>`)}
+                </select>
+              </div>
+              <div>
                 Max number of results:
                 <input class="govuk-input govuk-input--width-10" id="nb-results" type="number" value="${state.maxNumberOfResultsRequested}"/>
               </div>
@@ -168,6 +175,14 @@ const view = function() {
     .forEach(input => input.addEventListener(
       'click',
       event => handleEvent({type: 'dom', id: event.target.getAttribute('id')})));
+
+
+  // add the accessible autocomplete
+  accessibleAutocomplete.enhanceSelectElement({
+    selectElement: document.querySelector('#taxons')
+  });
+
+
 };
 
 
@@ -288,7 +303,7 @@ const viewSearchResultsTable = function(records, showFields) {
 
     html.push(`<tr class="govuk-table__row"><td class="govuk-table__cell"><a href="${dict.url}">${dict.title}</a></td>`);
     if (showFields.contentId) html.push(`<td class="govuk-table__cell">${dict.contentID}</td>`);
-    if (showFields.documentType) html.push(`<td class="govuk-table__cell">${dict.documentType}</td>`);
+    if (showFields.documentType) html.push(`<td class="govuk-table__cell">${dict.documentType.replace('_', ' ')}</td>`);
     if (showFields.publishingApp) html.push(`<td class="govuk-table__cell">${dict.publishingApp}</td>`);
     if (showFields.firstPublished) html.push(`
       <td class="govuk-table__cell">
@@ -300,7 +315,7 @@ const viewSearchResultsTable = function(records, showFields) {
         ${dict.lastUpdated.slice(0,-7).replace(' ', '<br/>')}
       </td>
     `);
-    if (showFields.taxons) html.push(`<td class="govuk-table__cell">${dict.taxons.join()}</td>`);
+    if (showFields.taxons) html.push(`<td class="govuk-table__cell">${dict.taxons.join(', ')}</td>`);
     html.push('</tr>');
   });
   html.push('</tbody></table>');
