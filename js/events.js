@@ -75,9 +75,7 @@ const linkSearchButtonClicked = async function(url) {
     WHERE t.name="${justThePath}"
     RETURN ${returnFields()}
     LIMIT ${state.maxNumberOfResultsRequested}`;
-  const queryResults = await state.neo4jSession.readTransaction(tx =>
-    tx.run(state.searchQuery));
-  handleEvent({type:'neo4j-callback-ok', data: queryResults});
+  queryGraph(state.searchQuery);
 };
 
 
@@ -90,9 +88,7 @@ const externalSearchButtonClicked = async function(url) {
     ${returnFields()},
     e.name AS externalUrl
     LIMIT ${state.maxNumberOfResultsRequested}`;
-  const queryResults = await state.neo4jSession.readTransaction(tx =>
-    tx.run(state.searchQuery));
-  handleEvent({type:'neo4j-callback-ok', data: queryResults});
+  queryGraph(state.searchQuery);
 };
 
 
@@ -109,9 +105,7 @@ const contentIdSearchButtonClicked = async function() {
     RETURN
     ${returnFields()}
     LIMIT ${state.maxNumberOfResultsRequested}`;
-  const queryResults = await state.neo4jSession.readTransaction(tx =>
-    tx.run(state.searchQuery));
-  handleEvent({type:'neo4j-callback-ok', data: queryResults});
+  queryGraph(state.searchQuery);
 };
 
 
@@ -128,7 +122,7 @@ const splitKeywords = function(keywords) {
   return output;
 };
 
-const searchButtonClicked = function() {
+const searchButtonClicked = async function() {
   if (state.selectedWords.length < 3) {
     state.errorText = 'Please make your search terms longer to avoid returning too many results';
     state.waiting = false;
@@ -141,11 +135,21 @@ const searchButtonClicked = function() {
           .filter(d=>d.length>0)
           .map(s => s.toLowerCase());
     state.searchQuery = buildQuery(state, keywords, excludedKeywords);
-    console.log('running', state.searchQuery)
-    state.neo4jSession.run(state.searchQuery)
-      .then(async results => {
-        await handleEvent({type:'neo4j-callback-ok', data: results})
-      });
+    queryGraph(state.searchQuery);
+  }
+};
+
+
+const queryGraph = async function(query) {
+  console.log('running', state.searchQuery)
+  try {
+    const queryResults = await state.neo4jSession.readTransaction(tx =>
+      tx.run(query));
+    console.log(queryResults)
+    return handleEvent({type:'neo4j-callback-ok', data: queryResults});
+  } catch (e) {
+    console.log('Neo4j error', e);
+    return handleEvent({type:'neo4j-callback-fail'});
   }
 };
 
@@ -225,6 +229,11 @@ const handleEvent = async function(event) {
     state.searchResults = event.data;
     state.waiting = false;
     state.errorText = null;
+  break;
+  case 'neo4j-callback-fail':
+    state.searchResults = null;
+    state.waiting = false;
+    state.errorText = 'There was a problem querying the GovGraph. Are you on the VPN? If yes, you may have found a bug. Please send details to the Data Labs';
   break;
   default:
     console.log('unknown event:', event);
