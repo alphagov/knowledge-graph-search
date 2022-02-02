@@ -1,9 +1,9 @@
-/* global state */
+/* global accessibleAutocomplete */
 /*eslint no-unused-vars: ["error", { "varsIgnorePattern": "view" }]*/
 
-//==================================================
-// VIEW functions
-//==================================================
+import { id, sanitise } from './utils.js';
+import { state } from './state.js';
+import { handleEvent } from './events.js';
 
 const view = function() {
   const html = [];
@@ -176,12 +176,12 @@ const view = function() {
       'click',
       event => handleEvent({type: 'dom', id: event.target.getAttribute('id')})));
 
-
   // add the accessible autocomplete
-  accessibleAutocomplete.enhanceSelectElement({
-    selectElement: document.querySelector('#taxons')
-  });
-
+  if (document.querySelector('#taxons')) {
+    accessibleAutocomplete.enhanceSelectElement({
+      selectElement: document.querySelector('#taxons')
+    });
+  }
 
 };
 
@@ -401,3 +401,5 @@ const viewSearchResults = function(mode, results, showFields) {
 
   return html.join('');
 };
+
+export { view };

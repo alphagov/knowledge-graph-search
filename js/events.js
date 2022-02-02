@@ -1,85 +1,70 @@
-/* global neo4j, view */
+import { state } from './state.js';
+import { id, sanitise } from './utils.js';
+import { view } from './view.js';
 
 
 //==================================================
-// Utils
+// Cypher query methods
 //==================================================
 
+const containsClause = function(field, word, caseSensitive) {
+  return caseSensitive ?
+    `(n.${field} CONTAINS "${word}")`
+  :
+    `(toLower(n.${field}) CONTAINS toLower("${word}"))`
+  ;
 
-const id = x => document.getElementById(x);
+}
 
+const multiContainsClause = function(fields, word, caseSensitive) {
+  return '(' + fields
+    .map(field => containsClause(field, word, caseSensitive))
+    .join(' OR ') + ')'
+}
 
-const tagBody = '(?:[^"\'>]|"[^"]*"|\'[^\']*\')*';
-
-const tagOrComment = new RegExp(
-    '<(?:'
-    // Comment body.
-    + '!--(?:(?:-*[^->])*--+|-?)'
-    // Special "raw text" elements whose content should be elided.
-    + '|script\\b' + tagBody + '>[\\s\\S]*?</script\\s*'
-    + '|style\\b' + tagBody + '>[\\s\\S]*?</style\\s*'
-    // Regular name
-    + '|/?[a-z]'
-    + tagBody
-    + ')>',
-    'gi');
-
-const sanitise = function(text) {
-  let oldText;
-  do {
-    oldText = text;
-    text = text.replace(tagOrComment, '');
-  } while (text !== oldText);
-  return text.replace(/</g, '&lt;').replace(/""*/g, '"');
+const returnFields = function() {
+  return `
+    "https://www.gov.uk"+n.name AS url,
+    n.name AS slug,
+    n.title AS title,
+    n.documentType AS documentType,
+    n.contentID AS contentID,
+    n.publishing_app AS publishingApp,
+    n.first_published_at AS firstPublished,
+    n.public_updated_at AS lastUpdated,
+    COLLECT (taxon.name) AS taxons
+  `;
 };
 
+const buildQuery = function(state, keywords, exclusions) {
+  const fieldsToSearch = [
+    state.whereToSearch.title?'title':null,
+    state.whereToSearch.description?'description':null,
+    state.whereToSearch.text?'text':null
+  ].filter(item => item)
 
+  const inclusionClause = 'WHERE\n' +
+    keywords
+      .map(word => multiContainsClause(fieldsToSearch, word, state.caseSensitive))
+      .join(`\n ${state.combinator} `);
+  const exclusionClause = exclusions.length ?
+    ('WITH * WHERE NOT ' + exclusions.map(word => multiContainsClause(fieldsToSearch, word, state.caseSensitive)).join(`\n OR `)) : '';
 
-//==================================================
-// STATE
-//==================================================
+  const taxon = state.selectedTaxon;
 
-
-const state = {
-  user: '',
-  password: '',
-  server: '',
-  taxons: [], // list of names of all the taxons
-  errorText: null,
-  neo4jSession: null,
-  combinator: 'and', // or 'or'
-  selectedWords: '',
-  excludedWords: '',
-  selectedTaxon: '',
-  contentIds: '',
-  externalUrl: '',
-  linkSearchUrl: '',
-  searchQuery: null,
-  searchResults: null,
-  maxNumberOfResultsRequested: 100,
-  showFields: {
-    contentId: false,
-    documentType: true,
-    publishingApp: true,
-    firstPublished: true,
-    lastUpdated: true,
-    taxons: false
-  },
-  whereToSearch: {
-    title: true,
-    description: false,
-    text: false
-  },
-  caseSensitive: false,
-  activeMode: 'keyword-search',
-  //  possible values: 'keyword-search', 'contentid-search', 'external-search', 'link-search'
-  waiting: false // whether we're waiting for a request to return
+  return `
+    MATCH (n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
+    MATCH (n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
+    MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)${taxon.length > 0 ? '<-[:HAS_PARENT*]-(c:Taxon)' : '' }
+    ${inclusionClause}
+    ${exclusionClause}
+    ${taxon.length > 0 ? `AND (taxon.name = "${taxon}" OR c.name = "${taxon}")` : ''}
+    RETURN ${returnFields()},
+    COLLECT (o.name) AS primary_organisation,
+    COLLECT (o2.name) AS all_organisations, n.pagerank AS popularity
+    ORDER BY n.pagerank DESC
+    LIMIT ${state.maxNumberOfResultsRequested};`
 };
-
-
-//==================================================
-// UPDATE
-//==================================================
 
 
 const linkSearchButtonClicked = async function(url) {
@@ -248,113 +233,4 @@ const handleEvent = async function(event) {
 };
 
 
-
-//==================================================
-// Cypher query methods
-//==================================================
-
-const containsClause = function(field, word, caseSensitive) {
-  return caseSensitive ?
-    `(n.${field} CONTAINS "${word}")`
-  :
-    `(toLower(n.${field}) CONTAINS toLower("${word}"))`
-  ;
-
-}
-
-const multiContainsClause = function(fields, word, caseSensitive) {
-  return '(' + fields
-    .map(field => containsClause(field, word, caseSensitive))
-    .join(' OR ') + ')'
-}
-
-const returnFields = function() {
-  return `
-    "https://www.gov.uk"+n.name AS url,
-    n.name AS slug,
-    n.title AS title,
-    n.documentType AS documentType,
-    n.contentID AS contentID,
-    n.publishing_app AS publishingApp,
-    n.first_published_at AS firstPublished,
-    n.public_updated_at AS lastUpdated,
-    COLLECT (taxon.name) AS taxons
-  `;
-};
-
-const buildQuery = function(state, keywords, exclusions) {
-  const fieldsToSearch = [
-    state.whereToSearch.title?'title':null,
-    state.whereToSearch.description?'description':null,
-    state.whereToSearch.text?'text':null
-  ].filter(item => item)
-
-  const inclusionClause = 'WHERE\n' +
-    keywords
-      .map(word => multiContainsClause(fieldsToSearch, word, state.caseSensitive))
-      .join(`\n ${state.combinator} `);
-  const exclusionClause = exclusions.length ?
-    ('WITH * WHERE NOT ' + exclusions.map(word => multiContainsClause(fieldsToSearch, word, state.caseSensitive)).join(`\n OR `)) : '';
-
-  const taxon = state.selectedTaxon;
-
-  return `
-    MATCH (n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
-    MATCH (n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
-    MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)${taxon.length > 0 ? '<-[:HAS_PARENT*]-(c:Taxon)' : '' }
-    ${inclusionClause}
-    ${exclusionClause}
-    ${taxon.length > 0 ? `AND (taxon.name = "${taxon}" OR c.name = "${taxon}")` : ''}
-    RETURN ${returnFields()},
-    COLLECT (o.name) AS primary_organisation,
-    COLLECT (o2.name) AS all_organisations, n.pagerank AS popularity
-    ORDER BY n.pagerank DESC
-    LIMIT ${state.maxNumberOfResultsRequested};`
-};
-
-
-//==================================================
-// INIT
-//==================================================
-
-const init = async function() {
-  // First, look if there's a file with authentication params
-  await fetch('params.json')
-    .then(async response => {
-      const data = await response.json();
-
-      state.server = data.server;
-      state.user = data.user;
-      state.password = data.password;
-    }).catch(error => {
-      console.warn(error);
-      state.errorText('Failed to retrieve credentials to connect to the Knowledge Graph');
-    });
-
-  // Initialise neo4j
-  state.neo4jDriver = neo4j.driver(state.server, neo4j.auth.basic(state.user, state.password));
-  state.neo4jSession = state.neo4jDriver.session({ defaultAccessMode: neo4j.session.READ });
-  state.errorText = null;
-
-
-  // Get the list of all the taxons
-  const taxons = await state.neo4jSession.readTransaction(tx =>
-    tx.run('MATCH (t:Taxon) RETURN t.name'));
-  state.taxons = taxons.records.map(taxon => taxon._fields[0]).sort();
-
-
-
-
-
-};
-
-
-//==================================================
-// START
-//==================================================
-
-
-(async () => {
-  await init();
-  view();
-})();
+export { handleEvent };
