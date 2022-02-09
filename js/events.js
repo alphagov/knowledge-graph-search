@@ -70,10 +70,11 @@ const buildQuery = function(state, keywords, exclusions) {
 const linkSearchButtonClicked = async function(url) {
   const justThePath = url.replace(/.*\.gov.uk/, '');
   state.searchQuery = `
-    MATCH (t:Cid)<-[HYPERLINKS_TO]-(n:Cid)
-    MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
-    WHERE t.name="${justThePath}"
-    RETURN ${returnFields()}
+    MATCH (n:Cid)-[:HYPERLINKS_TO]->(n2:Cid)
+    WHERE n2.name = "${justThePath}"
+    WITH n
+    OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
+    RETURN DISTINCT ${returnFields()}
     LIMIT ${state.maxNumberOfResultsRequested}`;
   queryGraph(state.searchQuery);
 };
