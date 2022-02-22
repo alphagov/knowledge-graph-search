@@ -9,8 +9,7 @@ const view = function() {
   const html = [];
   html.push(`
     <main class="govuk-main-wrapper " id="main-content" role="main">
-      <h1 class="govuk-heading-xl">Search the GovGraph</h1>
-      <h2 class="govuk-heading-s">Please note that you must be on the GDS VPN for searches to work</h2>`);
+      <h1 class="govuk-heading-xl">Search the GovGraph</h1>`);
 
   if (state.errorText) {
     html.push(`
