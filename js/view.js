@@ -9,7 +9,11 @@ const view = function() {
   const html = [];
   html.push(`
     <main class="govuk-main-wrapper " id="main-content" role="main">
-      <h1 class="govuk-heading-xl">Search the GovGraph</h1>`);
+      <h1 class="govuk-heading-xl">Search the GovGraph</h1>
+      <h2 class="govuk-heading-m">New (22/2/22): share your search by copying the URL</h2>
+      <h2 class="govuk-heading-m">New (22/2/22): the browser back button now works</h2>
+
+`);
 
   if (state.errorText) {
     html.push(`

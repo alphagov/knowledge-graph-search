@@ -46,7 +46,7 @@ const buildQuery = function(state, keywords, exclusions) {
   const inclusionClause = 'WHERE\n' +
     keywords
       .map(word => multiContainsClause(fieldsToSearch, word, state.caseSensitive))
-      .join(`\n ${state.combinator} `);
+      .join(`\n ${state.combinator.toUpperCase()} `);
   const exclusionClause = exclusions.length ?
     ('WITH * WHERE NOT ' + exclusions.map(word => multiContainsClause(fieldsToSearch, word, state.caseSensitive)).join(`\n OR `)) : '';
 
@@ -162,7 +162,7 @@ const handleEvent = async function(event) {
       case "keyword-search":
         state.selectedWords = sanitise(id('keyword').value);
         state.excludedWords = sanitise(id('excluded-keyword').value);
-        state.combinator = id('and-or').selectedIndex == 0 ? 'AND' : 'OR';
+        state.combinator = id('and-or').selectedIndex == 0 ? 'and' : 'or';
         state.selectedTaxon = id('taxons').selectedIndex > 0 ? state.taxons[id('taxons').selectedIndex - 1] : '';
         state.whereToSearch.title = id('search-title').checked;
         state.whereToSearch.description = id('search-description').checked;
@@ -239,8 +239,37 @@ const handleEvent = async function(event) {
   default:
     console.log('unknown event:', event);
   }
+  updateUrl();
   view();
 };
+
+
+const updateUrl = function() {
+
+  if ('URLSearchParams' in window) {
+    var searchParams = new URLSearchParams();
+
+    if (state.selectedWords !== '') searchParams.set('selected-words', state.selectedWords);
+    if (state.excludedWords !== '') searchParams.set('excluded-words', state.excludedWords);
+    if (state.externalUrl !== '') searchParams.set('external-url', state.externalUrl);
+    if (state.linkSearchUrl !== '') searchParams.set('link-search-url', state.linkSearchUrl);
+    if (state.contentIds !== '') searchParams.set('content-ids', state.contentIds);
+    if (state.combinator !== 'and') searchParams.set('combinator', state.combinator);
+    if (state.selectedTaxon !== '') searchParams.set('selected-taxon', state.selectedTaxon);
+    if (state.caseSensitive) searchParams.set('case-sensitive', state.caseSensitive);
+    if (state.activeMode !== 'keyword-search') searchParams.set('active-mode', state.activeMode);
+    if (state.maxNumberOfResultsRequested !== 100) searchParams.set('max-results', state.maxNumberOfResultsRequested);
+    if (!state.whereToSearch.title) searchParams.set('search-in-title', 'false')
+    if (state.whereToSearch.description) searchParams.set('search-in-description', 'true')
+    if (state.whereToSearch.text) searchParams.set('search-in-text', 'true')
+
+    let newRelativePathQuery = window.location.pathname;
+    if (searchParams.toString().length > 0) {
+      newRelativePathQuery += '?' + searchParams.toString();
+    }
+    history.pushState(null, '', newRelativePathQuery);
+  }
+}
 
 
 export { handleEvent };

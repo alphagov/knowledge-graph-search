@@ -1,7 +1,7 @@
 /* global neo4j */
 
 import { view } from './view.js';
-import { state } from './state.js';
+import { state, setStateFromQS } from './state.js';
 
 
 //==================================================
@@ -52,6 +52,11 @@ const init = async function() {
   } catch (e) {
     state.errorText = 'Error retrieving taxons.';
   }
+
+  window.addEventListener('popstate', () => {
+    setStateFromQS();
+    view();
+  });
 };
 
 
@@ -62,5 +67,6 @@ const init = async function() {
 
 (async () => {
   await init();
+  setStateFromQS();
   view();
 })();
