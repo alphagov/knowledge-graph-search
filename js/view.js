@@ -9,11 +9,7 @@ const view = function() {
   const html = [];
   html.push(`
     <main class="govuk-main-wrapper " id="main-content" role="main">
-      <h1 class="govuk-heading-xl">Search the GovGraph</h1>
-      <h2 class="govuk-heading-m">New (22/2/22): share your search by copying the URL</h2>
-      <h2 class="govuk-heading-m">New (22/2/22): the browser back button now works</h2>
-
-`);
+      <h1 class="govuk-heading-xl">Search the GovGraph</h1>`);
 
   if (state.errorText) {
     html.push(`
@@ -109,7 +105,9 @@ const view = function() {
       break;
       case 'contentid-search':
       html.push(`
-            <p>Enter one or more contentIDs:</p>
+            <p class="govuk-body">Enter one or more contentIDs:</p>
+            <span>For example: ad5110e0-fa62-49d3-923f-d50101f12014, 52feb778-b249-4804-a9c3-dfdc05b7b224</span>
+
             <div class="govuk-form-group" id="contentid-search-panel">
               <p class="govuk-body">
                 <textarea class="govuk-textarea" rows="5" id="contentid">${state.contentIds}</textarea>
