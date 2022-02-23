@@ -148,7 +148,7 @@ const view = function() {
               <p class="govuk-body">
                 <input class="govuk-input" id="link-search"
                        value="${state.linkSearchUrl}"
-                       placeholder="eg: /benefits"/>
+                       placeholder="eg: /maternity-pay-leave"/>
               </p>
               <p class="govuk-body">
                 <button
