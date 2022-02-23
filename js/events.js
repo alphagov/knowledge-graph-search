@@ -24,16 +24,14 @@ const multiContainsClause = function(fields, word, caseSensitive) {
 
 const returnFields = function() {
   return `
-    "https://www.gov.uk"+n.name AS url,
-    n.name AS slug,
+    n.name as name,
     n.title AS title,
     n.documentType AS documentType,
     n.contentID AS contentID,
-    n.publishing_app AS publishingApp,
-    n.first_published_at AS firstPublished,
-    n.public_updated_at AS lastUpdated,
-    COLLECT (taxon.name) AS taxons
-  `;
+    n.publishing_app AS publishing_app,
+    n.first_published_at AS first_published_at,
+    n.public_updated_at AS public_updated_at,
+    COLLECT (taxon.name) AS taxons`;
 };
 
 const buildQuery = function(state, keywords, exclusions) {
@@ -160,6 +158,7 @@ const queryGraph = async function(query) {
 
 
 const handleEvent = async function(event) {
+  let fieldClicked;
   switch(event.type) {
     case "dom":
       switch(event.id) {
@@ -199,24 +198,6 @@ const handleEvent = async function(event) {
       case "clear":
         state.searchResults = null;
         break;
-      case "show-contentid":
-        state.showFields.contentId = id('show-contentid').checked;
-        break;
-      case "show-doctype":
-        state.showFields.documentType = id('show-doctype').checked;
-        break;
-      case "show-publishingapp":
-        state.showFields.publishingApp = id('show-publishingapp').checked;
-        break;
-      case "show-firstpublished":
-        state.showFields.firstPublished = id('show-firstpublished').checked;
-        break;
-      case "show-lastupdated":
-        state.showFields.lastUpdated = id('show-lastupdated').checked;
-        break;
-      case "show-taxons":
-        state.showFields.taxons = id('show-taxons').checked;
-        break;
       case 'button-select-keyword-search':
         state.activeMode = 'keyword-search';
         break;
@@ -233,7 +214,12 @@ const handleEvent = async function(event) {
         state.activeMode = 'link-search';
         break;
       default:
-        console.log('unknown DOM event received:', event);
+        fieldClicked = event.id.match(/show-field-(.*)/);
+        if (fieldClicked) {
+          state.showFields[fieldClicked[1]] = id(event.id).checked;
+        } else {
+          console.log('unknown DOM event received:', event);
+        }
       }
     break;
 

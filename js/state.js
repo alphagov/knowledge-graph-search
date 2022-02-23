@@ -16,12 +16,8 @@ const state = {
   searchResults: null,
   maxNumberOfResultsRequested: 100,
   showFields: {
-    contentId: false,
-    documentType: true,
-    publishingApp: true,
-    firstPublished: true,
-    lastUpdated: true,
-    taxons: false
+    name: true,
+    title: true,
   },
   whereToSearch: {
     title: true, // user input: whether search should include page titles
@@ -51,5 +47,6 @@ const setStateFromQS = function() {
   state.whereToSearch.description = searchParams.get('search-in-description') === 'true';
   state.whereToSearch.text = searchParams.get('search-in-text') === 'true';
 }
+
 
 export { state, setStateFromQS };

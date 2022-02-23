@@ -208,137 +208,45 @@ const view = function() {
 };
 
 
-const viewExternalSearchResultsTable = function(records, showFields) {
-  const html = [];
-  html.push(`<table class="govuk-table">
-    <tbody class="govuk-table__body">`);
-  html.push(`<tr class="govuk-table__row"><th scope="row" class="govuk-table__header">Title</th>`);
-  if (showFields.documentType) html.push('<th scope="row" class="govuk-table__header">External URL</th>');
-  html.push(`</tr>`);
-
-  records.forEach(record => {
-    let dict = {};
-    record.keys.forEach((key, index) => dict[key] = record._fields[index]);
-
-    html.push(`<tr class="govuk-table__row">
-      <td class="govuk-table__cell"><a href="${dict.url}">${dict.title}</a></td>
-      <td class="govuk-table__cell">${dict.externalUrl}</td>
-    </tr>`);
-  });
-  html.push('</tbody></table>');
-  return html.join('');
-};
-
-const viewLinkSearchResultsTable = function(records, showFields) {
-  const html = [];
-  html.push(`<table class="govuk-table">
-    <tbody class="govuk-table__body">`);
-  html.push(`<tr class="govuk-table__row"><th scope="row" class="govuk-table__header">Title</th>`);
-  if (showFields.documentType) html.push('<th scope="row" class="govuk-table__header">URL</th>');
-  html.push(`</tr>`);
-
-  records.forEach(record => {
-    let dict = {};
-    record.keys.forEach((key, index) => dict[key] = record._fields[index]);
-
-    html.push(`<tr class="govuk-table__row">
-      <td class="govuk-table__cell"><a href="${dict.url}">${dict.title}</a></td>
-      <td class="govuk-table__cell">${dict.slug}</td>
-    </tr>`);
-  });
-  html.push('</tbody></table>');
-  return html.join('');
-};
-
-
 const viewSearchResultsTable = function(records, showFields) {
   const html = [];
   html.push('<table class="govuk-table">');
   html.push(`<thead class="govuk-table__head">
       <div id="show-fields-wrapper">
       Show:
-        <ul class="kg-checkboxes" id="show-fields" onclick="handleEvent">
-          <li class="kg-checkboxes__item">
-            <input class="kg-checkboxes__input"
-                   data-interactive="true"
-                   type="checkbox" id="show-contentid"
-                   ${showFields.contentId ? 'checked' : ''}/>
-            <label class="kg-label kg-checkboxes__label">content ID</label>
-          </li>
-          <li class="kg-checkboxes__item">
-            <input class="kg-checkboxes__input"
-                   data-interactive="true"
-                   type="checkbox" id="show-doctype"
-                   ${showFields.documentType ? 'checked' : ''}/>
-            <label class="kg-label kg-checkboxes__label">Document type</label>
-          </li>
-          <li class="kg-checkboxes__item">
-            <input class="kg-checkboxes__input"
-                   data-interactive="true"
-                   type="checkbox" id="show-publishingapp"
-                   ${showFields.publishingApp ? 'checked' : ''}/>
-            <label class="kg-label kg-checkboxes__label">Publishing app</label>
-          </li>
-          <li class="kg-checkboxes__item">
-            <input class="kg-checkboxes__input"
-                   data-interactive="true"
-                   type="checkbox" id="show-firstpublished"
-                   ${showFields.firstPublished ? 'checked' : ''}/>
-            <label class="kg-label kg-checkboxes__label">First published</label>
-          </li>
-          <li class="kg-checkboxes__item">
-            <input class="kg-checkboxes__input"
-                   data-interactive="true"
-                   type="checkbox" id="show-lastupdated"
-                   ${showFields.lastUpdated ? 'checked' : ''}/>
-            <label class="kg-label kg-checkboxes__label">Last Updated</label>
-          </li>
-          <li class="kg-checkboxes__item">
-            <input class="kg-checkboxes__input"
-                   data-interactive="true"
-                   type="checkbox" id="show-taxons"
-                   ${showFields.taxons ? 'checked' : ''}/>
-            <label class="kg-label kg-checkboxes__label">Taxons</label>
-          </li>
+      <ul class="kg-checkboxes" id="show-fields">
+ `);
+
+  html.push(records[0].keys.map(key => `
+    <li class="kg-checkboxes__item">
+      <input class="kg-checkboxes__input"
+             data-interactive="true"
+             type="checkbox" id="show-field-${key}"
+             ${showFields[key] ? 'checked' : ''}/>
+      <label class="kg-label kg-checkboxes__label">${fieldName(key)}</label>
+    </li>`).join(''));
+  html.push(`
         </ul>
       </div>
     </thead>
-    <tbody class="govuk-table__body">`);
-  html.push(`<tr class="govuk-table__row"><th scope="row" class="govuk-table__header">Title</th>`);
-  if (showFields.contentId) html.push('<th scope="row" class="govuk-table__header">ContentID</th>');
-  if (showFields.documentType) html.push('<th scope="row" class="govuk-table__header">Type</th>');
-  if (showFields.publishingApp) html.push('<th scope="row" class="govuk-table__header">Publishing app</th>');
-  if (showFields.firstPublished) html.push(
-    '<th scope="row" class="govuk-table__header">First published</th>'
-  );
-  if (showFields.lastUpdated) html.push(
-    '<th scope="row" class="govuk-table__header">Last updated</th>'
-  );
-  if (showFields.taxons) html.push(
-    '<th scope="row" class="govuk-table__header">Taxons</th>'
-  );
-  html.push(`</tr>`);
+    <tbody class="govuk-table__body">
+      <tr class="govuk-table__row">`);
+
+  records[0].keys.forEach(key => {
+    if (state.showFields[key]) {
+      html.push(`<th scope="scope" class="govuk-table__header">${fieldName(key)}</th>`);
+    }
+  });
 
   records.forEach(record => {
-    let dict = {};
-    record.keys.forEach((key, index) => dict[key] = record._fields[index]);
+    html.push(`<tr class="govuk-table__row">`);
 
-    html.push(`<tr class="govuk-table__row"><td class="govuk-table__cell"><a href="${dict.url}">${dict.title}</a></td>`);
-    if (showFields.contentId) html.push(`<td class="govuk-table__cell">${dict.contentID}</td>`);
-    if (showFields.documentType) html.push(`<td class="govuk-table__cell">${dict.documentType.replace('_', ' ')}</td>`);
-    if (showFields.publishingApp) html.push(`<td class="govuk-table__cell">${dict.publishingApp}</td>`);
-    if (showFields.firstPublished) html.push(`
-      <td class="govuk-table__cell">
-        ${dict.firstPublished.slice(0,-7).replace(' ', '<br/>')}
-      </td>
-    `);
-    if (showFields.lastUpdated) html.push(`
-      <td class="govuk-table__cell">
-        ${dict.lastUpdated.slice(0,-7).replace(' ', '<br/>')}
-      </td>
-    `);
-    if (showFields.taxons) html.push(`<td class="govuk-table__cell">${dict.taxons.join(', ')}</td>`);
-    html.push('</tr>');
+    record._fields.forEach((val, idx) => {
+      if (state.showFields[record.keys[idx]]) {
+        html.push(`<td class="govuk-table__cell">${fieldFormat(record.keys[idx], val)}</td>`);
+      }
+    });
+    html.push(`</tr>`);
   });
   html.push('</tbody></table>');
   return html.join('');
@@ -384,23 +292,8 @@ const viewSearchResults = function(mode, results, showFields) {
     const url = URL.createObjectURL(file); // TODO: use window.URL.revokeObjectURL(url);  after
     html.push(`<a class="govuk-link" href="${url}" download="export.csv">Export as CSV</a></div>`);
 
-    switch(mode) {
-    case 'keyword-search':
-    case 'contentid-search':
-      html.push(viewSearchResultsTable(results.records, showFields));
-      break;
-    case 'external-search':
-      html.push(viewExternalSearchResultsTable(results.records, showFields));
-      break;
-    case 'link-search':
-      html.push(viewLinkSearchResultsTable(results.records, showFields));
-      break;
-    case 'cypher-search':
-//      html.push(viewLinkSearchResultsTable(results.records, showFields));
-      break;
-    default:
-      console.log('unknown mode', mode);
-    }
+
+    html.push(viewSearchResultsTable(results.records, showFields));
   } else {
     html.push('<h2 class="govuk-heading-m">No results</h2>');
     html.push('<div><button class="govuk-button" id="clear">Back</button></div>');
@@ -426,5 +319,48 @@ const viewSearchResults = function(mode, results, showFields) {
 
   return html.join('');
 };
+
+
+
+// Remove duplicates - but should be fixed in cypher
+const formatNames = array => [...new Set(array)].join(', ')
+
+const fieldFormatters = {
+  'name' : { name: 'URL', format: val => `<a href="https://www.gov.uk${val}">${val}</a>` },
+  'title': { name: 'Title' },
+  'documentType': { name: 'Document type' },
+  'publishing_app': { name: 'Publishing app' },
+  'first_published_at' : {
+    name: 'First published',
+    format: val => val.slice(0,-7).replace(' ', '<br/>')
+  },
+  'public_updated_at' : {
+    name: 'Last publicly updated',
+    format: val => val.slice(0,-7).replace(' ', '<br/>')
+  },
+  'taxons' : {
+    name: 'Taxons',
+    format: formatNames
+  },
+  'primary_organisation' : {
+    name: 'Primary Organisation',
+    format: formatNames
+  },
+  'all_organisations' : {
+    name: 'Organisations',
+    format: formatNames
+  }
+}
+
+const fieldName = function(key) {
+  const f = fieldFormatters[key];
+  return f ? f.name : key;
+}
+
+const fieldFormat = function(key, val) {
+  const f = fieldFormatters[key];
+  return (f && f.format) ? f.format(val) : val;
+}
+
 
 export { view };
