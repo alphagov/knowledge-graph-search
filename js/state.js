@@ -12,7 +12,7 @@ const state = {
   contentIds: '', // user input: the list of content ID to search for
   externalUrl: '', // user input: the external URL to search for
   linkSearchUrl: '', // user input: URL to find all pages linking to
-  searchQuery: null,
+  searchQuery: '', // generated from other user inputs or typed in directly
   searchResults: null,
   maxNumberOfResultsRequested: 100,
   showFields: {
@@ -30,7 +30,7 @@ const state = {
   },
   caseSensitive: false, // user input - whether the keyword search is case sensitive
   activeMode: 'keyword-search', // user input - type of search selected
-  //  possible values: 'keyword-search', 'contentid-search', 'external-search', 'link-search'
+  //  possible values: 'keyword-search', 'contentid-search', 'external-search', 'link-search', 'cypher-search'
   waiting: false // whether we're waiting for a request to return
 };
 

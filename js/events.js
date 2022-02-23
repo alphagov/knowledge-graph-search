@@ -109,6 +109,10 @@ const contentIdSearchButtonClicked = async function() {
   queryGraph(state.searchQuery);
 };
 
+const cypherSearchButtonClicked = async function() {
+  queryGraph(state.searchQuery);
+};
+
 
 const splitKeywords = function(keywords) {
   var regexp = /[^\s"]+|"([^"]*)"/gi;
@@ -187,6 +191,11 @@ const handleEvent = async function(event) {
         state.waiting = true;
         linkSearchButtonClicked(state.linkSearchUrl);
         break;
+      case "cypher-search":
+        state.searchQuery = id('cypher').value;
+        state.waiting = true;
+        cypherSearchButtonClicked();
+        break;
       case "clear":
         state.searchResults = null;
         break;
@@ -213,6 +222,9 @@ const handleEvent = async function(event) {
         break;
       case 'button-select-contentid-search':
         state.activeMode = 'contentid-search';
+        break;
+      case 'button-select-cypher-search':
+        state.activeMode = 'cypher-search';
         break;
       case 'button-select-external-search':
         state.activeMode = 'external-search';
