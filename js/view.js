@@ -181,12 +181,15 @@ const view = function() {
         console.log('invalid mode', state.activeMode);
     }
   } else {
-  html.push(`
+    html.push(`
       </div>
-      <div id="results">${viewSearchResults(state.activeMode, state.searchResults, state.showFields)}</div>
-    </main>
-  `);
+      <div id="results">${viewSearchResults(state.activeMode, state.searchResults, state.showFields)}</div> `);
   }
+
+  html.push(`
+    </main>
+    <p class="govuk-body sig">Brought to you by the Data Labs<br/>Help/problem/feedback: Contact <a href="mailto:max.froumentin@digital.cabinet-office.gov.uk">Max Froumentin</a>
+`);
 
   id('page-content').innerHTML = html.join('');
 
