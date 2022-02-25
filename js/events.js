@@ -167,7 +167,7 @@ const handleEvent = async function(event) {
         state.selectedWords = sanitise(id('keyword').value);
         state.excludedWords = sanitise(id('excluded-keyword').value);
         state.combinator = id('and-or').selectedIndex == 0 ? 'and' : 'or';
-        state.selectedTaxon = id('taxons').selectedIndex > 0 ? state.taxons[id('taxons').selectedIndex - 1] : '';
+        state.selectedTaxon = sanitise(id('taxons').value);
         state.whereToSearch.title = id('search-title').checked;
         state.whereToSearch.description = id('search-description').checked;
         state.whereToSearch.text = id('search-text').checked;
@@ -244,7 +244,6 @@ const handleEvent = async function(event) {
 
 
 const updateUrl = function() {
-
   if ('URLSearchParams' in window) {
     var searchParams = new URLSearchParams();
 
