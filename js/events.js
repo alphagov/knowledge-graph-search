@@ -31,6 +31,7 @@ const returnFields = function() {
     n.publishing_app AS publishing_app,
     n.first_published_at AS first_published_at,
     n.public_updated_at AS public_updated_at,
+    n.pagerank AS pagerank,
     COLLECT (taxon.name) AS taxons`;
 };
 
@@ -59,7 +60,7 @@ const buildQuery = function(state, keywords, exclusions) {
     ${taxon.length > 0 ? `AND (taxon.name = "${taxon}" OR c.name = "${taxon}")` : ''}
     RETURN ${returnFields()},
     COLLECT (o.name) AS primary_organisation,
-    COLLECT (o2.name) AS all_organisations, n.pagerank AS popularity
+    COLLECT (o2.name) AS all_organisations
     ORDER BY n.pagerank DESC
     LIMIT ${state.maxNumberOfResultsRequested};`
 };

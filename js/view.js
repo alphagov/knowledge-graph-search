@@ -347,8 +347,12 @@ const fieldFormatters = {
   'all_organisations' : {
     name: 'Organisations',
     format: formatNames
+  },
+  'pagerank' : {
+    name: 'Popularity',
+    format: val => val.toFixed(2)
   }
-}
+};
 
 const fieldName = function(key) {
   const f = fieldFormatters[key];
