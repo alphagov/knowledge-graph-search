@@ -6602,10 +6602,6 @@ pre {
   padding: 0;
   margin: 0;
 }
-#keyword-search-panel p, #contentid-search-panel p {
-  padding: 0;
-  margin: 0;
-}
 
 #show-fields-wrapper {
   margin: 2em 0;
@@ -6641,4 +6637,24 @@ pre {
 .sig {
   font-size: 16px;
   margin-top: 15px;
+}
+
+.has-tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 2px dotted black;
+}
+.has-tooltip .tooltip-text {
+  visibility: hidden;
+  width: 200px;
+  text-align: center;
+  border: 2px solid black;
+  padding: 5px;
+  background: #ddd;
+  position: absolute;
+  z-index: 1;
+  left: 10px;
+}
+.has-tooltip:hover .tooltip-text {
+  visibility: visible;
 }

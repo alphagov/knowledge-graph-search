@@ -22,16 +22,26 @@ const view = function() {
   if (state.searchResults === null) {
     html.push(`
         <p class="govuk-body mode-buttons">
-          <button class="${state.activeMode==='keyword-search'?'search-active':''}"
-                  id="button-select-keyword-search">Keyword search</button>
-          <button class="${state.activeMode==='contentid-search'?'search-active':''}"
-                  id="button-select-contentid-search">Content ID search</button>
-          <button class="${state.activeMode==='external-search'?'search-active':''}"
-                  id="button-select-external-search">External page search</button>
-          <button class="${state.activeMode==='link-search'?'search-active':''}"
-                  id="button-select-link-search">Link search</button>
-          <button class="${state.activeMode==='cypher-search'?'search-active':''}"
-                  id="button-select-cypher-search">Cypher search</button>
+          <button class="${state.activeMode==='keyword-search'?'search-active':''} has-tooltip" id="button-select-keyword-search">
+            Keyword search
+            <p class="tooltip-text">Find pages containing specified terms</p>
+          </button>
+          <button class="${state.activeMode==='link-search'?'search-active':''} has-tooltip" id="button-select-link-search">
+            Link search
+            <p class="tooltip-text">Find pages that link to a specific page</p>
+          </button>
+          <button class="${state.activeMode==='external-search'?'search-active':''} has-tooltip" id="button-select-external-search">
+            External page search
+            <p class="tooltip-text">Find pages that link to an external URL</p>
+          </button>
+          <button class="${state.activeMode==='contentid-search'?'search-active':''} has-tooltip" id="button-select-contentid-search">
+            Content ID search
+            <p class="tooltip-text">Find pages with specified ContentIDs</p>
+          </button>
+          <button class="${state.activeMode==='cypher-search'?'search-active':''} has-tooltip" id="button-select-cypher-search">
+            Cypher search
+            <p class="tooltip-text">Enter a Cypher query directly</p>
+          </button>
         </p>
         <div class="search-panel">`);
 
@@ -64,13 +74,16 @@ const view = function() {
                     <input class="kg-checkboxes__input"
                            type="checkbox" id="search-description"
                            ${state.whereToSearch.description ? 'checked' : ''}/>
-                    <label class="kg-label kg-checkboxes__label">Description</label>
+                    <label class="kg-label kg-checkboxes__label has-tooltip">
+                      <p class="tooltip-text">Description of the page set by its author, but not necessarily visible on the page</p>
+                      Description
+                    </label>
                   </li>
                   <li class="kg-checkboxes__item">
                     <input class="kg-checkboxes__input"
                            type="checkbox" id="search-text"
                            ${state.whereToSearch.text ? 'checked' : ''}/>
-                    <label class="kg-label kg-checkboxes__label">Text</label>
+                    <label class="kg-label kg-checkboxes__label">Page content</label>
                   </li>
                 </ul>
               </div>
