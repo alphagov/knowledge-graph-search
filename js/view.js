@@ -48,18 +48,22 @@ const view = function() {
   case 'keyword-search':
     html.push(`
             <div id="keyword-search-panel">
-              <p class="govuk-body">
-                <span class="keyword-label">Search for:</span>
+              <div class="govuk-body">
+                <span class="keyword-label has-tooltip">
+                  Search for:
+                  <p class="tooltip-text">The terms you want to look for. You can use "" to search for expressions (like "health certificate")</p>
+                </span>
                 <select class="govuk-select" id="and-or">
                   <option name="and" ${state.combinator === 'and' ? 'selected' : ''}>all of</option>
                   <option name="or" ${state.combinator === 'or' ? 'selected' : ''}>any of</option>
                 </select>
                 <input class="govuk-input" id="keyword" placeholder="eg: cat dog &quot;health certificate&quot;" value='${sanitise(state.selectedWords).replace('"', '&quot;')}'/>
-
-
-                <span class="keyword-label">Exclude:</span>
+                <span class="keyword-label has-tooltip">
+                  Exclude:
+                  <p class="tooltip-text">Keywords you want to exclude from your search</p>
+                </span>
                 <input class="govuk-input" id="excluded-keyword" placeholder="leave blank if no exclusions" value='${sanitise(state.excludedWords).replace('"', '&quot;')}'/>
-              </p>
+              </div>
               <div class="kg-checkboxes">
                 <div class="kg-checkboxes__item">
                   <input class="kg-checkboxes__input"
@@ -69,7 +73,10 @@ const view = function() {
                 </div>
               </div>
               <div id="search-locations-wrapper">
-                Search in:
+                <span class="has-tooltip">
+                  Search in:
+                  <p class="tooltip-text">You can search for your keywords in page titles only (faster) or in the full text of pages</p>
+                </span>
                 <ul class="kg-checkboxes" id="search-locations">
                   <li class="kg-checkboxes__item">
                     <input class="kg-checkboxes__input"
@@ -86,7 +93,10 @@ const view = function() {
                 </ul>
               </div>
               <div id="search-areas-wrapper">
-                Site area:
+                <span class="has-tooltip">
+                  Limit to:
+                  <p class="tooltip-text">Limit your search to Mainstream, Whitehall, or anywhere on GOV.UK</p>
+                </span>
                 <ul class="kg-radios" id="site-areas">
                   <li class="kg-radios__item">
                     <input class="kg-radios__input"
@@ -107,7 +117,7 @@ const view = function() {
                            type="radio" id="area-any"
                            name="area"
                            ${state.areaToSearch === '' ? 'checked' : ''}/>
-                    <label class="kg-label kg-radios__label">Any</label>
+                    <label class="kg-label kg-radios__label">Anywhere</label>
                   </li>
 
                 </ul>
