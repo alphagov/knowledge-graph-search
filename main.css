@@ -6571,12 +6571,12 @@ pre {
   background: #ddd;
 }
 
-.kg-checkboxes {
+.kg-checkboxes, .kg-radios {
   padding: 0;
   display: inline;
 }
 
-.kg-checkboxes__item {
+.kg-checkboxes__item, .kg-radios__item {
   display: inline-block;
   padding: 0 1em 0 0;
   background: #ddd;
@@ -6600,6 +6600,23 @@ pre {
 
 #keyword-search-panel input {
   margin-top: 5px;
+}
+#keyword-search-panel #keyword {
+  max-width: 300px;
+  margin-right: 10px;
+}
+#keyword-search-panel #excluded-keyword {
+  max-width: 200px;
+}
+#keyword-search-panel .keyword-label {
+  display: inline-block;
+  width: 90px;
+}
+#keyword-search-panel .taxon-facet {
+  margin-top: 10px;
+}
+#keyword-search-panel .taxon-facet #taxon {
+  display: inline-block;
 }
 
 #keyword-search-panel, #contentid-search-panel {

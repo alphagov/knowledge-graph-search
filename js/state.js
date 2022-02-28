@@ -24,6 +24,10 @@ const state = {
     description: false,  // user input: whether search should include page descriptions
     text: false  // user input: whether search should include page content
   },
+
+  //user input what broad area of the GOV.UK to search in
+  areaToSearch: '', // can be "whitehall", "mainstream" or "" (meaning any)
+
   caseSensitive: false, // user input - whether the keyword search is case sensitive
   activeMode: 'keyword-search', // user input - type of search selected
   //  possible values: 'keyword-search', 'contentid-search', 'external-search', 'link-search', 'cypher-search'
@@ -45,6 +49,7 @@ const setStateFromQS = function() {
   state.whereToSearch.title = !(searchParams.get('search-in-title') === 'false');
   state.whereToSearch.description = searchParams.get('search-in-description') === 'true';
   state.whereToSearch.text = searchParams.get('search-in-text') === 'true';
+  state.areaToSearch = searchParams.get('area') || '';
 }
 
 

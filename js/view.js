@@ -49,17 +49,25 @@ const view = function() {
     html.push(`
             <div id="keyword-search-panel">
               <p class="govuk-body">
-               Type keywords to find pages with title or content containing<br/>
+                <span class="keyword-label">Search for:</span>
                 <select class="govuk-select" id="and-or">
-                  <option name="and" ${state.combinator === 'and' ? 'selected' : ''}>all the words:</option>
-                  <option name="or" ${state.combinator === 'or' ? 'selected' : ''}>any of the words:</option>
+                  <option name="and" ${state.combinator === 'and' ? 'selected' : ''}>all of</option>
+                  <option name="or" ${state.combinator === 'or' ? 'selected' : ''}>any of</option>
                 </select>
-                <input class="govuk-input govuk-input--width-20" id="keyword" placeholder="eg: cat dog &quot;health certificate&quot;" value='${sanitise(state.selectedWords).replace('"', '&quot;')}'/>
+                <input class="govuk-input" id="keyword" placeholder="eg: cat dog &quot;health certificate&quot;" value='${sanitise(state.selectedWords).replace('"', '&quot;')}'/>
 
-              <br/>but not:
 
-                <input class="govuk-input govuk-input--width-20" id="excluded-keyword" placeholder="leave blank if no exclusions" value='${sanitise(state.excludedWords).replace('"', '&quot;')}'/>
+                <span class="keyword-label">Exclude:</span>
+                <input class="govuk-input" id="excluded-keyword" placeholder="leave blank if no exclusions" value='${sanitise(state.excludedWords).replace('"', '&quot;')}'/>
               </p>
+              <div class="kg-checkboxes">
+                <div class="kg-checkboxes__item">
+                  <input class="kg-checkboxes__input"
+                         type="checkbox" id="case-sensitive"
+                         ${state.caseSensitive ? 'checked' : ''}/>
+                  <label class="kg-label kg-checkboxes__label">Case-sensitive</label>
+                </div>
+              </div>
               <div id="search-locations-wrapper">
                 Search in:
                 <ul class="kg-checkboxes" id="search-locations">
@@ -67,16 +75,7 @@ const view = function() {
                     <input class="kg-checkboxes__input"
                            type="checkbox" id="search-title"
                            ${state.whereToSearch.title ? 'checked' : ''}/>
-                    <label class="kg-label kg-checkboxes__label">Title</label>
-                  </li>
-                  <li class="kg-checkboxes__item">
-                    <input class="kg-checkboxes__input"
-                           type="checkbox" id="search-description"
-                           ${state.whereToSearch.description ? 'checked' : ''}/>
-                    <label class="kg-label kg-checkboxes__label has-tooltip">
-                      <p class="tooltip-text">Description of the page set by its author, but not necessarily visible on the page</p>
-                      Description
-                    </label>
+                    <label class="kg-label kg-checkboxes__label">Page title</label>
                   </li>
                   <li class="kg-checkboxes__item">
                     <input class="kg-checkboxes__input"
@@ -86,21 +85,39 @@ const view = function() {
                   </li>
                 </ul>
               </div>
-              <div class="kg-checkboxes">
-                Case-sensitive:
-                <div class="kg-checkboxes__item">
-                  <input class="kg-checkboxes__input"
-                         type="checkbox" id="case-sensitive"
-                         ${state.caseSensitive ? 'checked' : ''}/>
-                </div>
-              </div>
+              <div id="search-areas-wrapper">
+                Site area:
+                <ul class="kg-radios" id="site-areas">
+                  <li class="kg-radios__item">
+                    <input class="kg-radios__input"
+                           type="radio" id="area-mainstream"
+                           name="area"
+                           ${state.areaToSearch === 'mainstream' ? 'checked' : ''}/>
+                    <label class="kg-label kg-radios__label">Mainstream</label>
+                  </li>
+                  <li class="kg-radios__item">
+                    <input class="kg-radios__input"
+                           type="radio" id="area-whitehall"
+                           name="area"
+                           ${state.areaToSearch === 'whitehall' ? 'checked' : ''}/>
+                    <label class="kg-label kg-radios__label">Whitehall</label>
+                  </li>
+                  <li class="kg-radios__item">
+                    <input class="kg-radios__input"
+                           type="radio" id="area-any"
+                           name="area"
+                           ${state.areaToSearch === '' ? 'checked' : ''}/>
+                    <label class="kg-label kg-radios__label">Any</label>
+                  </li>
 
-              <div class="govuk-body">
+                </ul>
+              </div>
+              <div class="govuk-body taxon-facet">
                 <label id="taxon-label" class="has-tooltip">Taxon:
                   <p class="tooltip-text">Limit this search to a taxon (and its sub-taxons)</p>
                 </label>
-              <div id="taxon"></div>
-
+                <div id="taxon"></div>
+              </div>
               <p class="govuk-body">
                 <button
                     class="govuk-button ${state.waiting?'govuk-button--secondary':''}"
@@ -295,7 +312,7 @@ const viewSearchResults = function(mode, results, showFields) {
   if (state.waiting) {
     html.push(`<h2 class="govuk-heading-l">Searching</h2>`);
   } else if (results && results.records.length > 0) {
-    html.push(`<h2 class="govuk-heading-l">${results.records.length} results found</h2>`);
+    html.push(`<h2 class="govuk-heading-l">${results.records.length} results</h2>`);
 
     const csv = csvFromResults(results);
     const file = new Blob([csv], { type: 'text/csv' });

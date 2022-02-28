@@ -51,17 +51,25 @@ const keywordSearchQuery = function(state, keywords, exclusions) {
   const exclusionClause = exclusions.length ?
     ('WITH * WHERE NOT ' + exclusions.map(word => multiContainsClause(fieldsToSearch, word, state.caseSensitive)).join(`\n OR `)) : '';
 
+  let areaClause = '';
+  if (state.areaToSearch === 'mainstream') {
+    areaClause = 'AND n.publishing_app = "publisher"';
+  } else if (state.areaToSearch === 'whitehall') {
+    areaClause = 'AND n.publishing_app = "whitehall"';
+  }
+
   const taxon = state.selectedTaxon;
 
   return `
     MATCH (n:Cid)
     ${inclusionClause}
     ${exclusionClause}
+    ${areaClause}
     WITH n
     OPTIONAL MATCH (n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
     OPTIONAL MATCH (n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
     OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)${taxon.length > 0 ? '<-[:HAS_PARENT*]-(c:Taxon)' : '' }
-    ${taxon.length > 0 ? `AND (taxon.name = "${taxon}" OR c.name = "${taxon}")` : ''}
+    ${taxon.length > 0 ? `WHERE taxon.name = "${taxon}" OR c.name = "${taxon}"` : ''}
     RETURN ${returnFields()}
     ORDER BY n.pagerank DESC
     LIMIT ${state.maxNumberOfResultsRequested};`
@@ -162,6 +170,7 @@ const queryGraph = async function(query) {
 
 
 const handleEvent = async function(event) {
+  console.log('event!', event);
   let fieldClicked;
   switch(event.type) {
     case "dom":
@@ -175,6 +184,9 @@ const handleEvent = async function(event) {
         state.whereToSearch.description = id('search-description').checked;
         state.whereToSearch.text = id('search-text').checked;
         state.caseSensitive = id('case-sensitive').checked;
+        if (id('area-mainstream').checked) state.areaToSearch = 'mainstream';
+        if (id('area-whitehall').checked) state.areaToSearch = 'whitehall';
+        if (id('area-any').checked) state.areaToSearch = '';
         keywordSearchButtonClicked();
         break;
       case "contentid-search":
@@ -252,9 +264,10 @@ const updateUrl = function() {
       if (state.combinator !== 'and') searchParams.set('combinator', state.combinator);
       if (state.selectedTaxon !== '') searchParams.set('selected-taxon', state.selectedTaxon);
       if (state.caseSensitive) searchParams.set('case-sensitive', state.caseSensitive);
-      if (!state.whereToSearch.title) searchParams.set('search-in-title', 'false')
-      if (state.whereToSearch.description) searchParams.set('search-in-description', 'true')
-      if (state.whereToSearch.text) searchParams.set('search-in-text', 'true')
+      if (!state.whereToSearch.title) searchParams.set('search-in-title', 'false');
+      if (state.whereToSearch.description) searchParams.set('search-in-description', 'true');
+      if (state.whereToSearch.text) searchParams.set('search-in-text', 'true');
+      if (state.areaToSearch.length > 0) searchParams.set('area', state.areaToSearch);
     break;
     case 'contentid-search':
       if (state.contentIds !== '') searchParams.set('content-ids', state.contentIds);
