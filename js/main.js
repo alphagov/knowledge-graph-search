@@ -3,7 +3,7 @@
 import { view } from './view.js';
 import { state, setStateFromQS } from './state.js';
 import {
-  searchButtonClicked,
+  keywordSearchButtonClicked,
   contentIdSearchButtonClicked,
   linkSearchButtonClicked,
   externalSearchButtonClicked,
@@ -78,7 +78,7 @@ const init = async function() {
   state.waiting = true;
   switch(state.activeMode) {
   case 'keyword-search':
-    searchButtonClicked();
+    keywordSearchButtonClicked();
   break;
   case 'contentid-search':
     contentIdSearchButtonClicked();

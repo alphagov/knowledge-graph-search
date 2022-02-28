@@ -13,7 +13,6 @@ const containsClause = function(field, word, caseSensitive) {
   :
     `(toLower(n.${field}) CONTAINS toLower("${word}"))`
   ;
-
 }
 
 const multiContainsClause = function(fields, word, caseSensitive) {
@@ -32,10 +31,13 @@ const returnFields = function() {
     n.first_published_at AS first_published_at,
     n.public_updated_at AS public_updated_at,
     n.pagerank AS pagerank,
-    COLLECT (taxon.name) AS taxons`;
+    COLLECT (taxon.name) AS taxons,
+    COLLECT (o.name) AS primary_organisation,
+    COLLECT (o2.name) AS all_organisations
+`;
 };
 
-const buildQuery = function(state, keywords, exclusions) {
+const keywordSearchQuery = function(state, keywords, exclusions) {
   const fieldsToSearch = [
     state.whereToSearch.title?'title':null,
     state.whereToSearch.description?'description':null,
@@ -52,15 +54,15 @@ const buildQuery = function(state, keywords, exclusions) {
   const taxon = state.selectedTaxon;
 
   return `
-    MATCH (n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
-    MATCH (n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
-    MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)${taxon.length > 0 ? '<-[:HAS_PARENT*]-(c:Taxon)' : '' }
+    MATCH (n:Cid)
     ${inclusionClause}
     ${exclusionClause}
+    WITH n
+    OPTIONAL MATCH (n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
+    OPTIONAL MATCH (n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
+    OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)${taxon.length > 0 ? '<-[:HAS_PARENT*]-(c:Taxon)' : '' }
     ${taxon.length > 0 ? `AND (taxon.name = "${taxon}" OR c.name = "${taxon}")` : ''}
-    RETURN ${returnFields()},
-    COLLECT (o.name) AS primary_organisation,
-    COLLECT (o2.name) AS all_organisations
+    RETURN ${returnFields()}
     ORDER BY n.pagerank DESC
     LIMIT ${state.maxNumberOfResultsRequested};`
 };
@@ -72,6 +74,8 @@ const linkSearchButtonClicked = async function() {
     MATCH (n:Cid)-[:HYPERLINKS_TO]->(n2:Cid)
     WHERE n2.name = "${justThePath}"
     WITH n
+    OPTIONAL MATCH (n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
+    OPTIONAL MATCH (n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
     OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
     RETURN DISTINCT ${returnFields()}
     LIMIT ${state.maxNumberOfResultsRequested}`;
@@ -82,11 +86,13 @@ const linkSearchButtonClicked = async function() {
 const externalSearchButtonClicked = async function() {
   state.searchQuery = `
     MATCH (n:Cid) -[:HYPERLINKS_TO]-> (e:ExternalPage)
-    MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
     WHERE e.name CONTAINS "${state.externalUrl}"
+    WITH n
+    OPTIONAL MATCH (n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
+    OPTIONAL MATCH (n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
+    OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
     RETURN
-    ${returnFields()},
-    e.name AS externalUrl
+    ${returnFields()}
     LIMIT ${state.maxNumberOfResultsRequested}`;
   queryGraph(state.searchQuery);
 };
@@ -100,8 +106,9 @@ const contentIdSearchButtonClicked = async function() {
   const whereStatement = contentIds.map(cid => `n.contentID="${cid}" `).join(' OR ');
   state.searchQuery = `
     MATCH (n:Cid)
-    MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
     WHERE ${whereStatement}
+    WITH n
+    OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
     RETURN
     ${returnFields()}
     LIMIT ${state.maxNumberOfResultsRequested}`;
@@ -126,24 +133,25 @@ const splitKeywords = function(keywords) {
   return output;
 };
 
-const searchButtonClicked = async function() {
-  if (state.selectedWords.length < 3) {
-    state.errorText = 'Please make your search terms longer to avoid returning too many results';
-  } else {
-    state.errorText = null;
-    const keywords = splitKeywords(state.selectedWords)
-          .filter(d=>d.length>0)
-          .map(s => s.toLowerCase());
-    const excludedKeywords = splitKeywords(state.excludedWords)
-          .filter(d=>d.length>0)
-          .map(s => s.toLowerCase());
-    state.searchQuery = buildQuery(state, keywords, excludedKeywords);
+const keywordSearchButtonClicked = async function() {
+  state.errorText = null;
+  const keywords = splitKeywords(state.selectedWords)
+        .filter(d=>d.length>0)
+        .map(s => s.toLowerCase());
+  const excludedKeywords = splitKeywords(state.excludedWords)
+        .filter(d=>d.length>0)
+        .map(s => s.toLowerCase());
+  if (keywords.length > 0) {
+    state.searchQuery = keywordSearchQuery(state, keywords, excludedKeywords);
     queryGraph(state.searchQuery);
+  } else {
+    state.waiting = false;
   }
 };
 
 
 const queryGraph = async function(query) {
+  console.log(query)
   state.neo4jSession
     .run(query)
     .then(result => handleEvent({type:'neo4j-callback-ok', result}))
@@ -167,9 +175,7 @@ const handleEvent = async function(event) {
         state.whereToSearch.description = id('search-description').checked;
         state.whereToSearch.text = id('search-text').checked;
         state.caseSensitive = id('case-sensitive').checked;
-        console.log('beforeclick');
-        searchButtonClicked();
-        console.log('afterclick');
+        keywordSearchButtonClicked();
         break;
       case "contentid-search":
         state.contentIds = id('contentid').value;
@@ -276,7 +282,7 @@ const updateUrl = function() {
 
 export {
   handleEvent,
-  searchButtonClicked,
+  keywordSearchButtonClicked,
   contentIdSearchButtonClicked,
   linkSearchButtonClicked,
   externalSearchButtonClicked,
