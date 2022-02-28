@@ -9,6 +9,10 @@ body {
   color: red;
 }
 
+#results {
+  margin-top: 32px;
+}
+
 svg {
   border: 1px solid black;
 }
@@ -40,7 +44,7 @@ pre {
 }
 
 .search-panel {
-  padding: 1em;
+  padding: 10px 10px 0 10px;
   border: 1px solid black;
 }
 
@@ -53,6 +57,10 @@ pre {
   margin: 0;
 }
 
+#keyword-search {
+  margin-top: 20px;
+}
+
 #show-fields-wrapper {
   margin: 2em 0;
 }
@@ -63,7 +71,7 @@ pre {
 }
 
 #cypher-query {
-  margin-top: 2em;
+  margin-top: 200px;
 }
 
 #clear {

@@ -42,7 +42,6 @@ const setStateFromQS = function() {
   state.selectedTaxon = searchParams.get('selected-taxon') || '';
   state.caseSensitive = searchParams.get('case-sensitive') || false;
   state.activeMode = searchParams.get('active-mode') || 'keyword-search';
-  state.maxNumberOfResultsRequested = parseInt(searchParams.get('max-results')) || 100;
   state.whereToSearch.title = !(searchParams.get('search-in-title') === 'false');
   state.whereToSearch.description = searchParams.get('search-in-description') === 'true';
   state.whereToSearch.text = searchParams.get('search-in-text') === 'true';

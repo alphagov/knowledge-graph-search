@@ -66,8 +66,8 @@ const buildQuery = function(state, keywords, exclusions) {
 };
 
 
-const linkSearchButtonClicked = async function(url) {
-  const justThePath = url.replace(/.*\.gov.uk/, '');
+const linkSearchButtonClicked = async function() {
+  const justThePath = state.linkSearchUrl.replace(/.*\.gov.uk/, '');
   state.searchQuery = `
     MATCH (n:Cid)-[:HYPERLINKS_TO]->(n2:Cid)
     WHERE n2.name = "${justThePath}"
@@ -79,11 +79,11 @@ const linkSearchButtonClicked = async function(url) {
 };
 
 
-const externalSearchButtonClicked = async function(url) {
+const externalSearchButtonClicked = async function() {
   state.searchQuery = `
     MATCH (n:Cid) -[:HYPERLINKS_TO]-> (e:ExternalPage)
     MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
-    WHERE e.name CONTAINS "${url}"
+    WHERE e.name CONTAINS "${state.externalUrl}"
     RETURN
     ${returnFields()},
     e.name AS externalUrl
@@ -129,7 +129,6 @@ const splitKeywords = function(keywords) {
 const searchButtonClicked = async function() {
   if (state.selectedWords.length < 3) {
     state.errorText = 'Please make your search terms longer to avoid returning too many results';
-    state.waiting = false;
   } else {
     state.errorText = null;
     const keywords = splitKeywords(state.selectedWords)
@@ -145,16 +144,12 @@ const searchButtonClicked = async function() {
 
 
 const queryGraph = async function(query) {
-  console.log('running', state.searchQuery)
-  try {
-    const queryResults = await state.neo4jSession.readTransaction(tx =>
-      tx.run(query));
-    console.log(queryResults)
-    return handleEvent({type:'neo4j-callback-ok', data: queryResults});
-  } catch (e) {
-    console.log('Neo4j error', e);
-    return handleEvent({type:'neo4j-callback-fail'});
-  }
+  state.neo4jSession
+    .run(query)
+    .then(result => handleEvent({type:'neo4j-callback-ok', result}))
+    .catch(error => handleEvent({type:'neo4j-callback-fail', error}));
+
+  handleEvent({type: 'neo4j-running'});
 };
 
 
@@ -167,37 +162,30 @@ const handleEvent = async function(event) {
         state.selectedWords = sanitise(id('keyword').value);
         state.excludedWords = sanitise(id('excluded-keyword').value);
         state.combinator = id('and-or').selectedIndex == 0 ? 'and' : 'or';
-        state.selectedTaxon = sanitise(id('taxons').value);
+        state.selectedTaxon = document.querySelector('#taxon input').value;
         state.whereToSearch.title = id('search-title').checked;
         state.whereToSearch.description = id('search-description').checked;
         state.whereToSearch.text = id('search-text').checked;
         state.caseSensitive = id('case-sensitive').checked;
-        state.maxNumberOfResultsRequested = sanitise(id('nb-results').value);
-        state.waiting = true;
+        console.log('beforeclick');
         searchButtonClicked();
+        console.log('afterclick');
         break;
       case "contentid-search":
         state.contentIds = id('contentid').value;
-        state.waiting = true;
         contentIdSearchButtonClicked();
         break;
       case "external-search":
         state.externalUrl = id('external').value;
-        state.waiting = true;
-        externalSearchButtonClicked(state.externalUrl);
+        externalSearchButtonClicked();
         break;
       case "link-search":
         state.linkSearchUrl = id('link-search').value;
-        state.waiting = true;
-        linkSearchButtonClicked(state.linkSearchUrl);
+        linkSearchButtonClicked();
         break;
       case "cypher-search":
         state.searchQuery = id('cypher').value;
-        state.waiting = true;
         cypherSearchButtonClicked();
-        break;
-      case "clear":
-        state.searchResults = null;
         break;
       case 'button-select-keyword-search':
         state.activeMode = 'keyword-search';
@@ -225,15 +213,18 @@ const handleEvent = async function(event) {
     break;
 
   // non-dom events
+  case 'neo4j-running':
+    state.waiting = true;
+    break;
   case 'neo4j-callback-ok':
-    state.searchResults = event.data;
+    state.searchResults = event.result;
     state.waiting = false;
     state.errorText = null;
   break;
   case 'neo4j-callback-fail':
     state.searchResults = null;
     state.waiting = false;
-    state.errorText = 'There was a problem querying the GovGraph. Are you on the VPN? If yes, you may have found a bug. Please send details to the Data Labs';
+    state.errorText = `There was a problem querying the GovGraph: ${event.error}`;
   break;
   default:
     console.log('unknown event:', event);
@@ -247,19 +238,32 @@ const updateUrl = function() {
   if ('URLSearchParams' in window) {
     var searchParams = new URLSearchParams();
 
-    if (state.selectedWords !== '') searchParams.set('selected-words', state.selectedWords);
-    if (state.excludedWords !== '') searchParams.set('excluded-words', state.excludedWords);
-    if (state.externalUrl !== '') searchParams.set('external-url', state.externalUrl);
-    if (state.linkSearchUrl !== '') searchParams.set('link-search-url', state.linkSearchUrl);
-    if (state.contentIds !== '') searchParams.set('content-ids', state.contentIds);
-    if (state.combinator !== 'and') searchParams.set('combinator', state.combinator);
-    if (state.selectedTaxon !== '') searchParams.set('selected-taxon', state.selectedTaxon);
-    if (state.caseSensitive) searchParams.set('case-sensitive', state.caseSensitive);
     if (state.activeMode !== 'keyword-search') searchParams.set('active-mode', state.activeMode);
-    if (state.maxNumberOfResultsRequested !== 100) searchParams.set('max-results', state.maxNumberOfResultsRequested);
-    if (!state.whereToSearch.title) searchParams.set('search-in-title', 'false')
-    if (state.whereToSearch.description) searchParams.set('search-in-description', 'true')
-    if (state.whereToSearch.text) searchParams.set('search-in-text', 'true')
+    switch (state.activeMode) {
+    case 'keyword-search':
+      if (state.selectedWords !== '') searchParams.set('selected-words', state.selectedWords);
+      if (state.excludedWords !== '') searchParams.set('excluded-words', state.excludedWords);
+      if (state.combinator !== 'and') searchParams.set('combinator', state.combinator);
+      if (state.selectedTaxon !== '') searchParams.set('selected-taxon', state.selectedTaxon);
+      if (state.caseSensitive) searchParams.set('case-sensitive', state.caseSensitive);
+      if (!state.whereToSearch.title) searchParams.set('search-in-title', 'false')
+      if (state.whereToSearch.description) searchParams.set('search-in-description', 'true')
+      if (state.whereToSearch.text) searchParams.set('search-in-text', 'true')
+    break;
+    case 'contentid-search':
+      if (state.contentIds !== '') searchParams.set('content-ids', state.contentIds);
+    break;
+    case 'external-search':
+      if (state.externalUrl !== '') searchParams.set('external-url', state.externalUrl);
+    break;
+    case 'link-search':
+      if (state.linkSearchUrl !== '') searchParams.set('link-search-url', state.linkSearchUrl);
+    break;
+    case 'cypher-search':
+    break;
+    default:
+      console.log('update URL unknown activeMode:', state.activeMode);
+    }
 
     let newRelativePathQuery = window.location.pathname;
     if (searchParams.toString().length > 0) {
@@ -270,4 +274,11 @@ const updateUrl = function() {
 }
 
 
-export { handleEvent };
+export {
+  handleEvent,
+  searchButtonClicked,
+  contentIdSearchButtonClicked,
+  linkSearchButtonClicked,
+  externalSearchButtonClicked,
+  cypherSearchButtonClicked
+};

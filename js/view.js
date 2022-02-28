@@ -19,8 +19,7 @@ const view = function() {
       </div>`)
   }
 
-  if (state.searchResults === null) {
-    html.push(`
+  html.push(`
         <p class="govuk-body mode-buttons">
           <button class="${state.activeMode==='keyword-search'?'search-active':''} has-tooltip" id="button-select-keyword-search">
             Keyword search
@@ -45,10 +44,10 @@ const view = function() {
         </p>
         <div class="search-panel">`);
 
-    switch(state.activeMode) {
-      case 'keyword-search':
-      html.push(`
-            <div class="govuk-form-group" id="keyword-search-panel">
+  switch(state.activeMode) {
+  case 'keyword-search':
+    html.push(`
+            <div id="keyword-search-panel">
               <p class="govuk-body">
                Type keywords to find pages with title or content containing<br/>
                 <select class="govuk-select" id="and-or">
@@ -88,24 +87,20 @@ const view = function() {
                 </ul>
               </div>
               <div class="kg-checkboxes">
+                Case-sensitive:
                 <div class="kg-checkboxes__item">
                   <input class="kg-checkboxes__input"
                          type="checkbox" id="case-sensitive"
                          ${state.caseSensitive ? 'checked' : ''}/>
-                  <label class="kg-label kg-checkboxes__label">case sensitive</label>
                 </div>
               </div>
-              <div>
-                <p class="govuk-body">Search within taxon (and sub-taxons): <span class="experimental">EXPERIMENTAL</span></p>
-                <select class="govuk-select" id="taxons">
-                  <option name=""}>All taxons</option>
-                  ${state.taxons.map(taxon => `<option name="${taxon}" ${state.selectedTaxon === taxon ? 'selected' :''}>${taxon}</option>`)}
-                </select>
-              </div>
-              <div>
-                Max number of results:
-                <input class="govuk-input govuk-input--width-10" id="nb-results" type="number" value="${state.maxNumberOfResultsRequested}"/>
-              </div>
+
+              <div class="govuk-body">
+                <label id="taxon-label" class="has-tooltip">Taxon:
+                  <p class="tooltip-text">Limit this search to a taxon (and its sub-taxons)</p>
+                </label>
+              <div id="taxon"></div>
+
               <p class="govuk-body">
                 <button
                     class="govuk-button ${state.waiting?'govuk-button--secondary':''}"
@@ -115,13 +110,13 @@ const view = function() {
               </p>
             </div>
       `);
-      break;
-      case 'contentid-search':
-      html.push(`
+    break;
+  case 'contentid-search':
+    html.push(`
             <p class="govuk-body">Enter one or more contentIDs:</p>
             <span>For example: ad5110e0-fa62-49d3-923f-d50101f12014, 52feb778-b249-4804-a9c3-dfdc05b7b224</span>
 
-            <div class="govuk-form-group" id="contentid-search-panel">
+            <div id="contentid-search-panel">
               <p class="govuk-body">
                 <textarea class="govuk-textarea" rows="5" id="contentid">${state.contentIds}</textarea>
               </p>
@@ -134,11 +129,11 @@ const view = function() {
               </p>
             </div>
       `);
-      break;
-      case 'external-search':
-      html.push(`
+    break;
+  case 'external-search':
+    html.push(`
             <p>Enter an external URL to find all pages linking to it</p>
-            <div class="govuk-form-group" id="external-search-panel">
+            <div id="external-search-panel">
               <p class="govuk-body">
                 <input class="govuk-input govuk-input--width-20" id="external"
                        value="${state.externalUrl}"
@@ -153,11 +148,11 @@ const view = function() {
               </p>
             </div>
       `);
-      break;
-      case 'link-search':
-      html.push(`
+    break;
+  case 'link-search':
+    html.push(`
             <p>Enter a URL to find all pages linking to it</p>
-            <div class="govuk-form-group" id="link-search-panel">
+            <div id="link-search-panel">
               <p class="govuk-body">
                 <input class="govuk-input" id="link-search"
                        value="${state.linkSearchUrl}"
@@ -172,11 +167,11 @@ const view = function() {
               </p>
             </div>
       `);
-      break;
-      case 'cypher-search':
-      html.push(`
+    break;
+  case 'cypher-search':
+    html.push(`
             <p>Type a Cypher query:</p>
-            <div class="govuk-form-group" id="cypher-search-panel">
+            <div id="cypher-search-panel">
               <p class="govuk-body">
                 <textarea class="govuk-textarea" rows="5" id="cypher">${state.searchQuery}</textarea>
               </p>
@@ -189,20 +184,17 @@ const view = function() {
               </p>
             </div>
       `);
-      break;
-      default:
-        console.log('invalid mode', state.activeMode);
-    }
-  } else {
-    html.push(`
-      </div>
-      <div id="results">${viewSearchResults(state.activeMode, state.searchResults, state.showFields)}</div> `);
+    break;
+  default:
+    console.log('invalid mode', state.activeMode);
   }
 
   html.push(`
+          </div>
+        </div>
+      <div id="results">${viewSearchResults(state.activeMode, state.searchResults, state.showFields)}</div>
     </main>
-    <p class="govuk-body sig">Brought to you by the Data Labs<br/>Help/problem/feedback: Contact <a href="mailto:max.froumentin@digital.cabinet-office.gov.uk">Max Froumentin</a>
-`);
+    <p class="govuk-body sig">Brought to you by the Data Labs<br/>Help/problem/feedback: Contact <a href="mailto:max.froumentin@digital.cabinet-office.gov.uk">Max Froumentin</a>`);
 
   id('page-content').innerHTML = html.join('');
 
@@ -213,12 +205,15 @@ const view = function() {
       event => handleEvent({type: 'dom', id: event.target.getAttribute('id')})));
 
   // add the accessible autocomplete
-  if (document.querySelector('#taxons')) {
-    accessibleAutocomplete.enhanceSelectElement({
-      selectElement: document.querySelector('#taxons')
+  if (id('taxon')) {
+    accessibleAutocomplete({
+      element: document.querySelector('#taxon'),
+      id: 'taxon-label',
+      source: state.taxons,
+      defaultValue: state.selectedTaxon,
+      showAllValues: true
     });
   }
-
 };
 
 
@@ -297,9 +292,10 @@ const csvFromResults = function(searchResults) {
 
 const viewSearchResults = function(mode, results, showFields) {
   const html = [];
-  if (results && results.records.length > 0) {
-    html.push(`<h2 class="govuk-heading-m">${results.records.length} results found</h2>`);
-    html.push('<div><button class="govuk-button" id="clear">Back</button> ');
+  if (state.waiting) {
+    html.push(`<h2 class="govuk-heading-l">Searching</h2>`);
+  } else if (results && results.records.length > 0) {
+    html.push(`<h2 class="govuk-heading-l">${results.records.length} results found</h2>`);
 
     const csv = csvFromResults(results);
     const file = new Blob([csv], { type: 'text/csv' });
@@ -309,10 +305,10 @@ const viewSearchResults = function(mode, results, showFields) {
 
     html.push(viewSearchResultsTable(results.records, showFields));
   } else {
-    html.push('<h2 class="govuk-heading-m">No results</h2>');
-    html.push('<div><button class="govuk-button" id="clear">Back</button></div>');
+    html.push('<h2 class="govuk-heading-l">No results</h2>');
   }
 
+  // Print the cypher query used, for the advanced user
   if (state.searchQuery.length > 0) {
     html.push(`
       <div id="cypher-query">

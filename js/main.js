@@ -2,6 +2,13 @@
 
 import { view } from './view.js';
 import { state, setStateFromQS } from './state.js';
+import {
+  searchButtonClicked,
+  contentIdSearchButtonClicked,
+  linkSearchButtonClicked,
+  externalSearchButtonClicked,
+  cypherSearchButtonClicked
+ } from './events.js';
 
 
 //==================================================
@@ -39,7 +46,6 @@ const init = async function() {
     return;
   }
 
-
   state.neo4jSession = state.neo4jDriver.session({ defaultAccessMode: neo4j.session.READ });
   state.errorText = null;
 
@@ -69,4 +75,24 @@ const init = async function() {
   await init();
   setStateFromQS();
   view();
+  state.waiting = true;
+  switch(state.activeMode) {
+  case 'keyword-search':
+    searchButtonClicked();
+  break;
+  case 'contentid-search':
+    contentIdSearchButtonClicked();
+  break;
+  case 'link-search':
+    linkSearchButtonClicked();
+  break;
+  case 'external-search':
+    externalSearchButtonClicked();
+  break;
+  case 'cypher-search':
+    cypherSearchButtonClicked();
+  break;
+  default:
+    console.log('init: unknown mode', state.activeMode);
+  }
 })();
