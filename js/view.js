@@ -246,6 +246,7 @@ const view = function() {
 
 const viewSearchResultsTable = function(records, showFields) {
   const html = [];
+  const recordsToShow = records.slice(state.skip, state.skip + state.limit);
   html.push('<table class="govuk-table">');
   html.push(`<thead class="govuk-table__head">
       <div id="show-fields-wrapper">
@@ -253,7 +254,7 @@ const viewSearchResultsTable = function(records, showFields) {
       <ul class="kg-checkboxes" id="show-fields">
  `);
 
-  html.push(records[0].keys.map(key => `
+  html.push(recordsToShow[0].keys.map(key => `
     <li class="kg-checkboxes__item">
       <input class="kg-checkboxes__input"
              data-interactive="true"
@@ -268,13 +269,13 @@ const viewSearchResultsTable = function(records, showFields) {
     <tbody class="govuk-table__body">
       <tr class="govuk-table__row">`);
 
-  records[0].keys.forEach(key => {
+  recordsToShow[0].keys.forEach(key => {
     if (state.showFields[key]) {
       html.push(`<th scope="scope" class="govuk-table__header">${fieldName(key)}</th>`);
     }
   });
 
-  records.forEach(record => {
+  recordsToShow.forEach(record => {
     html.push(`<tr class="govuk-table__row">`);
 
     record._fields.forEach((val, idx) => {
@@ -322,15 +323,24 @@ const viewSearchResults = function(mode, results, showFields) {
   if (state.waiting) {
     html.push(`<h2 class="govuk-heading-l">Searching</h2>`);
   } else if (results && results.records.length > 0) {
-    html.push(`<h2 class="govuk-heading-l">${results.records.length} results</h2>`);
+    const nbRecords = results.records.length;
+    html.push(`<h2 class="govuk-heading-l">${nbRecords} Results</h2>`);
+    if (nbRecords >= state.limit) {
+      html.push(`<p class="govuk-body">Showing ${state.skip + 1} - ${Math.min(nbRecords, state.skip + state.limit)}</p>`);
+    }
+    html.push(viewSearchResultsTable(results.records, showFields));
+    html.push(`
+      <p class="govuk-body">
+        <button class="govuk-button" id="button-prev-page">Previous</button>
+        <button class="govuk-button" id="button-next-page">Next</button>
+      </p>`
+    );
 
     const csv = csvFromResults(results);
     const file = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(file); // TODO: use window.URL.revokeObjectURL(url);  after
-    html.push(`<a class="govuk-link" href="${url}" download="export.csv">Export as CSV</a></div>`);
+    html.push(`<p class="govuk-body"><a class="govuk-link" href="${url}" download="export.csv">Save all ${nbRecords} results as a CSV file</a></p>`);
 
-
-    html.push(viewSearchResultsTable(results.records, showFields));
   } else {
     html.push('<h2 class="govuk-heading-l">No results</h2>');
   }
@@ -343,16 +353,6 @@ const viewSearchResults = function(mode, results, showFields) {
       <pre>${state.searchQuery}</pre>
     `);
   }
-
-  if(results && results.records.length > 0) {
-    html.push(`
-    <div id="raw-results">
-      <hr/><h2 class="govuk-heading-s">Raw results:</h2>
-      <pre>${csvFromResults(state.searchResults)}</pre>
-    </div>
-  `);
-  }
-
 
   return html.join('');
 };

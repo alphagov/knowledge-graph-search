@@ -14,7 +14,8 @@ const state = {
   linkSearchUrl: '', // user input: URL to find all pages linking to
   searchQuery: '', // generated from other user inputs or typed in directly
   searchResults: null,
-  maxNumberOfResultsRequested: 100,
+  skip: 0, // where to start the pagination (number of results)
+  limit: 10, // number of results per page
   showFields: {
     name: true,
     title: true,
@@ -48,6 +49,7 @@ const setStateFromQS = function() {
   state.whereToSearch.title = !(searchParams.get('search-in-title') === 'false');
   state.whereToSearch.text = searchParams.get('search-in-text') === 'true';
   state.areaToSearch = searchParams.get('area') || '';
+  state.skip = parseInt(searchParams.get('skip')) || 0;
 }
 
 

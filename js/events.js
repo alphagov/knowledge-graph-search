@@ -21,8 +21,8 @@ const multiContainsClause = function(fields, word, caseSensitive) {
     .join(' OR ') + ')'
 }
 
-const returnFields = function() {
-  return `
+const returnClause = function() {
+  return `RETURN
     n.name as name,
     n.title AS title,
     n.documentType AS documentType,
@@ -34,7 +34,7 @@ const returnFields = function() {
     COLLECT (taxon.name) AS taxons,
     COLLECT (o.name) AS primary_organisation,
     COLLECT (o2.name) AS all_organisations
-`;
+    ORDER BY n.pagerank DESC`;
 };
 
 const keywordSearchQuery = function(state, keywords, exclusions) {
@@ -64,14 +64,11 @@ const keywordSearchQuery = function(state, keywords, exclusions) {
     ${inclusionClause}
     ${exclusionClause}
     ${areaClause}
-    WITH n
     OPTIONAL MATCH (n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
     OPTIONAL MATCH (n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
     OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)${taxon.length > 0 ? '<-[:HAS_PARENT*]-(c:Taxon)' : '' }
     ${taxon.length > 0 ? `WHERE taxon.name = "${taxon}" OR c.name = "${taxon}"` : ''}
-    RETURN ${returnFields()}
-    ORDER BY n.pagerank DESC
-    LIMIT ${state.maxNumberOfResultsRequested};`
+    ${returnClause()}`;
 };
 
 
@@ -84,8 +81,8 @@ const linkSearchButtonClicked = async function() {
     OPTIONAL MATCH (n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
     OPTIONAL MATCH (n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
     OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
-    RETURN DISTINCT ${returnFields()}
-    LIMIT ${state.maxNumberOfResultsRequested}`;
+    ${returnClause()}`;
+
   queryGraph(state.searchQuery);
 };
 
@@ -98,9 +95,7 @@ const externalSearchButtonClicked = async function() {
     OPTIONAL MATCH (n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
     OPTIONAL MATCH (n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
     OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
-    RETURN
-    ${returnFields()}
-    LIMIT ${state.maxNumberOfResultsRequested}`;
+    ${returnClause()}`;
   queryGraph(state.searchQuery);
 };
 
@@ -116,9 +111,7 @@ const contentIdSearchButtonClicked = async function() {
     WHERE ${whereStatement}
     WITH n
     OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
-    RETURN
-    ${returnFields()}
-    LIMIT ${state.maxNumberOfResultsRequested}`;
+    ${returnClause()}`;
   queryGraph(state.searchQuery);
 };
 
@@ -158,7 +151,7 @@ const keywordSearchButtonClicked = async function() {
 
 
 const queryGraph = async function(query) {
-  console.log(query)
+  console.log('running', query);
   state.neo4jSession
     .run(query)
     .then(result => handleEvent({type:'neo4j-callback-ok', result}))
@@ -169,7 +162,6 @@ const queryGraph = async function(query) {
 
 
 const handleEvent = async function(event) {
-  console.log('event!', event);
   let fieldClicked;
   switch(event.type) {
     case "dom":
@@ -182,6 +174,7 @@ const handleEvent = async function(event) {
         state.whereToSearch.title = id('search-title').checked;
         state.whereToSearch.text = id('search-text').checked;
         state.caseSensitive = id('case-sensitive').checked;
+        state.skip = 0; // reset to first page
         if (id('area-mainstream').checked) state.areaToSearch = 'mainstream';
         if (id('area-whitehall').checked) state.areaToSearch = 'whitehall';
         if (id('area-any').checked) state.areaToSearch = '';
@@ -189,18 +182,22 @@ const handleEvent = async function(event) {
         break;
       case "contentid-search":
         state.contentIds = id('contentid').value;
+        state.skip = 0; // reset to first page
         contentIdSearchButtonClicked();
         break;
       case "external-search":
         state.externalUrl = id('external').value;
+        state.skip = 0; // reset to first page
         externalSearchButtonClicked();
         break;
       case "link-search":
         state.linkSearchUrl = id('link-search').value;
+        state.skip = 0; // reset to first page
         linkSearchButtonClicked();
         break;
       case "cypher-search":
         state.searchQuery = id('cypher').value;
+        state.skip = 0; // reset to first page
         cypherSearchButtonClicked();
         break;
       case 'button-select-keyword-search':
@@ -218,6 +215,14 @@ const handleEvent = async function(event) {
       case 'button-select-link-search':
         state.activeMode = 'link-search';
         break;
+      case 'button-next-page':
+        state.skip = state.skip + state.limit;
+        updateUrl();
+        break;
+      case 'button-prev-page':
+        state.skip = Math.max(state.skip - state.limit, 0);
+        updateUrl();
+        break;
       default:
         fieldClicked = event.id.match(/show-field-(.*)/);
         if (fieldClicked) {
@@ -234,7 +239,6 @@ const handleEvent = async function(event) {
     break;
   case 'neo4j-callback-ok':
     state.searchResults = event.result;
-    console.log(event.result);
     state.waiting = false;
     state.errorText = null;
   break;
@@ -266,6 +270,7 @@ const updateUrl = function() {
       if (!state.whereToSearch.title) searchParams.set('search-in-title', 'false');
       if (state.whereToSearch.text) searchParams.set('search-in-text', 'true');
       if (state.areaToSearch.length > 0) searchParams.set('area', state.areaToSearch);
+      if (state.skip) searchParams.set('skip', state.skip);
     break;
     case 'contentid-search':
       if (state.contentIds !== '') searchParams.set('content-ids', state.contentIds);
