@@ -21,7 +21,6 @@ const state = {
   },
   whereToSearch: {
     title: true, // user input: whether search should include page titles
-    description: false,  // user input: whether search should include page descriptions
     text: false  // user input: whether search should include page content
   },
 
@@ -47,7 +46,6 @@ const setStateFromQS = function() {
   state.caseSensitive = searchParams.get('case-sensitive') || false;
   state.activeMode = searchParams.get('active-mode') || 'keyword-search';
   state.whereToSearch.title = !(searchParams.get('search-in-title') === 'false');
-  state.whereToSearch.description = searchParams.get('search-in-description') === 'true';
   state.whereToSearch.text = searchParams.get('search-in-text') === 'true';
   state.areaToSearch = searchParams.get('area') || '';
 }

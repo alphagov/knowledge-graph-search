@@ -40,7 +40,6 @@ const returnFields = function() {
 const keywordSearchQuery = function(state, keywords, exclusions) {
   const fieldsToSearch = [
     state.whereToSearch.title?'title':null,
-    state.whereToSearch.description?'description':null,
     state.whereToSearch.text?'text':null
   ].filter(item => item)
 
@@ -181,7 +180,6 @@ const handleEvent = async function(event) {
         state.combinator = id('and-or').selectedIndex == 0 ? 'and' : 'or';
         state.selectedTaxon = document.querySelector('#taxon input').value;
         state.whereToSearch.title = id('search-title').checked;
-        state.whereToSearch.description = id('search-description').checked;
         state.whereToSearch.text = id('search-text').checked;
         state.caseSensitive = id('case-sensitive').checked;
         if (id('area-mainstream').checked) state.areaToSearch = 'mainstream';
@@ -236,6 +234,7 @@ const handleEvent = async function(event) {
     break;
   case 'neo4j-callback-ok':
     state.searchResults = event.result;
+    console.log(event.result);
     state.waiting = false;
     state.errorText = null;
   break;
@@ -265,7 +264,6 @@ const updateUrl = function() {
       if (state.selectedTaxon !== '') searchParams.set('selected-taxon', state.selectedTaxon);
       if (state.caseSensitive) searchParams.set('case-sensitive', state.caseSensitive);
       if (!state.whereToSearch.title) searchParams.set('search-in-title', 'false');
-      if (state.whereToSearch.description) searchParams.set('search-in-description', 'true');
       if (state.whereToSearch.text) searchParams.set('search-in-text', 'true');
       if (state.areaToSearch.length > 0) searchParams.set('area', state.areaToSearch);
     break;
