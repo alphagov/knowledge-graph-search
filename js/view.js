@@ -9,7 +9,13 @@ const view = function() {
   const html = [];
   html.push(`
     <main class="govuk-main-wrapper " id="main-content" role="main">
-      <h1 class="govuk-heading-xl">Search the GovGraph</h1>`);
+      <h1 class="govuk-heading-xl">
+      GovGraph search
+      <p class="govuk-heading-m">Search GOV.UK by keywords, links, taxons, etc.</p>
+      <p class="govuk-heading-s">Brought to you by the Data Labs</p>
+     </h1>
+
+ `);
 
   if (state.errorText) {
     html.push(`
@@ -221,7 +227,7 @@ const view = function() {
         </div>
       <div id="results">${viewSearchResults(state.activeMode, state.searchResults, state.showFields)}</div>
     </main>
-    <p class="govuk-body sig">Brought to you by the Data Labs<br/>Help/problem/feedback: Contact <a href="mailto:max.froumentin@digital.cabinet-office.gov.uk">Max Froumentin</a>`);
+    <p class="govuk-body sig">Help/problem/feedback: Contact <a href="mailto:max.froumentin@digital.cabinet-office.gov.uk">Max Froumentin</a>`);
 
   id('page-content').innerHTML = html.join('');
 
