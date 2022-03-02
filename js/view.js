@@ -30,7 +30,7 @@ const view = function() {
             <p class="tooltip-text">Find pages that link to a specific page</p>
           </button>
           <button class="${state.activeMode==='external-search'?'search-active':''} has-tooltip" id="button-select-external-search">
-            External page search
+            External link search
             <p class="tooltip-text">Find pages that link to an external URL</p>
           </button>
           <button class="${state.activeMode==='contentid-search'?'search-active':''} has-tooltip" id="button-select-contentid-search">
@@ -132,7 +132,7 @@ const view = function() {
                 <button
                     class="govuk-button ${state.waiting?'govuk-button--secondary':''}"
                     id="keyword-search">
-                  ${state.waiting?'Searching...':'Search'}
+                  ${state.waiting?'Searching':'Search'}
                 </button>
               </p>
             </div>
@@ -151,7 +151,7 @@ const view = function() {
                 <button
                     class="govuk-button ${state.waiting?'govuk-button--secondary':''}"
                     id="contentid-search">
-                  ${state.waiting?'Searching...':'Search'}
+                  ${state.waiting?'Searching':'Search'}
                 </button>
               </p>
             </div>
@@ -170,7 +170,7 @@ const view = function() {
                 <button
                     class="govuk-button ${state.waiting?'govuk-button--secondary':''}"
                     id="external-search">
-                  ${state.waiting?'Searching...':'Search'}
+                  ${state.waiting?'Searching':'Search'}
                 </button>
               </p>
             </div>
@@ -189,7 +189,7 @@ const view = function() {
                 <button
                     class="govuk-button ${state.waiting?'govuk-button--secondary':''}"
                     id="link-search">
-                  ${state.waiting?'Searching...':'Search'}
+                  ${state.waiting?'Searching':'Search'}
                 </button>
               </p>
             </div>
@@ -206,7 +206,7 @@ const view = function() {
                 <button
                     class="govuk-button ${state.waiting?'govuk-button--secondary':''}"
                     id="cypher-search">
-                  ${state.waiting?'Searching...':'Search'}
+                  ${state.waiting?'Searching':'Search'}
                 </button>
               </p>
             </div>
@@ -321,7 +321,7 @@ const csvFromResults = function(searchResults) {
 const viewSearchResults = function(mode, results, showFields) {
   const html = [];
   if (state.waiting) {
-    html.push(`<h2 class="govuk-heading-l">Searching</h2>`);
+    html.push(`<h2 class="govuk-heading-l">Searching <img src="assets/images/loader.gif" height="20px" alt="loader"/></h2>`);
   } else if (results && results.records.length > 0) {
     const nbRecords = results.records.length;
     html.push(`<h2 class="govuk-heading-l">${nbRecords} Results</h2>`);
@@ -329,12 +329,15 @@ const viewSearchResults = function(mode, results, showFields) {
       html.push(`<p class="govuk-body">Showing ${state.skip + 1} - ${Math.min(nbRecords, state.skip + state.limit)}</p>`);
     }
     html.push(viewSearchResultsTable(results.records, showFields));
-    html.push(`
-      <p class="govuk-body">
-        <button class="govuk-button" id="button-prev-page">Previous</button>
-        <button class="govuk-button" id="button-next-page">Next</button>
-      </p>`
-    );
+
+    if (nbRecords >= state.limit) {
+      html.push(`
+        <p class="govuk-body">
+          <button class="govuk-button" id="button-prev-page">Previous</button>
+          <button class="govuk-button" id="button-next-page">Next</button>
+        </p>`
+      );
+    }
 
     const csv = csvFromResults(results);
     const file = new Blob([csv], { type: 'text/csv' });

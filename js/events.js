@@ -77,7 +77,6 @@ const linkSearchButtonClicked = async function() {
   state.searchQuery = `
     MATCH (n:Cid)-[:HYPERLINKS_TO]->(n2:Cid)
     WHERE n2.name = "${justThePath}"
-    WITH n
     OPTIONAL MATCH (n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
     OPTIONAL MATCH (n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
     OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
@@ -91,7 +90,6 @@ const externalSearchButtonClicked = async function() {
   state.searchQuery = `
     MATCH (n:Cid) -[:HYPERLINKS_TO]-> (e:ExternalPage)
     WHERE e.name CONTAINS "${state.externalUrl}"
-    WITH n
     OPTIONAL MATCH (n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
     OPTIONAL MATCH (n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
     OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
@@ -109,7 +107,6 @@ const contentIdSearchButtonClicked = async function() {
   state.searchQuery = `
     MATCH (n:Cid)
     WHERE ${whereStatement}
-    WITH n
     OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
     ${returnClause()}`;
   queryGraph(state.searchQuery);
