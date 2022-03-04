@@ -398,7 +398,10 @@ const formatNames = array => [...new Set(array)].join(', ')
 const formatDateTime = date => `${date.slice(0,10)}<br/>${date.slice(12, 16)}`;
 
 const fieldFormatters = {
-  'name' : { name: 'URL', format: val => `<a href="https://www.gov.uk${val}">${val}</a>` },
+  'url' : {
+    name: 'URL',
+    format: url => `<a href="${url}">${url}</a>`
+  },
   'title': { name: 'Title' },
   'documentType': { name: 'Document type' },
   'publishing_app': { name: 'Publishing app' },

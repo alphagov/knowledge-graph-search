@@ -23,7 +23,7 @@ const multiContainsClause = function(fields, word, caseSensitive) {
 
 const returnClause = function() {
   return `RETURN
-    n.name as name,
+    'https://www.gov.uk' + n.name as url,
     n.title AS title,
     n.documentType AS documentType,
     n.contentID AS contentID,

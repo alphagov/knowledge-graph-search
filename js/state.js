@@ -16,8 +16,8 @@ const state = {
   searchResults: null,
   skip: 0, // where to start the pagination (number of results)
   limit: 10, // number of results per page
-  showFields: {
-    name: true,
+  showFields: { // what result fields to show by default
+    url: true,
     title: true,
   },
   whereToSearch: {
