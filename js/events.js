@@ -109,6 +109,8 @@ const contentIdSearchButtonClicked = async function() {
   state.searchQuery = `
     MATCH (n:Cid)
     WHERE ${whereStatement}
+    OPTIONAL MATCH (n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
+    OPTIONAL MATCH (n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
     OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
     ${returnClause()}`;
   queryGraph(state.searchQuery);
@@ -153,7 +155,7 @@ const queryGraph = async function(query) {
   console.log('running', query);
   state.neo4jSession
     .run(query)
-    .then(result => { console.log(result); return handleEvent({type:'neo4j-callback-ok', result})})
+    .then(result => handleEvent({type:'neo4j-callback-ok', result}))
     .catch(error => handleEvent({type:'neo4j-callback-fail', error}));
 
   handleEvent({type: 'neo4j-running'});
