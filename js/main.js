@@ -33,7 +33,9 @@ const init = async function() {
   state.neo4jDriver = neo4j.driver(
     state.server,
     neo4j.auth.basic(state.user, state.password),
-    { maxTransactionRetryTime: 3000 }
+    { // see https://neo4j.com/docs/javascript-manual/current/client-applications/#js-driver-configuration
+      connectionTimeout: 5000
+    }
   );
 
   try {
@@ -42,7 +44,11 @@ const init = async function() {
     );
   } catch (e) {
     console.log('connectivity check failed', e);
-    state.errorText = 'Error connecting to the GovGraph. Are you on the VPN?';
+    state.errorText = `Error connecting to the GovGraph.<br/>
+Possible causes:<br/>
+- You''re not on the VPN<br/>
+- The GovGraph only runs on weekdays from 9 to 7<br/>
+Otherwise there's probably a problem. Please contact the Data Labs`;
     return;
   }
 
