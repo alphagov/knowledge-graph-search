@@ -370,6 +370,7 @@ const viewSearchResults = function(mode, results, showFields) {
 
 // Remove duplicates - but should be fixed in cypher
 const formatNames = array => [...new Set(array)].join(', ')
+const formatDateTime = date => `${date.slice(0,10)}<br/>${date.slice(12, 16)}`;
 
 const fieldFormatters = {
   'name' : { name: 'URL', format: val => `<a href="https://www.gov.uk${val}">${val}</a>` },
@@ -378,11 +379,11 @@ const fieldFormatters = {
   'publishing_app': { name: 'Publishing app' },
   'first_published_at' : {
     name: 'First published',
-    format: val => val.slice(0,-7).replace(' ', '<br/>')
+    format: formatDateTime
   },
   'public_updated_at' : {
     name: 'Last publicly updated',
-    format: val => val.slice(0,-7).replace(' ', '<br/>')
+    format: formatDateTime,
   },
   'taxons' : {
     name: 'Taxons',
@@ -399,6 +400,14 @@ const fieldFormatters = {
   'pagerank' : {
     name: 'Popularity',
     format: val => val.toFixed(2)
+  },
+  'withdrawn_at' : {
+    name: 'Withdrawn at',
+    format: date => date ? formatDateTime(date) : "Not withdrawn"
+  },
+  'withdrawn_explanation' : {
+    name: 'Withdrawn reason',
+    format: text => text || 'n/a'
   }
 };
 

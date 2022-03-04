@@ -30,6 +30,8 @@ const returnClause = function() {
     n.publishing_app AS publishing_app,
     n.first_published_at AS first_published_at,
     n.public_updated_at AS public_updated_at,
+    n.withdrawn_at AS withdrawn_at,
+    n.withdrawn_explanation AS withdrawn_explanation,
     n.pagerank AS pagerank,
     COLLECT (taxon.name) AS taxons,
     COLLECT (o.name) AS primary_organisation,
@@ -151,7 +153,7 @@ const queryGraph = async function(query) {
   console.log('running', query);
   state.neo4jSession
     .run(query)
-    .then(result => handleEvent({type:'neo4j-callback-ok', result}))
+    .then(result => { console.log(result); return handleEvent({type:'neo4j-callback-ok', result})})
     .catch(error => handleEvent({type:'neo4j-callback-fail', error}));
 
   handleEvent({type: 'neo4j-running'});
