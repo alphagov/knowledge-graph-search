@@ -6606,7 +6606,7 @@ pre {
   margin-right: 10px;
 }
 #keyword-search-panel #excluded-keyword {
-  max-width: 200px;
+  max-width: 405px;
 }
 #keyword-search-panel .keyword-label {
   display: inline-block;
@@ -6666,7 +6666,6 @@ pre {
 .has-tooltip {
   position: relative;
   display: inline-block;
-  border-bottom: 2px dotted black;
 }
 .has-tooltip .tooltip-text {
   visibility: hidden;
