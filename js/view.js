@@ -9,6 +9,7 @@ const view = function() {
   const html = [];
   html.push(`
     <main class="govuk-main-wrapper " id="main-content" role="main">
+      <strong class="govuk-tag govuk-phase-banner__content__tag">DISCOVERY</strong>
       <h1 class="govuk-heading-xl">
       GovGraph search
       <p class="govuk-heading-m">Search GOV.UK by keywords, links, taxons, etc.</p>
