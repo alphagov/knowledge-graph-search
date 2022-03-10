@@ -27,6 +27,7 @@ const returnClause = function() {
     n.title AS title,
     n.documentType AS documentType,
     n.contentID AS contentID,
+    n.locale AS locale,
     n.publishing_app AS publishing_app,
     n.first_published_at AS first_published_at,
     n.public_updated_at AS public_updated_at,

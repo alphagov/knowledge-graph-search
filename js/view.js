@@ -397,6 +397,14 @@ const viewSearchResults = function(mode, results, showFields) {
 // Remove duplicates - but should be fixed in cypher
 const formatNames = array => [...new Set(array)].join(', ')
 const formatDateTime = date => `${date.slice(0,10)}<br/>${date.slice(12, 16)}`;
+const formatLanguageCode = code => {
+  switch (code) {
+    case 'en': return 'English';
+    case 'cy': return 'Welsh';
+    // add other codes as required
+    default: return code;
+  }
+};
 
 const fieldFormatters = {
   'url' : {
@@ -404,6 +412,7 @@ const fieldFormatters = {
     format: url => `<a href="${url}">${url}</a>`
   },
   'title': { name: 'Title' },
+  'locale': { name: 'Language', format: formatLanguageCode },
   'documentType': { name: 'Document type' },
   'publishing_app': { name: 'Publishing app' },
   'first_published_at' : {
