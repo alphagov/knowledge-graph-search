@@ -29,42 +29,22 @@ const view = function() {
   html.push(`
         <p class="govuk-body mode-buttons">
           <button class="${state.activeMode==='keyword-search'?'search-active':''}" id="button-select-keyword-search">
-            Keyword search
-            <span class="has-tooltip">
-              <img class="has-tooltip" src="assets/images/question-mark.svg" height="15px"/>
-              <p class="tooltip-text">Find pages containing specified terms</p>
-            </span>
+            Keyword search ${viewTooltip('Find pages containing specified terms')}
           </button>
 
           <button class="${state.activeMode==='link-search'?'search-active':''}" id="button-select-link-search">
-            Link search
-            <span class="has-tooltip">
-              <img class="has-tooltip" src="assets/images/question-mark.svg" height="15px"/>
-              <p class="tooltip-text">Find pages that link to a specific page</p>
-            </span>
+            Link search ${viewTooltip('Find pages that link to a specific page')}
           </button>
 
           <button class="${state.activeMode==='external-search'?'search-active':''}" id="button-select-external-search">
-            External link search
-            <span class="has-tooltip">
-              <img class="has-tooltip" src="assets/images/question-mark.svg" height="15px"/>
-              <p class="tooltip-text">Find pages that link to an external URL</p>
-            </span>
+            External link search ${viewTooltip('Find pages that link to an external URL')}
           </button>
 
           <button class="${state.activeMode==='contentid-search'?'search-active':''}" id="button-select-contentid-search">
-            Content ID search
-              <span class="has-tooltip">
-              <img class="has-tooltip" src="assets/images/question-mark.svg" height="15px"/>
-              <p class="tooltip-text">Find pages with specified ContentIDs</p>
-            </span>
-
+            Content ID search ${viewTooltip('Find pages with specified ContentIDs')}
           </button>
           <button class="${state.activeMode==='cypher-search'?'search-active':''}" id="button-select-cypher-search">
-            Cypher search
-            <span class="has-tooltip">
-              <img class="has-tooltip" src="assets/images/question-mark.svg" height="15px"/>
-              <p class="tooltip-text">Enter a Cypher query directly</p>
+            Cypher search ${viewTooltip('Enter a Cypher query directly')}
             </span>
           </button>
         </p>
@@ -76,20 +56,13 @@ const view = function() {
             <div id="keyword-search-panel">
               <div class="govuk-body">
                 Search for:
-                <span class="keyword-label has-tooltip">
-                  <img class="has-tooltip" src="assets/images/question-mark.svg" height="15px"/>
-                  <p class="tooltip-text">The terms you want to look for. You can use "" to search for expressions (like "health certificate")</p>
-                </span>
+               ${viewTooltip('The terms you want to look for. You can use "" to search for expressions (like "health certificate')}
                 <select class="govuk-select" id="and-or">
                   <option name="and" ${state.combinator === 'and' ? 'selected' : ''}>all of</option>
                   <option name="or" ${state.combinator === 'or' ? 'selected' : ''}>any of</option>
                 </select>
                 <input class="govuk-input" id="keyword" placeholder="eg: cat dog &quot;health certificate&quot;" value='${sanitise(state.selectedWords).replace('"', '&quot;')}'/><br/>
-                Exclude:
-                <span class="keyword-label has-tooltip">
-                  <img class="has-tooltip" src="assets/images/question-mark.svg" height="15px"/>
-                  <p class="tooltip-text">Keywords you want to exclude from your search</p>
-                </span>
+                Exclude: ${viewTooltip('Keywords you want to exclude from your search')}
                 <input class="govuk-input" id="excluded-keyword" placeholder="leave blank if no exclusions" value='${sanitise(state.excludedWords).replace('"', '&quot;')}'/>
               </div>
               <div class="kg-checkboxes">
@@ -101,11 +74,7 @@ const view = function() {
                 </div>
               </div>
               <div id="search-locations-wrapper">
-                Search in:
-                <span class="has-tooltip">
-                  <img class="has-tooltip" src="assets/images/question-mark.svg" height="15px"/>
-                  <p class="tooltip-text">You can search for your keywords in page titles only (faster) or in the full text of pages</p>
-                </span>
+                Search in: ${viewTooltip('You can search for your keywords in page titles only (faster) or in the full text of pages')}
                 <ul class="kg-checkboxes" id="search-locations">
                   <li class="kg-checkboxes__item">
                     <input class="kg-checkboxes__input"
@@ -122,11 +91,7 @@ const view = function() {
                 </ul>
               </div>
               <div id="search-areas-wrapper">
-                Limit to:
-                <span class="has-tooltip">
-                  <img class="has-tooltip" src="assets/images/question-mark.svg" height="15px"/>
-                  <p class="tooltip-text">Limit your search to Mainstream, Whitehall, or anywhere on GOV.UK</p>
-                </span>
+                Limit to: ${viewTooltip('Limit your search to Mainstream, Whitehall, or anywhere on GOV.UK')}
                 <ul class="kg-radios" id="site-areas">
                   <li class="kg-radios__item">
                     <input class="kg-radios__input"
@@ -153,11 +118,7 @@ const view = function() {
                 </ul>
               </div>
               <div class="govuk-body taxon-facet">
-                Taxon:
-                <label id="taxon-label" class="has-tooltip">
-                  <img class="has-tooltip" src="assets/images/question-mark.svg" height="15px"/>
-                  <p class="tooltip-text">Limit this search to a taxon (and its sub-taxons)</p>
-                </label>
+                Taxon: ${viewTooltip('Limit this search to a taxon (and its sub-taxons)')}
                 <div id="taxon"></div>
               </div>
               <p class="govuk-body">
@@ -392,6 +353,13 @@ const viewSearchResults = function(mode, results, showFields) {
   return html.join('');
 };
 
+const viewTooltip = function(text) {
+  return `
+    <span class="keyword-label has-tooltip">
+      <img class="has-tooltip" src="assets/images/question-mark.svg" height="15px"/>
+      <p class="tooltip-text">${text}</p>
+   </span>`;
+};
 
 
 // Remove duplicates - but should be fixed in cypher
