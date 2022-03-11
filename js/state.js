@@ -3,19 +3,22 @@ const state = {
   password: '',
   server: '',
   taxons: [], // list of names of all the taxons
+  locales: [], // all the languages found in the content store
   errorText: null,
   neo4jSession: null,
+  nbResultsLimit: 10000, // limit queries to this number of results
   combinator: 'and', // user input: whether to search all or any word
   selectedWords: '', // user input: list of words to search
   excludedWords: '', // user input: list of words to exclude
   selectedTaxon: '', // user input: the taxon to search in
+  selectedLocale: '', // user input: the language to search
   contentIds: '', // user input: the list of content ID to search for
   externalUrl: '', // user input: the external URL to search for
   linkSearchUrl: '', // user input: URL to find all pages linking to
   searchQuery: '', // generated from other user inputs or typed in directly
   searchResults: null,
   skip: 0, // where to start the pagination (number of results)
-  limit: 10, // number of results per page
+  resultsPerPage: 10, // number of results per page
   showFields: { // what result fields to show by default
     url: true,
     title: true,
@@ -44,6 +47,7 @@ const setStateFromQS = function() {
   state.contentIds = searchParams.get('content-ids') || '';
   state.combinator = searchParams.get('combinator') || 'and';
   state.selectedTaxon = searchParams.get('selected-taxon') || '';
+  state.selectedLocale = searchParams.get('lang') || '';
   state.caseSensitive = searchParams.get('case-sensitive') || false;
   state.activeMode = searchParams.get('active-mode') || 'keyword-search';
   state.whereToSearch.title = !(searchParams.get('search-in-title') === 'false');

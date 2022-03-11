@@ -82,7 +82,10 @@ pre {
 }
 
 #show-fields-wrapper {
-  margin: 2em 0;
+  text-align: left;
+  td {
+    width: 100%;
+  }
 }
 
 .govuk-button, .govuk-textarea {

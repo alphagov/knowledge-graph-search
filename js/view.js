@@ -13,7 +13,6 @@ const view = function() {
       <h1 class="govuk-heading-xl">
       GovGraph search
       <p class="govuk-heading-m">Search GOV.UK by keywords, links, taxons, etc.</p>
-      <p class="govuk-heading-s">Brought to you by the Data Labs</p>
      </h1>
 
  `);
@@ -51,17 +50,20 @@ const view = function() {
         <div class="search-panel">`);
 
   switch(state.activeMode) {
+  case '':
+    break;
   case 'keyword-search':
     html.push(`
             <div id="keyword-search-panel">
               <div class="govuk-body">
                 Search for:
-               ${viewTooltip('The terms you want to look for. You can use "" to search for expressions (like "health certificate')}
+               ${viewTooltip('The terms you want to look for. You can use "" to search for expressions (like "health certificate")')}
                 <select class="govuk-select" id="and-or">
                   <option name="and" ${state.combinator === 'and' ? 'selected' : ''}>all of</option>
                   <option name="or" ${state.combinator === 'or' ? 'selected' : ''}>any of</option>
                 </select>
-                <input class="govuk-input" id="keyword" placeholder="eg: cat dog &quot;health certificate&quot;" value='${sanitise(state.selectedWords).replace('"', '&quot;')}'/><br/>
+                <input class="govuk-input" id="keyword" placeholder="eg: cat dog &quot;health certificate&quot;" value='${sanitise(state.selectedWords).replace('"', '&quot;')}'/>
+                <br/>
                 Exclude: ${viewTooltip('Keywords you want to exclude from your search')}
                 <input class="govuk-input" id="excluded-keyword" placeholder="leave blank if no exclusions" value='${sanitise(state.excludedWords).replace('"', '&quot;')}'/>
               </div>
@@ -121,6 +123,7 @@ const view = function() {
                 Taxon: ${viewTooltip('Limit this search to a taxon (and its sub-taxons)')}
                 <div id="taxon"></div>
               </div>
+              ${viewLocaleSelector()}
               <p class="govuk-body">
                 <button
                     class="govuk-button ${state.waiting?'govuk-button--secondary':''}"
@@ -214,7 +217,8 @@ const view = function() {
         </div>
       <div id="results">${viewSearchResults(state.activeMode, state.searchResults, state.showFields)}</div>
     </main>
-    <p class="govuk-body sig">Help/problem/feedback: Contact <a href="mailto:max.froumentin@digital.cabinet-office.gov.uk">Max Froumentin</a>`);
+    <p class="govuk-body">Brought to you by the Data Labs</p>
+    <p class="govuk-body sig">Help/problem/feedback: Contact <a href="mailto:max.froumentin@digital.cabinet-office.gov.uk">Max Froumentin</a></p>`);
 
   id('page-content').innerHTML = html.join('');
 
@@ -237,27 +241,42 @@ const view = function() {
 };
 
 
+const viewLocaleSelector = function() {
+  const html = [`
+    <div class="govuk-body taxon-facet">
+      Language: ${viewTooltip('Limit results to the specified language')}
+      <select id="locale" class="govuk-select">
+  `];
+  html.push(...state.locales.map(code => `<option name="${code}" ${state.selectedLocale==code ? 'selected' : ''}>${localeNames[code]}</option>`))
+  html.push('</select></div>');
+  return html.join('');
+}
+
+
 const viewSearchResultsTable = function(records, showFields) {
   const html = [];
-  const recordsToShow = records.slice(state.skip, state.skip + state.limit);
+  const recordsToShow = records.slice(state.skip, state.skip + state.resultsPerPage);
   html.push('<table class="govuk-table">');
-  html.push(`<thead class="govuk-table__head">
-      <div id="show-fields-wrapper">
-      Show:
-      <ul class="kg-checkboxes" id="show-fields">
+  html.push(`
+    <thead class="govuk-table__head">
+      <tr id="show-fields-wrapper">
+        <td>
+          Show:
+          <ul class="kg-checkboxes" id="show-fields">
  `);
 
   html.push(recordsToShow[0].keys.map(key => `
-    <li class="kg-checkboxes__item">
-      <input class="kg-checkboxes__input"
-             data-interactive="true"
-             type="checkbox" id="show-field-${key}"
-             ${showFields[key] ? 'checked' : ''}/>
-      <label class="kg-label kg-checkboxes__label">${fieldName(key)}</label>
-    </li>`).join(''));
+            <li class="kg-checkboxes__item">
+              <input class="kg-checkboxes__input"
+                data-interactive="true"
+                type="checkbox" id="show-field-${key}"
+                ${showFields[key] ? 'checked' : ''}/>
+              <label class="kg-label kg-checkboxes__label">${fieldName(key)}</label>
+            </li>`).join(''));
   html.push(`
-        </ul>
-      </div>
+          </ul>
+        </td>
+      </tr>
     </thead>
     <tbody class="govuk-table__body">
       <tr class="govuk-table__row">`);
@@ -314,16 +333,24 @@ const csvFromResults = function(searchResults) {
 const viewSearchResults = function(mode, results, showFields) {
   const html = [];
   if (state.waiting) {
-    html.push(`<h2 class="govuk-heading-l">Searching <img src="assets/images/loader.gif" height="20px" alt="loader"/></h2>`);
+    html.push(`<h2 class="govuk-heading-l">Searching, please wait <img src="assets/images/loader.gif" height="20px" alt="loader"/></h2>`);
   } else if (results && results.records.length > 0) {
     const nbRecords = results.records.length;
-    html.push(`<h2 class="govuk-heading-l">${nbRecords} Results</h2>`);
-    if (nbRecords >= state.limit) {
-      html.push(`<p class="govuk-body">Showing ${state.skip + 1} - ${Math.min(nbRecords, state.skip + state.limit)}</p>`);
+    if (nbRecords < state.nbResultsLimit) {
+      html.push(`<h2 class="govuk-heading-l">${nbRecords} result${nbRecords!==0 ? 's' : ''}</h2>`);
+    } else {
+      html.push(`
+        <h2 class="govuk-heading-l">Results</h2>
+        <h3 class="govuk" class="govuk-heading-m">Note: this query returned more than ${state.nbResultsLimit} results. Try to narrow down your search.</h3>
+      `);
+    }
+
+    if (nbRecords >= state.resultsPerPage) {
+      html.push(`<p class="govuk-body">Showing ${state.skip + 1} - ${Math.min(nbRecords, state.skip + state.resultsPerPage)}</p>`);
     }
     html.push(viewSearchResultsTable(results.records, showFields));
 
-    if (nbRecords >= state.limit) {
+    if (nbRecords >= state.resultsPerPage) {
       html.push(`
         <p class="govuk-body">
           <button class="govuk-button" id="button-prev-page">Previous</button>
@@ -337,7 +364,7 @@ const viewSearchResults = function(mode, results, showFields) {
     const url = URL.createObjectURL(file); // TODO: use window.URL.revokeObjectURL(url);  after
     html.push(`<p class="govuk-body"><a class="govuk-link" href="${url}" download="export.csv">Save all ${nbRecords} results as a CSV file</a></p>`);
 
-  } else {
+  } else if (results && results.records.length == 0) {
     html.push('<h2 class="govuk-heading-l">No results</h2>');
   }
 
@@ -365,14 +392,7 @@ const viewTooltip = function(text) {
 // Remove duplicates - but should be fixed in cypher
 const formatNames = array => [...new Set(array)].join(', ')
 const formatDateTime = date => `${date.slice(0,10)}<br/>${date.slice(12, 16)}`;
-const formatLanguageCode = code => {
-  switch (code) {
-    case 'en': return 'English';
-    case 'cy': return 'Welsh';
-    // add other codes as required
-    default: return code;
-  }
-};
+const formatLanguageCode = code => localeNames[code] || code;
 
 const fieldFormatters = {
   'url' : {
@@ -427,5 +447,137 @@ const fieldFormat = function(key, val) {
   return (f && f.format) ? f.format(val) : val;
 }
 
+// IETF language codes https://en.wikipedia.org/wiki/IETF_language_tag
+const localeNames = {
+  '': 'All languages',
+  'af': 'Afrikaans',
+  'am': 'Amharic',
+  'ar': 'Arabic',
+  'arn': 'Mapudungun',
+  'as': 'Assamese',
+  'az': 'Azeri',
+  'ba': 'Bashkir',
+  'be': 'Belarusian',
+  'bg': 'Bulgarian',
+  'bn': 'Bengali',
+  'bo': 'Tibetan',
+  'br': 'Breton',
+  'bs': 'Bosnian',
+  'ca': 'Catalan',
+  'co': 'Corsican',
+  'cs': 'Czech',
+  'cy': 'Welsh',
+  'da': 'Danish',
+  'de': 'German',
+  'dr': 'Dari', // Not an official iso code
+  'dsb': 'Lower Sorbian',
+  'dv': 'Divehi',
+  'el': 'Greek',
+  'en': 'English',
+  'es': 'Spanish',
+  'es-419': 'Latin-american Spanish',
+  'et': 'Estonian',
+  'eu': 'Basque',
+  'fa': 'Persian',
+  'fi': 'Finnish',
+  'fil': 'Filipino',
+  'fo': 'Faroese',
+  'fr': 'French',
+  'fy': 'Frisian',
+  'ga': 'Irish',
+  'gd': 'Scottish Gaelic',
+  'gl': 'Galician',
+  'gsw': 'Alsatian',
+  'gu': 'Gujarati',
+  'ha': 'Hausa',
+  'he': 'Hebrew',
+  'hi': 'Hindi',
+  'hr': 'Croatian',
+  'hsb': 'Upper Sorbian',
+  'hu': 'Hungarian',
+  'hy': 'Armenian',
+  'id': 'Indonesian',
+  'ig': 'Igbo',
+  'ii': 'Yi',
+  'is': 'Icelandic',
+  'it': 'Italian',
+  'iu': 'Inuktitut',
+  'ja': 'Japanese',
+  'ka': 'Georgian',
+  'kk': 'Kazakh',
+  'kl': 'Greenlandic',
+  'km': 'Khmer',
+  'kn': 'Kannada',
+  'ko': 'Korean',
+  'kok': 'Konkani',
+  'ky': 'Kyrgyz',
+  'lb': 'Luxembourgish',
+  'lo': 'Lao',
+  'lt': 'Lithuanian',
+  'lv': 'Latvian',
+  'mi': 'Maori',
+  'mk': 'Macedonian',
+  'ml': 'Malayalam',
+  'mn': 'Mongolian',
+  'moh': 'Mohawk',
+  'mr': 'Marathi',
+  'ms': 'Malay',
+  'mt': 'Maltese',
+  'my': 'Burmese',
+  'nb': 'Norwegian (Bokmål)',
+  'ne': 'Nepali',
+  'nl': 'Dutch',
+  'nn': 'Norwegian (Nynorsk)',
+  'no': 'Norwegian',
+  'nso': 'Sesotho',
+  'oc': 'Occitan',
+  'or': 'Oriya',
+  'pa': 'Punjabi',
+  'pl': 'Polish',
+  'prs': 'Dari',
+  'ps': 'Pashto',
+  'pt': 'Portuguese',
+  'qut': 'K\'iche',
+  'quz': 'Quechua',
+  'rm': 'Romansh',
+  'ro': 'Romanian',
+  'ru': 'Russian',
+  'rw': 'Kinyarwanda',
+  'sa': 'Sanskrit',
+  'sah': 'Yakut',
+  'se': 'Sami (Northern)',
+  'si': 'Sinhala',
+  'sk': 'Slovak',
+  'sl': 'Slovenian',
+  'sma': 'Sami (Southern)',
+  'smj': 'Sami (Lule)',
+  'smn': 'Sami (Inari)',
+  'sms': 'Sami (Skolt)',
+  'sq': 'Albanian',
+  'sr': 'Serbian',
+  'sv': 'Swedish',
+  'sw': 'Kiswahili',
+  'syr': 'Syriac',
+  'ta': 'Tamil',
+  'te': 'Telugu',
+  'tg': 'Tajik',
+  'th': 'Thai',
+  'tk': 'Turkmen',
+  'tn': 'Setswana',
+  'tr': 'Turkish',
+  'tt': 'Tatar',
+  'tzm': 'Tamazight',
+  'ug': 'Uyghur',
+  'uk': 'Ukrainian',
+  'ur': 'Urdu',
+  'uz': 'Uzbek',
+  'vi': 'Vietnamese',
+  'wo': 'Wolof',
+  'xh': 'isiXhosa',
+  'yo': 'Yoruba',
+  'zh': 'Chinese',
+  'zh-tw': 'Taiwan Chinese',
+  'zu': 'isiZulu'
+}
 
 export { view };
