@@ -6,6 +6,7 @@ import { state } from './state.js';
 import { handleEvent } from './events.js';
 
 const view = function() {
+  console.log('view')
   const html = [];
   html.push(`
     <main class="govuk-main-wrapper " id="main-content" role="main">

@@ -31,6 +31,7 @@ const init = async function() {
     });
 
   // Initialise neo4j
+  console.log('starting neo4j driver');
   state.neo4jDriver = neo4j.driver(
     state.server,
     neo4j.auth.basic(state.user, state.password),
@@ -53,8 +54,16 @@ Otherwise there's probably a problem. Please contact the Data Labs`;
     return;
   }
 
+  console.log('starting neo4j session');
   state.neo4jSession = state.neo4jDriver.session({ defaultAccessMode: neo4j.session.READ });
   state.errorText = null;
+
+  // if page is unloaded then close the neo4j connection
+  window.addEventListener('beforeunload', async () => {
+    console.log('closing session and driver');
+    await state.neo4jSession.close();
+    await state.neo4jDriver.close();
+  });
 
   // Get the list of all the taxons
   try {
