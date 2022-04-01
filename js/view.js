@@ -29,15 +29,11 @@ const view = function() {
   html.push(`
         <p class="govuk-body mode-buttons">
           <button class="${state.activeMode==='keyword-search'?'search-active':''}" id="button-select-keyword-search">
-            Keyword search ${viewTooltip('Find pages containing specified terms')}
+            Keyword search
           </button>
 
           <button class="${state.activeMode==='link-search'?'search-active':''}" id="button-select-link-search">
-            Link search ${viewTooltip('Find pages that link to a specific page')}
-          </button>
-
-          <button class="${state.activeMode==='external-search'?'search-active':''}" id="button-select-external-search">
-            External link search ${viewTooltip('Find pages that link to an external URL')}
+            Link search
           </button>
 
           <button class="${state.activeMode==='contentid-search'?'search-active':''}" id="button-select-contentid-search">
@@ -154,33 +150,17 @@ const view = function() {
             </div>
       `);
     break;
-  case 'external-search':
-    html.push(`
-            <p>Enter an external URL to find all pages linking to it</p>
-            <div id="external-search-panel">
-              <p class="govuk-body">
-                <input class="govuk-input govuk-input--width-20" id="external"
-                       value="${state.externalUrl}"
-                       placeholder="eg: youtu.be"/>
-              </p>
-              <p class="govuk-body">
-                <button
-                    class="govuk-button ${state.waiting?'govuk-button--secondary':''}"
-                    id="external-search">
-                  ${state.waiting?'Searching':'Search'}
-                </button>
-              </p>
-            </div>
-      `);
-    break;
   case 'link-search':
     html.push(`
             <p>Enter a URL to find all pages linking to it</p>
+            <div class="govuk-hint">
+              For instance: '/maternity-pay-leave' or 'youtube.com'
+            </div>
+
             <div id="link-search-panel">
               <p class="govuk-body">
                 <input class="govuk-input" id="link-search"
-                       value="${state.linkSearchUrl}"
-                       placeholder="eg: /maternity-pay-leave"/>
+                       value="${state.linkSearchUrl}"/>
               </p>
               <p class="govuk-body">
                 <button

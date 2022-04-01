@@ -6,7 +6,6 @@ import {
   keywordSearchButtonClicked,
   contentIdSearchButtonClicked,
   linkSearchButtonClicked,
-  externalSearchButtonClicked,
   cypherSearchButtonClicked
  } from './events.js';
 
@@ -113,9 +112,6 @@ Otherwise there's probably a problem. Please contact the Data Labs`;
   break;
   case 'link-search':
     linkSearchButtonClicked();
-  break;
-  case 'external-search':
-    externalSearchButtonClicked();
   break;
   case 'cypher-search':
     cypherSearchButtonClicked();

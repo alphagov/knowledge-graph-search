@@ -91,28 +91,30 @@ const keywordSearchQuery = function(state, keywords, exclusions) {
 
 
 const linkSearchButtonClicked = async function() {
-  const justThePath = state.linkSearchUrl.replace(/.*\.gov.uk/, '');
-  state.searchQuery = `
-    MATCH (n:Cid)-[:HYPERLINKS_TO]->(n2:Cid)
-    WHERE n2.name = "${justThePath}"
-    OPTIONAL MATCH (n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
-    OPTIONAL MATCH (n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
-    OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
-    ${returnClause()}`;
-
-  queryGraph(state.searchQuery);
-};
-
-
-const externalSearchButtonClicked = async function() {
-  state.searchQuery = `
-    MATCH (n:Cid) -[:HYPERLINKS_TO]-> (e:ExternalPage)
-    WHERE e.name CONTAINS "${state.externalUrl}"
-    OPTIONAL MATCH (n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
-    OPTIONAL MATCH (n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
-    OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
-    ${returnClause()}`;
-  queryGraph(state.searchQuery);
+  if (state.linkSearchUrl.length > 0) {
+    // We need to determine if the link is internal or external
+    const internalLinkRexExp = /^((https:\/\/)?((www\.)?gov\.uk))?\//;
+    if (internalLinkRexExp.test(state.linkSearchUrl)) {
+      state.searchQuery = `
+        MATCH (n:Cid)-[:HYPERLINKS_TO]->(n2:Cid)
+        WHERE n2.name = "${state.linkSearchUrl.replace(internalLinkRexExp, '/')}"
+        OPTIONAL MATCH (n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
+        OPTIONAL MATCH (n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
+        OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
+        ${returnClause()}`;
+    } else {
+      state.searchQuery = `
+        MATCH (n:Cid) -[:HYPERLINKS_TO]-> (e:ExternalPage)
+        WHERE e.name CONTAINS "${state.linkSearchUrl}"
+        OPTIONAL MATCH (n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
+        OPTIONAL MATCH (n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
+        OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
+        ${returnClause()}`;
+      }
+    queryGraph(state.searchQuery);
+  } else {
+    state.searchResults = { records: [] };
+  }
 };
 
 
@@ -205,11 +207,6 @@ const handleEvent = async function(event) {
         state.skip = 0; // reset to first page
         contentIdSearchButtonClicked();
         break;
-      case "external-search":
-        state.externalUrl = id('external').value;
-        state.skip = 0; // reset to first page
-        externalSearchButtonClicked();
-        break;
       case "link-search":
         state.linkSearchUrl = id('link-search').value;
         state.skip = 0; // reset to first page
@@ -228,9 +225,6 @@ const handleEvent = async function(event) {
         break;
       case 'button-select-cypher-search':
         state.activeMode = 'cypher-search';
-        break;
-      case 'button-select-external-search':
-        state.activeMode = 'external-search';
         break;
       case 'button-select-link-search':
         state.activeMode = 'link-search';
@@ -297,9 +291,6 @@ const updateUrl = function() {
     case 'contentid-search':
       if (state.contentIds !== '') searchParams.set('content-ids', state.contentIds);
     break;
-    case 'external-search':
-      if (state.externalUrl !== '') searchParams.set('external-url', state.externalUrl);
-    break;
     case 'link-search':
       if (state.linkSearchUrl !== '') searchParams.set('link-search-url', state.linkSearchUrl);
     break;
@@ -323,6 +314,5 @@ export {
   keywordSearchButtonClicked,
   contentIdSearchButtonClicked,
   linkSearchButtonClicked,
-  externalSearchButtonClicked,
   cypherSearchButtonClicked
 };
