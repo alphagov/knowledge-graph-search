@@ -235,6 +235,7 @@ const view = function() {
       element: document.querySelector('#taxon'),
       id: 'taxon-label',
       source: state.taxons,
+      placeholder: 'All taxons',
       defaultValue: state.selectedTaxon,
       showAllValues: true
     });
