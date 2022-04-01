@@ -35,14 +35,6 @@ const view = function() {
           <button class="${state.activeMode==='link-search'?'search-active':''}" id="button-select-link-search">
             Link search
           </button>
-
-          <button class="${state.activeMode==='contentid-search'?'search-active':''}" id="button-select-contentid-search">
-            Content ID search ${viewTooltip('Find pages with specified ContentIDs')}
-          </button>
-          <button class="${state.activeMode==='cypher-search'?'search-active':''}" id="button-select-cypher-search">
-            Cypher search ${viewTooltip('Enter a Cypher query directly')}
-            </span>
-          </button>
         </p>
         <div class="search-panel">`);
 
@@ -131,25 +123,6 @@ const view = function() {
             </div>
       `);
     break;
-  case 'contentid-search':
-    html.push(`
-            <p class="govuk-body">Enter one or more contentIDs:</p>
-            <span>For example: ad5110e0-fa62-49d3-923f-d50101f12014, 52feb778-b249-4804-a9c3-dfdc05b7b224</span>
-
-            <div id="contentid-search-panel">
-              <p class="govuk-body">
-                <textarea class="govuk-textarea" rows="5" id="contentid">${state.contentIds}</textarea>
-              </p>
-              <p class="govuk-body">
-                <button
-                    class="govuk-button ${state.waiting?'govuk-button--secondary':''}"
-                    id="contentid-search">
-                  ${state.waiting?'Searching':'Search'}
-                </button>
-              </p>
-            </div>
-      `);
-    break;
   case 'link-search':
     html.push(`
             <p>Enter a URL to find all pages linking to it</p>
@@ -166,23 +139,6 @@ const view = function() {
                 <button
                     class="govuk-button ${state.waiting?'govuk-button--secondary':''}"
                     id="link-search">
-                  ${state.waiting?'Searching':'Search'}
-                </button>
-              </p>
-            </div>
-      `);
-    break;
-  case 'cypher-search':
-    html.push(`
-            <p>Type a Cypher query:</p>
-            <div id="cypher-search-panel">
-              <p class="govuk-body">
-                <textarea class="govuk-textarea" rows="5" id="cypher">${state.searchQuery}</textarea>
-              </p>
-              <p class="govuk-body">
-                <button
-                    class="govuk-button ${state.waiting?'govuk-button--secondary':''}"
-                    id="cypher-search">
                   ${state.waiting?'Searching':'Search'}
                 </button>
               </p>

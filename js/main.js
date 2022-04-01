@@ -4,9 +4,7 @@ import { view } from './view.js';
 import { state, setStateFromQS } from './state.js';
 import {
   keywordSearchButtonClicked,
-  contentIdSearchButtonClicked,
-  linkSearchButtonClicked,
-  cypherSearchButtonClicked
+  linkSearchButtonClicked
  } from './events.js';
 
 
@@ -107,14 +105,8 @@ Otherwise there's probably a problem. Please contact the Data Labs`;
   case 'keyword-search':
       keywordSearchButtonClicked();
   break;
-  case 'contentid-search':
-    contentIdSearchButtonClicked();
-  break;
   case 'link-search':
     linkSearchButtonClicked();
-  break;
-  case 'cypher-search':
-    cypherSearchButtonClicked();
   break;
   default:
     console.log('init: unknown mode', state.activeMode);

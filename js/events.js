@@ -118,28 +118,6 @@ const linkSearchButtonClicked = async function() {
 };
 
 
-const contentIdSearchButtonClicked = async function() {
-  const contentIds = state.contentIds
-    .split(/[^a-zA-Z0-9-]+/)
-    .filter(d=>d.length>0)
-    .map(s => s.toLowerCase());
-  const whereStatement = contentIds.map(cid => `n.contentID="${cid}" `).join(' OR ');
-  state.searchQuery = `
-    MATCH (n:Cid)
-    WHERE ${whereStatement}
-    OPTIONAL MATCH (n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
-    OPTIONAL MATCH (n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
-    OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
-    ${returnClause()}`;
-  queryGraph(state.searchQuery);
-};
-
-
-const cypherSearchButtonClicked = async function() {
-  queryGraph(state.searchQuery);
-};
-
-
 const splitKeywords = function(keywords) {
   var regexp = /[^\s"]+|"([^"]*)"/gi;
   var output = [];
@@ -202,29 +180,13 @@ const handleEvent = async function(event) {
         if (id('area-any').checked) state.areaToSearch = '';
         keywordSearchButtonClicked();
         break;
-      case "contentid-search":
-        state.contentIds = id('contentid').value;
-        state.skip = 0; // reset to first page
-        contentIdSearchButtonClicked();
-        break;
       case "link-search":
         state.linkSearchUrl = id('link-search').value;
         state.skip = 0; // reset to first page
         linkSearchButtonClicked();
         break;
-      case "cypher-search":
-        state.searchQuery = id('cypher').value;
-        state.skip = 0; // reset to first page
-        cypherSearchButtonClicked();
-        break;
       case 'button-select-keyword-search':
         state.activeMode = 'keyword-search';
-        break;
-      case 'button-select-contentid-search':
-        state.activeMode = 'contentid-search';
-        break;
-      case 'button-select-cypher-search':
-        state.activeMode = 'cypher-search';
         break;
       case 'button-select-link-search':
         state.activeMode = 'link-search';
@@ -288,13 +250,8 @@ const updateUrl = function() {
       if (state.areaToSearch.length > 0) searchParams.set('area', state.areaToSearch);
       if (state.skip) searchParams.set('skip', state.skip);
     break;
-    case 'contentid-search':
-      if (state.contentIds !== '') searchParams.set('content-ids', state.contentIds);
-    break;
     case 'link-search':
       if (state.linkSearchUrl !== '') searchParams.set('link-search-url', state.linkSearchUrl);
-    break;
-    case 'cypher-search':
     break;
     default:
       console.log('update URL unknown activeMode:', state.activeMode);
@@ -312,7 +269,5 @@ const updateUrl = function() {
 export {
   handleEvent,
   keywordSearchButtonClicked,
-  contentIdSearchButtonClicked,
-  linkSearchButtonClicked,
-  cypherSearchButtonClicked
+  linkSearchButtonClicked
 };

@@ -6618,7 +6618,7 @@ pre {
   display: inline-block;
 }
 
-#keyword-search-panel, #contentid-search-panel {
+#keyword-search-panel {
   padding: 0;
   margin: 0;
 }
@@ -6639,10 +6639,6 @@ pre {
   margin-bottom: 0;
 }
 
-#cypher-query {
-  margin-top: 200px;
-}
-
 #clear {
   padding: 0px 5px;
   margin-top: 0;
@@ -6655,10 +6651,6 @@ pre {
 .experimental {
   background: #f33;
   color: white;
-}
-
-#cypher-search-panel textarea {
-  height: 500px;
 }
 
 .sig {

@@ -12,7 +12,6 @@ const state = {
   excludedWords: '', // user input: list of words to exclude
   selectedTaxon: '', // user input: the taxon to search in
   selectedLocale: '', // user input: the language to search
-  contentIds: '', // user input: the list of content ID to search for
   linkSearchUrl: '', // user input: URL to find all pages linking to
   searchQuery: '', // generated from other user inputs or typed in directly
   searchResults: null,
@@ -32,7 +31,7 @@ const state = {
 
   caseSensitive: false, // user input - whether the keyword search is case sensitive
   activeMode: 'keyword-search', // user input - type of search selected
-  //  possible values: 'keyword-search', 'contentid-search', 'link-search', 'cypher-search'
+  //  possible values: 'keyword-search', 'link-search'
   waiting: false // whether we're waiting for a request to return
 };
 
@@ -42,7 +41,6 @@ const setStateFromQS = function() {
   state.selectedWords = searchParams.get('selected-words') || '';
   state.excludedWords = searchParams.get('excluded-words') || '';
   state.linkSearchUrl = searchParams.get('link-search-url') || '';
-  state.contentIds = searchParams.get('content-ids') || '';
   state.combinator = searchParams.get('combinator') || 'and';
   state.selectedTaxon = searchParams.get('selected-taxon') || '';
   state.selectedLocale = searchParams.get('lang') || '';
