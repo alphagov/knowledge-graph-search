@@ -34,9 +34,9 @@ const returnClause = function() {
     n.withdrawn_at AS withdrawn_at,
     n.withdrawn_explanation AS withdrawn_explanation,
     n.pagerank AS pagerank,
-    COLLECT (taxon.name) AS taxons,
-    COLLECT (o.name) AS primary_organisation,
-    COLLECT (o2.name) AS all_organisations
+    COLLECT (distinct taxon.name) AS taxons,
+    COLLECT (distinct o.name) AS primary_organisation,
+    COLLECT (distinct o2.name) AS all_organisations
     ORDER BY n.pagerank DESC
     LIMIT ${state.nbResultsLimit}`;
 };
@@ -71,6 +71,11 @@ const keywordSearchQuery = function(state, keywords, exclusions) {
   }
 
   const taxon = state.selectedTaxon;
+  const taxonClause = taxon ? `WITH n
+    MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)<-[:HAS_PARENT*]-(c:Taxon)
+    WHERE taxon.name = "${taxon}" OR c.name = "${taxon}"` :
+    `OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)<-[:HAS_PARENT*]-(c:Taxon)`;
+
 
   return `
     MATCH (n:Cid)
@@ -78,10 +83,9 @@ const keywordSearchQuery = function(state, keywords, exclusions) {
     ${exclusionClause}
     ${localeClause}
     ${areaClause}
+    ${taxonClause}
     OPTIONAL MATCH (n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
     OPTIONAL MATCH (n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
-    OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)${taxon.length > 0 ? '<-[:HAS_PARENT*]-(c:Taxon)' : '' }
-    ${taxon.length > 0 ? `WHERE taxon.name = "${taxon}" OR c.name = "${taxon}"` : ''}
     ${returnClause()}`;
 };
 
