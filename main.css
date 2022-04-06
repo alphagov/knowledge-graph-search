@@ -6550,6 +6550,16 @@ x:-moz-any-link {
   }
 }
 
+.govuk-width-container {
+  max-width: unset;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.govuk-footer {
+  clear: both;
+}
+
 body {
   font-family: arial, sans-serif;
 }
@@ -6560,7 +6570,13 @@ body {
 }
 
 #results {
-  margin-top: 32px;
+  float: right;
+  width: 60%;
+  padding: 10px;
+}
+
+#results-table {
+  margin-top: 10px;
 }
 
 svg {
@@ -6574,6 +6590,7 @@ pre {
 .kg-checkboxes, .kg-radios {
   padding: 0;
   display: inline;
+  line-height: 1.2;
 }
 
 .kg-checkboxes__item, .kg-radios__item {
@@ -6586,6 +6603,7 @@ pre {
   margin-bottom: 0;
 }
 .mode-buttons button {
+  font-size: 19px;
   border: 1px solid black;
   background: #ddd;
 }
@@ -6594,8 +6612,14 @@ pre {
 }
 
 .search-panel {
+  float: left;
+  width: 33%;
   padding: 10px 10px 0 10px;
+}
+
+.search-mode-panel {
   border: 1px solid black;
+  padding: 20px;
 }
 
 #keyword-search-panel input {
@@ -6625,13 +6649,6 @@ pre {
 
 #keyword-search {
   margin-top: 20px;
-}
-
-#show-fields-wrapper {
-  text-align: left;
-}
-#show-fields-wrapper td {
-  width: 100%;
 }
 
 .govuk-button, .govuk-textarea {
@@ -6675,4 +6692,14 @@ pre {
 }
 .has-tooltip:hover .tooltip-text {
   visibility: visible;
+}
+
+#cypher-query {
+  clear: both;
+  padding-top: 100px;
+}
+
+#locale {
+  width: 100%;
+  display: block;
 }

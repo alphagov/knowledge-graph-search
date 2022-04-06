@@ -12,150 +12,23 @@ const view = function() {
     <main class="govuk-main-wrapper " id="main-content" role="main">
       <strong class="govuk-tag govuk-phase-banner__content__tag">DISCOVERY</strong>
       <h1 class="govuk-heading-xl">
-      GovGraph search
-      <p class="govuk-heading-m">Search GOV.UK by keywords, links, taxons, etc.</p>
-     </h1>
-
- `);
+        GovGraph search
+        <p class="govuk-heading-m">Search GOV.UK by keywords, links, taxons, etc.</p>
+      </h1>`);
 
   if (state.errorText) {
     html.push(`
       <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
         <h2 class="govuk-error-summary__title" id="error-summary-title">Error</h2>
         <p class="govuk-body">${state.errorText}</p>
-      </div>`)
-  }
+      </div>`);
+    }
 
+  html.push(viewSearchPanel());
+  html.push(viewSearchResults(state.activeMode, state.searchResults, state.showFields));
+  html.push(viewCypherQuery());
   html.push(`
-        <p class="govuk-body mode-buttons">
-          <button class="${state.activeMode==='keyword-search'?'search-active':''}" id="button-select-keyword-search">
-            Keyword search
-          </button>
-
-          <button class="${state.activeMode==='link-search'?'search-active':''}" id="button-select-link-search">
-            Link search
-          </button>
-        </p>
-        <div class="search-panel">`);
-
-  switch(state.activeMode) {
-  case '':
-    break;
-  case 'keyword-search':
-    html.push(`
-            <div id="keyword-search-panel">
-              <div class="govuk-body">
-                Search for:
-               ${viewTooltip('The terms you want to look for. You can use "" to search for expressions (like "health certificate")')}
-                <select class="govuk-select" id="and-or">
-                  <option name="and" ${state.combinator === 'and' ? 'selected' : ''}>all of</option>
-                  <option name="or" ${state.combinator === 'or' ? 'selected' : ''}>any of</option>
-                </select>
-                <input class="govuk-input" id="keyword" placeholder="eg: cat dog &quot;health certificate&quot;" value='${sanitise(state.selectedWords).replace('"', '&quot;')}'/>
-                <br/>
-                Exclude: ${viewTooltip('Keywords you want to exclude from your search')}
-                <input class="govuk-input" id="excluded-keyword" placeholder="leave blank if no exclusions" value='${sanitise(state.excludedWords).replace('"', '&quot;')}'/>
-              </div>
-              <div class="kg-checkboxes">
-                <div class="kg-checkboxes__item">
-                  <input class="kg-checkboxes__input"
-                         type="checkbox" id="case-sensitive"
-                         ${state.caseSensitive ? 'checked' : ''}/>
-                  <label class="kg-label kg-checkboxes__label">Case-sensitive</label>
-                </div>
-              </div>
-              <div id="search-locations-wrapper">
-                Search in: ${viewTooltip('You can search for your keywords in page titles only (faster) or in the full text of pages')}
-                <ul class="kg-checkboxes" id="search-locations">
-                  <li class="kg-checkboxes__item">
-                    <input class="kg-checkboxes__input"
-                           type="checkbox" id="search-title"
-                           ${state.whereToSearch.title ? 'checked' : ''}/>
-                    <label class="kg-label kg-checkboxes__label">Page title</label>
-                  </li>
-                  <li class="kg-checkboxes__item">
-                    <input class="kg-checkboxes__input"
-                           type="checkbox" id="search-text"
-                           ${state.whereToSearch.text ? 'checked' : ''}/>
-                    <label class="kg-label kg-checkboxes__label">Page content</label>
-                  </li>
-                </ul>
-              </div>
-              <div id="search-areas-wrapper">
-                Limit to: ${viewTooltip('Limit your search to Mainstream, Whitehall, or anywhere on GOV.UK')}
-                <ul class="kg-radios" id="site-areas">
-                  <li class="kg-radios__item">
-                    <input class="kg-radios__input"
-                           type="radio" id="area-mainstream"
-                           name="area"
-                           ${state.areaToSearch === 'mainstream' ? 'checked' : ''}/>
-                    <label class="kg-label kg-radios__label">Mainstream</label>
-                  </li>
-                  <li class="kg-radios__item">
-                    <input class="kg-radios__input"
-                           type="radio" id="area-whitehall"
-                           name="area"
-                           ${state.areaToSearch === 'whitehall' ? 'checked' : ''}/>
-                    <label class="kg-label kg-radios__label">Whitehall</label>
-                  </li>
-                  <li class="kg-radios__item">
-                    <input class="kg-radios__input"
-                           type="radio" id="area-any"
-                           name="area"
-                           ${state.areaToSearch === '' ? 'checked' : ''}/>
-                    <label class="kg-label kg-radios__label">Anywhere</label>
-                  </li>
-
-                </ul>
-              </div>
-              <div class="govuk-body taxon-facet">
-                Taxon: ${viewTooltip('Limit this search to a taxon (and its sub-taxons)')}
-                <div id="taxon"></div>
-              </div>
-              ${viewLocaleSelector()}
-              <p class="govuk-body">
-                <button
-                    class="govuk-button ${state.waiting?'govuk-button--secondary':''}"
-                    id="keyword-search">
-                  ${state.waiting?'Searching':'Search'}
-                </button>
-              </p>
-            </div>
-      `);
-    break;
-  case 'link-search':
-    html.push(`
-            <p>Enter a URL to find all pages linking to it</p>
-            <div class="govuk-hint">
-              For instance: '/maternity-pay-leave' or 'youtube.com'
-            </div>
-
-            <div id="link-search-panel">
-              <p class="govuk-body">
-                <input class="govuk-input" id="link-search"
-                       value="${state.linkSearchUrl}"/>
-              </p>
-              <p class="govuk-body">
-                <button
-                    class="govuk-button ${state.waiting?'govuk-button--secondary':''}"
-                    id="link-search">
-                  ${state.waiting?'Searching':'Search'}
-                </button>
-              </p>
-            </div>
-      `);
-    break;
-  default:
-    console.log('invalid mode', state.activeMode);
-  }
-
-  html.push(`
-          </div>
-        </div>
-      <div id="results">${viewSearchResults(state.activeMode, state.searchResults, state.showFields)}</div>
-    </main>
-    <p class="govuk-body">Brought to you by the Data Labs</p>
-    <p class="govuk-body sig">Help/problem/feedback: Contact <a href="mailto:max.froumentin@digital.cabinet-office.gov.uk">Max Froumentin</a></p>`);
+    </main>`);
 
   id('page-content').innerHTML = html.join('');
 
@@ -178,46 +51,194 @@ const view = function() {
   }
 };
 
+const viewSearchPanel = function() {
+  const html = [];
+  html.push(`
+    <div class="search-panel">
+      <p class="govuk-body mode-buttons">
+        <button class="${state.activeMode==='keyword-search'?'search-active':''}" id="button-select-keyword-search">
+          Keyword search
+        </button>
+        <button class="${state.activeMode==='link-search'?'search-active':''}" id="button-select-link-search">
+          Link search
+        </button>
+      </p>
+      <div class="search-mode-panel">`);
+
+  switch(state.activeMode) {
+  case 'keyword-search':
+    html.push(viewKeywordSearchPanel());
+    break;
+
+  case 'link-search':
+    html.push(viewLinkSearchPanel());
+    break;
+
+  default:
+    console.log('invalid mode', state.activeMode);
+  }
+  html.push(`
+      </div>
+      <div ckass="sig">
+        <p class="govuk-body">Brought to you by the Data Labs</p>
+        <p class="govuk-body">Help/problem/feedback: Contact <a href="mailto:max.froumentin@digital.cabinet-office.gov.uk">Max Froumentin</a></p>
+      </div>
+    </div>`);
+  return html.join('');
+};
+
+
+const viewKeywordSearchPanel = function() {
+  const html = [];
+  html.push(`
+    <div class="govuk-body">
+      Search for
+      <select class="govuk-select" id="and-or">
+        <option name="and" ${state.combinator === 'and' ? 'selected' : ''}>all of the following:</option>
+        <option name="or" ${state.combinator === 'or' ? 'selected' : ''}>any of the following:</option>
+      </select>
+    </div>
+    <div class="govuk-body">
+      <input class="govuk-input" id="keyword" placeholder="eg: cat dog &quot;health certificate&quot;" value='${sanitise(state.selectedWords).replace('"', '&quot;')}'/>
+    </div>
+    <div class="govuk-body">
+      Exclude keywords:
+      <input class="govuk-input" id="excluded-keyword" placeholder="leave blank if no exclusions" value='${sanitise(state.excludedWords).replace('"', '&quot;')}'/>
+    </div>
+    <div class="govuk-body">
+      <div class="kg-checkboxes">
+        <div class="kg-checkboxes__item">
+          <input class="kg-checkboxes__input"
+                 type="checkbox" id="case-sensitive"
+            ${state.caseSensitive ? 'checked' : ''}/>
+          <label class="kg-label kg-checkboxes__label">Case-sensitive</label>
+        </div>
+      </div>
+    </div>
+    <div class="govuk-body">
+      <div id="search-locations-wrapper">
+        Search in:
+        <ul class="kg-checkboxes" id="search-locations">
+          <li class="kg-checkboxes__item">
+            <input class="kg-checkboxes__input"
+                   type="checkbox" id="search-title"
+              ${state.whereToSearch.title ? 'checked' : ''}/>
+            <label class="kg-label kg-checkboxes__label">Page title</label>
+          </li>
+          <li class="kg-checkboxes__item">
+            <input class="kg-checkboxes__input"
+                   type="checkbox" id="search-text"
+              ${state.whereToSearch.text ? 'checked' : ''}/>
+            <label class="kg-label kg-checkboxes__label">Page text</label>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="govuk-body">
+      <div id="search-areas-wrapper">
+        Limit to:
+        <ul class="kg-radios" id="site-areas">
+          <li class="kg-radios__item">
+            <input class="kg-radios__input"
+                   type="radio" id="area-mainstream"
+                   name="area"
+              ${state.areaToSearch === 'mainstream' ? 'checked' : ''}/>
+            <label class="kg-label kg-radios__label">Mainstream</label>
+          </li>
+          <li class="kg-radios__item">
+            <input class="kg-radios__input"
+                   type="radio" id="area-whitehall"
+                   name="area"
+              ${state.areaToSearch === 'whitehall' ? 'checked' : ''}/>
+            <label class="kg-label kg-radios__label">Whitehall</label>
+          </li>
+          <li class="kg-radios__item">
+            <input class="kg-radios__input"
+                   type="radio" id="area-any"
+                   name="area"
+              ${state.areaToSearch === '' ? 'checked' : ''}/>
+            <label class="kg-label kg-radios__label">Any</label>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="govuk-body">
+      <div class="taxon-facet">
+        Search in taxon:
+        <div id="taxon"></div>
+      </div>
+    </div>
+    ${viewLocaleSelector()}
+    <p class="govuk-body">
+      <button
+class="govuk-button ${state.waiting?'govuk-button--secondary':''}"
+id="keyword-search">
+        ${state.waiting?'Searching':'Search'}
+      </button>
+    </p>`);
+
+  return html.join('');
+};
+
 
 const viewLocaleSelector = function() {
   const html = [`
     <div class="govuk-body taxon-facet">
-      Language: ${viewTooltip('Limit results to the specified language')}
+      Search by language:
       <select id="locale" class="govuk-select">
   `];
   html.push(...state.locales.map(code => `<option name="${code}" ${state.selectedLocale==code ? 'selected' : ''}>${localeNames[code]}</option>`))
   html.push('</select></div>');
   return html.join('');
-}
+};
+
+
+const viewLinkSearchPanel = function() {
+  const html = [];
+  html.push(`
+    <p>Enter a URL to find all pages linking to it</p>
+    <div class="govuk-hint">
+      For instance: '/maternity-pay-leave' or 'youtube.com'
+    </div>
+
+    <div id="link-search-panel">
+      <p class="govuk-body">
+        <input class="govuk-input" id="link-search"
+               value="${state.linkSearchUrl}"/>
+      </p>
+      <p class="govuk-body">
+        <button
+            class="govuk-button ${state.waiting?'govuk-button--secondary':''}"
+            id="link-search">
+          ${state.waiting?'Searching':'Search'}
+        </button>
+      </p>
+    </div>`);
+
+  return html.join('');
+};
 
 
 const viewSearchResultsTable = function(records, showFields) {
   const html = [];
   const recordsToShow = records.slice(state.skip, state.skip + state.resultsPerPage);
-  html.push('<table class="govuk-table">');
   html.push(`
-    <thead class="govuk-table__head">
-      <tr id="show-fields-wrapper">
-        <td>
-          Show:
-          <ul class="kg-checkboxes" id="show-fields">
- `);
-
+    <div class="govuk-body">
+      Show:
+      <ul class="kg-checkboxes" id="show-fields">`);
   html.push(recordsToShow[0].keys.map(key => `
-            <li class="kg-checkboxes__item">
-              <input class="kg-checkboxes__input"
-                data-interactive="true"
-                type="checkbox" id="show-field-${key}"
-                ${showFields[key] ? 'checked' : ''}/>
-              <label class="kg-label kg-checkboxes__label">${fieldName(key)}</label>
-            </li>`).join(''));
+        <li class="kg-checkboxes__item">
+          <input class="kg-checkboxes__input"
+                 data-interactive="true"
+                 type="checkbox" id="show-field-${key}"
+            ${showFields[key] ? 'checked' : ''}/>
+          <label class="kg-label kg-checkboxes__label">${fieldName(key)}</label>
+        </li>`).join(''));
   html.push(`
-          </ul>
-        </td>
-      </tr>
-    </thead>
-    <tbody class="govuk-table__body">
-      <tr class="govuk-table__row">`);
+      </ul>
+      <table id="results-table" class="govuk-table">
+        <tbody class="govuk-table__body">
+        <tr class="govuk-table__row">`);
 
   recordsToShow[0].keys.forEach(key => {
     if (state.showFields[key]) {
@@ -235,7 +256,10 @@ const viewSearchResultsTable = function(records, showFields) {
     });
     html.push(`</tr>`);
   });
-  html.push('</tbody></table>');
+  html.push(`
+        </tbody>
+      </table>
+    </div>`);
   return html.join('');
 }
 
@@ -270,51 +294,62 @@ const csvFromResults = function(searchResults) {
 
 const viewSearchResults = function(mode, results, showFields) {
   const html = [];
+  html.push(`
+    <div id="results">`);
   if (state.waiting) {
-    html.push(`<h2 class="govuk-heading-l">Searching, please wait <img src="assets/images/loader.gif" height="20px" alt="loader"/></h2>`);
+    html.push(`
+      <h2 class="govuk-heading-l">Searching, please wait <img src="assets/images/loader.gif" height="20px" alt="loader"/></h2>`);
   } else if (results && results.records.length > 0) {
     const nbRecords = results.records.length;
     if (nbRecords < state.nbResultsLimit) {
-      html.push(`<h2 class="govuk-heading-l">${nbRecords} result${nbRecords!==0 ? 's' : ''}</h2>`);
+      html.push(`
+      <h2 class="govuk-heading-l">${nbRecords} result${nbRecords!==0 ? 's' : ''}</h2>`);
     } else {
       html.push(`
-        <h2 class="govuk-heading-l">Results</h2>
-        <h3 class="govuk" class="govuk-heading-m">Note: this query returned more than ${state.nbResultsLimit} results. Try to narrow down your search.</h3>
+      <h2 class="govuk-heading-l">Results</h2>
+      <h3 class="govuk" class="govuk-heading-m">Note: this query returned more than ${state.nbResultsLimit} results. Try to narrow down your search.</h3>
       `);
     }
 
     if (nbRecords >= state.resultsPerPage) {
-      html.push(`<p class="govuk-body">Showing ${state.skip + 1} - ${Math.min(nbRecords, state.skip + state.resultsPerPage)}</p>`);
+      html.push(`
+      <p class="govuk-body">Showing ${state.skip + 1} - ${Math.min(nbRecords, state.skip + state.resultsPerPage)}</p>`);
     }
     html.push(viewSearchResultsTable(results.records, showFields));
 
     if (nbRecords >= state.resultsPerPage) {
       html.push(`
-        <p class="govuk-body">
-          <button class="govuk-button" id="button-prev-page">Previous</button>
-          <button class="govuk-button" id="button-next-page">Next</button>
-        </p>`
-      );
+      <p class="govuk-body">
+        <button class="govuk-button" id="button-prev-page">Previous</button>
+        <button class="govuk-button" id="button-next-page">Next</button>
+      </p>`);
     }
 
     const csv = csvFromResults(results);
     const file = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(file); // TODO: use window.URL.revokeObjectURL(url);  after
-    html.push(`<p class="govuk-body"><a class="govuk-link" href="${url}" download="export.csv">Save all ${nbRecords} results as a CSV file</a></p>`);
+    html.push(`
+      <p class="govuk-body"><a class="govuk-link" href="${url}" download="export.csv">Save all ${nbRecords} results as a CSV file</a></p>`);
 
   } else if (results && results.records.length == 0) {
-    html.push('<h2 class="govuk-heading-l">No results</h2>');
+    html.push(`
+      <h2 class="govuk-heading-l">No results</h2>`);
   }
+  html.push(`
+    </div>`);
+  return html.join('');
+};
 
+const viewCypherQuery = function() {
+  const html = [];
   // Print the cypher query used, for the advanced user
   if (state.searchQuery.length > 0) {
     html.push(`
       <div id="cypher-query">
-      <hr/><h2 class="govuk-heading-s">Cypher query used:</h2>
+      <hr/><h2 class="govuk-heading-s">Cypher query (for debugging):</h2>
       <pre>${state.searchQuery}</pre>
     `);
   }
-
   return html.join('');
 };
 

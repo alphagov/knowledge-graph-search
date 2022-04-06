@@ -229,6 +229,11 @@ const handleEvent = async function(event) {
   }
   updateUrl();
   view();
+
+  // scroll to the top of the page when paginating
+  if (event.id === 'button-next-page' || event.id === 'button-prev-page') {
+    window.scrollTo(0, 0);
+  }
 };
 
 
