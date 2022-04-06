@@ -52,7 +52,7 @@ const keywordSearchQuery = function(state, keywords, exclusions) {
     inclusionClause = 'WHERE\n' +
     keywords
       .map(word => multiContainsClause(fieldsToSearch, word, state.caseSensitive))
-      .join(`\n ${state.combinator.toUpperCase()} `);
+      .join(`\n AND `);
   }
 
   const exclusionClause = exclusions.length ?
@@ -168,7 +168,6 @@ const handleEvent = async function(event) {
       case "keyword-search":
         state.selectedWords = sanitise(id('keyword').value);
         state.excludedWords = sanitise(id('excluded-keyword').value);
-        state.combinator = id('and-or').selectedIndex == 0 ? 'and' : 'or';
         state.selectedTaxon = document.querySelector('#taxon input').value;
         state.selectedLocale = state.locales[id('locale').selectedIndex];
         state.whereToSearch.title = id('search-title').checked;
@@ -246,7 +245,6 @@ const updateUrl = function() {
     case 'keyword-search':
       if (state.selectedWords !== '') searchParams.set('selected-words', state.selectedWords);
       if (state.excludedWords !== '') searchParams.set('excluded-words', state.excludedWords);
-      if (state.combinator !== 'and') searchParams.set('combinator', state.combinator);
       if (state.selectedTaxon !== '') searchParams.set('selected-taxon', state.selectedTaxon);
       if (state.selectedLocale !== '') searchParams.set('lang', state.selectedLocale);
       if (state.caseSensitive) searchParams.set('case-sensitive', state.caseSensitive);

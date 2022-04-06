@@ -92,13 +92,7 @@ const viewKeywordSearchPanel = function() {
   const html = [];
   html.push(`
     <div class="govuk-body">
-      Search for
-      <select class="govuk-select" id="and-or">
-        <option name="and" ${state.combinator === 'and' ? 'selected' : ''}>all of the following:</option>
-        <option name="or" ${state.combinator === 'or' ? 'selected' : ''}>any of the following:</option>
-      </select>
-    </div>
-    <div class="govuk-body">
+      Keywords:
       <input class="govuk-input" id="keyword" placeholder="eg: cat dog &quot;health certificate&quot;" value='${sanitise(state.selectedWords).replace('"', '&quot;')}'/>
     </div>
     <div class="govuk-body">
@@ -111,7 +105,7 @@ const viewKeywordSearchPanel = function() {
           <input class="kg-checkboxes__input"
                  type="checkbox" id="case-sensitive"
             ${state.caseSensitive ? 'checked' : ''}/>
-          <label class="kg-label kg-checkboxes__label">Case-sensitive</label>
+          <label class="kg-label kg-checkboxes__label">Case-sensitive search</label>
         </div>
       </div>
     </div>

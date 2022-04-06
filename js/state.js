@@ -7,7 +7,6 @@ const state = {
   errorText: null,
   neo4jSession: null,
   nbResultsLimit: 10000, // limit queries to this number of results
-  combinator: 'and', // user input: whether to search all or any word
   selectedWords: '', // user input: list of words to search
   excludedWords: '', // user input: list of words to exclude
   selectedTaxon: '', // user input: the taxon to search in
@@ -41,7 +40,6 @@ const setStateFromQS = function() {
   state.selectedWords = searchParams.get('selected-words') || '';
   state.excludedWords = searchParams.get('excluded-words') || '';
   state.linkSearchUrl = searchParams.get('link-search-url') || '';
-  state.combinator = searchParams.get('combinator') || 'and';
   state.selectedTaxon = searchParams.get('selected-taxon') || '';
   state.selectedLocale = searchParams.get('lang') || '';
   state.caseSensitive = searchParams.get('case-sensitive') || false;
