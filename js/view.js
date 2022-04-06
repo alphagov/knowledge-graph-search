@@ -190,7 +190,7 @@ const viewLocaleSelector = function() {
 const viewLinkSearchPanel = function() {
   const html = [];
   html.push(`
-    <p>Enter a URL to find all pages linking to it</p>
+    <p class="govuk-body">Enter a URL to find all pages linking to it</p>
     <div class="govuk-hint">
       For instance: '/maternity-pay-leave' or 'youtube.com'
     </div>
