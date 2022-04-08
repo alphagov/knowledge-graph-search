@@ -29,8 +29,6 @@ const state = {
   areaToSearch: '', // can be "whitehall", "mainstream" or "" (meaning any)
 
   caseSensitive: false, // user input - whether the keyword search is case sensitive
-  activeMode: 'keyword-search', // user input - type of search selected
-  //  possible values: 'keyword-search', 'link-search'
   waiting: false // whether we're waiting for a request to return
 };
 
@@ -43,7 +41,6 @@ const setStateFromQS = function() {
   state.selectedTaxon = searchParams.get('selected-taxon') || '';
   state.selectedLocale = searchParams.get('lang') || '';
   state.caseSensitive = searchParams.get('case-sensitive') || false;
-  state.activeMode = searchParams.get('active-mode') || 'keyword-search';
   state.whereToSearch.title = !(searchParams.get('search-in-title') === 'false');
   state.whereToSearch.text = searchParams.get('search-in-text') === 'true';
   state.areaToSearch = searchParams.get('area') || '';

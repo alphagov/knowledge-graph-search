@@ -2,10 +2,7 @@
 
 import { view } from './view.js';
 import { state, setStateFromQS } from './state.js';
-import {
-  keywordSearchButtonClicked,
-  linkSearchButtonClicked
- } from './events.js';
+import { searchButtonClicked } from './events.js';
 
 
 
@@ -100,15 +97,5 @@ Otherwise there's probably a problem. Please contact the Data Labs`;
   await init();
   setStateFromQS();
   view();
-
-  switch(state.activeMode) {
-  case 'keyword-search':
-      keywordSearchButtonClicked();
-  break;
-  case 'link-search':
-    linkSearchButtonClicked();
-  break;
-  default:
-    console.log('init: unknown mode', state.activeMode);
-  }
+  searchButtonClicked();
 })();

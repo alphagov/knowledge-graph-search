@@ -6556,6 +6556,10 @@ x:-moz-any-link {
   margin-right: 20px;
 }
 
+.govuk-hint {
+  margin-bottom: 0;
+}
+
 .govuk-footer {
   clear: both;
 }

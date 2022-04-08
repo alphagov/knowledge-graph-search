@@ -41,7 +41,7 @@ const returnClause = function() {
     LIMIT ${state.nbResultsLimit}`;
 };
 
-const keywordSearchQuery = function(state, keywords, exclusions) {
+const searchQuery = function(state, keywords, exclusions) {
   const fieldsToSearch = [
     state.whereToSearch.title?'title':null,
     state.whereToSearch.text?'text':null
@@ -77,6 +77,23 @@ const keywordSearchQuery = function(state, keywords, exclusions) {
     WHERE taxon.name = "${taxon}" OR c.name = "${taxon}"` :
     `OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)<-[:HAS_PARENT*]-(c:Taxon)`;
 
+  let linkClause = '';
+
+  if (state.linkSearchUrl.length > 0) {
+    // We need to determine if the link is internal or external
+    const internalLinkRexExp = /^((https:\/\/)?((www\.)?gov\.uk))?\//;
+    if (internalLinkRexExp.test(state.linkSearchUrl)) {
+      linkClause = `
+        WITH n, taxon
+        MATCH (n:Cid)-[:HYPERLINKS_TO]->(n2:Cid)
+        WHERE n2.name = "${state.linkSearchUrl.replace(internalLinkRexExp, '/')}"`
+    } else {
+      linkClause = `
+        WITH n, taxon
+        MATCH (n:Cid) -[:HYPERLINKS_TO]-> (e:ExternalPage)
+        WHERE e.name CONTAINS "${state.linkSearchUrl}"`
+    }
+  }
 
   return `
     MATCH (n:Cid)
@@ -85,37 +102,10 @@ const keywordSearchQuery = function(state, keywords, exclusions) {
     ${localeClause}
     ${areaClause}
     ${taxonClause}
+    ${linkClause}
     OPTIONAL MATCH (n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
     OPTIONAL MATCH (n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
     ${returnClause()}`;
-};
-
-
-const linkSearchButtonClicked = async function() {
-  if (state.linkSearchUrl.length > 0) {
-    // We need to determine if the link is internal or external
-    const internalLinkRexExp = /^((https:\/\/)?((www\.)?gov\.uk))?\//;
-    if (internalLinkRexExp.test(state.linkSearchUrl)) {
-      state.searchQuery = `
-        MATCH (n:Cid)-[:HYPERLINKS_TO]->(n2:Cid)
-        WHERE n2.name = "${state.linkSearchUrl.replace(internalLinkRexExp, '/')}"
-        OPTIONAL MATCH (n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
-        OPTIONAL MATCH (n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
-        OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
-        ${returnClause()}`;
-    } else {
-      state.searchQuery = `
-        MATCH (n:Cid) -[:HYPERLINKS_TO]-> (e:ExternalPage)
-        WHERE e.name CONTAINS "${state.linkSearchUrl}"
-        OPTIONAL MATCH (n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
-        OPTIONAL MATCH (n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
-        OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
-        ${returnClause()}`;
-      }
-    queryGraph(state.searchQuery);
-  } else {
-    state.searchResults = { records: [] };
-  }
 };
 
 
@@ -132,10 +122,10 @@ const splitKeywords = function(keywords) {
   return output;
 };
 
-const keywordSearchButtonClicked = async function() {
+const searchButtonClicked = async function() {
   state.errorText = null;
 
-  if (state.selectedWords !== '' || state.selectedLocale !== '' || state.selectedTaxon !== '') {
+  if (state.selectedWords !== '' || state.selectedLocale !== '' || state.selectedTaxon !== '' || state.linkSearchUrl !== '') {
     state.waiting = true;
     const keywords = splitKeywords(state.selectedWords)
       .filter(d=>d.length>0)
@@ -144,14 +134,13 @@ const keywordSearchButtonClicked = async function() {
       .filter(d=>d.length>0)
       .map(s => s.toLowerCase());
 
-    state.searchQuery = keywordSearchQuery(state, keywords, excludedKeywords);
+    state.searchQuery = searchQuery(state, keywords, excludedKeywords);
     queryGraph(state.searchQuery);
   }
 };
 
 
 const queryGraph = async function(query) {
-  console.log('running', query);
   state.neo4jSession
     .run(query)
     .then(result => handleEvent({type:'neo4j-callback-ok', result}))
@@ -166,7 +155,7 @@ const handleEvent = async function(event) {
   switch(event.type) {
     case "dom":
       switch(event.id) {
-      case "keyword-search":
+      case "search":
         state.selectedWords = sanitise(id('keyword').value);
         state.excludedWords = sanitise(id('excluded-keyword').value);
         state.selectedTaxon = document.querySelector('#taxon input').value;
@@ -174,22 +163,12 @@ const handleEvent = async function(event) {
         state.whereToSearch.title = id('search-title').checked;
         state.whereToSearch.text = id('search-text').checked;
         state.caseSensitive = id('case-sensitive').checked;
+        state.linkSearchUrl = id('link-search').value;
         state.skip = 0; // reset to first page
         if (id('area-mainstream').checked) state.areaToSearch = 'mainstream';
         if (id('area-whitehall').checked) state.areaToSearch = 'whitehall';
         if (id('area-any').checked) state.areaToSearch = '';
-        keywordSearchButtonClicked();
-        break;
-      case "link-search":
-        state.linkSearchUrl = id('link-search').value;
-        state.skip = 0; // reset to first page
-        linkSearchButtonClicked();
-        break;
-      case 'button-select-keyword-search':
-        state.activeMode = 'keyword-search';
-        break;
-      case 'button-select-link-search':
-        state.activeMode = 'link-search';
+        searchButtonClicked();
         break;
       case 'button-next-page':
         state.skip = state.skip + state.resultsPerPage;
@@ -241,25 +220,16 @@ const updateUrl = function() {
   if ('URLSearchParams' in window) {
     var searchParams = new URLSearchParams();
 
-    if (state.activeMode !== 'keyword-search') searchParams.set('active-mode', state.activeMode);
-    switch (state.activeMode) {
-    case 'keyword-search':
-      if (state.selectedWords !== '') searchParams.set('selected-words', state.selectedWords);
-      if (state.excludedWords !== '') searchParams.set('excluded-words', state.excludedWords);
-      if (state.selectedTaxon !== '') searchParams.set('selected-taxon', state.selectedTaxon);
-      if (state.selectedLocale !== '') searchParams.set('lang', state.selectedLocale);
-      if (state.caseSensitive) searchParams.set('case-sensitive', state.caseSensitive);
-      if (!state.whereToSearch.title) searchParams.set('search-in-title', 'false');
-      if (state.whereToSearch.text) searchParams.set('search-in-text', 'true');
-      if (state.areaToSearch.length > 0) searchParams.set('area', state.areaToSearch);
-      if (state.skip) searchParams.set('skip', state.skip);
-    break;
-    case 'link-search':
-      if (state.linkSearchUrl !== '') searchParams.set('link-search-url', state.linkSearchUrl);
-    break;
-    default:
-      console.log('update URL unknown activeMode:', state.activeMode);
-    }
+    if (state.selectedWords !== '') searchParams.set('selected-words', state.selectedWords);
+    if (state.excludedWords !== '') searchParams.set('excluded-words', state.excludedWords);
+    if (state.selectedTaxon !== '') searchParams.set('selected-taxon', state.selectedTaxon);
+    if (state.selectedLocale !== '') searchParams.set('lang', state.selectedLocale);
+    if (state.caseSensitive) searchParams.set('case-sensitive', state.caseSensitive);
+    if (!state.whereToSearch.title) searchParams.set('search-in-title', 'false');
+    if (state.whereToSearch.text) searchParams.set('search-in-text', 'true');
+    if (state.areaToSearch.length > 0) searchParams.set('area', state.areaToSearch);
+    if (state.linkSearchUrl !== '') searchParams.set('link-search-url', state.linkSearchUrl);
+    if (state.skip) searchParams.set('skip', state.skip);
 
     let newRelativePathQuery = window.location.pathname;
     if (searchParams.toString().length > 0) {
@@ -272,6 +242,5 @@ const updateUrl = function() {
 
 export {
   handleEvent,
-  keywordSearchButtonClicked,
-  linkSearchButtonClicked
+  searchButtonClicked
 };
