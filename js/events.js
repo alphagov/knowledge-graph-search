@@ -72,7 +72,8 @@ const keywordSearchQuery = function(state, keywords, exclusions) {
 
   const taxon = state.selectedTaxon;
   const taxonClause = taxon ? `WITH n
-    MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)<-[:HAS_PARENT*]-(c:Taxon)
+    MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
+    OPTIONAL MATCH (taxon:Taxon)<-[:HAS_PARENT*]-(c:Taxon)
     WHERE taxon.name = "${taxon}" OR c.name = "${taxon}"` :
     `OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)<-[:HAS_PARENT*]-(c:Taxon)`;
 
