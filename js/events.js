@@ -128,12 +128,9 @@ const searchButtonClicked = async function() {
   if (state.selectedWords !== '' || state.selectedLocale !== '' || state.selectedTaxon !== '' || state.linkSearchUrl !== '') {
     state.waiting = true;
     const keywords = splitKeywords(state.selectedWords)
-      .filter(d=>d.length>0)
-      .map(s => s.toLowerCase());
+      .filter(d=>d.length>0);
     const excludedKeywords = splitKeywords(state.excludedWords)
-      .filter(d=>d.length>0)
-      .map(s => s.toLowerCase());
-
+      .filter(d=>d.length>0);
     state.searchQuery = searchQuery(state, keywords, excludedKeywords);
     queryGraph(state.searchQuery);
   }
