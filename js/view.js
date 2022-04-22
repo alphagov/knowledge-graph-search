@@ -38,6 +38,14 @@ const view = function() {
       'click',
       event => handleEvent({type: 'dom', id: event.target.getAttribute('id')})));
 
+  document.getElementById('search-form').addEventListener(
+    'submit',
+    event => {
+      event.preventDefault();
+      handleEvent({type: 'dom', id: 'search'});
+    }
+  );
+
   // add the accessible autocomplete
   if (id('taxon')) {
     accessibleAutocomplete({
@@ -54,7 +62,7 @@ const view = function() {
 const viewSearchPanel = function() {
   const html = [];
   html.push(`
-    <div class="search-panel">
+    <form id="search-form" class="search-panel govuk-form">
       <div class="search-mode-panel">
         <div class="govuk-body">
           Keywords:
@@ -149,7 +157,7 @@ const viewSearchPanel = function() {
         <p class="govuk-body">Brought to you by the Data Labs</p>
         <p class="govuk-body">Help/problem/feedback: Contact <a href="mailto:max.froumentin@digital.cabinet-office.gov.uk">Max Froumentin</a></p>
       </div>
-    </div>`);
+    </form>`);
   return html.join('');
 };
 
