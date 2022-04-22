@@ -65,12 +65,12 @@ const viewSearchPanel = function() {
     <form id="search-form" class="search-panel govuk-form">
       <div class="search-mode-panel">
         <div class="govuk-body">
-          <label for="keyword" class="govuk-label">Keywords:</label>
+          <label for="keyword" class="govuk-label">Search for:</label>
           <input class="govuk-input" id="keyword" placeholder="eg: cat dog &quot;health certificate&quot;" value='${sanitise(state.selectedWords).replace('"', '&quot;')}'/>
         </div>
         <div class="govuk-body">
           <label for="excluded-keyword" class="govuk-label">Exclude keywords:</label>
-          <input class="govuk-input" id="excluded-keyword" placeholder="leave blank if no exclusions" value='${sanitise(state.excludedWords).replace('"', '&quot;')}'/>
+          <input class="govuk-input" id="excluded-keyword" value='${sanitise(state.excludedWords).replace('"', '&quot;')}'/>
         </div>
         <div class="govuk-body">
           <div class="kg-checkboxes">
