@@ -65,11 +65,11 @@ const viewSearchPanel = function() {
     <form id="search-form" class="search-panel govuk-form">
       <div class="search-mode-panel">
         <div class="govuk-body">
-          Keywords:
+          <label for="keyword" class="govuk-label">Keywords:</label>
           <input class="govuk-input" id="keyword" placeholder="eg: cat dog &quot;health certificate&quot;" value='${sanitise(state.selectedWords).replace('"', '&quot;')}'/>
         </div>
         <div class="govuk-body">
-          Exclude keywords:
+          <label for="excluded-keyword" class="govuk-label">Exclude keywords:</label>
           <input class="govuk-input" id="excluded-keyword" placeholder="leave blank if no exclusions" value='${sanitise(state.excludedWords).replace('"', '&quot;')}'/>
         </div>
         <div class="govuk-body">
@@ -83,8 +83,10 @@ const viewSearchPanel = function() {
           </div>
         </div>
         <div class="govuk-body">
-          <div id="search-locations-wrapper">
-            Search in:
+          <fieldset class="govuk-fieldset" id="search-locations-wrapper">
+            <legend class="govuk-fieldset__legend">
+              Search in:
+            </legend>
             <ul class="kg-checkboxes" id="search-locations">
               <li class="kg-checkboxes__item">
                 <input class="kg-checkboxes__input"
@@ -99,11 +101,13 @@ const viewSearchPanel = function() {
                 <label class="kg-label kg-checkboxes__label">Page text</label>
               </li>
             </ul>
-          </div>
+          </fieldset>
         </div>
         <div class="govuk-body">
-          <div id="search-areas-wrapper">
-            Limit to:
+          <fieldset class="govuk-fieldset" id="search-areas-wrapper">
+            <legend class="govuk-fieldset__legend">
+              Limit to:
+            </legend>
             <ul class="kg-radios" id="site-areas">
               <li class="kg-radios__item">
                 <input class="kg-radios__input"
@@ -128,16 +132,16 @@ const viewSearchPanel = function() {
               </li>
             </ul>
           </div>
-        </div>
+        </fieldset>
         <div class="govuk-body">
           <div class="taxon-facet">
-            Search in taxon:
+            <label class="kg-label" for="taxon-label">Search in taxon:</label>
             <div id="taxon"></div>
           </div>
         </div>
         ${viewLocaleSelector()}
         <div class="govuk-body">
-          Enter a URL to select pages linking to it
+          <label class="kg-label" for="link-search">Enter a URL to select pages linking to it</label>
           <div class="govuk-hint">
             For instance: '/maternity-pay-leave' or 'youtube.com'
           </div>
@@ -165,7 +169,7 @@ const viewSearchPanel = function() {
 const viewLocaleSelector = function() {
   const html = [`
     <div class="govuk-body taxon-facet">
-      Search by language:
+      <label class="kg-label" for="locale">Search by language:</label>
       <select id="locale" class="govuk-select">
   `];
   html.push(...state.locales.map(code => `<option name="${code}" ${state.selectedLocale==code ? 'selected' : ''}>${localeNames[code]}</option>`))
@@ -179,18 +183,20 @@ const viewSearchResultsTable = function(records, showFields) {
   const recordsToShow = records.slice(state.skip, state.skip + state.resultsPerPage);
   html.push(`
     <div class="govuk-body">
-      Show:
-      <ul class="kg-checkboxes" id="show-fields">`);
+      <fieldset class="govuk-fieldset">
+        <legend class="govuk-fieldset__legend">Show:</legend>
+        <ul class="kg-checkboxes" id="show-fields">`);
   html.push(recordsToShow[0].keys.map(key => `
-        <li class="kg-checkboxes__item">
-          <input class="kg-checkboxes__input"
-                 data-interactive="true"
-                 type="checkbox" id="show-field-${key}"
-            ${showFields[key] ? 'checked' : ''}/>
-          <label class="kg-label kg-checkboxes__label">${fieldName(key)}</label>
-        </li>`).join(''));
+          <li class="kg-checkboxes__item">
+            <input class="kg-checkboxes__input"
+                   data-interactive="true"
+                   type="checkbox" id="show-field-${key}"
+              ${showFields[key] ? 'checked' : ''}/>
+            <label class="kg-label kg-checkboxes__label">${fieldName(key)}</label>
+          </li>`).join(''));
   html.push(`
-      </ul>
+        </ul>
+      </fieldset>
       <table id="results-table" class="govuk-table">
         <tbody class="govuk-table__body">
         <tr class="govuk-table__row">`);
