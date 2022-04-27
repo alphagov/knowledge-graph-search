@@ -203,7 +203,7 @@ const viewSearchResultsTable = function(records, showFields) {
 
   recordsToShow[0].keys.forEach(key => {
     if (state.showFields[key]) {
-      html.push(`<th scope="scope" class="govuk-table__header">${fieldName(key)}</th>`);
+      html.push(`<th scope="col" class="govuk-table__header">${fieldName(key)}</th>`);
     }
   });
 
@@ -267,14 +267,19 @@ const viewSearchResults = function(results, showFields) {
       <h2 class="govuk-heading-l">${nbRecords} result${nbRecords!==0 ? 's' : ''}</h2>`);
     } else {
       html.push(`
-      <h2 class="govuk-heading-l">Results</h2>
-      <h3 class="govuk" class="govuk-heading-m">Note: this query returned more than ${state.nbResultsLimit} results. Try to narrow down your search.</h3>
+      <div class="govuk-warning-text">
+        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+        <strong class="govuk-warning-text__text">
+          <span class="govuk-warning-text__assistive">Warning</span>
+          There are more than ${state.nbResultsLimit} results. Try to narrow down your search.
+        </strong>
+      </div>
       `);
     }
 
     if (nbRecords >= state.resultsPerPage) {
       html.push(`
-      <p class="govuk-body">Showing ${state.skip + 1} - ${Math.min(nbRecords, state.skip + state.resultsPerPage)}</p>`);
+      <p class="govuk-body">Showing results ${state.skip + 1} to ${Math.min(nbRecords, state.skip + state.resultsPerPage)}</p>`);
     }
     html.push(viewSearchResultsTable(results.records, showFields));
 
