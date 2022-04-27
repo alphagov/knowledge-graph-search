@@ -78,7 +78,7 @@ const viewSearchPanel = function() {
               <input class="kg-checkboxes__input"
                      type="checkbox" id="case-sensitive"
                 ${state.caseSensitive ? 'checked' : ''}/>
-              <label class="kg-label kg-checkboxes__label">Case-sensitive search</label>
+              <label for="case-sensitive" class="kg-label kg-checkboxes__label">Case-sensitive search</label>
             </div>
           </div>
         </div>
@@ -92,13 +92,13 @@ const viewSearchPanel = function() {
                 <input class="kg-checkboxes__input"
                        type="checkbox" id="search-title"
                   ${state.whereToSearch.title ? 'checked' : ''}/>
-                <label class="kg-label kg-checkboxes__label">Page title</label>
+                <label for="search-title" class="kg-label kg-checkboxes__label">Page title</label>
               </li>
               <li class="kg-checkboxes__item">
                 <input class="kg-checkboxes__input"
                        type="checkbox" id="search-text"
                   ${state.whereToSearch.text ? 'checked' : ''}/>
-                <label class="kg-label kg-checkboxes__label">Page text</label>
+                <label for="search-text" class="kg-label kg-checkboxes__label">Page text</label>
               </li>
             </ul>
           </fieldset>
@@ -114,21 +114,21 @@ const viewSearchPanel = function() {
                        type="radio" id="area-mainstream"
                        name="area"
                   ${state.areaToSearch === 'mainstream' ? 'checked' : ''}/>
-                <label class="kg-label kg-radios__label">Mainstream</label>
+                <label for="area-mainstream" class="kg-label kg-radios__label">Mainstream</label>
               </li>
               <li class="kg-radios__item">
                 <input class="kg-radios__input"
                        type="radio" id="area-whitehall"
                        name="area"
                   ${state.areaToSearch === 'whitehall' ? 'checked' : ''}/>
-                <label class="kg-label kg-radios__label">Whitehall</label>
+                <label for="area-whitehall" class="kg-label kg-radios__label">Whitehall</label>
               </li>
               <li class="kg-radios__item">
                 <input class="kg-radios__input"
                        type="radio" id="area-any"
                        name="area"
                   ${state.areaToSearch === '' ? 'checked' : ''}/>
-                <label class="kg-label kg-radios__label">Any</label>
+                <label for="area-any" class="kg-label kg-radios__label">Any</label>
               </li>
             </ul>
           </div>
@@ -192,7 +192,7 @@ const viewSearchResultsTable = function(records, showFields) {
                    data-interactive="true"
                    type="checkbox" id="show-field-${key}"
               ${showFields[key] ? 'checked' : ''}/>
-            <label class="kg-label kg-checkboxes__label">${fieldName(key)}</label>
+            <label for="show-field-${key}" class="kg-label kg-checkboxes__label">${fieldName(key)}</label>
           </li>`).join(''));
   html.push(`
         </ul>
