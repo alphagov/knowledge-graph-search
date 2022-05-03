@@ -6560,6 +6560,33 @@ x:-moz-any-link {
   margin-bottom: 0;
 }
 
+h1.initial {
+  margin-top: 20px;
+}
+
+h1.main-title {
+  float: left;
+  max-width: 500px;
+  margin-bottom: 0;
+}
+h1.main-title p {
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+
+#main-content {
+  padding-top: 0;
+}
+
+.please-note {
+  margin-top: 20px;
+  padding-left: 10px;
+  max-width: 300px;
+  float: right;
+  border: 1px solid black;
+  max-width: 300px;
+}
+
 .govuk-footer {
   clear: both;
 }
@@ -6616,13 +6643,14 @@ pre {
 }
 
 .search-panel {
+  clear: both;
   float: left;
   width: 33%;
   padding: 10px 10px 0 10px;
 }
 
 .search-mode-panel {
-  border: 1px solid black;
+  background: #f3f2f1;
   padding: 20px;
 }
 
