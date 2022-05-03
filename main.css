@@ -6565,8 +6565,6 @@ h1.initial {
 }
 
 h1.main-title {
-  float: left;
-  max-width: 500px;
   margin-bottom: 0;
 }
 h1.main-title p {
@@ -6576,15 +6574,6 @@ h1.main-title p {
 
 #main-content {
   padding-top: 0;
-}
-
-.please-note {
-  margin-top: 20px;
-  padding-left: 10px;
-  max-width: 300px;
-  float: right;
-  border: 1px solid black;
-  max-width: 300px;
 }
 
 .govuk-footer {

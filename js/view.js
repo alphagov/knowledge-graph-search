@@ -14,22 +14,9 @@ const view = function() {
         <h1 class="govuk-heading-xl main-title">
           <strong class="govuk-tag govuk-phase-banner__content__tag">DISCOVERY</strong><br/>
           GovGraph search
-          <p class="govuk-heading-m">Find GOV.UK content:</p>
-          <ul class="govuk-list govuk-list--bullet">
-            <li>containing keywords or links</li>
-            <li>tagged to a taxon and its subtaxons</li>
-          </ul>
+          <p class="govuk-body">Search for GOV.UK content containing keywords, links or by topic taxon between 9am and 7pm.</p>
+          <p class="govuk-body">This is a discovery tool. Searches do not include history mode content, Mainstream GitHub smart answers or service domains. Popularity scores depend on cookie consent.</p>
         </h1>
-
-        <div class="please-note">
-          <p class="body govuk-!-font-size-14">Please note</p>
-          <ul class="govuk-list govuk-!-font-size-14 govuk-list--bullet">
-            <li>this is a discovery tool in development</li>
-            <li>this tool works between 9am and 7pm</li>
-            <li>searches do not include content in history mode, Github smart answers or on service domains</li>
-            <li>popularity scores depend on cookie consent</li>
-          </ul>
-        </div>
       </div>
 `);
 
