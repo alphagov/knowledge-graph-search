@@ -155,6 +155,8 @@ const viewSearchPanel = function() {
               id="search">
             ${state.waiting?'Searching':'Search'}
           </button>
+          ${state.waiting?'<br/><span class="govuk-body">Please note that some queries take up to one minute</span>':''}
+
         </p>
       </div>
       <div ckass="sig">
@@ -259,7 +261,8 @@ const viewSearchResults = function(results, showFields) {
     <div id="results">`);
   if (state.waiting) {
     html.push(`
-      <h2 class="govuk-heading-l">Searching, please wait <img src="assets/images/loader.gif" height="20px" alt="loader"/></h2>`);
+      <h2 class="govuk-heading-l">Searching, please wait <img src="assets/images/loader.gif" height="20px" alt="loader"/></h2>
+      <p class="govuk-body">Please note that some queries take up to one minute</p>`);
   } else if (results && results.records.length > 0) {
     const nbRecords = results.records.length;
     if (nbRecords < state.nbResultsLimit) {
