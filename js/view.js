@@ -66,8 +66,8 @@ const view = () => {
 const viewSearchPanel = () => `
   <form id="search-form" class="search-panel govuk-form">
     <div class="search-mode-panel">
-      ${viewExclusionsInput()}
       ${viewKeywordsInput()}
+      ${viewExclusionsInput()}
       ${viewCaseSensitiveSelector()}
       ${viewScopeSelector()}
       ${viewLinkSearch()}
@@ -116,20 +116,20 @@ const viewScopeSelector = () => `
       <legend class="govuk-fieldset__legend">
         Keyword location
       </legend>
-      <ul class="kg-checkboxes" id="search-locations">
-        <li class="kg-checkboxes__item">
-          <input class="kg-checkboxes__input"
+      <div class="govuk-checkboxes" id="search-locations">
+        <div class="govuk-checkboxes__item">
+          <input class="govuk-checkboxes__input"
                  type="checkbox" id="search-title"
             ${state.whereToSearch.title ? 'checked' : ''}/>
-          <label for="search-title" class="kg-label kg-checkboxes__label">title</label>
-        </li>
-        <li class="kg-checkboxes__item">
-          <input class="kg-checkboxes__input"
+          <label for="search-title" class="govuk-label govuk-checkboxes__label">title</label>
+        </div>
+        <div class="govuk-checkboxes__item">
+          <input class="govuk-checkboxes__input"
                  type="checkbox" id="search-text"
             ${state.whereToSearch.text ? 'checked' : ''}/>
-          <label for="search-text" class="kg-label kg-checkboxes__label">body content</label>
-        </li>
-      </ul>
+          <label for="search-text" class="govuk-label govuk-checkboxes__label">body content</label>
+        </div>
+      </div>
     </fieldset>
   </div>
 `;
@@ -137,12 +137,12 @@ const viewScopeSelector = () => `
 
 const viewCaseSensitiveSelector = () => `
   <div class="govuk-body">
-    <div class="kg-checkboxes">
-      <div class="kg-checkboxes__item">
-        <input class="kg-checkboxes__input"
+    <div class="govuk-checkboxes">
+      <div class="govuk-checkboxes__item">
+        <input class="govuk-checkboxes__input"
                type="checkbox" id="case-sensitive"
           ${state.caseSensitive ? 'checked' : ''}/>
-        <label for="case-sensitive" class="kg-label kg-checkboxes__label">case-sensitive search</label>
+        <label for="case-sensitive" class="govuk-label govuk-checkboxes__label">case-sensitive search</label>
       </div>
     </div>
   </div>
@@ -155,29 +155,29 @@ const viewPublishingAppSelector = () => `
       <legend class="govuk-fieldset__legend">
         Limit search
       </legend>
-      <ul class="kg-radios" id="site-areas">
-        <li class="kg-radios__item">
-          <input class="kg-radios__input"
+      <div class="govuk-radios" id="site-areas">
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input"
                  type="radio" id="area-mainstream"
                  name="area"
             ${state.areaToSearch === 'mainstream' ? 'checked' : ''}/>
-          <label for="area-mainstream" class="kg-label kg-radios__label">Mainstream</label>
-        </li>
-        <li class="kg-radios__item">
-          <input class="kg-radios__input"
+          <label for="area-mainstream" class="govuk-label govuk-radios__label">Mainstream</label>
+        </div>
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input"
                  type="radio" id="area-whitehall"
                  name="area"
             ${state.areaToSearch === 'whitehall' ? 'checked' : ''}/>
-          <label for="area-whitehall" class="kg-label kg-radios__label">Whitehall</label>
-        </li>
-        <li class="kg-radios__item">
-          <input class="kg-radios__input"
+          <label for="area-whitehall" class="govuk-label govuk-radios__label">Whitehall</label>
+        </div>
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input"
                  type="radio" id="area-any"
                  name="area"
             ${state.areaToSearch === '' ? 'checked' : ''}/>
-          <label for="area-any" class="kg-label kg-radios__label">All publishing applications</label>
-        </li>
-      </ul>
+          <label for="area-any" class="govuk-label govuk-radios__label">All publishing applications</label>
+        </div>
+      </div>
     </fieldset>
   </div>
 `;
