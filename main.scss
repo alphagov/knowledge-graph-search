@@ -77,12 +77,14 @@ pre {
   padding: 0;
   display: inline;
   line-height: 1.2;
-}
-
-.kg-checkboxes__item, .kg-radios__item {
-  display: inline-block;
-  padding: 0 1em 0 0;
-  background: #ddd;
+  .kg-checkboxes__item, .kg-radios__item {
+    display: inline-block;
+    padding: 0 1em 0 0;
+    background: #ddd;
+    label {
+      font-weight: normal;
+    }
+  }
 }
 
 .mode-buttons {
@@ -102,6 +104,9 @@ pre {
   float: left;
   width: 33%;
   padding: 10px 10px 0 10px;
+  label {
+    font-weight: bold;
+  }
 }
 
 .search-mode-panel {

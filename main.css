@@ -6623,11 +6623,13 @@ pre {
   display: inline;
   line-height: 1.2;
 }
-
-.kg-checkboxes__item, .kg-radios__item {
+.kg-checkboxes .kg-checkboxes__item, .kg-checkboxes .kg-radios__item, .kg-radios .kg-checkboxes__item, .kg-radios .kg-radios__item {
   display: inline-block;
   padding: 0 1em 0 0;
   background: #ddd;
+}
+.kg-checkboxes .kg-checkboxes__item label, .kg-checkboxes .kg-radios__item label, .kg-radios .kg-checkboxes__item label, .kg-radios .kg-radios__item label {
+  font-weight: normal;
 }
 
 .mode-buttons {
@@ -6647,6 +6649,9 @@ pre {
   float: left;
   width: 33%;
   padding: 10px 10px 0 10px;
+}
+.search-panel label {
+  font-weight: bold;
 }
 
 .search-mode-panel {
