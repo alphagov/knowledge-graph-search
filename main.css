@@ -6654,29 +6654,8 @@ pre {
   padding: 20px;
 }
 
-#keyword-search-panel input {
-  margin-top: 5px;
-}
-#keyword-search-panel #keyword {
-  max-width: 300px;
-  margin-right: 10px;
-}
-#keyword-search-panel #excluded-keyword {
-  max-width: 405px;
-}
-#keyword-search-panel .keyword-label {
-  display: inline-block;
-}
-#keyword-search-panel .taxon-facet {
-  margin-top: 10px;
-}
-#keyword-search-panel .taxon-facet #taxon {
-  display: inline-block;
-}
-
-#keyword-search-panel {
-  padding: 0;
-  margin: 0;
+#taxon-label {
+  background: white;
 }
 
 #keyword-search {

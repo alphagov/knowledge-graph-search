@@ -22,7 +22,7 @@ const view = function() {
         </h1>
 
         <div class="please-note">
-          <p class="body govuk-!-font-size-14">Please note:</p>
+          <p class="body govuk-!-font-size-14">Please note</p>
           <ul class="govuk-list govuk-!-font-size-14 govuk-list--bullet">
             <li>this is a discovery tool in development</li>
             <li>this tool works between 9am and 7pm</li>
@@ -82,40 +82,43 @@ const viewSearchPanel = function() {
     <form id="search-form" class="search-panel govuk-form">
       <div class="search-mode-panel">
         <div class="govuk-body">
-          <label for="keyword" class="govuk-label">Search for:</label>
-          <input class="govuk-input" id="keyword" placeholder="eg: cat dog &quot;health certificate&quot;" value='${sanitise(state.selectedWords).replace('"', '&quot;')}'/>
+          <label for="keyword" class="govuk-label">Search for</label>
+          <div class="govuk-hint">
+            For example: cat dog &quot;health certificate&quot;
+          </div>
+          <input class="govuk-input" id="keyword" value='${sanitise(state.selectedWords).replace('"', '&quot;')}'/>
         </div>
         <div class="govuk-body">
-          <label for="excluded-keyword" class="govuk-label">Exclude keywords:</label>
+          <label for="excluded-keyword" class="govuk-label">Exclude keywords</label>
           <input class="govuk-input" id="excluded-keyword" value='${sanitise(state.excludedWords).replace('"', '&quot;')}'/>
         </div>
         <div class="govuk-body">
           <div class="kg-checkboxes">
             <div class="kg-checkboxes__item">
+              <label for="case-sensitive" class="kg-label kg-checkboxes__label">Make it case-sensitive</label>
               <input class="kg-checkboxes__input"
                      type="checkbox" id="case-sensitive"
                 ${state.caseSensitive ? 'checked' : ''}/>
-              <label for="case-sensitive" class="kg-label kg-checkboxes__label">Case-sensitive search</label>
             </div>
           </div>
         </div>
         <div class="govuk-body">
           <fieldset class="govuk-fieldset" id="search-locations-wrapper">
             <legend class="govuk-fieldset__legend">
-              Search in:
+              Search
             </legend>
             <ul class="kg-checkboxes" id="search-locations">
               <li class="kg-checkboxes__item">
                 <input class="kg-checkboxes__input"
                        type="checkbox" id="search-title"
                   ${state.whereToSearch.title ? 'checked' : ''}/>
-                <label for="search-title" class="kg-label kg-checkboxes__label">Page title</label>
+                <label for="search-title" class="kg-label kg-checkboxes__label">title</label>
               </li>
               <li class="kg-checkboxes__item">
                 <input class="kg-checkboxes__input"
                        type="checkbox" id="search-text"
                   ${state.whereToSearch.text ? 'checked' : ''}/>
-                <label for="search-text" class="kg-label kg-checkboxes__label">Page text</label>
+                <label for="search-text" class="kg-label kg-checkboxes__label">body content</label>
               </li>
             </ul>
           </fieldset>
@@ -123,7 +126,7 @@ const viewSearchPanel = function() {
         <div class="govuk-body">
           <fieldset class="govuk-fieldset" id="search-areas-wrapper">
             <legend class="govuk-fieldset__legend">
-              Limit to:
+              Limit search
             </legend>
             <ul class="kg-radios" id="site-areas">
               <li class="kg-radios__item">
@@ -145,14 +148,14 @@ const viewSearchPanel = function() {
                        type="radio" id="area-any"
                        name="area"
                   ${state.areaToSearch === '' ? 'checked' : ''}/>
-                <label for="area-any" class="kg-label kg-radios__label">Any</label>
+                <label for="area-any" class="kg-label kg-radios__label">All publishing applications</label>
               </li>
             </ul>
           </div>
         </fieldset>
         <div class="govuk-body">
           <div class="taxon-facet">
-            <label class="kg-label" for="taxon-label">Search in taxon:</label>
+            <label class="kg-label" for="taxon-label">Search in taxon and its sub-taxons</label>
             <div id="taxon"></div>
           </div>
         </div>
@@ -160,10 +163,10 @@ const viewSearchPanel = function() {
         <div class="govuk-body">
           <label class="kg-label" for="link-search">Enter a URL to select pages linking to it</label>
           <div class="govuk-hint">
-            For instance: '/maternity-pay-leave' or 'youtube.com'
+            For example: /maternity-pay-leave or youtube.com
           </div>
-              <input class="govuk-input" id="link-search"
-                     value="${state.linkSearchUrl}"/>
+          <input class="govuk-input" id="link-search"
+                 value="${state.linkSearchUrl}"/>
         </div>
 
         <p class="govuk-body">
@@ -178,7 +181,7 @@ const viewSearchPanel = function() {
       </div>
       <div ckass="sig">
         <p class="govuk-body">Brought to you by the Data Labs</p>
-        <p class="govuk-body">Help/problem/feedback: Contact <a href="mailto:max.froumentin@digital.cabinet-office.gov.uk">Max Froumentin</a></p>
+        <p class="govuk-body">Help/problem/feedback: contact <a href="mailto:max.froumentin@digital.cabinet-office.gov.uk">Max Froumentin</a></p>
       </div>
     </form>`);
   return html.join('');
@@ -188,7 +191,7 @@ const viewSearchPanel = function() {
 const viewLocaleSelector = function() {
   const html = [`
     <div class="govuk-body taxon-facet">
-      <label class="kg-label" for="locale">Search by language:</label>
+      <label class="kg-label" for="locale">Search by language</label>
       <select id="locale" class="govuk-select">
   `];
   html.push(...state.locales.map(code => `<option name="${code}" ${state.selectedLocale==code ? 'selected' : ''}>${localeNames[code]}</option>`))
@@ -203,7 +206,7 @@ const viewSearchResultsTable = function(records, showFields) {
   html.push(`
     <div class="govuk-body">
       <fieldset class="govuk-fieldset">
-        <legend class="govuk-fieldset__legend">Show:</legend>
+        <legend class="govuk-fieldset__legend">Show</legend>
         <ul class="kg-checkboxes" id="show-fields">`);
   html.push(recordsToShow[0].keys.map(key => `
           <li class="kg-checkboxes__item">
@@ -332,7 +335,7 @@ const viewCypherQuery = function() {
   if (state.searchQuery.length > 0) {
     html.push(`
       <div id="cypher-query">
-      <hr/><h2 class="govuk-heading-s">Cypher query (for debugging):</h2>
+      <hr/><h2 class="govuk-heading-s">Cypher query (for debugging)</h2>
       <pre>${state.searchQuery}</pre>
     `);
   }

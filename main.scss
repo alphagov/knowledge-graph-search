@@ -109,33 +109,8 @@ pre {
   padding: 20px;
 }
 
-#keyword-search-panel {
-  input {
-    margin-top: 5px;
-  }
-  #keyword {
-    max-width: 300px;
-    margin-right: 10px;
-  }
-  #excluded-keyword {
-    max-width: 405px;
-  }
-
-  .keyword-label {
-    display: inline-block;
-  }
-
-  .taxon-facet {
-    margin-top: 10px;
-    #taxon {
-      display: inline-block;
-    }
-  }
-}
-
-#keyword-search-panel {
-  padding: 0;
-  margin: 0;
+#taxon-label {
+  background: white;
 }
 
 #keyword-search {
