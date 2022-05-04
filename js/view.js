@@ -411,6 +411,7 @@ const viewSearchResults = (results, showFields) => {
     html.push(`
       <h2 class="govuk-heading-l">No results</h2>`);
       html.push(`<div class="govuk-body-s">for ${viewQueryDescription()}</div>`);
+    document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraphSearch`;
   }
   html.push(`
     </div>`);
