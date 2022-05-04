@@ -5,6 +5,7 @@ import { id, sanitise } from './utils.js';
 import { state } from './state.js';
 import { handleEvent } from './events.js';
 
+
 const view = () => {
   console.log('view')
   id('page-content').innerHTML = `
@@ -54,6 +55,51 @@ const viewBanner = () => `
     </h1>
   </div>
 `;
+
+const makeBold = (text, includeMarkup) =>
+  includeMarkup ? `<span class="govuk-!-font-weight-bold">${text}</span>` : text;
+
+
+const viewContainDescription = (words, includeMarkup) => {
+  let where;
+  if (state.whereToSearch.title && state.whereToSearch.text) {
+    where = '';
+  } else if (state.whereToSearch.title) {
+    where = 'in their title';
+  } else {
+    where = 'in their body content';
+  }
+
+  return words !== '' ? `${makeBold(words, includeMarkup)} (${where})` : '';
+};
+
+
+const viewQueryDescription = (includeMarkup = true) => {
+  const clauses = [];
+  if (state.selectedWords !== '') {
+    let keywords = `contain ${viewContainDescription(state.selectedWords, includeMarkup)}`;
+    if (state.excludedWords !== '') {
+      keywords = `${keywords} but don't contain ${makeBold(state.excludedWords, includeMarkup)}`;
+    }
+    clauses.push(keywords);
+  }
+  if (state.selectedTaxon !== '')
+    clauses.push(`belong to the ${makeBold(state.selectedTaxon, includeMarkup)} taxon (or its sub-taxons)`);
+  if (state.selectedLocale !== '')
+    clauses.push(`are in ${makeBold(localeNames[state.selectedLocale], includeMarkup)}`);
+  if (state.linkSearchUrl !== '')
+    clauses.push(`link to ${makeBold(state.linkSearchUrl, includeMarkup)}`);
+  if (state.areaToSearch !== '')
+    clauses.push(`are published using ${makeBold(state.areaToSearch, includeMarkup)}`);
+
+  const joinedClauses = (clauses.length === 1) ?
+    clauses[0] :
+    `${clauses.slice(0, clauses.length - 1).join(', ')} and ${clauses[clauses.length - 1]}`;
+
+  return `pages that ${joinedClauses}`;
+
+};
+
 
 const viewError = () =>
   state.errorText ? `
@@ -315,10 +361,13 @@ const viewSearchResults = (results, showFields) => {
     <div id="results">`);
   if (state.waiting) {
     html.push(`
-      <h2 class="govuk-heading-l">Searching, please wait <img src="assets/images/loader.gif" height="20px" alt="loader"/></h2>
-      <p class="govuk-body">Please note that some queries take up to one minute</p>`);
+      <h2 class="govuk-heading-l">Please wait <img src="assets/images/loader.gif" height="20px" alt="loader"/></h2>
+      <div class="govuk-body">Searching for ${viewQueryDescription()}</div>
+      <p class="govuk-body-s">Please note that some queries take up to one minute</p>`);
+    document.title = 'Searching - GovGraphSearch';
   } else if (results && results.records.length > 0) {
     const nbRecords = results.records.length;
+    document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraphSearch`;
     if (nbRecords < state.nbResultsLimit) {
       html.push(`
       <h2 class="govuk-heading-l">${nbRecords} result${nbRecords!==0 ? 's' : ''}</h2>`);
@@ -333,6 +382,8 @@ const viewSearchResults = (results, showFields) => {
       </div>
       `);
     }
+
+    html.push(`<div class="govuk-body-s">for ${viewQueryDescription()}</div>`);
 
     if (nbRecords >= state.resultsPerPage) {
       html.push(`
@@ -357,6 +408,7 @@ const viewSearchResults = (results, showFields) => {
   } else if (results && results.records.length == 0) {
     html.push(`
       <h2 class="govuk-heading-l">No results</h2>`);
+      html.push(`<div class="govuk-body-s">for ${viewQueryDescription()}</div>`);
   }
   html.push(`
     </div>`);

@@ -122,8 +122,15 @@ const splitKeywords = function(keywords) {
   return output;
 };
 
+
 const searchButtonClicked = async function() {
   state.errorText = null;
+  window.scrollTo(0, 0);
+
+  if (!state.whereToSearch.title && !state.whereToSearch.text) {
+    state.errorText = 'You need to select a keyword location';
+    return;
+  }
 
   if (state.selectedWords !== '' || state.selectedLocale !== '' || state.selectedTaxon !== '' || state.linkSearchUrl !== '') {
     state.waiting = true;
@@ -152,7 +159,7 @@ const handleEvent = async function(event) {
   switch(event.type) {
     case "dom":
       switch(event.id) {
-      case "search":
+      case 'search':
         state.selectedWords = sanitise(id('keyword').value);
         state.excludedWords = sanitise(id('excluded-keyword').value);
         state.selectedTaxon = document.querySelector('#taxon input').value;

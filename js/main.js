@@ -96,6 +96,6 @@ Otherwise there's probably a problem. Please contact the Data Labs`;
 (async () => {
   await init();
   setStateFromQS();
-  view();
   searchButtonClicked();
+  view();
 })();
