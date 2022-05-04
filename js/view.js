@@ -46,13 +46,15 @@ const view = () => {
 
 
 const viewBanner = () => `
-  <div>
-    <h1 class="govuk-heading-xl main-title">
-      <strong class="govuk-tag govuk-phase-banner__content__tag">DISCOVERY</strong><br/>
-      GovGraph search
-      <p class="govuk-body">Search for GOV.UK content containing keywords, links or by topic taxon between 9am and 7pm.</p>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-xl main-title">
+        <strong class="govuk-tag govuk-phase-banner__content__tag">DISCOVERY</strong><br/>
+        GovGraph search
+      </h1>
+      <p class="govuk-body-s">Search for GOV.UK content containing keywords, links or by topic taxon.<br/>Runs only between 9am and 7pm.</p>
       <p class="govuk-body">This is a discovery tool. Searches do not include history mode content, Mainstream GitHub smart answers or service domains. Popularity scores depend on cookie consent.</p>
-    </h1>
+    </div>
   </div>
 `;
 
@@ -70,7 +72,7 @@ const viewContainDescription = (words, includeMarkup) => {
     where = 'in their body content';
   }
 
-  return words !== '' ? `${makeBold(words, includeMarkup)} (${where})` : '';
+  return words !== '' ? `${makeBold(words, includeMarkup)} ${where}` : '';
 };
 
 
@@ -79,7 +81,7 @@ const viewQueryDescription = (includeMarkup = true) => {
   if (state.selectedWords !== '') {
     let keywords = `contain ${viewContainDescription(state.selectedWords, includeMarkup)}`;
     if (state.excludedWords !== '') {
-      keywords = `${keywords} but don't contain ${makeBold(state.excludedWords, includeMarkup)}`;
+      keywords = `${keywords} (but don't contain ${makeBold(state.excludedWords, includeMarkup)})`;
     }
     clauses.push(keywords);
   }
