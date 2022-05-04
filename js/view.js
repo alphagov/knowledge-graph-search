@@ -7,36 +7,16 @@ import { handleEvent } from './events.js';
 
 const view = () => {
   console.log('view')
-  const html = [];
-  html.push(`
+  id('page-content').innerHTML = `
     <main class="govuk-main-wrapper " id="main-content" role="main">
-      <div>
-        <h1 class="govuk-heading-xl main-title">
-          <strong class="govuk-tag govuk-phase-banner__content__tag">DISCOVERY</strong><br/>
-          GovGraph search
-          <p class="govuk-body">Search for GOV.UK content containing keywords, links or by topic taxon between 9am and 7pm.</p>
-          <p class="govuk-body">This is a discovery tool. Searches do not include history mode content, Mainstream GitHub smart answers or service domains. Popularity scores depend on cookie consent.</p>
-        </h1>
-      </div>
-`);
+      ${viewBanner()}
+      ${viewError()}
+      ${viewSearchPanel()}
+      ${viewSearchResults(state.searchResults, state.showFields)}
+      ${viewCypherQuery()}
+    </main>
+  `;
 
-  if (state.errorText) {
-    html.push(`
-      <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
-        <h2 class="govuk-error-summary__title" id="error-summary-title">Error</h2>
-        <p class="govuk-body">${state.errorText}</p>
-      </div>`);
-    }
-
-  html.push(viewSearchPanel());
-  html.push(viewSearchResults(state.searchResults, state.showFields));
-  html.push(viewCypherQuery());
-  html.push(`
-    </main>`);
-
-  id('page-content').innerHTML = html.join('');
-
-  // adding onclick doesn't work
   document.querySelectorAll('button, input[type=checkbox][data-interactive=true]')
     .forEach(input => input.addEventListener(
       'click',
@@ -62,6 +42,27 @@ const view = () => {
     });
   }
 };
+
+
+const viewBanner = () => `
+  <div>
+    <h1 class="govuk-heading-xl main-title">
+      <strong class="govuk-tag govuk-phase-banner__content__tag">DISCOVERY</strong><br/>
+      GovGraph search
+      <p class="govuk-body">Search for GOV.UK content containing keywords, links or by topic taxon between 9am and 7pm.</p>
+      <p class="govuk-body">This is a discovery tool. Searches do not include history mode content, Mainstream GitHub smart answers or service domains. Popularity scores depend on cookie consent.</p>
+    </h1>
+  </div>
+`;
+
+const viewError = () =>
+  state.errorText ? `
+  <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+    <h2 class="govuk-error-summary__title" id="error-summary-title">Error</h2>
+    <p class="govuk-body">${state.errorText}</p>
+  </div>
+` : '';
+
 
 const viewSearchPanel = () => `
   <form id="search-form" class="search-panel govuk-form">
