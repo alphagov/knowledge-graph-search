@@ -2,7 +2,7 @@
 /*eslint no-unused-vars: ["error", { "varsIgnorePattern": "view" }]*/
 
 import { id, sanitise } from './utils.js';
-import { state } from './state.js';
+import { state, searchState } from './state.js';
 import { handleEvent } from './events.js';
 
 
@@ -12,8 +12,14 @@ const view = () => {
     <main class="govuk-main-wrapper " id="main-content" role="main">
       ${viewBanner()}
       ${viewError()}
-      ${viewSearchPanel()}
-      ${viewSearchResults(state.searchResults, state.showFields)}
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-third">
+          ${viewSearchPanel()}
+        </div>
+        <div class="govuk-grid-column-two-thirds">
+          ${viewSearchResults(state.searchResults, state.showFields)}
+        </div>
+      </div>
       ${viewCypherQuery()}
     </main>
   `;
@@ -91,7 +97,7 @@ const viewQueryDescription = (includeMarkup = true) => {
     clauses.push(`are in ${makeBold(localeNames[state.selectedLocale], includeMarkup)}`);
   if (state.linkSearchUrl !== '')
     clauses.push(`link to ${makeBold(state.linkSearchUrl, includeMarkup)}`);
-  if (state.areaToSearch !== '')
+  if (state.areaToSearch === 'whitehall' || state.areaToSearch === 'mainstream')
     clauses.push(`are published using ${makeBold(state.areaToSearch, includeMarkup)}`);
 
   const joinedClauses = (clauses.length === 1) ?
@@ -223,7 +229,7 @@ const viewPublishingAppSelector = () => `
           <input class="govuk-radios__input"
                  type="radio" id="area-any"
                  name="area"
-            ${state.areaToSearch === '' ? 'checked' : ''}/>
+            ${state.areaToSearch === 'any' ? 'checked' : ''}/>
           <label for="area-any" class="govuk-label govuk-radios__label">All publishing applications</label>
         </div>
       </div>
@@ -282,9 +288,10 @@ const viewLocaleSelector = () => {
 };
 
 
-const viewSearchResultsTable = (records, showFields) => {
+const viewSearchResultsTable = () => {
   const html = [];
-  const recordsToShow = records.slice(state.skip, state.skip + state.resultsPerPage);
+
+  const recordsToShow = state.searchResults.records.slice(state.skip, state.skip + state.resultsPerPage);
   html.push(`
     <div class="govuk-body">
       <fieldset class="govuk-fieldset">
@@ -295,7 +302,7 @@ const viewSearchResultsTable = (records, showFields) => {
             <input class="kg-checkboxes__input"
                    data-interactive="true"
                    type="checkbox" id="show-field-${key}"
-              ${showFields[key] ? 'checked' : ''}/>
+              ${state.showFields[key] ? 'checked' : ''}/>
             <label for="show-field-${key}" class="kg-label kg-checkboxes__label">${fieldName(key)}</label>
           </li>`).join(''));
   html.push(`
@@ -357,24 +364,25 @@ const csvFromResults = function(searchResults) {
 };
 
 
-const viewSearchResults = (results, showFields) => {
-  const html = [];
-  html.push(`
-    <div id="results">`);
-  if (state.waiting) {
-    html.push(`
+const viewWaiting = function() {
+  document.title = 'Searching - GovGraphSearch';
+
+  return `
       <h2 class="govuk-heading-l">Please wait <img src="assets/images/loader.gif" height="20px" alt="loader"/></h2>
       <div class="govuk-body">Searching for ${viewQueryDescription()}</div>
-      <p class="govuk-body-s">Please note that some queries take up to one minute</p>`);
-    document.title = 'Searching - GovGraphSearch';
-  } else if (results && results.records.length > 0) {
-    const nbRecords = results.records.length;
-    document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraphSearch`;
-    if (nbRecords < state.nbResultsLimit) {
-      html.push(`
+      <p class="govuk-body-s">Please note that some queries take up to one minute</p>`;
+};
+
+const viewResults = function() {
+  const html = [];
+  const nbRecords = state.searchResults.records.length;
+  document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraphSearch`;
+
+  if (nbRecords < state.nbResultsLimit) {
+    html.push(`
       <h2 class="govuk-heading-l">${nbRecords} result${nbRecords!==0 ? 's' : ''}</h2>`);
-    } else {
-      html.push(`
+  } else {
+    html.push(`
       <div class="govuk-warning-text">
         <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
         <strong class="govuk-warning-text__text">
@@ -382,40 +390,48 @@ const viewSearchResults = (results, showFields) => {
           There are more than ${state.nbResultsLimit} results. Try to narrow down your search.
         </strong>
       </div>
-      `);
-    }
+    `);
+  }
 
-    html.push(`<div class="govuk-body-s">for ${viewQueryDescription()}</div>`);
+  html.push(`<div class="govuk-body-s">for ${viewQueryDescription()}</div>`);
 
-    if (nbRecords >= state.resultsPerPage) {
-      html.push(`
+  if (nbRecords >= state.resultsPerPage) {
+    html.push(`
       <p class="govuk-body">Showing results ${state.skip + 1} to ${Math.min(nbRecords, state.skip + state.resultsPerPage)}</p>`);
-    }
-    html.push(viewSearchResultsTable(results.records, showFields));
+  }
+  html.push(viewSearchResultsTable());
 
-    if (nbRecords >= state.resultsPerPage) {
-      html.push(`
+  if (nbRecords >= state.resultsPerPage) {
+    html.push(`
       <p class="govuk-body">
         <button class="govuk-button" id="button-prev-page">Previous</button>
         <button class="govuk-button" id="button-next-page">Next</button>
       </p>`);
-    }
-
-    const csv = csvFromResults(results);
-    const file = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(file); // TODO: use window.URL.revokeObjectURL(url);  after
-    html.push(`
-      <p class="govuk-body"><a class="govuk-link" href="${url}" download="export.csv">Save all ${nbRecords} results as a CSV file</a></p>`);
-
-  } else if (results && results.records.length == 0) {
-    html.push(`
-      <h2 class="govuk-heading-l">No results</h2>`);
-      html.push(`<div class="govuk-body-s">for ${viewQueryDescription()}</div>`);
-    document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraphSearch`;
   }
+
+  const csv = csvFromResults(state.searchResults);
+  const file = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(file); // TODO: use window.URL.revokeObjectURL(url);  after
   html.push(`
-    </div>`);
+      <p class="govuk-body"><a class="govuk-link" href="${url}" download="export.csv">Save all ${nbRecords} results as a CSV file</a></p>`);
   return html.join('');
+};
+
+const viewNoResults = () => {
+  document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraphSearch`;
+  return `
+    <h2 class="govuk-heading-l">No results</h2>
+    <div class="govuk-body">for ${viewQueryDescription()}</div>
+  `;
+};
+
+const viewSearchResults = () => {
+  switch(searchState()) {
+  case 'waiting': return viewWaiting();
+  case 'results': return viewResults();
+  case 'no-results': return viewNoResults();
+  default: return '';
+  }
 };
 
 const viewCypherQuery = () => {
@@ -497,6 +513,7 @@ const fieldFormat = function(key, val) {
   const f = fieldFormatters[key];
   return (f && f.format) ? f.format(val) : val;
 }
+
 
 // IETF language codes https://en.wikipedia.org/wiki/IETF_language_tag
 const localeNames = {

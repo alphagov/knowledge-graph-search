@@ -1,7 +1,7 @@
 /* global neo4j */
 
 import { view } from './view.js';
-import { state, setStateFromQS } from './state.js';
+import { state, setQueryParamsFromQS } from './state.js';
 import { searchButtonClicked } from './events.js';
 
 
@@ -82,7 +82,7 @@ Otherwise there's probably a problem. Please contact the Data Labs`;
   }
 
   window.addEventListener('popstate', () => {
-    setStateFromQS();
+    setQueryParamsFromQS();
     view();
   });
 };
@@ -95,7 +95,7 @@ Otherwise there's probably a problem. Please contact the Data Labs`;
 
 (async () => {
   await init();
-  setStateFromQS();
+  setQueryParamsFromQS();
   searchButtonClicked();
   view();
 })();

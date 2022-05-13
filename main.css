@@ -6589,12 +6589,6 @@ body {
   color: red;
 }
 
-#results {
-  float: right;
-  width: 60%;
-  padding: 10px;
-}
-
 #results-table {
   margin-top: 10px;
 }
@@ -6631,12 +6625,6 @@ pre {
 }
 .mode-buttons button.search-active {
   border-width: 3px;
-}
-
-.search-panel {
-  clear: both;
-  float: left;
-  width: 33%;
 }
 
 label.govuk-label.label--bold, legend.govuk-fieldset__legend {

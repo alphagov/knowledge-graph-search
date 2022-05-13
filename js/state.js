@@ -1,4 +1,23 @@
+const initialSearchParams = { // user inputs that are used to build the query
+  selectedWords: '', // list of words to search
+  excludedWords: '', // list of words to exclude
+  selectedTaxon: '', // the taxon to search in
+  selectedLocale: '', // the language to search
+  linkSearchUrl: '', // URL to find all pages linking to
+  whereToSearch: {
+    title: false, // whether search should include page titles
+    text: false  // whether search should include page content
+  },
+
+  // the publishing app to search in
+  areaToSearch: '', // can be "whitehall", "mainstream", "any" (meaning the user hasn't chosen yet)
+
+  caseSensitive: false // whether the keyword search is case sensitive
+};
+
+
 const state = {
+  ...initialSearchParams,
   user: '',
   password: '',
   server: '',
@@ -7,11 +26,6 @@ const state = {
   errorText: null,
   neo4jSession: null,
   nbResultsLimit: 10000, // limit queries to this number of results
-  selectedWords: '', // user input: list of words to search
-  excludedWords: '', // user input: list of words to exclude
-  selectedTaxon: '', // user input: the taxon to search in
-  selectedLocale: '', // user input: the language to search
-  linkSearchUrl: '', // user input: URL to find all pages linking to
   searchQuery: '', // generated from other user inputs or typed in directly
   searchResults: null,
   skip: 0, // where to start the pagination (number of results)
@@ -20,32 +34,53 @@ const state = {
     url: true,
     title: true,
   },
-  whereToSearch: {
-    title: true, // user input: whether search should include page titles
-    text: false  // user input: whether search should include page content
-  },
-
-  //user input what broad area of the GOV.UK to search in
-  areaToSearch: '', // can be "whitehall", "mainstream" or "" (meaning any)
-
-  caseSensitive: false, // user input - whether the keyword search is case sensitive
   waiting: false // whether we're waiting for a request to return
 };
 
 
-const setStateFromQS = function() {
+const setQueryParamsFromQS = function() {
   const searchParams = new URLSearchParams(window.location.search);
-  state.selectedWords = searchParams.get('selected-words') || '';
-  state.excludedWords = searchParams.get('excluded-words') || '';
-  state.linkSearchUrl = searchParams.get('link-search-url') || '';
-  state.selectedTaxon = searchParams.get('selected-taxon') || '';
-  state.selectedLocale = searchParams.get('lang') || '';
-  state.caseSensitive = searchParams.get('case-sensitive') || false;
-  state.whereToSearch.title = !(searchParams.get('search-in-title') === 'false');
-  state.whereToSearch.text = searchParams.get('search-in-text') === 'true';
-  state.areaToSearch = searchParams.get('area') || '';
-  state.skip = parseInt(searchParams.get('skip')) || 0;
-}
 
+  const maybeReplace = (stateField, qspName) =>
+    searchParams.get(qspName) !== null ? searchParams.get(qspName) : initialSearchParams[stateField];
 
-export { state, setStateFromQS };
+  state.selectedWords = maybeReplace('selectedWords', 'selected-words');
+  state.excludedWords = maybeReplace('excludedWords', 'excluded-words');
+  state.linkSearchUrl = maybeReplace('linkSearchUrl', 'link-search-url');
+  state.selectedTaxon = maybeReplace('selectedTaxon', 'selected-taxon');
+  state.selectedLocale = maybeReplace('selectedLocale', 'lang');
+  state.caseSensitive = maybeReplace('caseSensitive', 'case-sensitive');
+  state.areaToSearch = maybeReplace('areaToSearch', 'area');
+
+  state.whereToSearch.title = searchParams.get('search-in-title') !== null ? searchParams.get('search-in-title') : initialSearchParams.whereToSearch.title;
+  state.whereToSearch.text = searchParams.get('search-in-text') !== null ? searchParams.get('search-in-text') : initialSearchParams.whereToSearch.text;
+};
+
+const searchState = function() {
+  // Find out what to display depending on state
+  // returns either
+  // "no-results": there was a search but no results were returned
+  // "results": there was a search and there are results to display
+  // "initial": there weren't any search criteria specified
+  // "missingWhereToSearch": keywords were specified but not where
+  //     to look for them on pages
+  // "missingArea": no publishing platform was specified
+  // "waiting": there's a query running
+
+  if (state.waiting) return 'waiting';
+  if (state.selectedWords === '' && state.excludedWords === '' && state.selectedTaxon === '' && state.selectedLocale === '' && state.linkSearchUrl === '' && state.whereToSearch.title === false && state.whereToSearch.text === false) {
+    return 'initial';
+  }
+  if (state.selectedKeywords !== '' && !state.whereToSearch.title && !state.whereToSearch.text) {
+    return 'missingWhereToSearch';
+  }
+  if (state.areaToSearch === '') {
+    return 'missingArea';
+  }
+  if (state.searchResults?.records?.length > 0) return 'results';
+  if (state.searchResults?.records?.length === 0) return 'no-results';
+
+  return 'ready-to-search';
+};
+
+export { state, setQueryParamsFromQS, searchState };

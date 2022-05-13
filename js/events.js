@@ -1,4 +1,4 @@
-import { state } from './state.js';
+import { state, searchState } from './state.js';
 import { id, sanitise } from './utils.js';
 import { view } from './view.js';
 
@@ -124,22 +124,38 @@ const splitKeywords = function(keywords) {
 
 
 const searchButtonClicked = async function() {
-  state.errorText = null;
+
+  // update the state from the form
   window.scrollTo(0, 0);
+  state.errorText = null;
 
-  if (!state.whereToSearch.title && !state.whereToSearch.text) {
+  switch(searchState()) {
+  case 'ready-to-search':
+    if (state.selectedWords !== '' || state.selectedLocale !== '' || state.selectedTaxon !== '' || state.linkSearchUrl !== '') {
+      state.waiting = true;
+      const keywords = splitKeywords(state.selectedWords)
+            .filter(d=>d.length>0);
+      const excludedKeywords = splitKeywords(state.excludedWords)
+            .filter(d=>d.length>0);
+      state.searchQuery = searchQuery(state, keywords, excludedKeywords);
+      state.waiting = true;
+      queryGraph(state.searchQuery);
+    }
+    break;
+  case 'missingWhereToSearch':
     state.errorText = 'You need to select a keyword location';
-    return;
-  }
-
-  if (state.selectedWords !== '' || state.selectedLocale !== '' || state.selectedTaxon !== '' || state.linkSearchUrl !== '') {
-    state.waiting = true;
-    const keywords = splitKeywords(state.selectedWords)
-      .filter(d=>d.length>0);
-    const excludedKeywords = splitKeywords(state.excludedWords)
-      .filter(d=>d.length>0);
-    state.searchQuery = searchQuery(state, keywords, excludedKeywords);
-    queryGraph(state.searchQuery);
+    break;
+  case 'missingArea':
+    state.errorText = 'You need to select a publishing platform';
+    break;
+  case 'waiting':
+  case 'initial':
+  case 'no-results':
+  case 'results':
+    break;
+  default:
+    console.log('unknown value for searchState', searchState());
+    break;
   }
 };
 
@@ -149,13 +165,13 @@ const queryGraph = async function(query) {
     .run(query)
     .then(result => handleEvent({type:'neo4j-callback-ok', result}))
     .catch(error => handleEvent({type:'neo4j-callback-fail', error}));
-
   handleEvent({type: 'neo4j-running'});
 };
 
 
 const handleEvent = async function(event) {
   let fieldClicked;
+  console.log('handleEvent:', event.type, event.id)
   switch(event.type) {
     case "dom":
       switch(event.id) {
@@ -171,7 +187,8 @@ const handleEvent = async function(event) {
         state.skip = 0; // reset to first page
         if (id('area-mainstream').checked) state.areaToSearch = 'mainstream';
         if (id('area-whitehall').checked) state.areaToSearch = 'whitehall';
-        if (id('area-any').checked) state.areaToSearch = '';
+        if (id('area-any').checked) state.areaToSearch = 'any';
+        state.searchResults = null;
         searchButtonClicked();
         break;
       case 'button-next-page':
@@ -200,15 +217,15 @@ const handleEvent = async function(event) {
     state.searchResults = event.result;
     state.waiting = false;
     state.errorText = null;
-  break;
+    break;
   case 'neo4j-callback-fail':
     state.searchResults = null;
     state.waiting = false;
     state.errorText = 'There was a problem querying the GovGraph. Please contact the Data Labs.';
-    console.log('neo4j-callback-fail', event.error);
-  break;
+    console.log('neo4j-callback-fail:', event.error);
+    break;
   default:
-    console.log('unknown event:', event);
+    console.log('unknown event type:', event);
   }
   updateUrl();
   view();
@@ -229,11 +246,10 @@ const updateUrl = function() {
     if (state.selectedTaxon !== '') searchParams.set('selected-taxon', state.selectedTaxon);
     if (state.selectedLocale !== '') searchParams.set('lang', state.selectedLocale);
     if (state.caseSensitive) searchParams.set('case-sensitive', state.caseSensitive);
-    if (!state.whereToSearch.title) searchParams.set('search-in-title', 'false');
+    if (state.whereToSearch.title) searchParams.set('search-in-title', 'true');
     if (state.whereToSearch.text) searchParams.set('search-in-text', 'true');
     if (state.areaToSearch.length > 0) searchParams.set('area', state.areaToSearch);
     if (state.linkSearchUrl !== '') searchParams.set('link-search-url', state.linkSearchUrl);
-    if (state.skip) searchParams.set('skip', state.skip);
 
     let newRelativePathQuery = window.location.pathname;
     if (searchParams.toString().length > 0) {
