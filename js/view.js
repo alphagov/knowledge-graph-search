@@ -64,6 +64,7 @@ const viewBanner = () => `
   </div>
 `;
 
+
 const makeBold = (text, includeMarkup) =>
   includeMarkup ? `<span class="govuk-!-font-weight-bold">${text}</span>` : text;
 
@@ -413,7 +414,7 @@ const viewResults = function() {
   const file = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(file); // TODO: use window.URL.revokeObjectURL(url);  after
   html.push(`
-      <p class="govuk-body"><a class="govuk-link" href="${url}" download="export.csv">Save all ${nbRecords} results as a CSV file</a></p>`);
+      <p class="govuk-body"><a class="govuk-link" href="${url}" download="export.csv">Download all data in CSV</a></p>`);
   return html.join('');
 };
 
