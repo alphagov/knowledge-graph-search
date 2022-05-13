@@ -166,12 +166,25 @@ const viewExclusionsInput = () => `
 `;
 
 
-const viewScopeSelector = () => `
-  <div class="govuk-body">
-    <fieldset class="govuk-fieldset" id="search-locations-wrapper">
+const viewInlineError = (id, message) => `
+  <p id="${id}" class="govuk-error-message">
+    <span class="govuk-visually-hidden">Error:</span> ${message}
+  </p>
+`;
+
+
+const viewScopeSelector = () => {
+  const err = searchState() === 'missingWhereToSearch';
+  return `
+  <div class="govuk-form-group ${err ? 'govuk-form-group--error' : ''}">
+    <fieldset class="govuk-fieldset" id="search-locations-wrapper" aria-describedby="scope-hint ${err ? 'scope-error' : ''}">
       <legend class="govuk-fieldset__legend">
         Keyword location
       </legend>
+      <div id="scope-hint" class="govuk-hint">
+        Select all that apply
+      </div>
+      ${err ? viewInlineError('scope-error', 'Please choose at least one option') : ''}
       <div class="govuk-checkboxes" id="search-locations">
         <div class="govuk-checkboxes__item">
           <input class="govuk-checkboxes__input"
@@ -188,8 +201,8 @@ const viewScopeSelector = () => `
       </div>
     </fieldset>
   </div>
-`;
-
+  `;
+};
 
 const viewCaseSensitiveSelector = () => `
   <div class="govuk-body">
@@ -205,12 +218,18 @@ const viewCaseSensitiveSelector = () => `
 `;
 
 
-const viewPublishingAppSelector = () => `
-  <div class="govuk-body">
-    <fieldset class="govuk-fieldset" id="search-areas-wrapper">
+const viewPublishingAppSelector = () => {
+  const err = searchState() === 'missingArea';
+  return `
+  <div class="govuk-form-group ${err ? 'govuk-form-group--error' : ''}">
+    <fieldset class="govuk-fieldset" id="search-areas-wrapper" aria-describedby="area-hint ${err ? 'area-error' : ''}">
       <legend class="govuk-fieldset__legend">
         Limit search
       </legend>
+      <div id="area-hint" class="govuk-hint">
+        Choose one option
+      </div>
+      ${err ? viewInlineError('area-error', 'Please choose one option') : ''}
       <div class="govuk-radios" id="site-areas">
         <div class="govuk-radios__item">
           <input class="govuk-radios__input"
@@ -236,8 +255,8 @@ const viewPublishingAppSelector = () => `
       </div>
     </fieldset>
   </div>
-`;
-
+  `;
+};
 
 const viewTaxonSelector = () => `
   <div class="govuk-body">
