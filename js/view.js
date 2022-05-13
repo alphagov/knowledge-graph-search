@@ -143,7 +143,7 @@ const viewKeywordsInput = () => `
   <div class="govuk-body">
     <label for="keyword" class="govuk-label label--bold">Search for</label>
     <div class="govuk-hint">
-      For example: cat dog &quot;health certificate&quot;
+      For example: cat, dog, &quot;health certificate&quot;
     </div>
     <input class="govuk-input" id="keyword" value='${sanitise(state.selectedWords).replace('"', '&quot;')}'/>
   </div>

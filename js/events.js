@@ -110,8 +110,8 @@ const searchQuery = function(state, keywords, exclusions) {
 
 
 const splitKeywords = function(keywords) {
-  var regexp = /[^\s"]+|"([^"]*)"/gi;
-  var output = [];
+  const regexp = /[^\s,"]+|"([^"]*)"/gi;
+  const output = [];
   let match;
   do {
     match = regexp.exec(keywords);
