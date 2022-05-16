@@ -66,20 +66,18 @@ const searchState = function() {
   //     to look for them on pages
   // "missingArea": no publishing platform was specified
   // "waiting": there's a query running
-
   if (state.waiting) return 'waiting';
   if (state.selectedWords === '' && state.excludedWords === '' && state.selectedTaxon === '' && state.selectedLocale === '' && state.linkSearchUrl === '' && state.whereToSearch.title === false && state.whereToSearch.text === false) {
     return 'initial';
   }
-  if (state.selectedKeywords !== '' && !state.whereToSearch.title && !state.whereToSearch.text) {
+  if (state.selectedWords !== '' && !state.whereToSearch.title && !state.whereToSearch.text) {
     return 'missingWhereToSearch';
   }
-  if (state.areaToSearch === '') {
+  if (state.selectedWords !== '' && state.areaToSearch === '') {
     return 'missingArea';
   }
   if (state.searchResults?.records?.length > 0) return 'results';
   if (state.searchResults?.records?.length === 0) return 'no-results';
-
   return 'ready-to-search';
 };
 
