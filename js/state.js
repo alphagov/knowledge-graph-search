@@ -34,7 +34,8 @@ const state = {
     url: true,
     title: true,
   },
-  waiting: false // whether we're waiting for a request to return
+  waiting: false, // whether we're waiting for a request to return,
+  infoPopupHtml: null // if non-null, it should be an objct with title and body, in which case show a popup with the text and a close button`
 };
 
 

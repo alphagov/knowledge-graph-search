@@ -6668,25 +6668,6 @@ label.govuk-label.label--bold, legend.govuk-fieldset__legend {
   margin-top: 15px;
 }
 
-.has-tooltip {
-  position: relative;
-  display: inline-block;
-}
-.has-tooltip .tooltip-text {
-  visibility: hidden;
-  width: 200px;
-  text-align: center;
-  border: 2px solid black;
-  padding: 5px;
-  background: #ddd;
-  position: absolute;
-  z-index: 1;
-  left: 10px;
-}
-.has-tooltip:hover .tooltip-text {
-  visibility: visible;
-}
-
 #cypher-query {
   clear: both;
   padding-top: 100px;
@@ -6695,4 +6676,69 @@ label.govuk-label.label--bold, legend.govuk-fieldset__legend {
 #locale {
   width: 100%;
   display: block;
+}
+
+.info-button {
+  vertical-align: bottom;
+}
+
+.info-popup {
+  z-index: 1000;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  outline: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+.info-popup--backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  opacity: 0.8;
+  pointer-events: none;
+  touch-action: 0;
+}
+.info-popup--panel {
+  display: block;
+  position: relative;
+  width: auto;
+  padding: 0;
+  max-width: 640px;
+  top: 0;
+  background: white;
+  margin: 30px auto;
+}
+.info-popup--panel:focus {
+  outline: 3px solid #ffbf47;
+  outline-offset: 0;
+}
+.info-popup--header {
+  background: black;
+  color: white;
+  height: 44px;
+}
+.info-popup--header svg {
+  margin-left: 10px;
+  margin-top: 10px;
+}
+.info-popup--content {
+  padding: 20px;
+}
+.info-popup--button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  color: white;
+  background: black;
+  font-size: 36px;
+  font-weight: bold;
 }
