@@ -66,6 +66,11 @@ const view = () => {
     view();
   });
 
+  id('info-button-popularity').addEventListener('click', () => {
+    state.infoPopupHtml = { title: 'Sorted by popularity', 'body': 'The popularity score is based on the number of onsite links to the page and 3 weeks of Google Analytics traffic. A higher score means greater popularity.' };
+    view();
+  });
+
   // focus any modal
   id('info-popup')?.focus();
 
@@ -156,8 +161,7 @@ const viewQueryDescription = (includeMarkup = true) => {
     clauses[0] :
     `${clauses.slice(0, clauses.length - 1).join(', ')} and ${clauses[clauses.length - 1]}`;
 
-  return `pages that ${joinedClauses}`;
-
+  return `pages that ${joinedClauses}, in descending popularity ${viewInfoButton('popularity')}`;
 };
 
 
@@ -475,7 +479,7 @@ const viewResults = function() {
     `);
   }
 
-  html.push(`<div class="govuk-body-s">for ${viewQueryDescription()}</div>`);
+  html.push(`<div class="govuk-body">for ${viewQueryDescription()}</div>`);
 
   if (nbRecords >= state.resultsPerPage) {
     html.push(`
