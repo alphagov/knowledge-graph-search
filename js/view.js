@@ -1,4 +1,3 @@
-/* global accessibleAutocomplete */
 /*eslint no-unused-vars: ["error", { "varsIgnorePattern": "view" }]*/
 
 import { id, sanitise } from './utils.js';
@@ -73,18 +72,6 @@ const view = () => {
 
   // focus any modal
   id('info-popup')?.focus();
-
-  // add the accessible autocomplete
-  if (id('taxon')) {
-    accessibleAutocomplete({
-      element: document.querySelector('#taxon'),
-      id: 'taxon-label',
-      source: state.taxons,
-      placeholder: 'All taxons',
-      defaultValue: state.selectedTaxon,
-      showAllValues: true
-    });
-  }
 };
 
 
@@ -103,7 +90,7 @@ const viewInfoPopup = () => {
         </dialog>
       </div>
     `
-  }
+  } else return '';
 };
 
 
@@ -237,7 +224,12 @@ const viewKeywordsInput = () => `
     <div class="govuk-hint">
       For example: cat, dog, &quot;health certificate&quot;
     </div>
-    <input class="govuk-input" id="keyword" value='${sanitise(state.selectedWords).replace('"', '&quot;')}'/>
+    <input
+      ${state.waiting && 'disabled="disabled"'}
+      class="govuk-input"
+      id="keyword"
+      value='${sanitise(state.selectedWords).replace('"', '&quot;')}'
+    />
   </div>
 `;
 
@@ -251,8 +243,9 @@ const viewExclusionsInput = () => `
       For example: passport
     </div>
     <input class="govuk-input"
-           id="excluded-keyword"
-           value='${sanitise(state.excludedWords).replace('"', '&quot;')}'/>
+        ${state.waiting && 'disabled="disabled"'}
+        id="excluded-keyword"
+        value='${sanitise(state.excludedWords).replace('"', '&quot;')}'/>
   </div>
 `;
 
@@ -269,7 +262,11 @@ const viewScopeSelector = () => {
   const err = errors && errors.includes('missingWhereToSearch');
   return `
   <div class="govuk-form-group ${err ? 'govuk-form-group--error' : ''}">
-    <fieldset class="govuk-fieldset" id="search-scope-wrapper" aria-describedby="scope-hint ${err ? 'scope-error' : ''}">
+    <fieldset
+        class="govuk-fieldset"
+        ${state.waiting && 'disabled="disabled"'}
+        id="search-scope-wrapper"
+        aria-describedby="scope-hint ${err ? 'scope-error' : ''}">
       <legend class="govuk-fieldset__legend">
         Keyword location
       </legend>
@@ -279,14 +276,17 @@ const viewScopeSelector = () => {
       ${err ? viewInlineError('scope-error', 'Please choose at least one option') : ''}
       <div class="govuk-checkboxes" id="search-locations">
         <div class="govuk-checkboxes__item">
-          <input class="govuk-checkboxes__input"
-                 type="checkbox" id="search-title"
-            ${state.whereToSearch.title ? 'checked' : ''}/>
+          <input
+              class="govuk-checkboxes__input"
+              type="checkbox" id="search-title"
+              ${state.whereToSearch.title ? 'checked' : ''}/>
           <label for="search-title" class="govuk-label govuk-checkboxes__label">title</label>
         </div>
         <div class="govuk-checkboxes__item">
-          <input class="govuk-checkboxes__input"
-                 type="checkbox" id="search-text"
+          <input
+              class="govuk-checkboxes__input"
+              type="checkbox"
+              id="search-text"
             ${state.whereToSearch.text ? 'checked' : ''}/>
           <label for="search-text" class="govuk-label govuk-checkboxes__label">
             body content ${viewInfoButton('content')}
@@ -302,9 +302,13 @@ const viewCaseSensitiveSelector = () => `
   <div class="govuk-body">
     <div class="govuk-checkboxes">
       <div class="govuk-checkboxes__item">
-        <input class="govuk-checkboxes__input"
-               type="checkbox" id="case-sensitive"
-          ${state.caseSensitive ? 'checked' : ''}/>
+        <input
+            class="govuk-checkboxes__input"
+            ${state.waiting && 'disabled="disabled"'}
+            type="checkbox"
+            id="case-sensitive"
+            ${state.caseSensitive ? 'checked' : ''}
+        />
         <label for="case-sensitive" class="govuk-label govuk-checkboxes__label">case-sensitive search</label>
       </div>
     </div>
@@ -317,7 +321,11 @@ const viewPublishingAppSelector = () => {
   const err = errors && errors.includes('missingArea');
   return `
   <div class="govuk-form-group ${err ? 'govuk-form-group--error' : ''}">
-    <fieldset class="govuk-fieldset" id="search-areas-wrapper" aria-describedby="area-hint ${err ? 'area-error' : ''}">
+    <fieldset
+        class="govuk-fieldset"
+        id="search-areas-wrapper"
+        ${state.waiting && 'disabled="disabled"'}
+        aria-describedby="area-hint ${err ? 'area-error' : ''}">
       <legend class="govuk-fieldset__legend">
         Limit search
       </legend>
@@ -366,24 +374,62 @@ const viewTaxonSelector = () => `
       <label class="govuk-label label--bold" for="taxon-label">
         Taxon ${viewInfoButton('taxon')}
       </label>
-      <div id="taxon"></div>
+      <datalist id="taxonList">
+        ${state.taxons.map(taxon => `<option>${taxon}</option>`)}
+      </datalist>
+      <div>
+      <input
+        ${state.waiting && 'disabled="disabled"'}
+        style="display: inline-block"
+        list="taxonList"
+        value="${state.selectedTaxon}"
+        class="govuk-input"
+        id="taxon"
+        autocomplete="off" />
+      </div>
+
     </div>
   </div>
 `;
+
+const viewLocaleSelector = () => {
+  const html = [`
+    <div class="govuk-body taxon-facet">
+      <label class="govuk-label label--bold" for="locale">
+        Search by language
+      </label>
+      <datalist id="localeList">
+  `];
+  html.push(...state.locales.map(code => `<option value="${code}" ${state.selectedLocale==code ? 'selected' : ''}>${localeNames[code]}</option>`))
+  html.push(`
+      </datalist>
+      <input type="text"
+         ${state.waiting && 'disabled="disabled"'}
+         value="${state.selectedLocale}"
+         class="govuk-input"
+         list="localeList"
+         id="locale" name="locale"
+         autocomplete="off" />
+    </div>`);
+  return html.join('');
+};
 
 
 const viewSearchButton = () => `
   <p class="govuk-body">
     <button
-      class="govuk-button ${state.waiting?'govuk-button--secondary':''}"
+      class="govuk-button ${state.waiting?'govuk-button--disabled':''}"
+      ${state.waiting ? 'disabled="disabled"' : '' }
       id="search">
       ${state.waiting?'Searching':'Search'}
     </button>
     <button
-      class="govuk-button govuk-button--secondary"
+      class="govuk-button govuk-button--secondary ${state.waiting?'govuk-button--disabled':''}"
+      ${state.waiting ? 'disabled="disabled"' : '' }
       id="clear-filters">
       Clear all filters
     </button>
+
 
     ${state.waiting?'<br/><span class="govuk-body">Please note that some queries take up to one minute</span>':''}
   </p>
@@ -398,24 +444,16 @@ const viewLinkSearch = () => `
     <div class="govuk-hint">
       For example: /maternity-pay-leave or youtube.com
     </div>
-    <input class="govuk-input" id="link-search"
-           value="${state.linkSearchUrl}"/>
+    <input
+        class="govuk-input"
+        id="link-search"
+        ${state.waiting && 'disabled="disabled"'}
+        value="${state.linkSearchUrl}"
+     />
   </div>
 `;
 
 
-const viewLocaleSelector = () => {
-  const html = [`
-    <div class="govuk-body taxon-facet">
-      <label class="govuk-label label--bold" for="locale">
-        Search by language
-      </label>
-      <select id="locale" class="govuk-select">
-  `];
-  html.push(...state.locales.map(code => `<option name="${code}" ${state.selectedLocale==code ? 'selected' : ''}>${localeNames[code]}</option>`))
-  html.push('</select></div>');
-  return html.join('');
-};
 
 
 const viewSearchResultsTable = () => {
@@ -424,7 +462,7 @@ const viewSearchResultsTable = () => {
   const recordsToShow = state.searchResults.records.slice(state.skip, state.skip + state.resultsPerPage);
   html.push(`
     <div class="govuk-body">
-      <fieldset class="govuk-fieldset">
+      <fieldset class="govuk-fieldset" ${state.waiting && 'disabled="disabled"'}>
         <legend class="govuk-fieldset__legend">Show with</legend>
         <ul class="kg-checkboxes" id="show-fields">`);
   html.push(recordsToShow[0].keys.map(key => `
@@ -504,6 +542,7 @@ const viewWaiting = function() {
       <div class="govuk-body">Searching for ${viewQueryDescription()}</div>
       <p class="govuk-body-s">Please note that some queries take up to one minute</p>`;
 };
+
 
 const viewResults = function() {
   const html = [];
@@ -646,6 +685,7 @@ const viewCrownSymbol = () => `
       </svg>`;
 
 // IETF language codes https://en.wikipedia.org/wiki/IETF_language_tag
+// with additions
 const localeNames = {
   '': 'All languages',
   'af': 'Afrikaans',
@@ -667,7 +707,7 @@ const localeNames = {
   'cy': 'Welsh',
   'da': 'Danish',
   'de': 'German',
-  'dr': 'Dari', // Not an official iso code
+  'dr': 'Dari',
   'dsb': 'Lower Sorbian',
   'dv': 'Divehi',
   'el': 'Greek',
@@ -731,6 +771,7 @@ const localeNames = {
   'oc': 'Occitan',
   'or': 'Oriya',
   'pa': 'Punjabi',
+  'pa-pk': 'Punjabi (Pakistan)',
   'pl': 'Polish',
   'prs': 'Dari',
   'ps': 'Pashto',
@@ -751,6 +792,7 @@ const localeNames = {
   'smj': 'Sami (Lule)',
   'smn': 'Sami (Inari)',
   'sms': 'Sami (Skolt)',
+  'so': 'Somani',
   'sq': 'Albanian',
   'sr': 'Serbian',
   'sv': 'Swedish',
@@ -772,10 +814,13 @@ const localeNames = {
   'vi': 'Vietnamese',
   'wo': 'Wolof',
   'xh': 'isiXhosa',
+  'yi': 'Yiddish',
   'yo': 'Yoruba',
   'zh': 'Chinese',
-  'zh-tw': 'Taiwan Chinese',
+  'zh-hk': 'Chinese (Hong-Kong)',
+  'zh-tw': 'Chinese (Taiwan)',
   'zu': 'isiZulu'
 }
+
 
 export { view };

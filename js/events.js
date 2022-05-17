@@ -130,7 +130,6 @@ const searchButtonClicked = async function() {
   state.errorText = null;
   state.userErrors = null;
   const searchStatus = searchState();
-  console.log('ss', searchStatus);
   switch(searchStatus.code) {
   case 'ready-to-search':
     if (state.selectedWords !== '' || state.selectedLocale !== '' || state.selectedTaxon !== '' || state.linkSearchUrl !== '') {
@@ -169,7 +168,6 @@ const queryGraph = async function(query) {
 
 
 const handleEvent = async function(event) {
-  console.log(event);
   let fieldClicked;
   console.log('handleEvent:', event.type, event.id)
   switch(event.type) {
@@ -178,8 +176,8 @@ const handleEvent = async function(event) {
       case 'search':
         state.selectedWords = sanitise(id('keyword').value);
         state.excludedWords = sanitise(id('excluded-keyword').value);
-        state.selectedTaxon = document.querySelector('#taxon input').value;
-        state.selectedLocale = state.locales[id('locale').selectedIndex];
+        state.selectedTaxon = document.querySelector('#taxon').value;
+        state.selectedLocale = document.querySelector('#locale').value;
         state.whereToSearch.title = id('search-title').checked;
         state.whereToSearch.text = id('search-text').checked;
         state.caseSensitive = id('case-sensitive').checked;
