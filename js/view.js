@@ -1,4 +1,3 @@
-/* global accessibleAutocomplete */
 /*eslint no-unused-vars: ["error", { "varsIgnorePattern": "view" }]*/
 
 import { id, sanitise } from './utils.js';
@@ -73,18 +72,6 @@ const view = () => {
 
   // focus any modal
   id('info-popup')?.focus();
-
-  // add the accessible autocomplete
-  if (id('taxon')) {
-    accessibleAutocomplete({
-      element: document.querySelector('#taxon'),
-      id: 'taxon-label',
-      source: state.taxons,
-      placeholder: 'All taxons',
-      defaultValue: state.selectedTaxon,
-      showAllValues: true
-    });
-  }
 };
 
 
@@ -366,7 +353,10 @@ const viewTaxonSelector = () => `
       <label class="govuk-label label--bold" for="taxon-label">
         Taxon ${viewInfoButton('taxon')}
       </label>
-      <div id="taxon"></div>
+      <datalist id="taxonList">
+        ${state.taxons.map(taxon => `<option>${taxon}</option>`)}
+      </datalist>
+      <input list="taxonList" id="taxon" autocomplete="off" />
     </div>
   </div>
 `;
@@ -410,10 +400,16 @@ const viewLocaleSelector = () => {
       <label class="govuk-label label--bold" for="locale">
         Search by language
       </label>
-      <select id="locale" class="govuk-select">
+      <datalist id="localeList">
   `];
-  html.push(...state.locales.map(code => `<option name="${code}" ${state.selectedLocale==code ? 'selected' : ''}>${localeNames[code]}</option>`))
-  html.push('</select></div>');
+  html.push(...state.locales.map(code => `<option value="${code}" ${state.selectedLocale==code ? 'selected' : ''}>${localeNames[code]}</option>`))
+  html.push(`
+      </datalist>
+      <input type="text"
+         list="localeList"
+         id="locale" name="locale"
+         autocomplete="off" />
+    </div>`);
   return html.join('');
 };
 
@@ -504,6 +500,7 @@ const viewWaiting = function() {
       <div class="govuk-body">Searching for ${viewQueryDescription()}</div>
       <p class="govuk-body-s">Please note that some queries take up to one minute</p>`;
 };
+
 
 const viewResults = function() {
   const html = [];
@@ -646,6 +643,7 @@ const viewCrownSymbol = () => `
       </svg>`;
 
 // IETF language codes https://en.wikipedia.org/wiki/IETF_language_tag
+// with additions
 const localeNames = {
   '': 'All languages',
   'af': 'Afrikaans',
@@ -667,7 +665,7 @@ const localeNames = {
   'cy': 'Welsh',
   'da': 'Danish',
   'de': 'German',
-  'dr': 'Dari', // Not an official iso code
+  'dr': 'Dari',
   'dsb': 'Lower Sorbian',
   'dv': 'Divehi',
   'el': 'Greek',
@@ -731,6 +729,7 @@ const localeNames = {
   'oc': 'Occitan',
   'or': 'Oriya',
   'pa': 'Punjabi',
+  'pa-pk': 'Punjabi (Pakistan)',
   'pl': 'Polish',
   'prs': 'Dari',
   'ps': 'Pashto',
@@ -751,6 +750,7 @@ const localeNames = {
   'smj': 'Sami (Lule)',
   'smn': 'Sami (Inari)',
   'sms': 'Sami (Skolt)',
+  'so': 'Somani',
   'sq': 'Albanian',
   'sr': 'Serbian',
   'sv': 'Swedish',
@@ -772,10 +772,13 @@ const localeNames = {
   'vi': 'Vietnamese',
   'wo': 'Wolof',
   'xh': 'isiXhosa',
+  'yi': 'Yiddish',
   'yo': 'Yoruba',
   'zh': 'Chinese',
-  'zh-tw': 'Taiwan Chinese',
+  'zh-hk': 'Chinese (Hong-Kong)',
+  'zh-tw': 'Chinese (Taiwan)',
   'zu': 'isiZulu'
 }
+
 
 export { view };

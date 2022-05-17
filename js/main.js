@@ -76,7 +76,6 @@ Otherwise there's probably a problem. Please contact the Data Labs`;
     );
     state.locales = locales.records.map(locale => locale._fields[0]).sort();
     state.locales = ['', 'en', 'cy'].concat(state.locales);
-
   } catch (e) {
     state.errorText = 'Error retrieving locales.';
   }
