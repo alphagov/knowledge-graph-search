@@ -169,6 +169,7 @@ const queryGraph = async function(query) {
 
 
 const handleEvent = async function(event) {
+  console.log(event);
   let fieldClicked;
   console.log('handleEvent:', event.type, event.id)
   switch(event.type) {
@@ -189,6 +190,23 @@ const handleEvent = async function(event) {
         if (id('area-any').checked) state.areaToSearch = 'any';
         state.searchResults = null;
         searchButtonClicked();
+        break;
+      case 'clear-filters':
+        state.selectedWords = '';
+        state.excludedWords = '';
+        state.selectedTaxon = '';
+        state.selectedLocale = '';
+        state.whereToSearch.title = false;
+        state.whereToSearch.text = false;
+        state.caseSensitive = false;
+        state.linkSearchUrl = '';
+        state.skip = 0; // reset to first page
+        state.showFields = { url: true, title: true };
+        state.areaToSearch = '';
+        state.searchResults = null;
+        state.searchQuery = '';
+        state.waiting = false;
+        state.infoPopupHtml = null;
         break;
       case 'button-next-page':
         state.skip = state.skip + state.resultsPerPage;

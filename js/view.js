@@ -379,6 +379,12 @@ const viewSearchButton = () => `
       id="search">
       ${state.waiting?'Searching':'Search'}
     </button>
+    <button
+      class="govuk-button govuk-button--secondary"
+      id="clear-filters">
+      Clear all filters
+    </button>
+
     ${state.waiting?'<br/><span class="govuk-body">Please note that some queries take up to one minute</span>':''}
   </p>
 `;
