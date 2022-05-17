@@ -128,8 +128,10 @@ const searchButtonClicked = async function() {
   // update the state from the form
   window.scrollTo(0, 0);
   state.errorText = null;
-
-  switch(searchState()) {
+  state.userErrors = null;
+  const searchStatus = searchState();
+  console.log('ss', searchStatus);
+  switch(searchStatus.code) {
   case 'ready-to-search':
     if (state.selectedWords !== '' || state.selectedLocale !== '' || state.selectedTaxon !== '' || state.linkSearchUrl !== '') {
       state.waiting = true;
@@ -142,11 +144,8 @@ const searchButtonClicked = async function() {
       queryGraph(state.searchQuery);
     }
     break;
-  case 'missingWhereToSearch':
-    state.errorText = 'You need to select a keyword location';
-    break;
-  case 'missingArea':
-    state.errorText = 'You need to select a publishing platform';
+  case 'error':
+    state.userErrors = searchStatus.errors;
     break;
   case 'waiting':
   case 'initial':

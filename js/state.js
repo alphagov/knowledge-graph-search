@@ -24,6 +24,7 @@ const state = {
   taxons: [], // list of names of all the taxons
   locales: [], // all the languages found in the content store
   errorText: null,
+  userErrors: null, // error codes due to user not entering valid search criteria
   neo4jSession: null,
   nbResultsLimit: 10000, // limit queries to this number of results
   searchQuery: '', // generated from other user inputs or typed in directly
@@ -59,27 +60,35 @@ const setQueryParamsFromQS = function() {
 
 const searchState = function() {
   // Find out what to display depending on state
-  // returns either
+  // returns an object with a "code" field
   // "no-results": there was a search but no results were returned
   // "results": there was a search and there are results to display
   // "initial": there weren't any search criteria specified
-  // "missingWhereToSearch": keywords were specified but not where
-  //     to look for them on pages
-  // "missingArea": no publishing platform was specified
+  // "errors": the user didn't specify a valid query. In this case
+  //   we add a "errors" fiels containing an array with values among:
+  //   - "missingWhereToSearch": keywords were specified but not where to look for them on pages
+  //   - "missingArea": no publishing platform was specified
+
   // "waiting": there's a query running
-  if (state.waiting) return 'waiting';
+  if (state.waiting) return { code: 'waiting'};
+
   if (state.selectedWords === '' && state.excludedWords === '' && state.selectedTaxon === '' && state.selectedLocale === '' && state.linkSearchUrl === '' && state.whereToSearch.title === false && state.whereToSearch.text === false) {
-    return 'initial';
+    return { code: 'initial' };
   }
-  if (state.selectedWords !== '' && !state.whereToSearch.title && !state.whereToSearch.text) {
-    return 'missingWhereToSearch';
+
+  if ((state.selectedWords !== '' && !state.whereToSearch.title && !state.whereToSearch.text) || state.areaToSearch === '') {
+    const error = { code: 'error', errors: [] };
+    if (state.selectedWords !== '' && !state.whereToSearch.title && !state.whereToSearch.text) {
+      error.errors.push('missingWhereToSearch');
+    }
+    if (state.areaToSearch === '') {
+      error.errors.push('missingArea');
+    }
+    return error;
   }
-  if (state.selectedWords !== '' && state.areaToSearch === '') {
-    return 'missingArea';
-  }
-  if (state.searchResults?.records?.length > 0) return 'results';
-  if (state.searchResults?.records?.length === 0) return 'no-results';
-  return 'ready-to-search';
+  if (state.searchResults?.records?.length > 0) return { code: 'results' };
+  if (state.searchResults?.records?.length === 0) return { code: 'no-results' };
+  return { code: 'ready-to-search' };
 };
 
 export { state, setQueryParamsFromQS, searchState };

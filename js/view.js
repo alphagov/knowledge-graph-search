@@ -11,7 +11,7 @@ const view = () => {
   id('page-content').innerHTML = `
     <main class="govuk-main-wrapper" ${state.infoPopupHtml ? 'style="filter: blur(2px)"' : ''} id="main-content" role="main">
       ${viewBanner()}
-      ${viewError()}
+      ${viewErrorBanner()}
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-third">
           ${viewSearchPanel()}
@@ -66,7 +66,7 @@ const view = () => {
     view();
   });
 
-  id('info-button-popularity').addEventListener('click', () => {
+  id('info-button-popularity')?.addEventListener('click', () => {
     state.infoPopupHtml = { title: 'Sorted by popularity', 'body': 'The popularity score is based on the number of onsite links to the page and 3 weeks of Google Analytics traffic. A higher score means greater popularity.' };
     view();
   });
@@ -165,13 +165,49 @@ const viewQueryDescription = (includeMarkup = true) => {
 };
 
 
-const viewError = () =>
-  state.errorText ? `
-  <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
-    <h2 class="govuk-error-summary__title" id="error-summary-title">Error</h2>
-    <p class="govuk-body">${state.errorText}</p>
-  </div>
-` : '';
+const viewErrorBanner = () => {
+  const html = [];
+  if (state.errorText || state.userErrors) {
+    html.push(`
+      <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">`);
+
+    if (state.errorText) {
+      html.push(`
+        <h2 class="govuk-error-summary__title" id="error-summary-title">System error</h2>
+        <p class="govuk-body">${state.errorText}</p>
+      `);
+    } else {
+      if (state.userErrors) {
+        html.push(`
+          <h2 class="govuk-error-summary__title" id="error-summary-title">
+            There is a problem
+          </h2>
+          <ul class="govuk-error-summary__list">
+        `);
+        state.userErrors.forEach(userError => {
+          switch (userError) {
+            case 'missingWhereToSearch':
+            html.push(`
+            <li><a href="#search-locations-wrapper">You need to select a keyword location</a></li>`);
+            break;
+            case 'missingArea':
+            html.push(`
+            <li><a href="#search-scope-wrapper">You need to select a publishing application</a></li>`);
+            break;
+            default:
+            console.log('unknown user error code:', userError);
+          }
+        });
+        html.push(`
+          </ul>`);
+      }
+    }
+    html.push(`
+      </div>
+    `);
+  }
+  return html.join('');
+}
 
 
 const viewSearchPanel = () => `
@@ -229,10 +265,11 @@ const viewInlineError = (id, message) => `
 
 
 const viewScopeSelector = () => {
-  const err = searchState() === 'missingWhereToSearch';
+  const errors = searchState()?.errors;
+  const err = errors && errors.includes('missingWhereToSearch');
   return `
   <div class="govuk-form-group ${err ? 'govuk-form-group--error' : ''}">
-    <fieldset class="govuk-fieldset" id="search-locations-wrapper" aria-describedby="scope-hint ${err ? 'scope-error' : ''}">
+    <fieldset class="govuk-fieldset" id="search-scope-wrapper" aria-describedby="scope-hint ${err ? 'scope-error' : ''}">
       <legend class="govuk-fieldset__legend">
         Keyword location
       </legend>
@@ -276,7 +313,8 @@ const viewCaseSensitiveSelector = () => `
 
 
 const viewPublishingAppSelector = () => {
-  const err = searchState() === 'missingArea';
+  const errors = searchState()?.errors;
+  const err = errors && errors.includes('missingArea');
   return `
   <div class="govuk-form-group ${err ? 'govuk-form-group--error' : ''}">
     <fieldset class="govuk-fieldset" id="search-areas-wrapper" aria-describedby="area-hint ${err ? 'area-error' : ''}">
@@ -514,7 +552,7 @@ const viewNoResults = () => {
 };
 
 const viewSearchResults = () => {
-  switch(searchState()) {
+  switch(searchState().code) {
   case 'waiting': return viewWaiting();
   case 'results': return viewResults();
   case 'no-results': return viewNoResults();
