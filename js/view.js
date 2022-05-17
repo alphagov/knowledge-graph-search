@@ -381,7 +381,7 @@ const viewSearchResultsTable = () => {
   html.push(`
     <div class="govuk-body">
       <fieldset class="govuk-fieldset">
-        <legend class="govuk-fieldset__legend">Show</legend>
+        <legend class="govuk-fieldset__legend">Show with</legend>
         <ul class="kg-checkboxes" id="show-fields">`);
   html.push(recordsToShow[0].keys.map(key => `
           <li class="kg-checkboxes__item">
@@ -425,7 +425,9 @@ const viewSearchResultsTable = () => {
 const csvFromResults = function(searchResults) {
   const csv = [];
   if (searchResults && searchResults.records.length > 0) {
-    csv.push(searchResults.records[0].keys.join()); // heading
+    // column headings:
+    csv.push(searchResults.records[0].keys.map(fieldName).join())
+    // rows:
     searchResults.records.forEach(record => {
       const line = [];
       record._fields.forEach(field => {
@@ -553,7 +555,7 @@ const fieldFormatters = {
     format: formatDateTime
   },
   'public_updated_at' : {
-    name: 'Last publicly updated',
+    name: 'Last major update',
     format: formatDateTime,
   },
   'taxons' : {
@@ -561,11 +563,11 @@ const fieldFormatters = {
     format: formatNames
   },
   'primary_organisation' : {
-    name: 'Primary Organisation',
+    name: 'Primary publishing organisations',
     format: formatNames
   },
   'all_organisations' : {
-    name: 'Organisations',
+    name: 'All publishing organisations',
     format: formatNames
   },
   'pagerank' : {
