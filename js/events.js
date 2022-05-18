@@ -42,10 +42,9 @@ const returnClause = function() {
 };
 
 const searchQuery = function(state, keywords, exclusions) {
-  const fieldsToSearch = [
-    state.whereToSearch.title?'title':null,
-    state.whereToSearch.text?'text':null
-  ].filter(item => item)
+  const fieldsToSearch = [];
+  if (state.whereToSearch.title) fieldsToSearch.push('title');
+  if (state.whereToSearch.text) fieldsToSearch.push('title', 'description');
 
   let inclusionClause = '';
   if (keywords.length > 0) {
