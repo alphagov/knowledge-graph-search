@@ -16,6 +16,7 @@ const tagOrComment = new RegExp(
 
 
 const id = x => document.getElementById(x);
+
 const sanitise = function(text) {
   let oldText;
   do {

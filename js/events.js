@@ -1,6 +1,7 @@
 import { state, searchState } from './state.js';
 import { id, sanitise } from './utils.js';
 import { view } from './view.js';
+import { languageCode } from './lang.js';
 
 
 //==================================================
@@ -66,7 +67,7 @@ const searchQuery = function(state, keywords, exclusions) {
 
   let localeClause = '';
   if (state.selectedLocale !== '') {
-    localeClause = `WITH * WHERE n.locale = "${state.selectedLocale}"\n`
+    localeClause = `WITH * WHERE n.locale = "${languageCode(state.selectedLocale)}"\n`
   }
 
   const taxon = state.selectedTaxon;
@@ -175,12 +176,12 @@ const handleEvent = async function(event) {
       case 'search':
         state.selectedWords = sanitise(id('keyword').value);
         state.excludedWords = sanitise(id('excluded-keyword').value);
-        state.selectedTaxon = document.querySelector('#taxon').value;
-        state.selectedLocale = document.querySelector('#locale').value;
+        state.selectedTaxon = sanitise(id('taxon').value);
+        state.selectedLocale = sanitise(id('locale').value);
         state.whereToSearch.title = id('search-title').checked;
         state.whereToSearch.text = id('search-text').checked;
         state.caseSensitive = id('case-sensitive').checked;
-        state.linkSearchUrl = id('link-search').value;
+        state.linkSearchUrl = sanitise(id('link-search').value);
         state.skip = 0; // reset to first page
         if (id('area-mainstream').checked) state.areaToSearch = 'mainstream';
         if (id('area-whitehall').checked) state.areaToSearch = 'whitehall';
@@ -258,7 +259,7 @@ const updateUrl = function() {
     if (state.selectedWords !== '') searchParams.set('selected-words', state.selectedWords);
     if (state.excludedWords !== '') searchParams.set('excluded-words', state.excludedWords);
     if (state.selectedTaxon !== '') searchParams.set('selected-taxon', state.selectedTaxon);
-    if (state.selectedLocale !== '') searchParams.set('lang', state.selectedLocale);
+    if (state.selectedLocale !== '') searchParams.set('lang', languageCode(state.selectedLocale));
     if (state.caseSensitive) searchParams.set('case-sensitive', state.caseSensitive);
     if (state.whereToSearch.title) searchParams.set('search-in-title', 'true');
     if (state.whereToSearch.text) searchParams.set('search-in-text', 'true');

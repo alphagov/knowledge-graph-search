@@ -3,6 +3,7 @@
 import { id, sanitise } from './utils.js';
 import { state, searchState } from './state.js';
 import { handleEvent } from './events.js';
+import { languageName } from './lang.js';
 
 
 const view = () => {
@@ -138,7 +139,7 @@ const viewQueryDescription = (includeMarkup = true) => {
   if (state.selectedTaxon !== '')
     clauses.push(`belong to the ${makeBold(state.selectedTaxon, includeMarkup)} taxon (or its sub-taxons)`);
   if (state.selectedLocale !== '')
-    clauses.push(`are in ${makeBold(localeNames[state.selectedLocale], includeMarkup)}`);
+    clauses.push(`are in ${makeBold(languageName(state.selectedLocale), includeMarkup)}`);
   if (state.linkSearchUrl !== '')
     clauses.push(`link to ${makeBold(state.linkSearchUrl, includeMarkup)}`);
   if (state.areaToSearch === 'whitehall' || state.areaToSearch === 'mainstream')
@@ -148,7 +149,7 @@ const viewQueryDescription = (includeMarkup = true) => {
     clauses[0] :
     `${clauses.slice(0, clauses.length - 1).join(', ')} and ${clauses[clauses.length - 1]}`;
 
-  return `pages that ${joinedClauses}, in descending popularity ${viewInfoButton('popularity')}`;
+  return `pages that ${joinedClauses}, in descending popularity&nbsp;${viewInfoButton('popularity')}`;
 };
 
 
@@ -289,7 +290,7 @@ const viewScopeSelector = () => {
               id="search-text"
             ${state.whereToSearch.text ? 'checked' : ''}/>
           <label for="search-text" class="govuk-label govuk-checkboxes__label">
-            body content ${viewInfoButton('content')}
+            body content&nbsp;${viewInfoButton('content')}
           </label>
         </div>
       </div>
@@ -340,8 +341,7 @@ const viewPublishingAppSelector = () => {
                  name="area"
             ${state.areaToSearch === 'mainstream' ? 'checked' : ''}/>
           <label for="area-mainstream" class="govuk-label govuk-radios__label">
-            Mainstream Publisher
-            ${viewInfoButton('mainstream')}
+            Mainstream Publisher&nbsp;${viewInfoButton('mainstream')}
           </label>
         </div>
         <div class="govuk-radios__item">
@@ -372,7 +372,7 @@ const viewTaxonSelector = () => `
   <div class="govuk-body">
     <div class="taxon-facet">
       <label class="govuk-label label--bold" for="taxon-label">
-        Taxon ${viewInfoButton('taxon')}
+        Taxon&nbsp;${viewInfoButton('taxon')}
       </label>
       <datalist id="taxonList">
         ${state.taxons.map(taxon => `<option>${taxon}</option>`)}
@@ -399,7 +399,7 @@ const viewLocaleSelector = () => {
       </label>
       <datalist id="localeList">
   `];
-  html.push(...state.locales.map(code => `<option value="${code}" ${state.selectedLocale==code ? 'selected' : ''}>${localeNames[code]}</option>`))
+  html.push(...state.locales.map(code => `<option data-value="${code}" ${state.selectedLocale==code ? 'selected' : ''}>${languageName(code)}</option>`))
   html.push(`
       </datalist>
       <input type="text"
@@ -438,7 +438,7 @@ const viewSearchButton = () => `
 const viewLinkSearch = () => `
   <div class="govuk-body">
     <label class="govuk-label label--bold" for="link-search">
-      Link search ${viewInfoButton('link')}
+      Link search&nbsp;${viewInfoButton('link')}
     </label>
     <div class="govuk-hint">
       For example: /maternity-pay-leave or youtube.com
@@ -451,27 +451,6 @@ const viewLinkSearch = () => `
      />
   </div>
 `;
-
-
-const viewLocaleSelector = () => {
-  const html = [`
-    <div class="govuk-body taxon-facet">
-      <label class="govuk-label label--bold" for="locale">
-        Search by language
-      </label>
-      <datalist id="localeList">
-  `];
-  html.push(...state.locales.map(code => `<option value="${code}" ${state.selectedLocale==code ? 'selected' : ''}>${localeNames[code]}</option>`))
-  html.push(`
-      </datalist>
-      <input type="text"
-         list="localeList"
-         id="locale" name="locale"
-         autocomplete="off" />
-    </div>`);
-  return html.join('');
-};
-
 
 const viewSearchResultsTable = () => {
   const html = [];
@@ -639,7 +618,7 @@ const viewCypherQuery = () => {
 // Remove duplicates - but should be fixed in cypher
 const formatNames = array => [...new Set(array)].join(', ')
 const formatDateTime = date => `${date.slice(0,10)}<br/>${date.slice(12, 16)}`;
-const formatLanguageCode = code => localeNames[code] || code;
+
 
 const fieldFormatters = {
   'url' : {
@@ -647,7 +626,7 @@ const fieldFormatters = {
     format: url => `<a href="${url}">${url}</a>`
   },
   'title': { name: 'Title' },
-  'locale': { name: 'Language', format: formatLanguageCode },
+  'locale': { name: 'Language', format: languageName },
   'documentType': { name: 'Document type' },
   'publishing_app': { name: 'Publishing app' },
   'first_published_at' : {
@@ -701,143 +680,6 @@ const viewCrownSymbol = () => `
         <image src="/assets/govuk-logotype-crown-66ad9a9b8fca42cf0ba18979eef6afc2e8056d5f158ca9b27ce9afdf852aae87.png" class="gem-c-modal-dialogue__logotype-crown-fallback-image"></image>
       </svg>`;
 
-// IETF language codes https://en.wikipedia.org/wiki/IETF_language_tag
-// with additions
-const localeNames = {
-  '': 'All languages',
-  'af': 'Afrikaans',
-  'am': 'Amharic',
-  'ar': 'Arabic',
-  'arn': 'Mapudungun',
-  'as': 'Assamese',
-  'az': 'Azeri',
-  'ba': 'Bashkir',
-  'be': 'Belarusian',
-  'bg': 'Bulgarian',
-  'bn': 'Bengali',
-  'bo': 'Tibetan',
-  'br': 'Breton',
-  'bs': 'Bosnian',
-  'ca': 'Catalan',
-  'co': 'Corsican',
-  'cs': 'Czech',
-  'cy': 'Welsh',
-  'da': 'Danish',
-  'de': 'German',
-  'dr': 'Dari',
-  'dsb': 'Lower Sorbian',
-  'dv': 'Divehi',
-  'el': 'Greek',
-  'en': 'English',
-  'es': 'Spanish',
-  'es-419': 'Latin-american Spanish',
-  'et': 'Estonian',
-  'eu': 'Basque',
-  'fa': 'Persian',
-  'fi': 'Finnish',
-  'fil': 'Filipino',
-  'fo': 'Faroese',
-  'fr': 'French',
-  'fy': 'Frisian',
-  'ga': 'Irish',
-  'gd': 'Scottish Gaelic',
-  'gl': 'Galician',
-  'gsw': 'Alsatian',
-  'gu': 'Gujarati',
-  'ha': 'Hausa',
-  'he': 'Hebrew',
-  'hi': 'Hindi',
-  'hr': 'Croatian',
-  'hsb': 'Upper Sorbian',
-  'hu': 'Hungarian',
-  'hy': 'Armenian',
-  'id': 'Indonesian',
-  'ig': 'Igbo',
-  'ii': 'Yi',
-  'is': 'Icelandic',
-  'it': 'Italian',
-  'iu': 'Inuktitut',
-  'ja': 'Japanese',
-  'ka': 'Georgian',
-  'kk': 'Kazakh',
-  'kl': 'Greenlandic',
-  'km': 'Khmer',
-  'kn': 'Kannada',
-  'ko': 'Korean',
-  'kok': 'Konkani',
-  'ky': 'Kyrgyz',
-  'lb': 'Luxembourgish',
-  'lo': 'Lao',
-  'lt': 'Lithuanian',
-  'lv': 'Latvian',
-  'mi': 'Maori',
-  'mk': 'Macedonian',
-  'ml': 'Malayalam',
-  'mn': 'Mongolian',
-  'moh': 'Mohawk',
-  'mr': 'Marathi',
-  'ms': 'Malay',
-  'mt': 'Maltese',
-  'my': 'Burmese',
-  'nb': 'Norwegian (Bokmål)',
-  'ne': 'Nepali',
-  'nl': 'Dutch',
-  'nn': 'Norwegian (Nynorsk)',
-  'no': 'Norwegian',
-  'nso': 'Sesotho',
-  'oc': 'Occitan',
-  'or': 'Oriya',
-  'pa': 'Punjabi',
-  'pa-pk': 'Punjabi (Pakistan)',
-  'pl': 'Polish',
-  'prs': 'Dari',
-  'ps': 'Pashto',
-  'pt': 'Portuguese',
-  'qut': 'K\'iche',
-  'quz': 'Quechua',
-  'rm': 'Romansh',
-  'ro': 'Romanian',
-  'ru': 'Russian',
-  'rw': 'Kinyarwanda',
-  'sa': 'Sanskrit',
-  'sah': 'Yakut',
-  'se': 'Sami (Northern)',
-  'si': 'Sinhala',
-  'sk': 'Slovak',
-  'sl': 'Slovenian',
-  'sma': 'Sami (Southern)',
-  'smj': 'Sami (Lule)',
-  'smn': 'Sami (Inari)',
-  'sms': 'Sami (Skolt)',
-  'so': 'Somani',
-  'sq': 'Albanian',
-  'sr': 'Serbian',
-  'sv': 'Swedish',
-  'sw': 'Kiswahili',
-  'syr': 'Syriac',
-  'ta': 'Tamil',
-  'te': 'Telugu',
-  'tg': 'Tajik',
-  'th': 'Thai',
-  'tk': 'Turkmen',
-  'tn': 'Setswana',
-  'tr': 'Turkish',
-  'tt': 'Tatar',
-  'tzm': 'Tamazight',
-  'ug': 'Uyghur',
-  'uk': 'Ukrainian',
-  'ur': 'Urdu',
-  'uz': 'Uzbek',
-  'vi': 'Vietnamese',
-  'wo': 'Wolof',
-  'xh': 'isiXhosa',
-  'yi': 'Yiddish',
-  'yo': 'Yoruba',
-  'zh': 'Chinese',
-  'zh-hk': 'Chinese (Hong-Kong)',
-  'zh-tw': 'Chinese (Taiwan)',
-  'zu': 'isiZulu'
-}
 
 
 export { view };
