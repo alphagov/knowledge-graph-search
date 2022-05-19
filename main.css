@@ -6632,7 +6632,7 @@ label.govuk-label.label--bold, legend.govuk-fieldset__legend {
 }
 
 .search-mode-panel {
-  background: #f3f2f1;
+  border: 1px solid black;
   padding: 20px;
 }
 
@@ -6644,7 +6644,7 @@ label.govuk-label.label--bold, legend.govuk-fieldset__legend {
   margin-top: 20px;
 }
 
-.govuk-button, .govuk-textarea {
+.govuk-button {
   margin-top: 10px;
   margin-bottom: 0;
 }
