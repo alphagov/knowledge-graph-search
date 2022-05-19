@@ -26,4 +26,19 @@ const sanitise = function(text) {
   return text.replace(/</g, '&lt;').replace(/""*/g, '"');
 };
 
-export { id, sanitise };
+
+const splitKeywords = function(keywords) {
+  const regexp = /[^\s,"]+|"([^"]*)"/gi;
+  const output = [];
+  let match;
+  do {
+    match = regexp.exec(keywords);
+    if (match) {
+        output.push(match[1] ? match[1] : match[0]);
+    }
+  } while (match);
+  return output;
+};
+
+
+export { id, sanitise, splitKeywords };

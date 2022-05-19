@@ -8,7 +8,7 @@ const initialSearchParams = { // user inputs that are used to build the query
     title: false, // whether search should include page titles
     text: false  // whether search should include page content
   },
-
+  combinator: null, // whether the user wants all the keywords or any of them (can be 'any', 'all' or null if the user hasn't selected yet)
   // the publishing app to search in
   areaToSearch: '', // can be "whitehall", "mainstream", "any" (meaning the user hasn't chosen yet)
 
@@ -53,6 +53,7 @@ const setQueryParamsFromQS = function() {
   state.selectedLocale = maybeReplace('selectedLocale', 'lang');
   state.caseSensitive = maybeReplace('caseSensitive', 'case-sensitive');
   state.areaToSearch = maybeReplace('areaToSearch', 'area');
+  state.combinator = maybeReplace('combinator', 'combinator');
 
   state.whereToSearch.title = searchParams.get('search-in-title') !== null ? searchParams.get('search-in-title') : initialSearchParams.whereToSearch.title;
   state.whereToSearch.text = searchParams.get('search-in-text') !== null ? searchParams.get('search-in-text') : initialSearchParams.whereToSearch.text;
@@ -68,6 +69,7 @@ const searchState = function() {
   //   we add a "errors" fiels containing an array with values among:
   //   - "missingWhereToSearch": keywords were specified but not where to look for them on pages
   //   - "missingArea": no publishing platform was specified
+  //   - "missingCombinator": no keyword combinator was specified
 
   // "waiting": there's a query running
   if (state.waiting) return { code: 'waiting'};
@@ -76,13 +78,16 @@ const searchState = function() {
     return { code: 'initial' };
   }
 
-  if ((state.selectedWords !== '' && !state.whereToSearch.title && !state.whereToSearch.text) || state.areaToSearch === '') {
+  if ((state.selectedWords !== '' && !state.whereToSearch.title && !state.whereToSearch.text) || state.areaToSearch === '' || state.combinator === '') {
     const error = { code: 'error', errors: [] };
     if (state.selectedWords !== '' && !state.whereToSearch.title && !state.whereToSearch.text) {
       error.errors.push('missingWhereToSearch');
     }
     if (state.areaToSearch === '') {
       error.errors.push('missingArea');
+    }
+    if (state.combinator === null) {
+      error.errors.push('missingCombinator');
     }
     return error;
   }

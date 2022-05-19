@@ -1,177 +1,14 @@
 import { state, searchState } from './state.js';
-import { id, sanitise } from './utils.js';
+import { id, sanitise, splitKeywords } from './utils.js';
 import { view } from './view.js';
 import { languageCode } from './lang.js';
-
-
-//==================================================
-// Cypher query methods
-//==================================================
-
-const containsClause = function(field, word, caseSensitive) {
-  return caseSensitive ?
-    `(n.${field} CONTAINS "${word}")`
-  :
-    `(toLower(n.${field}) CONTAINS toLower("${word}"))`
-  ;
-}
-
-const multiContainsClause = function(fields, word, caseSensitive) {
-  return '(' + fields
-    .map(field => containsClause(field, word, caseSensitive))
-    .join(' OR ') + ')'
-}
-
-const returnClause = function() {
-  return `RETURN
-    'https://www.gov.uk' + n.name as url,
-    n.title AS title,
-    n.documentType AS documentType,
-    n.contentID AS contentID,
-    n.locale AS locale,
-    n.publishing_app AS publishing_app,
-    n.first_published_at AS first_published_at,
-    n.public_updated_at AS public_updated_at,
-    n.withdrawn_at AS withdrawn_at,
-    n.withdrawn_explanation AS withdrawn_explanation,
-    n.pagerank AS pagerank,
-    COLLECT (distinct taxon.name) AS taxons,
-    COLLECT (distinct o.name) AS primary_organisation,
-    COLLECT (distinct o2.name) AS all_organisations
-    ORDER BY n.pagerank DESC
-    LIMIT ${state.nbResultsLimit}`;
-};
-
-const searchQuery = function(state, keywords, exclusions) {
-  const fieldsToSearch = [];
-  if (state.whereToSearch.title) fieldsToSearch.push('title');
-  if (state.whereToSearch.text) fieldsToSearch.push('title', 'description');
-
-  let inclusionClause = '';
-  if (keywords.length > 0) {
-    inclusionClause = 'WHERE\n' +
-    keywords
-      .map(word => multiContainsClause(fieldsToSearch, word, state.caseSensitive))
-      .join(`\n AND `);
-  }
-
-  const exclusionClause = exclusions.length ?
-    ('WITH * WHERE NOT ' + exclusions.map(word => multiContainsClause(fieldsToSearch, word, state.caseSensitive)).join(`\n OR `)) : '';
-
-  let areaClause = '';
-  if (state.areaToSearch === 'mainstream') {
-    areaClause = 'WITH * WHERE n.publishing_app = "publisher"';
-  } else if (state.areaToSearch === 'whitehall') {
-    areaClause = 'WITH * WHERE n.publishing_app = "whitehall"';
-  }
-
-  let localeClause = '';
-  if (state.selectedLocale !== '') {
-    localeClause = `WITH * WHERE n.locale = "${languageCode(state.selectedLocale)}"\n`
-  }
-
-  const taxon = state.selectedTaxon;
-  const taxonClause = taxon ? `WITH n
-    MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
-    MATCH (taxon:Taxon)-[:HAS_PARENT*]->(ancestor_taxon:Taxon)
-    WHERE taxon.name = "${taxon}" OR ancestor_taxon.name = "${taxon}"` :
-    `OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)`;
-
-  let linkClause = '';
-
-  if (state.linkSearchUrl.length > 0) {
-    // We need to determine if the link is internal or external
-    const internalLinkRexExp = /^((https:\/\/)?((www\.)?gov\.uk))?\//;
-    if (internalLinkRexExp.test(state.linkSearchUrl)) {
-      linkClause = `
-        WITH n, taxon
-        MATCH (n:Cid)-[:HYPERLINKS_TO]->(n2:Cid)
-        WHERE n2.name = "${state.linkSearchUrl.replace(internalLinkRexExp, '/')}"`
-    } else {
-      linkClause = `
-        WITH n, taxon
-        MATCH (n:Cid) -[:HYPERLINKS_TO]-> (e:ExternalPage)
-        WHERE e.name CONTAINS "${state.linkSearchUrl}"`
-    }
-  }
-
-  return `
-    MATCH (n:Cid)
-    ${inclusionClause}
-    ${exclusionClause}
-    ${localeClause}
-    ${areaClause}
-    ${taxonClause}
-    ${linkClause}
-    OPTIONAL MATCH (n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
-    OPTIONAL MATCH (n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
-    ${returnClause()}`;
-};
-
-
-const splitKeywords = function(keywords) {
-  const regexp = /[^\s,"]+|"([^"]*)"/gi;
-  const output = [];
-  let match;
-  do {
-    match = regexp.exec(keywords);
-    if (match) {
-        output.push(match[1] ? match[1] : match[0]);
-    }
-  } while (match);
-  return output;
-};
-
-
-const searchButtonClicked = async function() {
-
-  // update the state from the form
-  window.scrollTo(0, 0);
-  state.errorText = null;
-  state.userErrors = null;
-  const searchStatus = searchState();
-  switch(searchStatus.code) {
-  case 'ready-to-search':
-    if (state.selectedWords !== '' || state.selectedLocale !== '' || state.selectedTaxon !== '' || state.linkSearchUrl !== '') {
-      state.waiting = true;
-      const keywords = splitKeywords(state.selectedWords)
-            .filter(d=>d.length>0);
-      const excludedKeywords = splitKeywords(state.excludedWords)
-            .filter(d=>d.length>0);
-      state.searchQuery = searchQuery(state, keywords, excludedKeywords);
-      state.waiting = true;
-      queryGraph(state.searchQuery);
-    }
-    break;
-  case 'error':
-    state.userErrors = searchStatus.errors;
-    break;
-  case 'waiting':
-  case 'initial':
-  case 'no-results':
-  case 'results':
-    break;
-  default:
-    console.log('unknown value for searchState', searchState());
-    break;
-  }
-};
-
-
-const queryGraph = async function(query) {
-  state.neo4jSession
-    .run(query)
-    .then(result => handleEvent({type:'neo4j-callback-ok', result}))
-    .catch(error => handleEvent({type:'neo4j-callback-fail', error}));
-  handleEvent({type: 'neo4j-running'});
-};
-
+import { searchQuery, queryGraph } from './neo4j.js';
 
 const handleEvent = async function(event) {
   let fieldClicked;
-  console.log('handleEvent:', event.type, event.id)
+  console.log('handleEvent:', event.type, event.id || '')
   switch(event.type) {
-    case "dom":
+    case 'dom':
       switch(event.id) {
       case 'search':
         state.selectedWords = sanitise(id('keyword').value);
@@ -186,6 +23,8 @@ const handleEvent = async function(event) {
         if (id('area-mainstream').checked) state.areaToSearch = 'mainstream';
         if (id('area-whitehall').checked) state.areaToSearch = 'whitehall';
         if (id('area-any').checked) state.areaToSearch = 'any';
+        if (id('combinator-any').checked) state.combinator = 'any';
+        if (id('combinator-all').checked) state.combinator = 'all';
         state.searchResults = null;
         searchButtonClicked();
         break;
@@ -252,6 +91,40 @@ const handleEvent = async function(event) {
 };
 
 
+const searchButtonClicked = async function() {
+  // update the state when the user clicked Search
+  window.scrollTo(0, 0);
+  state.errorText = null;
+  state.userErrors = null;
+  const searchStatus = searchState();
+  switch(searchStatus.code) {
+  case 'ready-to-search':
+    if (state.selectedWords !== '' || state.selectedLocale !== '' || state.selectedTaxon !== '' || state.linkSearchUrl !== '') {
+      state.waiting = true;
+      const keywords = splitKeywords(state.selectedWords)
+            .filter(d=>d.length>0);
+      const excludedKeywords = splitKeywords(state.excludedWords)
+            .filter(d=>d.length>0);
+      state.searchQuery = searchQuery(state, keywords, excludedKeywords);
+      state.waiting = true;
+      queryGraph(state.searchQuery, handleEvent);
+    }
+    break;
+  case 'error':
+    state.userErrors = searchStatus.errors;
+    break;
+  case 'waiting':
+  case 'initial':
+  case 'no-results':
+  case 'results':
+    break;
+  default:
+    console.log('unknown value for searchState', searchState());
+    break;
+  }
+};
+
+
 const updateUrl = function() {
   if ('URLSearchParams' in window) {
     var searchParams = new URLSearchParams();
@@ -264,6 +137,7 @@ const updateUrl = function() {
     if (state.whereToSearch.title) searchParams.set('search-in-title', 'true');
     if (state.whereToSearch.text) searchParams.set('search-in-text', 'true');
     if (state.areaToSearch.length > 0) searchParams.set('area', state.areaToSearch);
+    if (state.combinator) searchParams.set('combinator', state.combinator);
     if (state.linkSearchUrl !== '') searchParams.set('link-search-url', state.linkSearchUrl);
 
     let newRelativePathQuery = window.location.pathname;

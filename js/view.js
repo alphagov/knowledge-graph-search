@@ -1,6 +1,6 @@
 /*eslint no-unused-vars: ["error", { "varsIgnorePattern": "view" }]*/
 
-import { id, sanitise } from './utils.js';
+import { id, sanitise, splitKeywords } from './utils.js';
 import { state, searchState } from './state.js';
 import { handleEvent } from './events.js';
 import { languageName } from './lang.js';
@@ -110,7 +110,9 @@ const viewBanner = () => `
 
 
 const makeBold = (text, includeMarkup) =>
-  includeMarkup ? `<span class="govuk-!-font-weight-bold">${text}</span>` : text;
+  includeMarkup ?
+    `<span class="govuk-!-font-weight-bold">${text}</span>` :
+    `"${text}"`;
 
 
 const viewContainDescription = (words, includeMarkup) => {
@@ -122,8 +124,11 @@ const viewContainDescription = (words, includeMarkup) => {
   } else {
     where = 'in their body content';
   }
-
-  return words !== '' ? `${makeBold(words, includeMarkup)} ${where}` : '';
+  let combineOp = state.combinator === 'all' ? 'and' : 'or';
+  let combinedWords = splitKeywords(words)
+    .map(w=>makeBold(w, includeMarkup))
+    .join(` ${combineOp} `);
+  return words !== '' ? `${combinedWords} ${where}` : '';
 };
 
 
@@ -182,6 +187,10 @@ const viewErrorBanner = () => {
             html.push(`
             <li><a href="#search-scope-wrapper">You need to select a publishing application</a></li>`);
             break;
+            case 'missingCombinator':
+            html.push(`
+            <li><a href="#combinator-wrapper">You need to select how to search for keywords</a></li>`);
+            break;
             default:
             console.log('unknown user error code:', userError);
           }
@@ -202,6 +211,7 @@ const viewSearchPanel = () => `
   <form id="search-form" class="search-panel govuk-form">
     <div class="search-mode-panel">
       ${viewKeywordsInput()}
+      ${viewKeywordsCombinator()}
       ${viewExclusionsInput()}
       ${viewCaseSensitiveSelector()}
       ${viewScopeSelector()}
@@ -221,7 +231,7 @@ const viewSearchPanel = () => `
 
 const viewKeywordsInput = () => `
   <div class="govuk-body">
-    <label for="keyword" class="govuk-label label--bold">Search for</label>
+    <label for="keyword" class="govuk-label label--bold">Search keywords</label>
     <div class="govuk-hint">
       For example: cat, dog, &quot;health certificate&quot;
     </div>
@@ -316,6 +326,47 @@ const viewCaseSensitiveSelector = () => `
   </div>
 `;
 
+const viewKeywordsCombinator = () => {
+  const errors = searchState()?.errors;
+  const err = errors && errors.includes('missingCombinator');
+  return `
+  <div class="govuk-form-group ${err ? 'govuk-form-group--error' : ''}">
+    <fieldset
+        class="govuk-fieldset"
+        id="combinator-wrapper"
+        ${state.waiting && 'disabled="disabled"'}
+        aria-describedby="combinator-hint ${err ? 'combinator-error' : ''}">
+      <legend class="govuk-fieldset__legend">
+        Search for
+      </legend>
+      <div id="combinator-hint" class="govuk-hint">
+        Choose one option
+      </div>
+      ${err ? viewInlineError('combinator-error', 'Please choose one option') : ''}
+      <div class="govuk-radios" id="combinators">
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input"
+                 type="radio" id="combinator-any"
+                 name="combinator"
+            ${state.combinator === 'any' ? 'checked' : ''}/>
+          <label for="combinator-any" class="govuk-label govuk-radios__label">
+            any keyword
+          </label>
+        </div>
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input"
+                 type="radio" id="combinator-all"
+                 name="combinator"
+            ${state.combinator === 'all' ? 'checked' : ''}/>
+          <label for="combinator-all" class="govuk-label govuk-radios__label">
+            all keywords
+          </label>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+  `;
+};
 
 const viewPublishingAppSelector = () => {
   const errors = searchState()?.errors;
