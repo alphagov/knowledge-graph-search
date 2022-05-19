@@ -154,7 +154,7 @@ const viewQueryDescription = (includeMarkup = true) => {
     clauses[0] :
     `${clauses.slice(0, clauses.length - 1).join(', ')} and ${clauses[clauses.length - 1]}`;
 
-  return `pages that ${joinedClauses}, in descending popularity&nbsp;${viewInfoButton('popularity')}`;
+  return `pages that ${joinedClauses}, in descending popularity`;
 };
 
 
@@ -611,7 +611,7 @@ const viewResults = function() {
     `);
   }
 
-  html.push(`<div class="govuk-body">for ${viewQueryDescription()}</div>`);
+  html.push(`<div class="govuk-body">for ${viewQueryDescription()}&nbsp;${viewInfoButton('popularity')}</div>`);
 
   if (nbRecords >= state.resultsPerPage) {
     html.push(`
