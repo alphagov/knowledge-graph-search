@@ -101,10 +101,8 @@ const searchButtonClicked = async function() {
   case 'ready-to-search':
     if (state.selectedWords !== '' || state.selectedLocale !== '' || state.selectedTaxon !== '' || state.linkSearchUrl !== '') {
       state.waiting = true;
-      const keywords = splitKeywords(state.selectedWords)
-            .filter(d=>d.length>0);
-      const excludedKeywords = splitKeywords(state.excludedWords)
-            .filter(d=>d.length>0);
+      const keywords = splitKeywords(state.selectedWords);
+      const excludedKeywords = splitKeywords(state.excludedWords);
       state.searchQuery = searchQuery(state, keywords, excludedKeywords);
       state.waiting = true;
       queryGraph(state.searchQuery, handleEvent);

@@ -37,7 +37,7 @@ const splitKeywords = function(keywords) {
         output.push(match[1] ? match[1] : match[0]);
     }
   } while (match);
-  return output;
+  return output.filter(d => d.length > 0);
 };
 
 

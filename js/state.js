@@ -1,3 +1,5 @@
+import { splitKeywords } from './utils.js';
+
 const initialSearchParams = { // user inputs that are used to build the query
   selectedWords: '', // list of words to search
   excludedWords: '', // list of words to exclude
@@ -78,19 +80,19 @@ const searchState = function() {
     return { code: 'initial' };
   }
 
-  if ((state.selectedWords !== '' && !state.whereToSearch.title && !state.whereToSearch.text) || state.areaToSearch === '' || state.combinator === '') {
-    const error = { code: 'error', errors: [] };
-    if (state.selectedWords !== '' && !state.whereToSearch.title && !state.whereToSearch.text) {
-      error.errors.push('missingWhereToSearch');
+  const errors = [];
+  if (state.selectedWords !== '') {
+    if (!state.whereToSearch.title && !state.whereToSearch.text) {
+      errors.push('missingWhereToSearch');
     }
-    if (state.areaToSearch === '') {
-      error.errors.push('missingArea');
+    if (splitKeywords(state.selectedWords).length > 1 && state.combinator === null) {
+      errors.push('missingCombinator');
     }
-    if (state.combinator === null) {
-      error.errors.push('missingCombinator');
-    }
-    return error;
   }
+  if (state.areaToSearch === '') {
+    errors.push('missingArea');
+  }
+  if (errors.length > 0) return { code: 'error', errors };
   if (state.searchResults?.records?.length > 0) return { code: 'results' };
   if (state.searchResults?.records?.length === 0) return { code: 'no-results' };
   return { code: 'ready-to-search' };
