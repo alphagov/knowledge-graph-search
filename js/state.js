@@ -1,4 +1,5 @@
 import { splitKeywords } from './utils.js';
+import { languageName } from './lang.js';
 
 const initialSearchParams = { // user inputs that are used to build the query
   selectedWords: '', // list of words to search
@@ -52,7 +53,8 @@ const setQueryParamsFromQS = function() {
   state.excludedWords = maybeReplace('excludedWords', 'excluded-words');
   state.linkSearchUrl = maybeReplace('linkSearchUrl', 'link-search-url');
   state.selectedTaxon = maybeReplace('selectedTaxon', 'selected-taxon');
-  state.selectedLocale = maybeReplace('selectedLocale', 'lang');
+  const lang = searchParams.get('lang');
+  state.selectedLocale = lang ? languageName(lang) : initialSearchParams.selectedLocale;
   state.caseSensitive = maybeReplace('caseSensitive', 'case-sensitive');
   state.areaToSearch = maybeReplace('areaToSearch', 'area');
   state.combinator = maybeReplace('combinator', 'combinator');
