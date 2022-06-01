@@ -86,7 +86,7 @@ const viewInfoPopup = () => {
           <div class="info-popup--content">
           <h1 class="govuk-heading-m">${sanitise(state.infoPopupHtml?.title)}</h1>
             <p class="govuk-body">${sanitise(state.infoPopupHtml?.body)}</h1>
-            <button class="info-popup--button" id="info-popup-close" aria-label="Close modal dialogue">×</button>
+            <button type="button" class="info-popup--button" id="info-popup-close" aria-label="Close modal dialogue">×</button>
           </div>
         </dialog>
       </div>
@@ -468,12 +468,14 @@ const viewLocaleSelector = () => {
 const viewSearchButton = () => `
   <p class="govuk-body">
     <button
+      type="button"
       class="govuk-button ${state.waiting?'govuk-button--disabled':''}"
       ${state.waiting ? 'disabled="disabled"' : '' }
       id="search">
       ${state.waiting?'Searching':'Search'}
     </button>
     <button
+      type="button"
       class="govuk-button govuk-button--secondary ${state.waiting?'govuk-button--disabled':''}"
       ${state.waiting ? 'disabled="disabled"' : '' }
       id="clear-filters">
@@ -622,8 +624,8 @@ const viewResults = function() {
   if (nbRecords >= state.resultsPerPage) {
     html.push(`
       <p class="govuk-body">
-        <button class="govuk-button" id="button-prev-page">Previous</button>
-        <button class="govuk-button" id="button-next-page">Next</button>
+        <button type="button" class="govuk-button" id="button-prev-page">Previous</button>
+        <button type="button" class="govuk-button" id="button-next-page">Next</button>
       </p>`);
   }
 
