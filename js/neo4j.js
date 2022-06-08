@@ -47,8 +47,7 @@ const searchQuery = function(state, keywords, exclusions) {
   const fieldsToSearch = [];
   const combinator = state.combinator === 'any' ? 'OR' : 'AND';
   if (state.whereToSearch.title) fieldsToSearch.push('title');
-  if (state.whereToSearch.text) fieldsToSearch.push('title', 'description');
-
+  if (state.whereToSearch.text) fieldsToSearch.push('text', 'description');
   let inclusionClause = '';
   if (keywords.length > 0) {
     inclusionClause = 'WHERE\n' +
