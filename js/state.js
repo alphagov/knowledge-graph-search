@@ -8,12 +8,12 @@ const initialSearchParams = { // user inputs that are used to build the query
   selectedLocale: '', // the language to search
   linkSearchUrl: '', // URL to find all pages linking to
   whereToSearch: {
-    title: false, // whether search should include page titles
+    title: true, // whether search should include page titles
     text: false  // whether search should include page content
   },
-  combinator: null, // whether the user wants all the keywords or any of them (can be 'any', 'all' or null if the user hasn't selected yet)
+  combinator: 'all', // whether the user wants all the keywords or any of them (can be 'any', 'all' or null if the user hasn't selected yet)
   // the publishing app to search in
-  areaToSearch: '', // can be "whitehall", "mainstream", "any" (meaning the user hasn't chosen yet)
+  areaToSearch: 'any', // can be "whitehall", "mainstream", "any" (meaning the user hasn't chosen yet)
 
   caseSensitive: false // whether the keyword search is case sensitive
 };
