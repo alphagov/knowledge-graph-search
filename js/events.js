@@ -44,6 +44,7 @@ const handleEvent = async function(event) {
         state.searchQuery = '';
         state.waiting = false;
         state.infoPopupHtml = null;
+        state.combinator = 'all';
         break;
       case 'button-next-page':
         state.skip = state.skip + state.resultsPerPage;
@@ -135,7 +136,7 @@ const updateUrl = function() {
     if (state.whereToSearch.title) searchParams.set('search-in-title', 'true');
     if (state.whereToSearch.text) searchParams.set('search-in-text', 'true');
     if (state.areaToSearch.length > 0) searchParams.set('area', state.areaToSearch);
-    if (state.combinator) searchParams.set('combinator', state.combinator);
+    if (state.combinator !== 'all') searchParams.set('combinator', state.combinator);
     if (state.linkSearchUrl !== '') searchParams.set('link-search-url', state.linkSearchUrl);
 
     let newRelativePathQuery = window.location.pathname;

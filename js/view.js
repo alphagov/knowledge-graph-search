@@ -8,6 +8,7 @@ import { languageName } from './lang.js';
 
 const view = () => {
   console.log('view')
+  document.title = 'GovGraphSearch';
   id('page-content').innerHTML = `
     <main class="govuk-main-wrapper" ${state.infoPopupHtml ? 'style="filter: blur(2px)"' : ''} id="main-content" role="main">
       ${viewBanner()}
