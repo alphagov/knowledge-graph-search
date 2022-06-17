@@ -469,7 +469,7 @@ const viewLocaleSelector = () => {
 const viewSearchButton = () => `
   <p class="govuk-body">
     <button
-      type="button"
+      type="submit"
       class="govuk-button ${state.waiting?'govuk-button--disabled':''}"
       ${state.waiting ? 'disabled="disabled"' : '' }
       id="search">
