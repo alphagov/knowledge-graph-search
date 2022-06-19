@@ -4,7 +4,7 @@
 
 import { state } from './state.js';
 import { languageCode } from './lang.js';
-
+import { splitKeywords } from './utils.js';
 
 const containsClause = function(field, word, caseSensitive) {
   return caseSensitive ?
@@ -43,8 +43,10 @@ const returnClause = function() {
 };
 
 
-const searchQuery = function(state, keywords, exclusions) {
+const searchQuery = function(state) {
   const fieldsToSearch = [];
+  const keywords = splitKeywords(state.selectedWords);
+  const excludedKeywords = splitKeywords(state.excludedWords);
   const combinator = state.combinator === 'any' ? 'OR' : 'AND';
   if (state.whereToSearch.title) fieldsToSearch.push('title');
   if (state.whereToSearch.text) fieldsToSearch.push('text', 'description');
@@ -56,8 +58,8 @@ const searchQuery = function(state, keywords, exclusions) {
       .join(`\n ${combinator}`);
   }
 
-  const exclusionClause = exclusions.length ?
-    ('WITH * WHERE NOT ' + exclusions.map(word => multiContainsClause(fieldsToSearch, word, state.caseSensitive)).join(`\n OR `)) : '';
+  const exclusionClause = excludedKeywords.length ?
+    ('WITH * WHERE NOT ' + excludedKeywords.map(word => multiContainsClause(fieldsToSearch, word, state.caseSensitive)).join(`\n OR `)) : '';
 
   let areaClause = '';
   if (state.areaToSearch === 'mainstream') {

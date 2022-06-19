@@ -1,5 +1,5 @@
 import { state, searchState } from './state.js';
-import { id, sanitise, splitKeywords } from './utils.js';
+import { id, sanitise } from './utils.js';
 import { view } from './view.js';
 import { languageCode } from './lang.js';
 import { searchQuery, queryGraph } from './neo4j.js';
@@ -102,10 +102,7 @@ const searchButtonClicked = async function() {
   case 'ready-to-search':
     if (state.selectedWords !== '' || state.selectedLocale !== '' || state.selectedTaxon !== '' || state.linkSearchUrl !== '') {
       state.waiting = true;
-      const keywords = splitKeywords(state.selectedWords);
-      const excludedKeywords = splitKeywords(state.excludedWords);
-      state.searchQuery = searchQuery(state, keywords, excludedKeywords);
-      state.waiting = true;
+      state.searchQuery = searchQuery(state);
       queryGraph(state.searchQuery, handleEvent);
     }
     break;
