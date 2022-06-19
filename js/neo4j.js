@@ -111,14 +111,27 @@ const searchQuery = function(state) {
     ${returnClause()}`;
 };
 
+const metaSearchQuery = state =>
+  `MATCH (n)-[l]->(d)
+   WHERE (n:BankHoliday OR n:Person) AND n.name = "${state.selectedWords}"
+   RETURN n,type(l),d`
+;
 
-const queryGraph = async function(query, callback) {
+const queryGraph = async function(query, metaQuery, callback) {
   state.neo4jSession
     .run(query)
-    .then(result => callback({type:'neo4j-callback-ok', result}))
+    .then(result => {
+      // we need metaQuery to be an array of queries (Person, BankHoliday, etc)
+      // and we run them synchronously until we have a result, then we stop
+      state.neo4jSession
+        .run(metaQuery)
+        .then(metaResult =>
+          callback({type:'neo4j-callback-ok', result, metaResult })
+        )
+    })
     .catch(error => callback({type:'neo4j-callback-fail', error}));
   callback({type: 'neo4j-running'});
 };
 
 
-export { searchQuery, queryGraph };
+export { searchQuery, metaSearchQuery, queryGraph };

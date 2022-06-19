@@ -2,7 +2,7 @@ import { state, searchState } from './state.js';
 import { id, sanitise } from './utils.js';
 import { view } from './view.js';
 import { languageCode } from './lang.js';
-import { searchQuery, queryGraph } from './neo4j.js';
+import { searchQuery, metaSearchQuery, queryGraph } from './neo4j.js';
 
 const handleEvent = async function(event) {
   let fieldClicked;
@@ -70,6 +70,8 @@ const handleEvent = async function(event) {
     break;
   case 'neo4j-callback-ok':
     state.searchResults = event.result;
+    state.metaSearchResults = event.metaResult;
+    console.log('ok1', event)
     state.waiting = false;
     state.errorText = null;
     break;
@@ -103,7 +105,8 @@ const searchButtonClicked = async function() {
     if (state.selectedWords !== '' || state.selectedLocale !== '' || state.selectedTaxon !== '' || state.linkSearchUrl !== '') {
       state.waiting = true;
       state.searchQuery = searchQuery(state);
-      queryGraph(state.searchQuery, handleEvent);
+      state.metaSearchQuery = metaSearchQuery(state);
+      queryGraph(state.searchQuery, state.metaSearchQuery, handleEvent);
     }
     break;
   case 'error':

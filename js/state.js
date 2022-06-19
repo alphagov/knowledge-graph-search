@@ -18,7 +18,6 @@ const initialSearchParams = { // user inputs that are used to build the query
   caseSensitive: false // whether the keyword search is case sensitive
 };
 
-
 const state = {
   ...initialSearchParams,
   user: '',
@@ -32,6 +31,7 @@ const state = {
   nbResultsLimit: 10000, // limit queries to this number of results
   searchQuery: '', // generated from other user inputs or typed in directly
   searchResults: null,
+  metaSearchResults: null,
   skip: 0, // where to start the pagination (number of results)
   resultsPerPage: 10, // number of results per page
   showFields: { // what result fields to show by default

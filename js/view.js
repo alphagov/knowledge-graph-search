@@ -594,10 +594,47 @@ const viewWaiting = function() {
 };
 
 
+const viewMetaResults = function() {
+  const records = state.metaSearchResults.records;
+  const nodeType = records[0]._fields[0].labels[0];
+  if (nodeType === 'BankHoliday') {
+    const dates = records
+      .filter(record => record._fields[1] == "IS_ON")
+      .map(record => record._fields[2].properties.dateString)
+      .join(', ');
+    const locations = records
+          .filter(record => record._fields[1] == "IS_OBSERVED_IN")
+          .map(record => record._fields[2].properties.name)
+          .join(', ');
+    return `
+      <div class="meta-results-panel">
+        <h1>${state.selectedWords} <span class="node-type">(Bank Holiday)</span></h1>
+        <p>On: ${dates}</p>
+        <p>Observed in: ${locations}</p>
+      </div>
+  `;
+  } else if (nodeType === 'Person') {
+    const roles = records
+      .filter(record => record._fields[1] == "HAS_ROLE")
+      .map(record => record._fields[2].properties.name)
+      .join(', ');
+    return `
+      <div class="meta-results-panel">
+        <h1>${state.selectedWords} <span class="node-type">(Person)</span></h1>
+        <p>Roles: ${roles}</p>
+      </div>
+    `;
+  }
+};
+
 const viewResults = function() {
   const html = [];
   const nbRecords = state.searchResults.records.length;
   document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraphSearch`;
+
+  if (state.metaSearchResults.records.length > 0) {
+    html.push(viewMetaResults());
+  }
 
   if (nbRecords < state.nbResultsLimit) {
     html.push(`
