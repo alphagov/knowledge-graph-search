@@ -594,34 +594,52 @@ const viewWaiting = function() {
 };
 
 
+const viewMetaStatementList = function(records, edgeTypeCode, edgeTypeName, targetIndex, targetField) {
+  const statementsOfInterest = records.filter(record => record._fields[1].type == edgeTypeCode);
+  let statementsHtml = '';
+  if (statementsOfInterest.length > 0) {
+    const statementListItems = statementsOfInterest
+      .map(statement => `<li>${statement._fields[targetIndex].properties[targetField]}</li>`)
+      .join('');
+    statementsHtml = `<p>${edgeTypeName}:</p><ul>${statementListItems}</ul>`;
+  }
+  return statementsHtml;
+}
+
+
 const viewMetaResults = function() {
-  const records = state.metaSearchResults.records;
+  const records = state.metaSearchResults;
   const nodeType = records[0]._fields[0].labels[0];
   if (nodeType === 'BankHoliday') {
-    const dates = records
-      .filter(record => record._fields[1] == "IS_ON")
-      .map(record => record._fields[2].properties.dateString)
-      .join(', ');
-    const locations = records
-          .filter(record => record._fields[1] == "IS_OBSERVED_IN")
-          .map(record => record._fields[2].properties.name)
-          .join(', ');
     return `
       <div class="meta-results-panel">
-        <h1>${state.selectedWords} <span class="node-type">(Bank Holiday)</span></h1>
-        <p>On: ${dates}</p>
-        <p>Observed in: ${locations}</p>
+        <h1>${state.selectedWords} <span class="node-type">(bank holiday)</span></h1>
+        ${viewMetaStatementList(records, 'IS_ON', 'On', 2, 'dateString')}
+        ${viewMetaStatementList(records, 'IS_OBSERVED_IN', 'Observed in', 2, 'name')}
       </div>
   `;
   } else if (nodeType === 'Person') {
-    const roles = records
-      .filter(record => record._fields[1] == "HAS_ROLE")
-      .map(record => record._fields[2].properties.name)
-      .join(', ');
+    const rolesHtml = records
+      .filter(record => record._fields[1].type == "HAS_ROLE")
+      .map(record => {
+        const roleName = record._fields[2].properties.name;
+        const orgName = record._fields[4].properties.name;
+        return `<li>${roleName}, <a href="#">${orgName}</a></li>`;
+      })
+      .join('');
     return `
       <div class="meta-results-panel">
-        <h1>${state.selectedWords} <span class="node-type">(Person)</span></h1>
-        <p>Roles: ${roles}</p>
+        <h1>${state.selectedWords} <span class="node-type">(person)</span></h1>
+        <p>Roles:</p>
+        <ul>${rolesHtml}</ul>
+      </div>
+    `;
+  } else if (nodeType === 'Organisation') {
+    return `
+      <div class="meta-results-panel">
+        <h1>${state.selectedWords} <span class="node-type">(organisation)</span></h1>
+        ${viewMetaStatementList(records, 'HAS_SUPERSEDED', 'Supersedes', 2, 'name')}
+        ${viewMetaStatementList(records, 'HAS_CHILD', 'Includes', 2, 'name')}
       </div>
     `;
   }
@@ -632,7 +650,7 @@ const viewResults = function() {
   const nbRecords = state.searchResults.records.length;
   document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraphSearch`;
 
-  if (state.metaSearchResults.records.length > 0) {
+  if (state.metaSearchResults.length > 0) {
     html.push(viewMetaResults());
   }
 

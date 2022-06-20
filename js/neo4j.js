@@ -111,27 +111,28 @@ const searchQuery = function(state) {
     ${returnClause()}`;
 };
 
-const metaSearchQuery = state =>
-  `MATCH (n)-[l]->(d)
-   WHERE (n:BankHoliday OR n:Person) AND n.name = "${state.selectedWords}"
-   RETURN n,type(l),d`
-;
+const metaSearchQueries = state => [
+  // TODO: sanitize input (everywhere)
+  `MATCH (b:BankHoliday { name: "${state.selectedWords}" })-[l]->(d) RETURN b,l,d`,
+  `MATCH (n:Person { name: "${state.selectedWords}" })-[l]->(t:Role)-[l2]->(o:Organisation) RETURN n,l,t,l2,o`,
+  `MATCH (o:Organisation { name:"${state.selectedWords}" })-[l:HAS_SUPERSEDED|HAS_CHILD]-(n) RETURN o, l, n` // TODO: also finds org roles and people
+];
 
-const queryGraph = async function(query, metaQuery, callback) {
-  state.neo4jSession
-    .run(query)
-    .then(result => {
-      // we need metaQuery to be an array of queries (Person, BankHoliday, etc)
-      // and we run them synchronously until we have a result, then we stop
-      state.neo4jSession
-        .run(metaQuery)
-        .then(metaResult =>
-          callback({type:'neo4j-callback-ok', result, metaResult })
-        )
-    })
-    .catch(error => callback({type:'neo4j-callback-fail', error}));
-  callback({type: 'neo4j-running'});
+const queryGraph = async function(query, callback) {
+
+  const metaQueries = metaSearchQueries(state);
+
+  state.neo4jSession.readTransaction(txc => {
+
+    const searchPromises = [query].concat(metaQueries).map(query => txc.run(query));
+    Promise.allSettled(searchPromises)
+    .then(results => callback({type:'neo4j-callback-ok', results }))
+    .catch(error => callback({type:'neo4j-callback-fail', error }));
+
+    callback({type: 'neo4j-running'});
+
+  });
 };
 
 
-export { searchQuery, metaSearchQuery, queryGraph };
+export { searchQuery, queryGraph };
