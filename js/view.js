@@ -8,7 +8,7 @@ import { languageName } from './lang.js';
 
 const view = () => {
   console.log('view')
-  document.title = 'GovGraphSearch';
+  document.title = 'GovGraph search';
   id('page-content').innerHTML = `
     <main class="govuk-main-wrapper" ${state.infoPopupHtml ? 'style="filter: blur(2px)"' : ''} id="main-content" role="main">
       ${viewBanner()}
@@ -584,7 +584,7 @@ const csvFromResults = function(searchResults) {
 
 
 const viewWaiting = function() {
-  document.title = 'Searching - GovGraphSearch';
+  document.title = 'Searching - GovGraph search';
 
   return `
       <h2 class="govuk-heading-l">Please wait <img src="assets/images/loader.gif" height="20px" alt="loader"/></h2>
@@ -647,7 +647,7 @@ const viewMetaResults = function() {
 const viewResults = function() {
   const html = [];
   const nbRecords = state.searchResults.records.length;
-  document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraphSearch`;
+  document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraph search`;
 
   if (state.metaSearchResults.length > 0) {
     html.push(viewMetaResults());
@@ -693,7 +693,7 @@ const viewResults = function() {
 };
 
 const viewNoResults = () => {
-  document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraphSearch`;
+  document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraph search`;
   return `
     <h2 class="govuk-heading-l">No results</h2>
     <div class="govuk-body">for ${viewQueryDescription()}</div>
