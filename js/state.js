@@ -29,7 +29,6 @@ const state = {
   userErrors: null, // error codes due to user not entering valid search criteria
   neo4jSession: null,
   nbResultsLimit: 10000, // limit queries to this number of results
-  searchQuery: '', // generated from other user inputs or typed in directly
   searchResults: null,
   metaSearchResults: null,
   skip: 0, // where to start the pagination (number of results)

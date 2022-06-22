@@ -6,42 +6,29 @@ import { state } from './state.js';
 import { languageCode } from './lang.js';
 import { splitKeywords } from './utils.js';
 
-const containsClause = function(field, word, caseSensitive) {
-  return caseSensitive ?
-    `(n.${field} CONTAINS "${word}")`
-  :
-    `(toLower(n.${field}) CONTAINS toLower("${word}"))`
-  ;
-}
 
+//=========== public methods ===========
 
-const multiContainsClause = function(fields, word, caseSensitive) {
-  return '(' + fields
-    .map(field => containsClause(field, word, caseSensitive))
-    .join(' OR ') + ')'
-}
-
-
-const returnClause = function() {
-  return `RETURN
-    'https://www.gov.uk' + n.name as url,
-    n.title AS title,
-    n.documentType AS documentType,
-    n.contentID AS contentID,
-    n.locale AS locale,
-    n.publishing_app AS publishing_app,
-    n.first_published_at AS first_published_at,
-    n.public_updated_at AS public_updated_at,
-    n.withdrawn_at AS withdrawn_at,
-    n.withdrawn_explanation AS withdrawn_explanation,
-    n.pagerank AS pagerank,
-    COLLECT (distinct taxon.name) AS taxons,
-    COLLECT (distinct o.name) AS primary_organisation,
-    COLLECT (distinct o2.name) AS all_organisations
-    ORDER BY n.pagerank DESC
-    LIMIT ${state.nbResultsLimit}`;
+const queryGraph = async function(state, callback) {
+  const metaSearchQueries = [
+    'MATCH (b:BankHoliday { name: $keywords })-[l]->(d) RETURN b,l,d',
+    'MATCH (n:Person { name: $keywords })-[l]->(t:Role)-[l2]->(o:Organisation) RETURN n,l,t,l2,o',
+    'MATCH (o:Organisation { name:$keywords })-[l:HAS_SUPERSEDED|HAS_CHILD]-(n) RETURN o, l, n'
+  ];
+  state.neo4jSession.readTransaction(txc => {
+    const mainCypherQuery = searchQuery(state);
+    console.log('running cypher queries', mainCypherQuery, metaSearchQueries);
+    const mainQueryPromise = txc.run(mainCypherQuery);
+    const metaQueryPromises = metaSearchQueries
+      .map(query => txc.run(query, { keywords: state.selectedWords }));
+    Promise.allSettled([mainQueryPromise].concat(metaQueryPromises))
+    .then(results => callback({type:'neo4j-callback-ok', results }))
+    .catch(error => callback({type:'neo4j-callback-fail', error }));
+    callback({type: 'neo4j-running'});
+  });
 };
 
+//=========== private ===========
 
 const searchQuery = function(state) {
   const fieldsToSearch = [];
@@ -111,26 +98,47 @@ const searchQuery = function(state) {
     ${returnClause()}`;
 };
 
-const metaSearchQueries = [
-  // TODO: sanitize input (everywhere)
-  'MATCH (b:BankHoliday { name: $keywords })-[l]->(d) RETURN b,l,d',
-  'MATCH (n:Person { name: $keywords })-[l]->(t:Role)-[l2]->(o:Organisation) RETURN n,l,t,l2,o',
-  'MATCH (o:Organisation { name:$keywords })-[l:HAS_SUPERSEDED|HAS_CHILD]-(n) RETURN o, l, n'
-];
 
-const queryGraph = async function(query, callback) {
+//========== Private methods ==========
 
-  state.neo4jSession.readTransaction(txc => {
+const containsClause = function(field, word, caseSensitive) {
+  return caseSensitive ?
+    `(n.${field} CONTAINS "${word}")`
+  :
+    `(toLower(n.${field}) CONTAINS toLower("${word}"))`
+  ;
+}
 
-    const mainQueryPromise = txc.run(query);
-    const metaQueryPromises = metaSearchQueries
-      .map(query => txc.run(query, { keywords: state.selectedWords }));
-    Promise.allSettled([mainQueryPromise].concat(metaQueryPromises))
-    .then(results => callback({type:'neo4j-callback-ok', results }))
-    .catch(error => callback({type:'neo4j-callback-fail', error }));
-    callback({type: 'neo4j-running'});
-  });
+
+const multiContainsClause = function(fields, word, caseSensitive) {
+  return '(' + fields
+    .map(field => containsClause(field, word, caseSensitive))
+    .join(' OR ') + ')'
+}
+
+
+const returnClause = function() {
+  return `RETURN
+    'https://www.gov.uk' + n.name as url,
+    n.title AS title,
+    n.documentType AS documentType,
+    n.contentID AS contentID,
+    n.locale AS locale,
+    n.publishing_app AS publishing_app,
+    n.first_published_at AS first_published_at,
+    n.public_updated_at AS public_updated_at,
+    n.withdrawn_at AS withdrawn_at,
+    n.withdrawn_explanation AS withdrawn_explanation,
+    n.pagerank AS pagerank,
+    COLLECT (distinct taxon.name) AS taxons,
+    COLLECT (distinct o.name) AS primary_organisation,
+    COLLECT (distinct o2.name) AS all_organisations
+    ORDER BY n.pagerank DESC
+    LIMIT ${state.nbResultsLimit}`;
 };
+
+
+
 
 
 export { searchQuery, queryGraph };

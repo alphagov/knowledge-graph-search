@@ -21,7 +21,6 @@ const view = () => {
           ${viewSearchResults(state.searchResults, state.showFields)}
         </div>
       </div>
-      ${viewCypherQuery()}
     </main>
     ${viewInfoPopup()}
   `;
@@ -708,19 +707,6 @@ const viewSearchResults = () => {
   case 'no-results': return viewNoResults();
   default: return '';
   }
-};
-
-const viewCypherQuery = () => {
-  const html = [];
-  // Print the cypher query used, for the advanced user
-  if (state.searchQuery.length > 0) {
-    html.push(`
-      <div id="cypher-query">
-      <hr/><h2 class="govuk-heading-s">Cypher query (for debugging)</h2>
-      <pre>${state.searchQuery}</pre>
-    `);
-  }
-  return html.join('');
 };
 
 

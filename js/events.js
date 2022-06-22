@@ -2,7 +2,7 @@ import { state, searchState } from './state.js';
 import { id, sanitise } from './utils.js';
 import { view } from './view.js';
 import { languageCode } from './lang.js';
-import { searchQuery, queryGraph } from './neo4j.js';
+import { queryGraph } from './neo4j.js';
 
 const handleEvent = async function(event) {
   let fieldClicked;
@@ -104,8 +104,7 @@ const searchButtonClicked = async function() {
   case 'ready-to-search':
     if (state.selectedWords !== '' || state.selectedLocale !== '' || state.selectedTaxon !== '' || state.linkSearchUrl !== '') {
       state.waiting = true;
-      state.searchQuery = searchQuery(state);
-      queryGraph(state.searchQuery, handleEvent);
+      queryGraph(state, handleEvent);
     }
     break;
   case 'error':
