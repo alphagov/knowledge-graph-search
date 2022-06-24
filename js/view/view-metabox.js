@@ -45,7 +45,6 @@ const viewMetaResults = function() {
     return `
       <div class="meta-results-panel">
         <h1>${state.selectedWords} <span class="node-type">(organisation)</span></h1>
-        ${viewMetaStatementList(records, 'HAS_SUPERSEDED', 'Supersedes', 2, 'name')}
         ${viewMetaStatementList(records, 'HAS_CHILD', 'Includes', 2, 'name')}
       </div>
     `;
