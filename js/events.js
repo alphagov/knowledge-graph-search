@@ -78,7 +78,7 @@ const handleEvent = async function(event) {
   case 'neo4j-callback-fail':
     state.searchResults = null;
     state.waiting = false;
-    state.errorText = 'There was a problem querying the GovGraph. Please contact the Data Labs.';
+    state.errorText = 'There was a problem querying the GovGraph. Please contact the Data Products team.';
     console.log('neo4j-callback-fail:', event.error);
     break;
   default:

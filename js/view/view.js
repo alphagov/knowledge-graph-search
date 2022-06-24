@@ -222,7 +222,7 @@ const viewSearchPanel = () => `
       ${viewSearchButton()}
     </div>
     <div ckass="sig">
-      <p class="govuk-body">Brought to you by the Data Labs</p>
+      <p class="govuk-body">Brought to you by the Data Products team</p>
       <p class="govuk-body">Help/problem/feedback: contact <a href="mailto:max.froumentin@digital.cabinet-office.gov.uk">Max Froumentin</a></p>
     </div>
   </form>

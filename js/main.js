@@ -44,7 +44,7 @@ const init = async function() {
 Possible causes:<br/>
 - You''re not on the VPN<br/>
 - The GovGraph only runs on weekdays from 9 to 7<br/>
-Otherwise there's probably a problem. Please contact the Data Labs`;
+Otherwise there's probably a problem. Please contact the Data Products team.`;
     return;
   }
 
