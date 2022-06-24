@@ -1,6 +1,6 @@
 import { state, searchState } from './state.js';
 import { id, sanitise } from './utils.js';
-import { view } from './view.js';
+import { view } from './view/view.js';
 import { languageCode } from './lang.js';
 import { queryGraph } from './neo4j.js';
 

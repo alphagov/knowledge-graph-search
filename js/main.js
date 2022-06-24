@@ -1,6 +1,6 @@
 /* global neo4j */
 
-import { view } from './view.js';
+import { view } from './view/view.js';
 import { state, setQueryParamsFromQS } from './state.js';
 import { searchButtonClicked } from './events.js';
 
@@ -90,7 +90,6 @@ Otherwise there's probably a problem. Please contact the Data Labs`;
 //==================================================
 // START
 //==================================================
-
 
 (async () => {
   await init();
