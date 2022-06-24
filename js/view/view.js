@@ -223,7 +223,7 @@ const viewSearchPanel = () => `
     </div>
     <div ckass="sig">
       <p class="govuk-body">Brought to you by the Data Products team</p>
-      <p class="govuk-body">Help/problem/feedback: contact <a href="mailto:max.froumentin@digital.cabinet-office.gov.uk">Max Froumentin</a></p>
+      <p class="govuk-body">Help/problem/feedback: contact <a class="govuk-link" href="mailto:max.froumentin@digital.cabinet-office.gov.uk">Max Froumentin</a></p>
     </div>
   </form>
 `;
@@ -680,7 +680,7 @@ const formatDateTime = date => `${date.slice(0,10)}<br/>${date.slice(12, 16)}`;
 const fieldFormatters = {
   'url' : {
     name: 'URL',
-    format: url => `<a href="${url}">${url}</a>`
+    format: url => `<a class="govuk-link" href="${url}">${url}</a>`
   },
   'title': { name: 'Title' },
   'locale': { name: 'Language', format: languageName },
