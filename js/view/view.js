@@ -584,8 +584,6 @@ const csvFromResults = function(searchResults) {
 
 
 const viewWaiting = function() {
-  document.title = 'Searching - GovGraph search';
-
   return `
       <h2 class="govuk-heading-l">Please wait <img src="assets/images/loader.gif" height="20px" alt="loader"/></h2>
       <div class="govuk-body">Searching for ${viewQueryDescription()}</div>
@@ -609,7 +607,6 @@ const viewMetaStatementList = function(records, edgeTypeCode, edgeTypeName, targ
 const viewResults = function() {
   const html = [];
   const nbRecords = state.searchResults.records.length;
-  document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraph search`;
 
   if (state.metaSearchResults.length > 0) {
     html.push(viewMetaResults());
@@ -655,7 +652,6 @@ const viewResults = function() {
 };
 
 const viewNoResults = () => {
-  document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraph search`;
   return `
     <h2 class="govuk-heading-l">No results</h2>
     <div class="govuk-body">for ${viewQueryDescription()}</div>
@@ -663,6 +659,7 @@ const viewNoResults = () => {
 };
 
 const viewSearchResults = () => {
+  document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraph search`;
   switch(searchState().code) {
   case 'waiting': return viewWaiting();
   case 'results': return viewResults();
