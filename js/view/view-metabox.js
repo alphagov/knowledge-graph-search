@@ -2,7 +2,7 @@ import { state } from '../state.js';
 
 
 const viewMetaStatementList = function(records, edgeTypeCode, edgeTypeName, targetIndex, targetField) {
-  const statementsOfInterest = records.filter(record => record._fields[1].type == edgeTypeCode);
+  const statementsOfInterest = records.filter(record => record._fields[0] && record._fields[1] && record._fields[2] && record._fields[1].type == edgeTypeCode);
   let statementsHtml = '';
   if (statementsOfInterest.length > 0) {
     const statementListItems = statementsOfInterest
@@ -42,10 +42,11 @@ const viewMetaResults = function() {
       </div>
     `;
   } else if (nodeType === 'Organisation') {
+    const statements = viewMetaStatementList(records, 'HAS_CHILD', 'Includes', 2, 'name');
     return `
       <div class="meta-results-panel">
         <h1>${state.selectedWords} <span class="node-type">(organisation)</span></h1>
-        ${viewMetaStatementList(records, 'HAS_CHILD', 'Includes', 2, 'name')}
+        ${statements.length > 0 ? statements : '<p class="govuk-body">No sub-organisations</p>'}
       </div>
     `;
   }
