@@ -34,13 +34,16 @@ const viewMetaResults = function() {
       .map(record => {
         const roleName = record._fields[2].properties.name;
         const orgName = record._fields[4].properties.name;
-        const startDate = `${record._fields[1].properties.startDate.day.low}/${record._fields[1].properties.startDate.month.low}/${record._fields[1].properties.startDate.year.low}`
-        let endDate = null;
+        let startDate = '';
+        if (record._fields[1].properties.startDate) {
+          startDate = `${record._fields[1].properties.startDate.day.low}/${record._fields[1].properties.startDate.month.low}/${record._fields[1].properties.startDate.year.low}`
+        }
+        let endDate = '';
         if (record._fields[1].properties.endDate) {
           endDate = `${record._fields[1].properties.endDate.day.low}/${record._fields[1].properties.endDate.month.low}/${record._fields[1].properties.endDate.year.low}`
         }
-        const dates = endDate ? `${startDate}-${endDate}` : `since ${startDate}`;
-        return `<li class="">${roleName}, <a class="govuk-link" href="/?selected-words=${encodeURIComponent(orgName)}">${orgName}</a> (${dates})</li>`;
+        const dateString = (startDate !== '' || endDate !== '') ? ` (${startDate} &mdash; ${endDate})` : '';
+        return `<li class="">${roleName}, <a class="govuk-link" href="/?selected-words=${encodeURIComponent(orgName)}">${orgName}</a>${dateString}</li>`;
       })
       .join('');
     return `
