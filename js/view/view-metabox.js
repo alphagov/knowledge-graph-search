@@ -18,27 +18,36 @@ const viewMetaResults = function() {
   const records = state.metaSearchResults;
   const nodeType = records[0]._fields[0].labels[0];
   if (nodeType === 'BankHoliday') {
+    const name = records[0]._fields[0].properties.name;
     return `
       <div class="meta-results-panel">
-        <h1>${state.selectedWords} <span class="node-type">(bank holiday)</span></h1>
+        <h1>${name} <span class="node-type">(bank holiday)</span></h1>
         ${viewMetaStatementList(records, 'IS_ON', 'On', 2, 'dateString')}
         ${viewMetaStatementList(records, 'IS_OBSERVED_IN', 'Observed in', 2, 'name')}
       </div>
   `;
   } else if (nodeType === 'Person') {
+    const personName = records[0]._fields[0].properties.name;
+    const personUrl = records[0]._fields[0].properties.basePath;
     const rolesHtml = records
       .filter(record => record._fields[1].type == "HAS_ROLE")
       .map(record => {
         const roleName = record._fields[2].properties.name;
         const orgName = record._fields[4].properties.name;
-        return `<li>${roleName}, <a href="#">${orgName}</a></li>`;
+        const startDate = `${record._fields[1].properties.startDate.day.low}/${record._fields[1].properties.startDate.month.low}/${record._fields[1].properties.startDate.year.low}`
+        let endDate = null;
+        if (record._fields[1].properties.endDate) {
+          endDate = `${record._fields[1].properties.endDate.day.low}/${record._fields[1].properties.endDate.month.low}/${record._fields[1].properties.endDate.year.low}`
+        }
+        const dates = endDate ? `${startDate}-${endDate}` : `since ${startDate}`;
+        return `<li class="">${roleName}, ${orgName} (${dates})</li>`;
       })
       .join('');
     return `
       <div class="meta-results-panel">
-        <h1>${state.selectedWords} <span class="node-type">(person)</span></h1>
-        <p>Roles:</p>
-        <ul>${rolesHtml}</ul>
+        <h1 class="govuk-heading-m"><a class="govuk-link" href="https://www.gov.uk${personUrl}">${personName}</a></h1>
+        <p class="govuk-body govuk-!-font-size-16">Roles:</p>
+        <ul class="govuk-list govuk-list--bullet govuk-!-font-size-16">${rolesHtml}</ul>
       </div>
     `;
   } else if (nodeType === 'Organisation') {

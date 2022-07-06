@@ -11,9 +11,21 @@ import { splitKeywords } from './utils.js';
 
 const queryGraph = async function(state, callback) {
   const metaSearchQueries = [
-    'MATCH (b:BankHoliday { name: $keywords })-[l]->(d) RETURN b,l,d',
-    'MATCH (n:Person { name: $keywords })-[l]->(t:Role)-[l2]->(o:Organisation) RETURN n,l,t,l2,o',
-    'MATCH (o:Organisation { name:$keywords }) OPTIONAL MATCH (o)-[l:HAS_CHILD]->(n:Organisation) WHERE n.status <> "closed" RETURN o, l, n'
+    `MATCH (b:BankHoliday)-[l]->(d)
+     WHERE toLower(b.name) CONTAINS toLower($keywords)
+     RETURN b,l,d`,
+
+    `MATCH (p:Person)-[l]->(t:Role)-[l2]->(o:Organisation)
+     WHERE toLower(p.name) CONTAINS toLower($keywords)
+     RETURN p,l,t,l2,o`,
+
+    `MATCH (o:Organisation)
+     WHERE toLower(o.name) CONTAINS toLower($keywords)
+     AND o.status <> "closed"
+     WITH o
+     OPTIONAL MATCH (o)-[l:HAS_CHILD]->(n:Organisation)
+     WHERE n.status <> "closed"
+     RETURN o, l, n`
   ];
   state.neo4jSession.readTransaction(txc => {
     const mainCypherQuery = searchQuery(state);

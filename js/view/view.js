@@ -609,7 +609,11 @@ const viewResults = function() {
   const nbRecords = state.searchResults.records.length;
 
   if (state.metaSearchResults.length > 0) {
-    html.push(viewMetaResults());
+    const names = state.metaSearchResults.map(result => JSON.stringify(result._fields[0].identity));
+    const uniqueNames = names.filter((v,i,a) => a.indexOf(v) === i);
+    if (uniqueNames.length === 1) {
+      html.push(viewMetaResults());
+    }
   }
 
   if (nbRecords < state.nbResultsLimit) {
