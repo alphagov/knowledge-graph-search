@@ -55,9 +55,10 @@ const viewMetaResults = function() {
     `;
   } else if (nodeType === 'Organisation') {
     const statements = viewMetaStatementList(records, 'HAS_CHILD', 'Includes', 2, 'name');
+    const orgName = records[0]._fields[0].properties.name;
     return `
       <div class="meta-results-panel">
-        <h1>${state.selectedWords}</h1>
+        <h1>${orgName}</h1>
         ${statements.length > 0 ? statements : '<p class="govuk-body">No sub-organisations</p>'}
       </div>
     `;
