@@ -99,7 +99,6 @@ const viewBanner = () => `
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       <h1 class="govuk-heading-xl main-title">
-        <strong class="govuk-tag govuk-phase-banner__content__tag">DISCOVERY</strong><br/>
         GovGraph search
       </h1>
       <p class="govuk-body-s">Search for GOV.UK content containing keywords, links or by topic taxon.<br/>Runs only between 9am and 7pm.</p>

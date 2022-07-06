@@ -1,5 +1,8 @@
 @import "node_modules/govuk-frontend/govuk/all";
 
+.govuk-phase-banner__content__tag {
+  vertical-align: 30%;
+}
 
 .govuk-width-container {
   max-width: unset;

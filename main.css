@@ -6506,6 +6506,10 @@ x:-moz-any-link {
   }
 }
 
+.govuk-phase-banner__content__tag {
+  vertical-align: 30%;
+}
+
 .govuk-width-container {
   max-width: unset;
   margin-left: 20px;
