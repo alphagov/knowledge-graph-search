@@ -40,7 +40,7 @@ const viewMetaResults = function() {
           endDate = `${record._fields[1].properties.endDate.day.low}/${record._fields[1].properties.endDate.month.low}/${record._fields[1].properties.endDate.year.low}`
         }
         const dates = endDate ? `${startDate}-${endDate}` : `since ${startDate}`;
-        return `<li class="">${roleName}, ${orgName} (${dates})</li>`;
+        return `<li class="">${roleName}, <a class="govuk-link" href="/?selected-words=${encodeURIComponent(orgName)}">${orgName}</a> (${dates})</li>`;
       })
       .join('');
     return `
