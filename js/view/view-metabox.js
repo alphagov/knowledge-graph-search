@@ -21,7 +21,7 @@ const viewMetaResults = function() {
     const name = records[0]._fields[0].properties.name;
     return `
       <div class="meta-results-panel">
-        <h1>${name} <span class="node-type">(bank holiday)</span></h1>
+        <h1>${name}</h1>
         ${viewMetaStatementList(records, 'IS_ON', 'On', 2, 'dateString')}
         ${viewMetaStatementList(records, 'IS_OBSERVED_IN', 'Observed in', 2, 'name')}
       </div>
@@ -54,7 +54,7 @@ const viewMetaResults = function() {
     const statements = viewMetaStatementList(records, 'HAS_CHILD', 'Includes', 2, 'name');
     return `
       <div class="meta-results-panel">
-        <h1>${state.selectedWords} <span class="node-type">(organisation)</span></h1>
+        <h1>${state.selectedWords}</h1>
         ${statements.length > 0 ? statements : '<p class="govuk-body">No sub-organisations</p>'}
       </div>
     `;
