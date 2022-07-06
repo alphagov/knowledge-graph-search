@@ -239,7 +239,7 @@ const viewKeywordsInput = () => `
       ${state.waiting && 'disabled="disabled"'}
       class="govuk-input"
       id="keyword"
-      value='${sanitise(state.selectedWords).replace('"', '&quot;')}'
+      value='${sanitise(state.selectedWords)}'
     />
   </div>
 `;
