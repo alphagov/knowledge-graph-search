@@ -421,7 +421,7 @@ const viewInfoButton = id => `
 const viewTaxonSelector = () => `
   <div class="govuk-body">
     <div class="taxon-facet">
-      <label class="govuk-label label--bold" for="taxon-label">
+      <label class="govuk-label label--bold" for="taxon">
         Taxon&nbsp;${viewInfoButton('taxon')}
       </label>
       <datalist id="taxonList">
