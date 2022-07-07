@@ -230,7 +230,8 @@ const viewSearchPanel = () => `
 
 const viewKeywordsInput = () => `
   <div class="govuk-body">
-    <label for="keyword" class="govuk-label label--bold">Search keywords</label>
+    <h2 class="govuk-heading-m">Search filters</h2>
+    <label for="keyword" class="govuk-label label--bold">Keywords</label>
     <div class="govuk-hint">
       For example: cat, dog, &quot;health certificate&quot;
     </div>
@@ -276,13 +277,10 @@ const viewScopeSelector = () => {
         class="govuk-fieldset"
         ${state.waiting && 'disabled="disabled"'}
         id="search-scope-wrapper"
-        aria-describedby="scope-hint ${err ? 'scope-error' : ''}">
+        ${err ? 'aria-describedby="scope-error"' : ''}>
       <legend class="govuk-fieldset__legend">
         Keyword location
       </legend>
-      <div id="scope-hint" class="govuk-hint">
-        Select all that apply
-      </div>
       ${err ? viewInlineError('scope-error', 'Please choose at least one option') : ''}
       <div class="govuk-checkboxes" id="search-locations">
         <div class="govuk-checkboxes__item">
@@ -334,13 +332,10 @@ const viewKeywordsCombinator = () => {
         class="govuk-fieldset"
         id="combinator-wrapper"
         ${state.waiting && 'disabled="disabled"'}
-        aria-describedby="combinator-hint ${err ? 'combinator-error' : ''}">
+        ${err ? 'aria-describedby="combinator-error"' : ''}">
       <legend class="govuk-fieldset__legend">
         Search for
       </legend>
-      <div id="combinator-hint" class="govuk-hint">
-        Choose one option
-      </div>
       ${err ? viewInlineError('combinator-error', 'Please choose one option') : ''}
       <div class="govuk-radios" id="combinators">
         <div class="govuk-radios__item">
@@ -376,13 +371,10 @@ const viewPublishingAppSelector = () => {
         class="govuk-fieldset"
         id="search-areas-wrapper"
         ${state.waiting && 'disabled="disabled"'}
-        aria-describedby="area-hint ${err ? 'area-error' : ''}">
+        ${err ? 'aria-describedby="area-error"' : ''}>
       <legend class="govuk-fieldset__legend">
         Limit search
       </legend>
-      <div id="area-hint" class="govuk-hint">
-        Choose one option
-      </div>
       ${err ? viewInlineError('area-error', 'Please choose one option') : ''}
       <div class="govuk-radios" id="site-areas">
         <div class="govuk-radios__item">
