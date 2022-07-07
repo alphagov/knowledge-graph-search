@@ -72,8 +72,12 @@ const view = () => {
     view();
   });
 
-  // focus any modal
+  // focus on the results heading if present
+  id('results-heading')?.focus();
+
+  // or any modal
   id('info-popup')?.focus();
+
 };
 
 
@@ -288,7 +292,7 @@ const viewResults = function() {
 
   if (nbRecords < state.nbResultsLimit) {
     html.push(`
-      <h2 class="govuk-heading-l">${nbRecords} result${nbRecords!==0 ? 's' : ''}</h2>`);
+      <h2 tabindex="0" id="results-heading" class="govuk-heading-l">${nbRecords} result${nbRecords!==0 ? 's' : ''}</h2>`);
   } else {
     html.push(`
       <div class="govuk-warning-text">
@@ -331,7 +335,7 @@ const viewResults = function() {
 
 const viewNoResults = () => {
   return `
-    <h2 class="govuk-heading-l">No results</h2>
+    <h2 tabindex="0" id="results-heading" class="govuk-heading-l">No results</h2>
     <div class="govuk-body">for ${viewQueryDescription()}</div>
   `;
 };
