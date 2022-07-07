@@ -415,7 +415,7 @@ const viewPublishingAppSelector = () => {
 };
 
 const viewInfoButton = id => `
-  <img class="info-button" id="info-button-${id}" src="assets/images/question-mark.svg" alt="question mark"/>
+  <img class="info-button" id="info-button-${id}" src="assets/images/question-mark.svg" alt="Show more information"/>
 `;
 
 const viewTaxonSelector = () => `
