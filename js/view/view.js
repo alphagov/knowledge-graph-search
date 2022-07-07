@@ -305,7 +305,10 @@ const viewResults = function() {
 
   if (nbRecords >= state.resultsPerPage) {
     html.push(`
-      <p class="govuk-body">Showing results ${state.skip + 1} to ${Math.min(nbRecords, state.skip + state.resultsPerPage)}</p>`);
+      <p class="govuk-body">Showing results ${state.skip + 1} to ${Math.min(nbRecords, state.skip + state.resultsPerPage)}</p>
+      <a class="govuk-skip-link" href="#results-table">Skip to results</a>
+      <a class="govuk-skip-link" href="#search-form">Back to search filters</a>
+`);
   }
   html.push(viewSearchResultsTable());
 

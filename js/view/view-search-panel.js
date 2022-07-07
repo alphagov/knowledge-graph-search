@@ -8,6 +8,7 @@ const viewSearchPanel = () => `
   <form id="search-form" class="search-panel govuk-form">
     <div class="search-mode-panel">
       <h2 class="govuk-heading-m">Search filters</h2>
+      <a class="govuk-skip-link" href="#results-table">Skip to results</a>
       ${viewKeywordsInput()}
       ${viewKeywordsCombinator()}
       ${viewExclusionsInput()}
