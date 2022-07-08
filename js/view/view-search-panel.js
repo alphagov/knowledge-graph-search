@@ -1,4 +1,4 @@
-import { sanitise } from '../utils.js';
+import { sanitiseOutput } from '../utils.js';
 import { state, searchState } from '../state.js';
 import { viewInfoButton } from './view-components.js';
 import { languageName } from '../lang.js';
@@ -274,7 +274,7 @@ const viewKeywordsInput = () => `
       ${state.waiting && 'disabled="disabled"'}
       class="govuk-input"
       id="keyword"
-      value='${sanitise(state.selectedWords)}'
+      value='${sanitiseOutput(state.selectedWords)}'
     />
   </div>
 `;
@@ -291,7 +291,7 @@ const viewExclusionsInput = () => `
     <input class="govuk-input"
         ${state.waiting && 'disabled="disabled"'}
         id="excluded-keyword"
-        value='${sanitise(state.excludedWords).replace('"', '&quot;')}'/>
+        value='${sanitiseOutput(state.excludedWords).replace('"', '&quot;')}'/>
   </div>
 `;
 

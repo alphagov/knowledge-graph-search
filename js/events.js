@@ -1,5 +1,5 @@
 import { state, searchState } from './state.js';
-import { id, sanitise } from './utils.js';
+import { id, sanitiseInput } from './utils.js';
 import { view } from './view/view.js';
 import { languageCode } from './lang.js';
 import { queryGraph } from './neo4j.js';
@@ -11,14 +11,15 @@ const handleEvent = async function(event) {
     case 'dom':
       switch(event.id) {
       case 'search':
-        state.selectedWords = sanitise(id('keyword').value);
-        state.excludedWords = sanitise(id('excluded-keyword').value);
-        state.selectedTaxon = sanitise(id('taxon').value);
-        state.selectedLocale = sanitise(id('locale').value);
+        state.selectedWords = sanitiseInput(id('keyword').value);
+        console.log(state.selectedWords)
+        state.excludedWords = sanitiseInput(id('excluded-keyword').value);
+        state.selectedTaxon = sanitiseInput(id('taxon').value);
+        state.selectedLocale = sanitiseInput(id('locale').value);
         state.whereToSearch.title = id('search-title').checked;
         state.whereToSearch.text = id('search-text').checked;
         state.caseSensitive = id('case-sensitive').checked;
-        state.linkSearchUrl = sanitise(id('link-search').value);
+        state.linkSearchUrl = sanitiseInput(id('link-search').value);
         state.skip = 0; // reset to first page
         if (id('area-mainstream').checked) state.areaToSearch = 'mainstream';
         if (id('area-whitehall').checked) state.areaToSearch = 'whitehall';

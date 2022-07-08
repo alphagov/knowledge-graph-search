@@ -32,7 +32,7 @@ const queryGraph = async function(state, callback) {
     console.log('running cypher queries', mainCypherQuery, metaSearchQueries);
     const mainQueryPromise = txc.run(mainCypherQuery);
     const metaQueryPromises = metaSearchQueries
-      .map(query => txc.run(query, { keywords: state.selectedWords }));
+      .map(query => txc.run(query, { keywords: state.selectedWords.replace(/"/g,'')}));
     Promise.allSettled([mainQueryPromise].concat(metaQueryPromises))
     .then(results => callback({type:'neo4j-callback-ok', results }))
     .catch(error => callback({type:'neo4j-callback-fail', error }));

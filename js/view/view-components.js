@@ -1,5 +1,5 @@
 import { state } from '../state.js';
-import { sanitise } from '../utils.js';
+import { sanitiseOutput } from '../utils.js';
 
 
 const viewInfoPopup = () => {
@@ -10,8 +10,8 @@ const viewInfoPopup = () => {
         <dialog class="info-popup--panel" id="info-popup" aria-modal="true" role="dialog" tabindex="0">
           <div class="info-popup--header">${viewCrownSymbol()}</div>
           <div class="info-popup--content">
-          <h1 class="govuk-heading-m">${sanitise(state.infoPopupHtml?.title)}</h1>
-            <p class="govuk-body">${sanitise(state.infoPopupHtml?.body)}</h1>
+          <h1 class="govuk-heading-m">${sanitiseOutput(state.infoPopupHtml?.title)}</h1>
+            <p class="govuk-body">${sanitiseOutput(state.infoPopupHtml?.body)}</h1>
             <button type="button" class="info-popup--button" id="info-popup-close" aria-label="Close modal dialogue">×</button>
           </div>
         </dialog>

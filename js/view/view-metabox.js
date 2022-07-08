@@ -43,7 +43,7 @@ const viewMetaResults = function() {
           endDate = `${record._fields[1].properties.endDate.day.low}/${record._fields[1].properties.endDate.month.low}/${record._fields[1].properties.endDate.year.low}`
         }
         const dateString = (startDate !== '' || endDate !== '') ? ` (${startDate} &mdash; ${endDate})` : '';
-        return `<li class="">${roleName}, <a class="govuk-link" href="/?selected-words=${encodeURIComponent(orgName)}">${orgName}</a>${dateString}</li>`;
+        return `<li class="">${roleName}, <a class="govuk-link" href="/?selected-words=${encodeURIComponent(`"${orgName}"`)}">${orgName}</a>${dateString}</li>`;
       })
       .join('');
     return `

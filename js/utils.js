@@ -1,6 +1,33 @@
 const id = x => document.getElementById(x);
 
-const sanitise = function(text) {
+const tagBody = '(?:[^"\'>]|"[^"]*"|\'[^\']*\')*';
+
+const tagOrComment = new RegExp(
+    '<(?:'
+    // Comment body.
+    + '!--(?:(?:-*[^->])*--+|-?)'
+    // Special "raw text" elements whose content should be elided.
+    + '|script\\b' + tagBody + '>[\\s\\S]*?</script\\s*'
+    + '|style\\b' + tagBody + '>[\\s\\S]*?</style\\s*'
+    // Regular name
+    + '|/?[a-z]'
+    + tagBody
+    + ')>',
+    'gi');
+
+
+const sanitiseInput = function(text) {
+  // remove text that could lead to script injections
+  let oldText;
+  do {
+    oldText = text;
+    text = text.replace(tagOrComment, '');
+  } while (text !== oldText);
+  return text.replace(/</g, '&lt;').replace(/""*/g, '"');
+};
+
+
+const sanitiseOutput = function(text) {
   const escapeHTML = str => new Option(str).innerHTML;
   return escapeHTML(text)
     .replace(/'/g, '&apos;')
@@ -22,4 +49,4 @@ const splitKeywords = function(keywords) {
 };
 
 
-export { id, sanitise, splitKeywords };
+export { id, sanitiseInput, sanitiseOutput, splitKeywords };
