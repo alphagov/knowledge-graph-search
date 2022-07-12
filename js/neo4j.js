@@ -74,10 +74,10 @@ const searchQuery = function(state) {
 
   const taxon = state.selectedTaxon;
   const taxonClause = taxon ? `WITH n
-    MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)
+    MATCH (n:Page)-[:IS_TAGGED_TO]->(taxon:Taxon)
     MATCH (taxon:Taxon)-[:HAS_PARENT*]->(ancestor_taxon:Taxon)
     WHERE taxon.name = "${taxon}" OR ancestor_taxon.name = "${taxon}"` :
-    `OPTIONAL MATCH (n:Cid)-[:IS_TAGGED_TO]->(taxon:Taxon)`;
+    `OPTIONAL MATCH (n:Page)-[:IS_TAGGED_TO]->(taxon:Taxon)`;
 
   let linkClause = '';
 
@@ -87,26 +87,26 @@ const searchQuery = function(state) {
     if (internalLinkRexExp.test(state.linkSearchUrl)) {
       linkClause = `
         WITH n, taxon
-        MATCH (n:Cid)-[:HYPERLINKS_TO]->(n2:Cid)
-        WHERE n2.name = "${state.linkSearchUrl.replace(internalLinkRexExp, '/')}"`
+        MATCH (n:Page)-[:HYPERLINKS_TO]->(n2:Page)
+        WHERE n2.url = "${state.linkSearchUrl.replace(internalLinkRexExp, '/')}"`
     } else {
       linkClause = `
         WITH n, taxon
-        MATCH (n:Cid) -[:HYPERLINKS_TO]-> (e:ExternalPage)
-        WHERE e.name CONTAINS "${state.linkSearchUrl}"`
+        MATCH (n:Page) -[:HYPERLINKS_TO]-> (e:ExternalPage)
+        WHERE e.url CONTAINS "${state.linkSearchUrl}"`
     }
   }
 
   return `
-    MATCH (n:Cid)
+    MATCH (n:Page)
     ${inclusionClause}
     ${exclusionClause}
     ${localeClause}
     ${areaClause}
     ${taxonClause}
     ${linkClause}
-    OPTIONAL MATCH (n:Cid)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
-    OPTIONAL MATCH (n:Cid)-[:HAS_ORGANISATIONS]->(o2:Organisation)
+    OPTIONAL MATCH (n:Page)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
+    OPTIONAL MATCH (n:Page)-[:HAS_ORGANISATIONS]->(o2:Organisation)
     ${returnClause()}`;
 };
 
@@ -131,7 +131,7 @@ const multiContainsClause = function(fields, word, caseSensitive) {
 
 const returnClause = function() {
   return `RETURN
-    'https://www.gov.uk' + n.name as url,
+    n.url as url,
     n.title AS title,
     n.documentType AS documentType,
     n.contentID AS contentID,

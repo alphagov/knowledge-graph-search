@@ -72,7 +72,7 @@ Otherwise there's probably a problem. Please contact the Data Products team.`;
   // get the list of all locales
   try {
     const locales = await state.neo4jSession.readTransaction(tx =>
-      tx.run('MATCH (n:Cid) WHERE n.locale <> "en" AND n.locale <> "cy" RETURN DISTINCT n.locale')
+      tx.run('MATCH (n:Page) WHERE n.locale <> "en" AND n.locale <> "cy" RETURN DISTINCT n.locale')
     );
     state.locales = locales.records.map(locale => locale._fields[0]).sort();
     state.locales = ['', 'en', 'cy'].concat(state.locales);
