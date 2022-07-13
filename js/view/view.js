@@ -236,7 +236,9 @@ const csvFromResults = function(searchResults) {
 
 const viewWaiting = function() {
   return `
-      <h2 class="govuk-heading-l">Please wait <img src="assets/images/loader.gif" height="20px" alt="loader"/></h2>
+      <h2 class="govuk-heading-l" aria-live="assertive">
+        Please wait <img src="assets/images/loader.gif" height="20px" alt="loader"/>
+      </h2>
       <div class="govuk-body">Searching for ${viewQueryDescription()}</div>
       <p class="govuk-body-s">Please note that some queries take up to one minute</p>`;
 };
