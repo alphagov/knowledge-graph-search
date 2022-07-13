@@ -1,7 +1,7 @@
 import { sanitiseOutput } from '../utils.js';
 import { state, searchState } from '../state.js';
-import { viewInfoButton } from './view-components.js';
 import { languageName } from '../lang.js';
+import { viewInfoButton } from './view-components.js';
 
 
 const viewSearchPanel = () => `

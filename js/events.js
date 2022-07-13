@@ -44,7 +44,6 @@ const handleEvent = async function(event) {
         state.searchResults = null;
         state.searchQuery = '';
         state.waiting = false;
-        state.infoPopupHtml = null;
         state.combinator = 'all';
         break;
       case 'button-next-page':

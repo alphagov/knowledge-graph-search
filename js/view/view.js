@@ -4,14 +4,14 @@ import { handleEvent } from '../events.js';
 import { languageName } from '../lang.js';
 import { viewMetaResults } from './view-metabox.js';
 import { viewSearchPanel } from './view-search-panel.js';
-import { viewInfoButton, viewInfoPopup } from './view-components.js';
+import { viewInfoButton } from './view-components.js';
 
 
 const view = () => {
   console.log('view')
   document.title = 'GovGraph search';
   id('page-content').innerHTML = `
-    <main class="govuk-main-wrapper" ${state.infoPopupHtml ? 'style="filter: blur(2px)"' : ''} id="main-content" role="main">
+    <main class="govuk-main-wrapper" id="main-content" role="main">
       ${viewBanner()}
       ${viewErrorBanner()}
       <div class="govuk-grid-row">
@@ -23,7 +23,6 @@ const view = () => {
         </div>
       </div>
     </main>
-    ${viewInfoPopup()}
   `;
 
 
@@ -40,43 +39,8 @@ const view = () => {
       handleEvent({type: 'dom', id: 'search'});
     });
 
-  document.getElementById('info-popup-close')?.addEventListener(
-    'click',
-    () => {
-      state.infoPopupHtml = null;
-      view();
-    });
-
-  id('info-button-content').addEventListener('click', () => {
-    state.infoPopupHtml = { title: 'Keyword location: body content', 'body': 'This includes Whitehall summary and Mainstream meta tag description.' };
-    view();
-  });
-
-  id('info-button-link').addEventListener('click', () => {
-    state.infoPopupHtml = { title: 'Link search', 'body': 'This only looks for links in the body content and not related links.' };
-    view();
-  });
-
-  id('info-button-taxon').addEventListener('click', () => {
-    state.infoPopupHtml = { title: 'Taxon', 'body': 'Searches include the selected topic taxon and all its child taxons.' };
-    view();
-  });
-
-  id('info-button-mainstream').addEventListener('click', () => {
-    state.infoPopupHtml = { title: 'Mainstream Publisher', 'body': 'Results show under the main guide URL not as individual chapters.' };
-    view();
-  });
-
-  id('info-button-popularity')?.addEventListener('click', () => {
-    state.infoPopupHtml = { title: 'Sorted by popularity', 'body': 'The popularity score is based on the number of onsite links to the page and 3 weeks of Google Analytics traffic. A higher score means greater popularity.' };
-    view();
-  });
-
   // focus on the results heading if present
   id('results-heading')?.focus();
-
-  // or any modal
-  id('info-popup')?.focus();
 
 };
 
