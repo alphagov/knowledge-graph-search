@@ -237,7 +237,7 @@ const csvFromResults = function(searchResults) {
 
 const viewWaiting = function() {
   return `
-      <h2 class="govuk-heading-l" aria-live="assertive">
+      <h2 class="govuk-heading-l" id="results-heading" aria-live="assertive">
         Please wait <img src="assets/images/loader.gif" height="20px" alt="loader"/>
       </h2>
       <div class="govuk-body">Searching for ${viewQueryDescription()}</div>
