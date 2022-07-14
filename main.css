@@ -6631,6 +6631,10 @@ pre {
   border-width: 3px;
 }
 
+h2:focus-visible {
+  outline: none;
+}
+
 label.govuk-label.label--bold, legend.govuk-fieldset__legend {
   font-weight: bold;
 }
