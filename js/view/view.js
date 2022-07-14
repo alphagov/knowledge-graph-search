@@ -163,7 +163,7 @@ const viewSearchResultsTable = () => {
   html.push(`
     <div class="govuk-body">
       <fieldset class="govuk-fieldset" ${state.waiting && 'disabled="disabled"'}>
-        <legend class="govuk-fieldset__legend">Show with</legend>
+        <legend class="govuk-fieldset__legend">For each result, display:</legend>
         <ul class="kg-checkboxes" id="show-fields">`);
   html.push(recordsToShow[0].keys.map(key => `
           <li class="kg-checkboxes__item">
