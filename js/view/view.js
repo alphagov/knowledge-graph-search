@@ -178,17 +178,18 @@ const viewSearchResultsTable = () => {
       </fieldset>
       <table id="results-table" class="govuk-table">
         <tbody class="govuk-table__body">
-        <tr class="govuk-table__row">`);
-
+        <tr class="govuk-table__row">
+          <th scope="col" class="a11y-hidden">Page</th>`);
   recordsToShow[0].keys.forEach(key => {
     if (state.showFields[key]) {
       html.push(`<th scope="col" class="govuk-table__header">${fieldName(key)}</th>`);
     }
   });
 
-  recordsToShow.forEach(record => {
-    html.push(`<tr class="govuk-table__row">`);
-
+  recordsToShow.forEach((record, recordIndex) => {
+    html.push(`
+      <tr class="govuk-table__row">
+        <th class="a11y-hidden">${recordIndex}</th>`);
     record._fields.forEach((val, idx) => {
       if (state.showFields[record.keys[idx]]) {
         html.push(`<td class="govuk-table__cell">${fieldFormat(record.keys[idx], val)}</td>`);
