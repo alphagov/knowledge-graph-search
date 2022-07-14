@@ -6560,6 +6560,10 @@ x:-moz-any-link {
   margin-bottom: 0;
 }
 
+.a11y-hidden {
+  display: none;
+}
+
 h1.initial {
   margin-top: 20px;
 }
