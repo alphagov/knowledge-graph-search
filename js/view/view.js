@@ -309,12 +309,19 @@ const viewNoResults = () => {
 
 
 const viewSearchResults = () => {
-  document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraph search`;
   switch(searchState().code) {
-  case 'waiting': return viewWaiting();
-  case 'results': return viewResults();
-  case 'no-results': return viewNoResults();
-  default: return '';
+  case 'waiting':
+    document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraph search`;
+    return viewWaiting();
+  case 'results':
+    document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraph search`;
+    return viewResults();
+  case 'no-results':
+    document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraph search`;
+    return viewNoResults();
+  default:
+    document.title = 'GovGraph search';
+    return '';
   }
 };
 
