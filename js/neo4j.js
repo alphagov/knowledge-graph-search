@@ -88,7 +88,7 @@ const searchQuery = function(state) {
       linkClause = `
         WITH n, taxon
         MATCH (n:Page)-[:HYPERLINKS_TO]->(n2:Page)
-        WHERE n2.url = "${state.linkSearchUrl.replace(internalLinkRexExp, '/')}"`
+        WHERE n2.url = "https://www.gov.uk${state.linkSearchUrl.replace(internalLinkRexExp, '/')}"`
     } else {
       linkClause = `
         WITH n, taxon
