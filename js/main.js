@@ -11,7 +11,10 @@ import { searchButtonClicked } from './events.js';
 //==================================================
 
 const init = async function() {
-  // First, look if there's a file with authentication params
+  // decide if we're showing the feedback banner
+  state.displayFeedbackBanner = !document.cookie.includes('feedback_banner_dismissed=true');
+
+  // Look if there's a file with authentication params
   await fetch('params.json')
     .then(async response => {
       const data = await response.json();
@@ -42,7 +45,7 @@ const init = async function() {
     console.log('connectivity check failed', e);
     state.errorText = `Error connecting to the GovGraph.<br/>
 Possible causes:<br/>
-- You''re not on the VPN<br/>
+- You're not on the VPN<br/>
 - The GovGraph only runs on weekdays from 9 to 7<br/>
 Otherwise there's probably a problem. Please contact the Data Products team.`;
     return;

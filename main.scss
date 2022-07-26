@@ -29,6 +29,7 @@ h1.initial {
 
 h1.main-title {
   margin-bottom: 0;
+  margin-top: 30px;
   p {
     margin-top: 10px;
     margin-bottom: 0;
@@ -157,4 +158,38 @@ label.govuk-label.label--bold, legend.govuk-fieldset__legend {
 
 .info-button {
   vertical-align: bottom;
+}
+
+.feedback-banner {
+  background: $govuk-brand-colour;
+  margin-top: -10px;
+  margin-left: -20px;
+  margin-right: -20px;
+  padding: 40px 20px 40px 20px;
+  &-rule {
+    border-top: 1px solid #ccc;
+    margin: 5px 15px 30px 15px;
+  }
+  h2, .govuk-body {
+    color: white;
+    margin-bottom: 20px;
+  }
+  .govuk-button {
+    background: white;
+    color: $govuk-brand-colour;
+    border: none;
+    font-weight: 700;
+    padding-left: 30px;
+    padding-right: 30px;
+    margin-right: 10px;
+    vertical-align: sub;
+  }
+  button {
+    background: $govuk-brand-colour;
+    color: white;
+    border: none;
+    vertical-align: sub;
+    text-decoration: underline;
+    font-size: 16px;
+  }
 }

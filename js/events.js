@@ -54,6 +54,10 @@ const handleEvent = async function(event) {
         state.skip = Math.max(state.skip - state.resultsPerPage, 0);
         updateUrl();
         break;
+      case 'dismiss-feedback-banner':
+        state.displayFeedbackBanner = false;
+        document.cookie = 'feedback_banner_dismissed=true';
+        break;
       default:
         fieldClicked = event.id.match(/show-field-(.*)/);
         if (fieldClicked) {

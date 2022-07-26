@@ -4,7 +4,7 @@ import { handleEvent } from '../events.js';
 import { languageName } from '../lang.js';
 import { viewMetaResults } from './view-metabox.js';
 import { viewSearchPanel } from './view-search-panel.js';
-import { viewInfoButton } from './view-components.js';
+import { viewInfoButton, viewFeedbackBanner } from './view-components.js';
 
 
 const view = () => {
@@ -12,7 +12,8 @@ const view = () => {
   document.title = 'GovGraph search';
   id('page-content').innerHTML = `
     <main class="govuk-main-wrapper" id="main-content" role="main">
-      ${viewBanner()}
+      ${state.displayFeedbackBanner ? viewFeedbackBanner() : ''}
+      ${viewTitle()}
       ${viewErrorBanner()}
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-third">
@@ -27,7 +28,7 @@ const view = () => {
 
 
   // Add event handlers
-  document.querySelectorAll('button.govuk-button, input[type=checkbox][data-interactive=true]')
+  document.querySelectorAll('#dismiss-feedback-banner, button.govuk-button, input[type=checkbox][data-interactive=true]')
     .forEach(input => input.addEventListener(
       'click',
       event => handleEvent({type: 'dom', id: event.target.getAttribute('id')})));
@@ -45,7 +46,7 @@ const view = () => {
 };
 
 
-const viewBanner = () => `
+const viewTitle = () => `
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       <h1 class="govuk-heading-xl main-title">
