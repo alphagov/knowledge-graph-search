@@ -11,6 +11,14 @@ const handleEvent = async function(event) {
     case 'dom':
       switch(event.id) {
       case 'search':
+        // Tell GTM a search is starting
+        window.dataLayer.push({
+          'event': 'formSubmission',
+          'formType': 'Search',
+          'formPosition': 'Page'
+        });
+
+        // Update the state
         state.selectedWords = sanitiseInput(id('keyword').value);
         console.log(state.selectedWords)
         state.excludedWords = sanitiseInput(id('excluded-keyword').value);

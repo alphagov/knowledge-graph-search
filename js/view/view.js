@@ -33,10 +33,18 @@ const view = () => {
       'click',
       event => handleEvent({type: 'dom', id: event.target.getAttribute('id')})));
 
+  // Not sure this is even fired, since browser blocks submit because "the form is not connected"
   document.getElementById('search-form').addEventListener(
     'submit',
     event => {
       event.preventDefault();
+      // Tell GTM the form was submitted
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        'event': 'formSubmission',
+        'formType': 'Search',
+        'formPosition': 'Page'
+      });
       handleEvent({type: 'dom', id: 'search'});
     });
 
