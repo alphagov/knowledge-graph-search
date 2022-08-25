@@ -1,65 +1,92 @@
 import { state } from '../state.js';
 
 
-const viewMetaStatementList = function(records, edgeTypeCode, edgeTypeName, targetIndex, targetField) {
-  const statementsOfInterest = records.filter(record => record._fields[0] && record._fields[1] && record._fields[2] && record._fields[1].type == edgeTypeCode);
-  let statementsHtml = '';
-  if (statementsOfInterest.length > 0) {
-    const statementListItems = statementsOfInterest
-      .map(statement => `<li>${statement._fields[targetIndex].properties[targetField]}</li>`)
-      .join('');
-    statementsHtml = `<p>${edgeTypeName}:</p><ul>${statementListItems}</ul>`;
-  }
-  return statementsHtml;
+const viewOrgSubOrg = function(subOrg) {
+  return `<li><a href="${subOrg.url}">${subOrg.name}</a></li>`;
+};
+
+const viewOrgSubOrgs = function(subOrgList) {
+  return `
+    <details class="govuk-details" data-module="govuk-details">
+      <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">
+          Sub organisations
+        </span>
+      </summary>
+      <div class="govuk-details__text">
+        <ul class="govuk-list">${subOrgList.map(viewOrgSubOrg).join('')}</ul>
+      </div>
+    </details>`;
+};
+
+const viewPersonRoles = function(roles) {
+  return `
+    <details class="govuk-details" data-module="govuk-details">
+      <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">
+          Roles
+        </span>
+      </summary>
+      <div class="govuk-details__text">
+        <ul class="govuk-list">${roles.map(role => `<li>${role.name} as <a href="${role.orgUrl}">${role.orgName}</a></li>`).join('')}</ul>
+      </div>
+    </details>`;
 }
 
+const viewBankHolidayDetails = function(holiday) {
+  return `
+    <details class="govuk-details" data-module="govuk-details">
+      <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">
+          Dates
+        </span>
+      </summary>
+      <div class="govuk-details__text">
+        <ul class="govuk-list">
+          ${holiday.dates.map(dateString => `<li>${dateString}</li>`).join('')}
+        </ul>
+      </div>
+    </details>
+    <details class="govuk-details" data-module="govuk-details">
+      <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">
+          Observed in
+        </span>
+      </summary>
+      <div class="govuk-details__text">
+        <ul class="govuk-list">
+          ${holiday.regions.map(region => `<li>${region}</li>`).join('')}
+        </ul>
+      </div>
+    </details>
+  `;
+};
 
 const viewMetaResults = function() {
-  const records = state.metaSearchResults;
-  const nodeType = records[0]._fields[0].labels[0];
-  if (nodeType === 'BankHoliday') {
-    const name = records[0]._fields[0].properties.name;
+  const record = state.metaSearchResults[0];
+
+  if (record.type === 'BankHoliday') {
     return `
       <div class="meta-results-panel">
-        <h1>${name}</h1>
-        ${viewMetaStatementList(records, 'IS_ON', 'On', 2, 'dateString')}
-        ${viewMetaStatementList(records, 'IS_OBSERVED_IN', 'Observed in', 2, 'name')}
+        <h1>${record.name}</h1>
+        ${viewBankHolidayDetails(record)}
       </div>
   `;
-  } else if (nodeType === 'Person') {
-    const personName = records[0]._fields[0].properties.name;
-    const personUrl = records[0]._fields[0].properties.basePath;
-    const rolesHtml = records
-      .filter(record => record._fields[1].type == "HAS_ROLE")
-      .map(record => {
-        const roleName = record._fields[2].properties.name;
-        const orgName = record._fields[4].properties.name;
-        let startDate = '';
-        if (record._fields[1].properties.startDate) {
-          startDate = `${record._fields[1].properties.startDate.day.low}/${record._fields[1].properties.startDate.month.low}/${record._fields[1].properties.startDate.year.low}`
-        }
-        let endDate = '';
-        if (record._fields[1].properties.endDate) {
-          endDate = `${record._fields[1].properties.endDate.day.low}/${record._fields[1].properties.endDate.month.low}/${record._fields[1].properties.endDate.year.low}`
-        }
-        const dateString = (startDate !== '' || endDate !== '') ? ` (${startDate} &mdash; ${endDate})` : '';
-        return `<li class="">${roleName}, <a class="govuk-link" href="/?selected-words=${encodeURIComponent(`"${orgName}"`)}">${orgName}</a>${dateString}</li>`;
-      })
-      .join('');
+  } else if (record.type === 'Person') {
+    const personName = record.name;
+    const personUrl = record.basePath;
     return `
       <div class="meta-results-panel">
         <h1 class="govuk-heading-m"><a class="govuk-link" href="https://www.gov.uk${personUrl}">${personName}</a></h1>
-        <p class="govuk-body govuk-!-font-size-16">Roles:</p>
-        <ul class="govuk-list govuk-list--bullet govuk-!-font-size-16">${rolesHtml}</ul>
+        ${record.roles && record.roles.length > 0 ? viewPersonRoles(record.roles) : ''}
       </div>
     `;
-  } else if (nodeType === 'Organisation') {
-    const statements = viewMetaStatementList(records, 'HAS_CHILD', 'Includes', 2, 'name');
-    const orgName = records[0]._fields[0].properties.name;
+  } else if (record.type === 'Organisation') {
+    const orgName = record.name;
     return `
       <div class="meta-results-panel">
         <h1>${orgName}</h1>
-        ${statements.length > 0 ? statements : '<p class="govuk-body">No sub-organisations</p>'}
+        ${record.subOrgs && record.subOrgs.length > 0 ? viewOrgSubOrgs(record.subOrgs) : '<p class="govuk-body">No sub-organisations</p>'}
       </div>
     `;
   }

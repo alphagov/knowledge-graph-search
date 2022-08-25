@@ -12,7 +12,7 @@ const handleEvent = async function(event) {
       switch(event.id) {
       case 'search':
         // Tell GTM a search is starting
-        window.dataLayer.push({
+        window.dataLayer?.push({
           'event': 'formSubmission',
           'formType': 'Search',
           'formPosition': 'Page'
@@ -81,9 +81,8 @@ const handleEvent = async function(event) {
     state.waiting = true;
     break;
   case 'neo4j-callback-ok':
-    state.searchResults = event.results[0].value;
-    var otherResults = event.results.slice(1).filter(result => result.value.records.length > 0);
-    state.metaSearchResults = otherResults.length > 0 ? otherResults[0].value.records : [];
+    state.searchResults = event.results.main;
+    state.metaSearchResults = event.results.meta;
     state.waiting = false;
     state.errorText = null;
     break;

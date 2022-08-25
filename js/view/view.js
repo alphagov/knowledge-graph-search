@@ -167,14 +167,13 @@ const viewErrorBanner = () => {
 
 const viewSearchResultsTable = () => {
   const html = [];
-
-  const recordsToShow = state.searchResults.records.slice(state.skip, state.skip + state.resultsPerPage);
+  const recordsToShow = state.searchResults.slice(state.skip, state.skip + state.resultsPerPage);
   html.push(`
     <div class="govuk-body">
       <fieldset class="govuk-fieldset" ${state.waiting && 'disabled="disabled"'}>
         <legend class="govuk-fieldset__legend">For each result, display:</legend>
         <ul class="kg-checkboxes" id="show-fields">`);
-  html.push(recordsToShow[0].keys.map(key => `
+  html.push(Object.keys(state.searchResults[0]).map(key => `
           <li class="kg-checkboxes__item">
             <input class="kg-checkboxes__input"
                    data-interactive="true"
@@ -189,7 +188,7 @@ const viewSearchResultsTable = () => {
         <tbody class="govuk-table__body">
         <tr class="govuk-table__row">
           <th scope="col" class="a11y-hidden">Page</th>`);
-  recordsToShow[0].keys.forEach(key => {
+  Object.keys(state.showFields).forEach(key => {
     if (state.showFields[key]) {
       html.push(`<th scope="col" class="govuk-table__header">${fieldName(key)}</th>`);
     }
@@ -199,9 +198,9 @@ const viewSearchResultsTable = () => {
     html.push(`
       <tr class="govuk-table__row">
         <th class="a11y-hidden">${recordIndex}</th>`);
-    record._fields.forEach((val, idx) => {
-      if (state.showFields[record.keys[idx]]) {
-        html.push(`<td class="govuk-table__cell">${fieldFormat(record.keys[idx], val)}</td>`);
+    Object.keys(state.showFields).forEach(key => {
+      if (state.showFields[key]) {
+        html.push(`<td class="govuk-table__cell">${fieldFormat(key, record[key])}</td>`);
       }
     });
     html.push(`</tr>`);
@@ -216,13 +215,13 @@ const viewSearchResultsTable = () => {
 
 const csvFromResults = function(searchResults) {
   const csv = [];
-  if (searchResults && searchResults.records.length > 0) {
-    // column headings:
-    csv.push(searchResults.records[0].keys.map(fieldName).join())
+  if (searchResults && searchResults.length > 0) {
+    // column headings: take them from the first record
+    csv.push(Object.keys(searchResults[0]).map(fieldName).join())
     // rows:
-    searchResults.records.forEach(record => {
+    searchResults.forEach(record => {
       const line = [];
-      record._fields.forEach(field => {
+      Object.keys(record).forEach(field => {
         if (field) {
           field = field.toString();
           if (field.includes(',')) {
@@ -256,10 +255,10 @@ const viewWaiting = function() {
 
 const viewResults = function() {
   const html = [];
-  const nbRecords = state.searchResults.records.length;
+  const nbRecords = state.searchResults.length;
 
   if (state.metaSearchResults.length > 0) {
-    const names = state.metaSearchResults.map(result => JSON.stringify(result._fields[0].identity));
+    const names = state.metaSearchResults.map(result => result.name);
     const uniqueNames = names.filter((v,i,a) => a.indexOf(v) === i);
     if (uniqueNames.length === 1) {
       html.push(viewMetaResults());
