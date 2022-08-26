@@ -55,8 +55,8 @@ const buildMetaboxInfo = async function(info) {
     await state.neo4jSession.readTransaction(async txc => {
       const resultsDates = await txc.run(
         `MATCH (b:BankHoliday)-[:IS_ON]->(d)
-                 WHERE b.name = $name
-                 RETURN d`,
+         WHERE b.name = $name
+         RETURN d`,
         { name: info.name }
       );
       result.dates = resultsDates.records.map(record => record._fields[0].properties.dateString);
@@ -64,8 +64,8 @@ const buildMetaboxInfo = async function(info) {
     await state.neo4jSession.readTransaction(async txc => {
       const resultsRegions = await txc.run(
         `MATCH (b:BankHoliday)-[:IS_OBSERVED_IN]->(r)
-                 WHERE b.name = $name
-                 RETURN r`,
+         WHERE b.name = $name
+         RETURN r`,
         { name: info.name }
       );
       result.regions = resultsRegions.records.map(record => record._fields[0].properties.name);
@@ -77,10 +77,12 @@ const buildMetaboxInfo = async function(info) {
     await state.neo4jSession.readTransaction(async txc => {
       const resultsRoles = await txc.run(
         `MATCH (p:Person)-[l]->(t:Role)-[l2]->(o:Organisation)
-                 WHERE p.name = $name
-                 RETURN p,l,t,l2,o`,
+         MATCH (p)-[:HAS_HOMEPAGE]->(h)
+         WHERE p.name = $name
+         RETURN p,l,t,l2,o,h`,
         { name: info.name }
       );
+      result.homePage = resultsRoles.records[0]?._fields[5].properties.url;
       result.roles = resultsRoles.records.map(result => {
         return {
           name: result._fields[2].properties.name,
@@ -97,17 +99,20 @@ const buildMetaboxInfo = async function(info) {
     // to get the sub organisations
     await state.neo4jSession.readTransaction(async txc => {
       const resultsSubOrgs = await txc.run(
-        `MATCH (o:Organisation)
-                 WHERE o.name = $name
-                 AND o.status <> "closed"
-                 WITH o
-                 OPTIONAL MATCH (o)-[l:HAS_CHILD]->(n:Organisation)
-                 WHERE n.status <> "closed"
-                 RETURN o, l, n`,
+        `MATCH (o:Organisation)-[:HAS_HOMEPAGE]->(h:Page)
+         WHERE o.name = $name
+         WITH o, h
+         OPTIONAL MATCH (o)-[l:HAS_CHILD]->(n:Organisation)
+         WHERE n.status <> "closed"
+         RETURN o, l, n, h`,
         { name: info.name }
       );
+      result.status = resultsSubOrgs.records[0]._fields[0].properties.status;
+      result.homePage = resultsSubOrgs.records[0]._fields[3].properties.url;
+      result.description = resultsSubOrgs.records[0]._fields[3].properties.description;
       result.subOrgs = resultsSubOrgs.records
-        .map(result => result._fields[2].properties);
+        .map(result => result._fields[2]?.properties)
+        .filter(org => org);
     });
     break;
   }

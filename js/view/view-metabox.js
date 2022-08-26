@@ -70,7 +70,7 @@ const viewMetaResults = function() {
       <div class="meta-results-panel">
         <h2 class="govuk-heading-s">"${state.selectedWords}" can refer to:</h2>
         <ul class="govuk-list govuk-list--bullet">
-          ${state.metaSearchResults.map(result => `<li><a href="/?selected-words=${encodeURIComponent(`"${result.name}"`)}">${result.name}</a> (${result.type})</li>`).join('')}
+          ${state.metaSearchResults.map(result => `<li><a href="/?selected-words=${encodeURIComponent(`"${result.name}"`)}">${result.name}</a> (${result.type.toLowerCase()})</li>`).join('')}
         </ul>
       </div>
     `;
@@ -80,24 +80,26 @@ const viewMetaResults = function() {
     if (record.type === 'BankHoliday') {
       return `
         <div class="meta-results-panel">
-          <h1>${record.name}</h1>
+          <h1 class="govuk-heading-m">${record.name}</h1>
           ${viewBankHolidayDetails(record)}
         </div>
     `;
     } else if (record.type === 'Person') {
-      const personName = record.name;
-      const personUrl = record.basePath;
       return `
         <div class="meta-results-panel">
-          <h1 class="govuk-heading-m"><a class="govuk-link" href="https://www.gov.uk${personUrl}">${personName}</a></h1>
+          <h1 class="govuk-heading-m">
+            <a class="govuk-link" href="${record.homePage}">${record.name}</a>
+          </h1>
           ${record.roles && record.roles.length > 0 ? viewPersonRoles(record.roles) : ''}
         </div>
       `;
     } else if (record.type === 'Organisation') {
-      const orgName = record.name;
       return `
         <div class="meta-results-panel">
-          <h1>${orgName}</h1>
+          <h1 class="govuk-heading-m">
+            <a class="govuk-link" href="${record.homePage}">${record.name}</a>
+          </h1>
+          <p class="govuk-body">${record.description}</p>
           ${record.subOrgs && record.subOrgs.length > 0 ? viewOrgSubOrgs(record.subOrgs) : '<p class="govuk-body">No sub-organisations</p>'}
         </div>
       `;
