@@ -14,7 +14,7 @@ const viewOrgSubOrgs = function(subOrgList) {
         </span>
       </summary>
       <div class="govuk-details__text">
-        <ul class="govuk-list">${subOrgList.map(viewOrgSubOrg).join('')}</ul>
+        <ul class="govuk-list govuk-list--bullet">${subOrgList.map(viewOrgSubOrg).join('')}</ul>
       </div>
     </details>`;
 };
@@ -28,7 +28,7 @@ const viewPersonRoles = function(roles) {
         </span>
       </summary>
       <div class="govuk-details__text">
-        <ul class="govuk-list">${roles.map(role => `<li>${role.name} as <a href="${role.orgUrl}">${role.orgName}</a></li>`).join('')}</ul>
+        <ul class="govuk-list govuk-list--bullet">${roles.map(role => `<li>${role.name} as <a href="${role.orgUrl}">${role.orgName}</a></li>`).join('')}</ul>
       </div>
     </details>`;
 }
@@ -42,7 +42,7 @@ const viewBankHolidayDetails = function(holiday) {
         </span>
       </summary>
       <div class="govuk-details__text">
-        <ul class="govuk-list">
+        <ul class="govuk-list govuk-list--bullet">
           ${holiday.dates.map(dateString => `<li>${dateString}</li>`).join('')}
         </ul>
       </div>
@@ -54,7 +54,7 @@ const viewBankHolidayDetails = function(holiday) {
         </span>
       </summary>
       <div class="govuk-details__text">
-        <ul class="govuk-list">
+        <ul class="govuk-list govuk-list--bullet">
           ${holiday.regions.map(region => `<li>${region}</li>`).join('')}
         </ul>
       </div>
@@ -62,33 +62,46 @@ const viewBankHolidayDetails = function(holiday) {
   `;
 };
 
-const viewMetaResults = function() {
-  const record = state.metaSearchResults[0];
+//=================== public ====================
 
-  if (record.type === 'BankHoliday') {
+const viewMetaResults = function() {
+  if (state.metaSearchResults.length > 1) {
     return `
       <div class="meta-results-panel">
-        <h1>${record.name}</h1>
-        ${viewBankHolidayDetails(record)}
-      </div>
-  `;
-  } else if (record.type === 'Person') {
-    const personName = record.name;
-    const personUrl = record.basePath;
-    return `
-      <div class="meta-results-panel">
-        <h1 class="govuk-heading-m"><a class="govuk-link" href="https://www.gov.uk${personUrl}">${personName}</a></h1>
-        ${record.roles && record.roles.length > 0 ? viewPersonRoles(record.roles) : ''}
+        <h2 class="govuk-heading-s">"${state.selectedWords}" can refer to:</h2>
+        <ul class="govuk-list govuk-list--bullet">
+          ${state.metaSearchResults.map(result => `<li><a href="/?selected-words=${encodeURIComponent(`"${result.name}"`)}">${result.name}</a> (${result.type})</li>`).join('')}
+        </ul>
       </div>
     `;
-  } else if (record.type === 'Organisation') {
-    const orgName = record.name;
-    return `
-      <div class="meta-results-panel">
-        <h1>${orgName}</h1>
-        ${record.subOrgs && record.subOrgs.length > 0 ? viewOrgSubOrgs(record.subOrgs) : '<p class="govuk-body">No sub-organisations</p>'}
-      </div>
+  } else {
+    const record = state.metaSearchResults[0];
+
+    if (record.type === 'BankHoliday') {
+      return `
+        <div class="meta-results-panel">
+          <h1>${record.name}</h1>
+          ${viewBankHolidayDetails(record)}
+        </div>
     `;
+    } else if (record.type === 'Person') {
+      const personName = record.name;
+      const personUrl = record.basePath;
+      return `
+        <div class="meta-results-panel">
+          <h1 class="govuk-heading-m"><a class="govuk-link" href="https://www.gov.uk${personUrl}">${personName}</a></h1>
+          ${record.roles && record.roles.length > 0 ? viewPersonRoles(record.roles) : ''}
+        </div>
+      `;
+    } else if (record.type === 'Organisation') {
+      const orgName = record.name;
+      return `
+        <div class="meta-results-panel">
+          <h1>${orgName}</h1>
+          ${record.subOrgs && record.subOrgs.length > 0 ? viewOrgSubOrgs(record.subOrgs) : '<p class="govuk-body">No sub-organisations</p>'}
+        </div>
+      `;
+    }
   }
 };
 

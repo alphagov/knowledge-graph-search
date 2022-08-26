@@ -10,26 +10,6 @@ import { splitKeywords } from './utils.js';
 //=========== public methods ===========
 
 const queryGraph = async function(state, callback) {
-
-  // const metaSearchQueries = [
-  //   `MATCH (b:BankHoliday)-[l]->(d)
-  //    WHERE toLower(b.name) CONTAINS toLower($keywords)
-  //    RETURN b,l,d`,
-
-  //   `MATCH (p:Person)-[l]->(t:Role)-[l2]->(o:Organisation)
-  //    WHERE toLower(p.name) CONTAINS toLower($keywords)
-  //    RETURN p,l,t,l2,o`,
-
-  //   `MATCH (o:Organisation)
-  //    WHERE toLower(o.name) CONTAINS toLower($keywords)
-  //    AND o.status <> "closed"
-  //    WITH o
-  //    OPTIONAL MATCH (o)-[l:HAS_CHILD]->(n:Organisation)
-  //    WHERE n.status <> "closed"
-  //    RETURN o, l, n`
-  // ];
-
-
   const metaSearchQuery = `
     MATCH (b)
     WHERE (b:BankHoliday OR b:Person OR b:Organisation)
@@ -51,75 +31,11 @@ const queryGraph = async function(state, callback) {
         const mainResults = formattedMainSearchResults(results[0].value);
         const metaResults = formattedMetaSearchResults(results[1].value);
         if (metaResults.length === 1) {
-          switch (metaResults[0].type) {
-            // We found a bank holiday, so we need to run 2 further queries
-            // one to get the dates, the other to get the regions
-            case 'BankHoliday':
-            await state.neo4jSession.readTransaction(async txc => {
-              const resultsDates = await txc.run(
-                `MATCH (b:BankHoliday)-[:IS_ON]->(d)
-                 WHERE b.name = $name
-                 RETURN d`,
-                { name: metaResults[0].name }
-              );
-              metaResults[0].dates = resultsDates.records.map(record => record._fields[0].properties.dateString);
-            });
-            await state.neo4jSession.readTransaction(async txc => {
-              const resultsRegions = await txc.run(
-                `MATCH (b:BankHoliday)-[:IS_OBSERVED_IN]->(r)
-                 WHERE b.name = $name
-                 RETURN r`,
-                { name: metaResults[0].name }
-              );
-            metaResults[0].regions = resultsRegions.records.map(record => record._fields[0].properties.name);
-            });
-            callback({type:'neo4j-callback-ok', results: { main: mainResults, meta: metaResults }});
-            break;
-            case 'Person':
-            // We found a person, so we need to run a further query
-            // to get the person's roles and organisations
-            await state.neo4jSession.readTransaction(async txc => {
-              const resultsRoles = await txc.run(
-                `MATCH (p:Person)-[l]->(t:Role)-[l2]->(o:Organisation)
-                 WHERE p.name = $name
-                 RETURN p,l,t,l2,o`,
-                { name: metaResults[0].name }
-              );
-              metaResults[0].roles = resultsRoles.records.map(result => {
-                return {
-                  name: result._fields[2].properties.name,
-                  orgName: result._fields[4].properties.name,
-                  orgUrl: result._fields[4].properties.url,
-                  startDate: result._fields[1].properties.startDate,
-                  endDate: result._fields[1].properties.endDate
-                };
-              })
-              callback({type:'neo4j-callback-ok', results: { main: mainResults, meta: metaResults }});
-            });
-            break;
-            case 'Organisation':
-            // We found an organisation, so we need to run a further query
-            // to get the sub organisations
-            await state.neo4jSession.readTransaction(async txc => {
-              const resultsSubOrgs = await txc.run(
-                `MATCH (o:Organisation)
-                 WHERE o.name = $name
-                 AND o.status <> "closed"
-                 WITH o
-                 OPTIONAL MATCH (o)-[l:HAS_CHILD]->(n:Organisation)
-                 WHERE n.status <> "closed"
-                 RETURN o, l, n`,
-                { name: metaResults[0].name }
-              );
-              metaResults[0].subOrgs = resultsSubOrgs.records
-                .map(result => result._fields[2].properties);
-            });
-            break;
-          }
+          const fullMetaResults = await buildMetaboxInfo(metaResults[0]);
+          callback({type:'neo4j-callback-ok', results: { main: mainResults, meta: [fullMetaResults] }});
         } else if (metaResults.length >= 1) {
-          // TODO: create a disambiguation page
+          callback({type:'neo4j-callback-ok', results: { main: mainResults, meta: metaResults }});
         }
-        callback({type:'neo4j-callback-ok', results: { main: mainResults, meta: metaResults }});
       })
       .catch(error => {
         console.log('error', error);
@@ -129,6 +45,75 @@ const queryGraph = async function(state, callback) {
 };
 
 //=========== private ===========
+
+const buildMetaboxInfo = async function(info) {
+  const result = info;
+  switch (info.type) {
+    // We found a bank holiday, so we need to run 2 further queries
+    // one to get the dates, the other to get the regions
+  case 'BankHoliday':
+    await state.neo4jSession.readTransaction(async txc => {
+      const resultsDates = await txc.run(
+        `MATCH (b:BankHoliday)-[:IS_ON]->(d)
+                 WHERE b.name = $name
+                 RETURN d`,
+        { name: info.name }
+      );
+      result.dates = resultsDates.records.map(record => record._fields[0].properties.dateString);
+    });
+    await state.neo4jSession.readTransaction(async txc => {
+      const resultsRegions = await txc.run(
+        `MATCH (b:BankHoliday)-[:IS_OBSERVED_IN]->(r)
+                 WHERE b.name = $name
+                 RETURN r`,
+        { name: info.name }
+      );
+      result.regions = resultsRegions.records.map(record => record._fields[0].properties.name);
+    });
+    break;
+  case 'Person':
+    // We found a person, so we need to run a further query
+    // to get the person's roles and organisations
+    await state.neo4jSession.readTransaction(async txc => {
+      const resultsRoles = await txc.run(
+        `MATCH (p:Person)-[l]->(t:Role)-[l2]->(o:Organisation)
+                 WHERE p.name = $name
+                 RETURN p,l,t,l2,o`,
+        { name: info.name }
+      );
+      result.roles = resultsRoles.records.map(result => {
+        return {
+          name: result._fields[2].properties.name,
+          orgName: result._fields[4].properties.name,
+          orgUrl: result._fields[4].properties.url,
+          startDate: result._fields[1].properties.startDate,
+          endDate: result._fields[1].properties.endDate
+        };
+      });
+    });
+    break;
+  case 'Organisation':
+    // We found an organisation, so we need to run a further query
+    // to get the sub organisations
+    await state.neo4jSession.readTransaction(async txc => {
+      const resultsSubOrgs = await txc.run(
+        `MATCH (o:Organisation)
+                 WHERE o.name = $name
+                 AND o.status <> "closed"
+                 WITH o
+                 OPTIONAL MATCH (o)-[l:HAS_CHILD]->(n:Organisation)
+                 WHERE n.status <> "closed"
+                 RETURN o, l, n`,
+        { name: info.name }
+      );
+      result.subOrgs = resultsSubOrgs.records
+        .map(result => result._fields[2].properties);
+    });
+    break;
+  }
+  return result;
+};
+
 
 const searchQuery = function(state) {
   const fieldsToSearch = [];
