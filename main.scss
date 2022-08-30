@@ -112,6 +112,20 @@ label.govuk-label.label--bold, legend.govuk-fieldset__legend {
   h1 {
     margin: 0 0 10px 0;
   }
+
+  &--collapsed {
+    max-height: 170px;
+    overflow: hidden;
+  }
+
+  #meta-results-expand {
+    position: relative;
+    top: 16px;
+    left: 40%;
+    padding: 0 2px 0 2px;
+    border: 1px solid black;
+  }
+
 }
 
 #taxon-label {

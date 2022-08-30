@@ -92,14 +92,24 @@ const viewOrg = record =>
 
 //=================== public ====================
 
+const viewMetaResultsExpandToggle = () =>
+  state.metaSearchResults.length > 5 ?
+    `<button id="meta-results-expand">${state.disambBoxExpanded ? 'show less' : 'show more'}</button>` :
+    '';
+
+
 const viewMetaResults = function() {
   if (state.metaSearchResults.length > 1) {
+    const expandedClass = state.metaSearchResults.length > 5 && !state.disambBoxExpanded ? 'meta-results-panel--collapsed' : '';
     return `
       <div class="meta-results-panel">
-        <h2 class="govuk-heading-s">"${state.selectedWords}" can refer to:</h2>
-        <ul class="govuk-list govuk-list--bullet">
-          ${state.metaSearchResults.map(result => `<li><a href="/?selected-words=${encodeURIComponent(`"${result.name}"`)}">${result.name}</a> (${result.type.toLowerCase()})</li>`).join('')}
-        </ul>
+        <div class="meta-results-panel__collapsible ${expandedClass}">
+          <h2 class="govuk-heading-s">"${state.selectedWords}" can refer to:</h2>
+          <ul class="govuk-list govuk-list--bullet">
+            ${state.metaSearchResults.map(result => `<li><a href="/?selected-words=${encodeURIComponent(`"${result.name}"`)}">${result.name}</a> (${result.type.toLowerCase()})</li>`).join('')}
+          </ul>
+        </div>
+        ${viewMetaResultsExpandToggle()}
       </div>
     `;
   } else {

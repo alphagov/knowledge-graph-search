@@ -48,9 +48,14 @@ const view = () => {
       handleEvent({type: 'dom', id: 'search'});
     });
 
+
+  document.getElementById('meta-results-expand')?.addEventListener(
+    'click',
+    () => handleEvent({type: 'dom', id: 'toggleDisamBox'})
+  );
+
   // focus on the results heading if present
   id('results-heading')?.focus();
-
 };
 
 

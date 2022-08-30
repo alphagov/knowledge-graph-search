@@ -16,7 +16,8 @@ const initialSearchParams = { // user inputs that are used to build the query
   areaToSearch: 'any', // can be "whitehall", "mainstream", "any" (meaning the user hasn't chosen yet)
 
   caseSensitive: false, // whether the keyword search is case sensitive
-  displayFeedbackBanner: true // whether we should show the banner requesting feedback from user.
+  displayFeedbackBanner: true, // whether we should show the banner requesting feedback from user.
+  disamBoxExpanded: false // if there's a resizeable disamb meta box, whether it's expanded or not
 };
 
 const state = {

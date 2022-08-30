@@ -20,7 +20,6 @@ const handleEvent = async function(event) {
 
         // Update the state
         state.selectedWords = sanitiseInput(id('keyword').value);
-        console.log(state.selectedWords)
         state.excludedWords = sanitiseInput(id('excluded-keyword').value);
         state.selectedTaxon = sanitiseInput(id('taxon').value);
         state.selectedLocale = sanitiseInput(id('locale').value);
@@ -65,6 +64,9 @@ const handleEvent = async function(event) {
       case 'dismiss-feedback-banner':
         state.displayFeedbackBanner = false;
         document.cookie = 'feedback_banner_dismissed=true';
+        break;
+      case 'toggleDisamBox':
+        state.disambBoxExpanded = !state.disambBoxExpanded;
         break;
       default:
         fieldClicked = event.id.match(/show-field-(.*)/);
