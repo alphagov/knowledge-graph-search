@@ -20,7 +20,7 @@ const viewSearchPanel = () => `
       ${viewLocaleSelector()}
       ${viewSearchButton()}
     </div>
-    <div ckass="sig">
+    <div class="sig">
       <p class="govuk-body">Brought to you by the Data Products team</p>
       <p class="govuk-body">Help/problem/feedback: contact <a class="govuk-link" href="mailto:max.froumentin@digital.cabinet-office.gov.uk">Max Froumentin</a></p>
     </div>
