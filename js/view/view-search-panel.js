@@ -179,20 +179,16 @@ const viewCaseSensitiveSelector = () => `
 `;
 
 
-const viewKeywordsCombinator = () => {
-  const errors = searchState()?.errors;
-  const err = errors && errors.includes('missingCombinator');
-  return `
-  <div class="govuk-form-group ${err ? 'govuk-form-group--error' : ''}">
+const viewKeywordsCombinator = () =>
+` <div class="govuk-form-group">
     <fieldset
         class="govuk-fieldset"
         id="combinator-wrapper"
-        ${state.waiting && 'disabled="disabled"'}
-        ${err ? 'aria-describedby="combinator-error"' : ''}">
+        ${state.waiting && 'disabled="disabled"'}>
+
       <legend class="govuk-fieldset__legend">
         Search for
       </legend>
-      ${err ? viewInlineError('combinator-error', 'Please choose one option') : ''}
       <div class="govuk-radios" id="combinators">
         <div class="govuk-radios__item">
           <input class="govuk-radios__input"
@@ -215,24 +211,18 @@ const viewKeywordsCombinator = () => {
       </div>
     </fieldset>
   </div>
-  `;
-};
+`;
 
 
-const viewPublishingAppSelector = () => {
-  const errors = searchState()?.errors;
-  const err = errors && errors.includes('missingArea');
-  return `
-  <div class="govuk-form-group ${err ? 'govuk-form-group--error' : ''}">
+const viewPublishingAppSelector = () =>
+` <div class="govuk-form-group">
     <fieldset
         class="govuk-fieldset"
         id="search-areas-wrapper"
-        ${state.waiting && 'disabled="disabled"'}
-        ${err ? 'aria-describedby="area-error"' : ''}>
+        ${state.waiting && 'disabled="disabled"'}>
       <legend class="govuk-fieldset__legend">
         Limit search
       </legend>
-      ${err ? viewInlineError('area-error', 'Please choose one option') : ''}
       <div class="govuk-radios" id="site-areas">
         <div class="govuk-radios__item">
           <input class="govuk-radios__input"
@@ -260,8 +250,7 @@ const viewPublishingAppSelector = () => {
       </div>
     </fieldset>
   </div>
-  `;
-};
+`;
 
 
 const viewKeywordsInput = () => `

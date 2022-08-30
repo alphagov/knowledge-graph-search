@@ -87,12 +87,6 @@ const searchState = function() {
     if (!state.whereToSearch.title && !state.whereToSearch.text) {
       errors.push('missingWhereToSearch');
     }
-    if (splitKeywords(state.selectedWords).length > 1 && state.combinator === null) {
-      errors.push('missingCombinator');
-    }
-  }
-  if (state.areaToSearch === '') {
-    errors.push('missingArea');
   }
   if (errors.length > 0) return { code: 'error', errors };
   if (state.searchResults?.length > 0) return { code: 'results' };

@@ -150,10 +150,6 @@ const viewErrorBanner = () => {
             html.push(`
             <li><a href="#search-scope-wrapper">You need to select a publishing application</a></li>`);
             break;
-            case 'missingCombinator':
-            html.push(`
-            <li><a href="#combinator-wrapper">You need to select how to search for keywords</a></li>`);
-            break;
             default:
             console.log('unknown user error code:', userError);
           }
