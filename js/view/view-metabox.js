@@ -62,6 +62,34 @@ const viewBankHolidayDetails = function(holiday) {
   `;
 };
 
+const viewBankHoliday = record =>
+  `<div class="meta-results-panel">
+     <h1 class="govuk-heading-m">${record.name}</h1>
+       ${viewBankHolidayDetails(record)}
+     </div>
+  `;
+
+const viewPerson = record =>
+  `<div class="meta-results-panel">
+     <h1 class="govuk-heading-m">
+       <a class="govuk-link" href="${record.homePage}">${record.name}</a>
+     </h1>
+     ${record.roles && record.roles.length > 0 ? viewPersonRoles(record.roles) : ''}
+   </div>`;
+
+const viewOrg = record =>
+  `<div class="meta-results-panel">
+     <h1 class="govuk-heading-m">
+       <a class="govuk-link" href="${record.homePage}">${record.name}</a>
+     </h1>
+     <p class="govuk-body">${record.description}</p>
+     ${record.subOrgs && record.subOrgs.length > 0 ?
+       viewOrgSubOrgs(record.subOrgs) :
+       '<p class="govuk-body">No sub-organisations</p>'
+     }
+   </div>`;
+
+
 //=================== public ====================
 
 const viewMetaResults = function() {
@@ -76,33 +104,11 @@ const viewMetaResults = function() {
     `;
   } else {
     const record = state.metaSearchResults[0];
-
-    if (record.type === 'BankHoliday') {
-      return `
-        <div class="meta-results-panel">
-          <h1 class="govuk-heading-m">${record.name}</h1>
-          ${viewBankHolidayDetails(record)}
-        </div>
-    `;
-    } else if (record.type === 'Person') {
-      return `
-        <div class="meta-results-panel">
-          <h1 class="govuk-heading-m">
-            <a class="govuk-link" href="${record.homePage}">${record.name}</a>
-          </h1>
-          ${record.roles && record.roles.length > 0 ? viewPersonRoles(record.roles) : ''}
-        </div>
-      `;
-    } else if (record.type === 'Organisation') {
-      return `
-        <div class="meta-results-panel">
-          <h1 class="govuk-heading-m">
-            <a class="govuk-link" href="${record.homePage}">${record.name}</a>
-          </h1>
-          <p class="govuk-body">${record.description}</p>
-          ${record.subOrgs && record.subOrgs.length > 0 ? viewOrgSubOrgs(record.subOrgs) : '<p class="govuk-body">No sub-organisations</p>'}
-        </div>
-      `;
+    switch (record.type) {
+      case "BankHoliday": return viewBankHoliday(record);
+      case "Organisation": return viewOrg(record);
+      case "Person": return viewPerson(record);
+      default: console.log(`unknown record type: ${record.type}`); return ``;
     }
   }
 };
