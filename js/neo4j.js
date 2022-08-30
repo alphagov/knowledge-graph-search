@@ -35,6 +35,8 @@ const queryGraph = async function(state, callback) {
           callback({type:'neo4j-callback-ok', results: { main: mainResults, meta: [fullMetaResults] }});
         } else if (metaResults.length >= 1) {
           callback({type:'neo4j-callback-ok', results: { main: mainResults, meta: metaResults }});
+        } else {
+          callback({type:'neo4j-callback-ok', results: { main: mainResults, meta: [] }});
         }
       })
       .catch(error => {

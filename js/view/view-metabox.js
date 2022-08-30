@@ -99,6 +99,7 @@ const viewMetaResultsExpandToggle = () =>
 
 
 const viewMetaResults = function() {
+  if (state.metaSearchResults.length === 0) return;
   if (state.metaSearchResults.length > 1) {
     const expandedClass = state.metaSearchResults.length > 5 && !state.disambBoxExpanded ? 'meta-results-panel--collapsed' : '';
     return `
