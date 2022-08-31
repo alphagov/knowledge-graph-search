@@ -96,10 +96,11 @@ const buildMetaboxInfo = async function(info) {
     // to get the person's roles and organisations
     await state.neo4jSession.readTransaction(async txc => {
       const resultsRoles = await txc.run(
-        `MATCH (p:Person)-[l]->(t:Role)-[l2]->(o:Organisation)
-         MATCH (p)-[:HAS_HOMEPAGE]->(h)
+        `MATCH (p:Person)-[l]->(r:Role)-[l2]->(o:Organisation)
+         MATCH (p)-[:HAS_HOMEPAGE]->(ph:Page)
+         OPTIONAL MATCH (r)-[:HAS_HOMEPAGE]->(rh:Page)
          WHERE p.name = $name
-         RETURN p,l,t,l2,o,h`,
+         RETURN p,l,r,l2,o,ph,rh`,
         { name: info.name }
       );
       result.homepage = resultsRoles.records[0]?._fields[5].properties.url;

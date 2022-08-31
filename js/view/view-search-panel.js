@@ -1,31 +1,111 @@
 import { sanitiseOutput } from '../utils.js';
 import { state, searchState } from '../state.js';
 import { languageName } from '../lang.js';
-import { viewInfoButton } from './view-components.js';
 
 
-const viewSearchPanel = () => `
-  <form id="search-form" class="search-panel govuk-form">
-    <div class="search-mode-panel">
-      <h2 class="govuk-heading-m">Search filters</h2>
-      <a class="govuk-skip-link" href="#results-table">Skip to results</a>
-      ${viewKeywordsInput()}
-      ${viewKeywordsCombinator()}
-      ${viewExclusionsInput()}
-      ${viewCaseSensitiveSelector()}
-      ${viewScopeSelector()}
-      ${viewLinkSearch()}
-      ${viewPublishingAppSelector()}
-      ${viewTaxonSelector()}
-      ${viewLocaleSelector()}
-      ${viewSearchButton()}
-    </div>
-    <div class="sig">
-      <p class="govuk-body">Brought to you by the Data Products team</p>
-      <p class="govuk-body">Help/problem/feedback: contact <a class="govuk-link" href="mailto:max.froumentin@digital.cabinet-office.gov.uk">Max Froumentin</a></p>
-    </div>
-  </form>
-`;
+const viewSearchPanel = (searchType) => {
+  switch (searchType) {
+  case 'mixed':
+  case 'results':
+    return `
+      <form id="search-form" class="search-panel govuk-form">
+        <div class="search-mode-panel">
+          <h2 class="govuk-heading-m">Mixed search</h2>
+          ${viewKeywordsInput()}
+          ${viewKeywordsCombinator()}
+          ${viewExclusionsInput()}
+          ${viewCaseSensitiveSelector()}
+          ${viewScopeSelector()}
+          ${viewLinkSearch()}
+          ${viewPublishingAppSelector()}
+          ${viewTaxonSelector()}
+          ${viewLocaleSelector()}
+          ${viewSearchButton()}
+        </div>
+      </form>
+    `;
+  case 'keyword':
+    return `
+      <form id="search-form" class="search-panel govuk-form">
+        <div class="search-mode-panel">
+          <a class="govuk-skip-link" href="#results-table">Skip to results</a>
+          ${viewKeywordsInput()}
+          <details class="govuk-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+              <span class="govuk-details__summary-text">
+                Filters
+              </span>
+            </summary>
+            <div class="govuk-details__text">
+              ${viewKeywordsCombinator()}
+              ${viewExclusionsInput()}
+              ${viewCaseSensitiveSelector()}
+              ${viewScopeSelector()}
+              ${viewPublishingAppSelector()}
+            </div>
+          </details>
+          ${viewSearchButton()}
+        </div>
+      </form>`;
+  case 'link':
+    return `
+      <form id="search-form" class="search-panel govuk-form">
+        <div class="search-mode-panel">
+          <a class="govuk-skip-link" href="#results-table">Skip to results</a>
+          ${viewLinkSearch()}
+          <details class="govuk-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+              <span class="govuk-details__summary-text">
+                Filters
+              </span>
+            </summary>
+            <div class="govuk-details__text">
+              ${viewPublishingAppSelector()}
+            </div>
+          </details>
+          ${viewSearchButton()}
+        </div>
+      </form>`;
+  case 'taxon':
+    return `
+      <form id="search-form" class="search-panel govuk-form">
+        <div class="search-mode-panel">
+          <a class="govuk-skip-link" href="#results-table">Skip to results</a>
+          ${viewTaxonSelector()}
+          <details class="govuk-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+              <span class="govuk-details__summary-text">
+                Filters
+              </span>
+            </summary>
+            <div class="govuk-details__text">
+              ${viewPublishingAppSelector()}
+            </div>
+          </details>
+          ${viewSearchButton()}
+        </div>
+      </form>`;
+  case 'language':
+    return `
+      <form id="search-form" class="search-panel govuk-form">
+        <div class="search-mode-panel">
+          <a class="govuk-skip-link" href="#results-table">Skip to results</a>
+          ${viewLocaleSelector()}
+          <details class="govuk-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+              <span class="govuk-details__summary-text">
+                Filters
+              </span>
+            </summary>
+            <div class="govuk-details__text">
+              ${viewPublishingAppSelector()}
+            </div>
+          </details>
+          ${viewSearchButton()}
+        </div>
+      </form>`;
+  }
+};
 
 
 const viewInlineError = (id, message) => `
@@ -64,7 +144,7 @@ const viewScopeSelector = () => {
               id="search-text"
             ${state.whereToSearch.text ? 'checked' : ''}/>
           <label for="search-text" class="govuk-label govuk-checkboxes__label">
-            body content&nbsp;${viewInfoButton('content')}
+            body content and description
           </label>
         </div>
       </div>
@@ -78,7 +158,7 @@ const viewTaxonSelector = () => `
   <div class="govuk-body">
     <div class="taxon-facet">
       <label class="govuk-label label--bold" for="taxon">
-        Taxon&nbsp;${viewInfoButton('taxon')}
+        Search for taxons
       </label>
       <datalist id="taxonList">
         ${state.taxons.map(taxon => `<option>${taxon}</option>`)}
@@ -97,11 +177,12 @@ const viewTaxonSelector = () => `
   </div>
 `;
 
+
 const viewLocaleSelector = () => {
   const html = [`
     <div class="govuk-body taxon-facet">
       <label class="govuk-label label--bold" for="locale">
-        Search by language
+        Search for languages
       </label>
       <datalist id="localeList">
   `];
@@ -125,20 +206,10 @@ const viewSearchButton = () => `
     <button
       type="submit"
       class="govuk-button ${state.waiting?'govuk-button--disabled':''}"
-      ${state.waiting ? 'disabled="disabled"' : '' }
+      ${state.waiting ? 'disabled="disabled"' : ''}
       id="search">
-      ${state.waiting?'Searching':'Search'}
+      ${state.waiting ? 'Searching <img src="assets/images/loader.gif" height="20px" alt="loader"/>' : 'Search'}
     </button>
-    <button
-      type="button"
-      class="govuk-button govuk-button--secondary ${state.waiting?'govuk-button--disabled':''}"
-      ${state.waiting ? 'disabled="disabled"' : '' }
-      id="clear-filters">
-      Clear all filters
-    </button>
-
-
-    ${state.waiting?'<br/><span class="govuk-body">Please note that some queries take up to one minute</span>':''}
   </p>
 `;
 
@@ -146,7 +217,7 @@ const viewSearchButton = () => `
 const viewLinkSearch = () => `
   <div class="govuk-body">
     <label class="govuk-label label--bold" for="link-search">
-      Link search&nbsp;${viewInfoButton('link')}
+      Search for links
     </label>
     <div class="govuk-hint">
       For example: /maternity-pay-leave or youtube.com
@@ -230,7 +301,7 @@ const viewPublishingAppSelector = () =>
                  name="area"
             ${state.areaToSearch === 'mainstream' ? 'checked' : ''}/>
           <label for="area-mainstream" class="govuk-label govuk-radios__label">
-            Mainstream Publisher&nbsp;${viewInfoButton('mainstream')}
+            Mainstream Publisher
           </label>
         </div>
         <div class="govuk-radios__item">
@@ -255,7 +326,7 @@ const viewPublishingAppSelector = () =>
 
 const viewKeywordsInput = () => `
   <div class="govuk-body">
-    <label for="keyword" class="govuk-label label--bold">Keywords</label>
+    <label for="keyword" class="govuk-label label--bold">Search for keywords</label>
     <div class="govuk-hint">
       For example: cat, dog, &quot;health certificate&quot;
     </div>

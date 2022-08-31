@@ -4,7 +4,7 @@ import { handleEvent } from '../events.js';
 import { languageName } from '../lang.js';
 import { viewMetaResults } from './view-metabox.js';
 import { viewSearchPanel } from './view-search-panel.js';
-import { viewInfoButton, viewFeedbackBanner } from './view-components.js';
+import { viewFeedbackBanner } from './view-components.js';
 
 
 const view = () => {
@@ -13,22 +13,21 @@ const view = () => {
   id('page-content').innerHTML = `
     <main class="govuk-main-wrapper" id="main-content" role="main">
       ${state.displayFeedbackBanner ? viewFeedbackBanner() : ''}
-      ${viewTitle()}
-      ${viewErrorBanner()}
       <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-third">
-          ${viewSearchPanel()}
-        </div>
         <div class="govuk-grid-column-two-thirds">
-          ${viewSearchResults(state.searchResults, state.showFields)}
-        </div>
+          <h1 class="govuk-heading-xl main-title">
+            GovGraph Search
+          </h1>
+          ${viewSearchTypeSelector()}
+          ${viewErrorBanner()}
+       </div>
       </div>
+      ${viewMainLayout()}
     </main>
   `;
 
-
   // Add event handlers
-  document.querySelectorAll('#dismiss-feedback-banner, button.govuk-button, input[type=checkbox][data-interactive=true]')
+  document.querySelectorAll('#dismiss-feedback-banner, button, input[type=checkbox][data-interactive=true]')
     .forEach(input => input.addEventListener(
       'click',
       event => handleEvent({type: 'dom', id: event.target.getAttribute('id')})));
@@ -56,20 +55,53 @@ const view = () => {
 
   // focus on the results heading if present
   id('results-heading')?.focus();
+
 };
 
 
-const viewTitle = () => `
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      <h1 class="govuk-heading-xl main-title">
-        GovGraph search
-      </h1>
-      <p class="govuk-body-s">Search for GOV.UK content containing keywords, links or by topic taxon.<br/>Runs only between 9am and 7pm.</p>
-      <p class="govuk-body">This is a discovery tool. Searches do not include history mode content, Mainstream GitHub smart answers or service domains. Popularity scores depend on cookie consent.</p>
-    </div>
-  </div>
-`;
+const viewSearchTypeSelector = () => `
+    <p class="govuk-body search-selector">
+      Search for:
+      <button class="${state.searchType === 'keyword' ? 'active' : '' }" id="search-keyword">Keywords</button>
+      <button class="${state.searchType === 'link' ? 'active' : '' }" id="search-link">Links</button>
+      <button class="${state.searchType === 'taxon' ? 'active' : '' }" id="search-taxon">Taxons</button>
+      <button class="${state.searchType === 'language' ? 'active' : '' }" id="search-language">Languages</button>
+      <button class="${state.searchType === 'mixed' ? 'active' : '' }" id="search-mixed">Mixed</button>
+    </p>
+  `;
+
+
+const viewMainLayout = () => {
+  if (state.searchType === 'mixed') {
+    if (!state.searchResults) {
+      return `
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-two-thirds">
+            ${viewSearchPanel(state.searchType)}
+          </div>
+        </div>`;
+    } else {
+      return `
+        <div class="govuk-grid-row mixed-layout">
+          <div class="govuk-grid-column-one-third">
+            ${viewSearchPanel(state.searchType)}
+          </div>
+          <div class="govuk-grid-column-two-thirds">
+            ${viewSearchResults(state.searchResults, state.showFields)}
+          </div>
+        </div>`;
+    }
+  } else {
+    return `
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+          ${viewSearchPanel(state.searchType)}
+        </div>
+      </div>
+      ${viewSearchResults(state.searchResults, state.showFields)}
+    `;
+  }
+};
 
 
 const makeBold = (text, includeMarkup) =>
@@ -78,7 +110,7 @@ const makeBold = (text, includeMarkup) =>
     `"${text}"`;
 
 
-const viewContainDescription = (words, includeMarkup) => {
+const viewContainDescription = (includeMarkup) => {
   let where;
   if (state.whereToSearch.title && state.whereToSearch.text) {
     where = '';
@@ -88,17 +120,17 @@ const viewContainDescription = (words, includeMarkup) => {
     where = 'in their body content';
   }
   let combineOp = state.combinator === 'all' ? 'and' : 'or';
-  let combinedWords = splitKeywords(words)
+  let combinedWords = splitKeywords(state.selectedWords)
     .map(w=>makeBold(w, includeMarkup))
     .join(` ${combineOp} `);
-  return words !== '' ? `${combinedWords} ${where}` : '';
+  return state.selectedWords !== '' ? `${combinedWords} ${where}` : '';
 };
 
 
 const viewQueryDescription = (includeMarkup = true) => {
   const clauses = [];
   if (state.selectedWords !== '') {
-    let keywords = `contain ${viewContainDescription(state.selectedWords, includeMarkup)}`;
+    let keywords = `contain ${viewContainDescription(includeMarkup)}`;
     if (state.excludedWords !== '') {
       keywords = `${keywords} (but don't contain ${makeBold(state.excludedWords, includeMarkup)})`;
     }
@@ -119,6 +151,7 @@ const viewQueryDescription = (includeMarkup = true) => {
 
   return `pages that ${joinedClauses}, in descending popularity`;
 };
+
 
 
 const viewErrorBanner = () => {
@@ -244,14 +277,10 @@ const csvFromResults = function(searchResults) {
 };
 
 
-const viewWaiting = function() {
-  return `
-      <h2 class="govuk-heading-l" id="results-heading" aria-live="assertive">
-        Please wait <img src="assets/images/loader.gif" height="20px" alt="loader"/>
-      </h2>
-      <div class="govuk-body">Searching for ${viewQueryDescription()}</div>
-      <p class="govuk-body-s">Please note that some queries take up to one minute</p>`;
-};
+const viewWaiting = () => `
+  <div class="govuk-body">Searching for ${viewQueryDescription()}</div>
+  <p class="govuk-body-s">Please note that some queries take up to one minute</p>
+`;
 
 
 const viewResults = function() {
@@ -283,7 +312,7 @@ const viewResults = function() {
     `);
   }
 
-  html.push(`<div class="govuk-body">for ${viewQueryDescription()}&nbsp;${viewInfoButton('popularity')}</div>`);
+  html.push(`<div class="govuk-body">for ${viewQueryDescription()}</div>`);
 
   if (nbRecords >= state.resultsPerPage) {
     html.push(`
@@ -320,7 +349,7 @@ const viewNoResults = () => {
 
 
 const viewSearchResults = () => {
-  switch(searchState().code) {
+  switch (searchState().code) {
   case 'waiting':
     document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraph search`;
     return viewWaiting();

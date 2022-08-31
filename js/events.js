@@ -1,5 +1,5 @@
 import { state, searchState } from './state.js';
-import { id, sanitiseInput } from './utils.js';
+import { id, getFormInputValue } from './utils.js';
 import { view } from './view/view.js';
 import { languageCode } from './lang.js';
 import { queryGraph } from './neo4j.js';
@@ -19,39 +19,22 @@ const handleEvent = async function(event) {
         });
 
         // Update the state
-        state.selectedWords = sanitiseInput(id('keyword').value);
-        state.excludedWords = sanitiseInput(id('excluded-keyword').value);
-        state.selectedTaxon = sanitiseInput(id('taxon').value);
-        state.selectedLocale = sanitiseInput(id('locale').value);
-        state.whereToSearch.title = id('search-title').checked;
-        state.whereToSearch.text = id('search-text').checked;
-        state.caseSensitive = id('case-sensitive').checked;
-        state.linkSearchUrl = sanitiseInput(id('link-search').value);
+        state.selectedWords = getFormInputValue('keyword');
+        state.excludedWords = getFormInputValue('excluded-keyword');
+        state.selectedTaxon = getFormInputValue('taxon');
+        state.selectedLocale = getFormInputValue('locale');
+        state.whereToSearch.title = id('search-title')?.checked;
+        state.whereToSearch.text = id('search-text')?.checked;
+        state.caseSensitive = id('case-sensitive')?.checked;
+        state.linkSearchUrl = getFormInputValue('link-search');
         state.skip = 0; // reset to first page
-        if (id('area-mainstream').checked) state.areaToSearch = 'mainstream';
-        if (id('area-whitehall').checked) state.areaToSearch = 'whitehall';
-        if (id('area-any').checked) state.areaToSearch = 'any';
-        if (id('combinator-any').checked) state.combinator = 'any';
-        if (id('combinator-all').checked) state.combinator = 'all';
+        if (id('area-mainstream')?.checked) state.areaToSearch = 'mainstream';
+        if (id('area-whitehall')?.checked) state.areaToSearch = 'whitehall';
+        if (id('area-any')?.checked) state.areaToSearch = 'any';
+        if (id('combinator-any')?.checked) state.combinator = 'any';
+        if (id('combinator-all')?.checked) state.combinator = 'all';
         state.searchResults = null;
         searchButtonClicked();
-        break;
-      case 'clear-filters':
-        state.selectedWords = '';
-        state.excludedWords = '';
-        state.selectedTaxon = '';
-        state.selectedLocale = '';
-        state.whereToSearch.title = false;
-        state.whereToSearch.text = false;
-        state.caseSensitive = false;
-        state.linkSearchUrl = '';
-        state.skip = 0; // reset to first page
-        state.showFields = { url: true, title: true };
-        state.areaToSearch = '';
-        state.searchResults = null;
-        state.searchQuery = '';
-        state.waiting = false;
-        state.combinator = 'all';
         break;
       case 'button-next-page':
         state.skip = state.skip + state.resultsPerPage;
@@ -67,6 +50,26 @@ const handleEvent = async function(event) {
         break;
       case 'toggleDisamBox':
         state.disambBoxExpanded = !state.disambBoxExpanded;
+        break;
+      case 'search-keyword':
+        clearAllFilters();
+        state.searchType = 'keyword';
+        break;
+      case 'search-link':
+        clearAllFilters();
+        state.searchType = 'link';
+        break;
+      case 'search-taxon':
+        clearAllFilters();
+        state.searchType = 'taxon';
+        break;
+      case 'search-language':
+        clearAllFilters();
+        state.searchType = 'language';
+        break;
+      case 'search-mixed':
+        clearAllFilters();
+        state.searchType = 'mixed';
         break;
       default:
         fieldClicked = event.id.match(/show-field-(.*)/);
@@ -135,10 +138,30 @@ const searchButtonClicked = async function() {
 };
 
 
+const clearAllFilters = function() {
+  state.selectedWords = '';
+  state.excludedWords = '';
+  state.selectedTaxon = '';
+  state.selectedLocale = '';
+  state.whereToSearch.title = true;
+  state.whereToSearch.text = false;
+  state.caseSensitive = false;
+  state.linkSearchUrl = '';
+  state.skip = 0; // reset to first page
+  state.showFields = { url: true, title: true };
+  state.areaToSearch = 'any';
+  state.searchResults = null;
+  state.searchQuery = '';
+  state.waiting = false;
+  state.combinator = 'all';
+};
+
+
 const updateUrl = function() {
   if ('URLSearchParams' in window) {
     var searchParams = new URLSearchParams();
 
+    if (state.searchType !== '') searchParams.set('search-type', state.searchType);
     if (state.selectedWords !== '') searchParams.set('selected-words', state.selectedWords);
     if (state.excludedWords !== '') searchParams.set('excluded-words', state.excludedWords);
     if (state.selectedTaxon !== '') searchParams.set('selected-taxon', state.selectedTaxon);

@@ -16,8 +16,12 @@ const tagOrComment = new RegExp(
     'gi');
 
 
+const getFormInputValue = inputId => sanitiseInput(id(inputId)?.value);
+
+
 const sanitiseInput = function(text) {
   // remove text that could lead to script injections
+  if (!text) return '';
   let oldText;
   do {
     oldText = text;
@@ -49,4 +53,4 @@ const splitKeywords = function(keywords) {
 };
 
 
-export { id, sanitiseInput, sanitiseOutput, splitKeywords };
+export { id, sanitiseInput, sanitiseOutput, splitKeywords, getFormInputValue };

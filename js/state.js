@@ -1,7 +1,12 @@
-import { splitKeywords } from './utils.js';
 import { languageName } from './lang.js';
 
-const initialSearchParams = { // user inputs that are used to build the query
+// user inputs that are used to build the query.
+// (basically, everything whose value could be found in the URL)
+// Separate from (but included in)  state to make
+// it easier to reset to those initial
+// values only while keeping the rest of the state
+const initialSearchParams = {
+  searchType: 'keyword', // What type of search are we displaying the page for. can be link, taxon, mixed, etc.
   selectedWords: '', // list of words to search
   excludedWords: '', // list of words to exclude
   selectedTaxon: '', // the taxon to search in
@@ -17,7 +22,6 @@ const initialSearchParams = { // user inputs that are used to build the query
 
   caseSensitive: false, // whether the keyword search is case sensitive
   displayFeedbackBanner: true, // whether we should show the banner requesting feedback from user.
-  disamBoxExpanded: false // if there's a resizeable disamb meta box, whether it's expanded or not
 };
 
 const state = {
@@ -39,7 +43,8 @@ const state = {
     url: true,
     title: true
   },
-  waiting: false // whether we're waiting for a request to return,
+  waiting: false, // whether we're waiting for a request to return,
+  disamBoxExpanded: false // if there's a resizeable disamb meta box, whether it's expanded or not
 };
 
 
@@ -49,6 +54,7 @@ const setQueryParamsFromQS = function() {
   const maybeReplace = (stateField, qspName) =>
     searchParams.get(qspName) !== null ? searchParams.get(qspName) : initialSearchParams[stateField];
 
+  state.searchType = maybeReplace('searchType', 'search-type');
   state.selectedWords = maybeReplace('selectedWords', 'selected-words');
   state.excludedWords = maybeReplace('excludedWords', 'excluded-words');
   state.linkSearchUrl = maybeReplace('linkSearchUrl', 'link-search-url');

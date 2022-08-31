@@ -6,15 +6,6 @@ const toolTipsText = {
   'popularity': 'The popularity score is based on the number of onsite links to the page and 3 weeks of Google Analytics traffic. A higher score means greater popularity.'
 };
 
-
-const viewInfoButton = function(id) {
-  const text = toolTipsText[id];
-  return text ?
-    `<img class="info-button" src="assets/images/question-mark.svg" alt="More information" title="${text}"/>`
-    : '';
-};
-
-
 const viewFeedbackBanner = function() {
   return `
     <div class="govuk-grid-row feedback-banner">
@@ -32,7 +23,9 @@ const viewFeedbackBanner = function() {
     </div>`;
 }
 
+
 const viewMetaLink = text =>
   `<a class="govuk-link" href="/?selected-words=${encodeURIComponent(`"${text}"`)}">${text}</a>`;
 
-export { viewInfoButton, viewFeedbackBanner, viewMetaLink };
+
+export { viewFeedbackBanner, viewMetaLink };
