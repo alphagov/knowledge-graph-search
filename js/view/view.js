@@ -222,7 +222,7 @@ const csvFromResults = function(searchResults) {
     // rows:
     searchResults.forEach(record => {
       const line = [];
-      Object.keys(record).forEach(field => {
+      Object.values(record).forEach(field => {
         if (field) {
           field = field.toString();
           if (field.includes(',')) {
