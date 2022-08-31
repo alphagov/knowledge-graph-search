@@ -18,24 +18,34 @@ const queryGraph = async function(state, callback) {
 
   state.neo4jSession.readTransaction(txc => {
     const mainCypherQuery = searchQuery(state);
-    console.log('running cypher queries', mainCypherQuery, metaSearchQuery);
-    const mainQueryPromise = txc.run(mainCypherQuery);
-    const metaQueryPromise = txc.run(
-      metaSearchQuery,
-      { keywords: state.selectedWords.replace(/"/g,'')}
-    );
+    console.log('running main cypher query', mainCypherQuery);
 
+    const mainQueryPromise = txc.run(mainCypherQuery);
+    const allPromises = [mainQueryPromise];
+
+    const searchKeywords = state.selectedWords.replace(/"/g,'');
+    if (searchKeywords.length > 5) {
+      console.log('running meta cypher query', metaSearchQuery);
+      const metaQueryPromise = txc.run(
+        metaSearchQuery,
+        { keywords: searchKeywords}
+      );
+      allPromises.push(metaQueryPromise);
+    }
     callback({type: 'neo4j-running'});
-    Promise.allSettled([mainQueryPromise, metaQueryPromise])
+    Promise.allSettled(allPromises)
       .then(async results => {
         const mainResults = formattedMainSearchResults(results[0].value);
-        const metaResults = formattedMetaSearchResults(results[1].value);
+        const metaResults = results.length === 2 ? formattedMetaSearchResults(results[1].value) : []
         if (metaResults.length === 1) {
+          // one meta results: show the knowledge panel
           const fullMetaResults = await buildMetaboxInfo(metaResults[0]);
           callback({type:'neo4j-callback-ok', results: { main: mainResults, meta: [fullMetaResults] }});
         } else if (metaResults.length >= 1) {
+          // multiple meta results: we'll show a disambiguation page
           callback({type:'neo4j-callback-ok', results: { main: mainResults, meta: metaResults }});
         } else {
+          // no meta results
           callback({type:'neo4j-callback-ok', results: { main: mainResults, meta: [] }});
         }
       })
