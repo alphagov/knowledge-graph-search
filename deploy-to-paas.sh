@@ -15,21 +15,6 @@ else
     fi
 fi
 
-if [ "${GA_ID}" != "" ]; then
-    echo "GA_ID is set to ${GA_ID}"
-else
-    echo "Enter a GA tracking ID"
-    read -r GA_ID
-    echo "You entered ${GA_ID}"
-    echo "Is that correct? (y/n)"
-    read -r CONFIRM
-
-    if [ "${CONFIRM}" != "y" ]; then
-        echo "Aborting"
-        exit 1
-    fi
-fi
-
 
 echo "Inserting GTM snippet"
 
@@ -43,20 +28,9 @@ GTM_BODY_SNIPPET="<\!-- Google Tag Manager (noscript) --><noscript><iframe src=\
 GTM_HEAD_PLACEHOLDER='<\!-- INSERT GTM HEAD SNIPPET -->'
 GTM_BODY_PLACEHOLDER='<\!-- INSERT GTM BODY SNIPPET -->'
 
-
-GA_SNIPPET="<\!-- Google Analytics --><script async src=\"https:\/\/www.googletagmanager.com\/gtag\/js?id=${GA_ID}\"><\/script> \
-<script> \
-  window.dataLayer = window.dataLayer || []; \
-  function gtag(){dataLayer.push(arguments);} \
-  gtag('js', new Date()); \
-  gtag('config', '${GA_ID}'); \
-<\/script>"
-
-GA_PLACEHOLDER='<!-- INSERT GA SNIPPET -->'
-
 echo "Inserting snippets"
 
-sed -i".bak" -e "s/${GA_PLACEHOLDER}/${GA_SNIPPET}/" -e "s/${GTM_HEAD_PLACEHOLDER}/${GTM_HEAD_SNIPPET}/" -e"s/${GTM_BODY_PLACEHOLDER}/${GTM_BODY_SNIPPET}/" index.html
+sed -i".bak" -e "s/${GTM_HEAD_PLACEHOLDER}/${GTM_HEAD_SNIPPET}/" -e"s/${GTM_BODY_PLACEHOLDER}/${GTM_BODY_SNIPPET}/" index.html
 
 
 echo "Pushing app"
