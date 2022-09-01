@@ -83,7 +83,7 @@ const handleEvent = async function(event) {
     state.waiting = true;
     break;
   case 'neo4j-callback-ok':
-    state.searchResults = event.results.main;
+    state.searchResults = event.results.main.sort((a, b) => b.pagerank - a.pagerank);
     state.metaSearchResults = event.results.meta;
     state.waiting = false;
     state.errorText = null;
