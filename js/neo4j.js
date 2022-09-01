@@ -152,9 +152,9 @@ const searchQuery = function(state) {
 
   let areaClause = '';
   if (state.areaToSearch === 'mainstream') {
-    areaClause = 'WITH * WHERE n.publishing_app = "publisher"';
+    areaClause = 'WITH * WHERE n.publishingApp = "publisher"';
   } else if (state.areaToSearch === 'whitehall') {
-    areaClause = 'WITH * WHERE n.publishing_app = "whitehall"';
+    areaClause = 'WITH * WHERE n.publishingApp = "whitehall"';
   }
 
   let localeClause = '';
@@ -226,11 +226,11 @@ const returnClause = function() {
     n.documentType AS documentType,
     n.contentID AS contentID,
     n.locale AS locale,
-    n.publishing_app AS publishing_app,
-    n.first_published_at AS first_published_at,
-    n.public_updated_at AS public_updated_at,
-    n.withdrawn_at AS withdrawn_at,
-    n.withdrawn_explanation AS withdrawn_explanation,
+    n.publishingApp AS publishing_app,
+    n.firstPublishedAt AS first_published_at,
+    n.publicUpdatedAt AS public_updated_at,
+    n.withdrawnAt AS withdrawn_at,
+    n.withdrawnExplanation AS withdrawn_explanation,
     n.pagerank AS pagerank,
     COLLECT (distinct taxon.name) AS taxons,
     COLLECT (distinct o.name) AS primary_organisation,
