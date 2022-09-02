@@ -308,7 +308,7 @@ const viewResults = function() {
   const file = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(file); // TODO: use window.URL.revokeObjectURL(url);  after
   html.push(`
-      <p class="govuk-body"><a class="govuk-link" href="${url}" download="export.csv">Download all data in CSV</a></p>`);
+      <p class="govuk-body"><a class="govuk-link" href="${url}" download="export.csv">Download all ${state.searchResults.length} records in CSV</a></p>`);
   return html.join('');
 };
 
