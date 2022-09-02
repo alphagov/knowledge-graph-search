@@ -141,7 +141,7 @@ const searchQuery = function(state) {
   if (state.whereToSearch.text) fieldsToSearch.push('text', 'description');
   let inclusionClause = '';
   if (keywords.length > 0) {
-    inclusionClause = 'WHERE\n' +
+    inclusionClause = 'WITH * WHERE\n' +
     keywords
       .map(word => multiContainsClause(fieldsToSearch, word, state.caseSensitive))
       .join(`\n ${combinator}`);
@@ -163,7 +163,8 @@ const searchQuery = function(state) {
   }
 
   const taxon = state.selectedTaxon;
-  const taxonClause = taxon ? `WITH n
+  const taxonClause = taxon ? `
+    WITH n
     MATCH (n:Page)-[:IS_TAGGED_TO]->(taxon:Taxon)
     MATCH (taxon:Taxon)-[:HAS_PARENT*]->(ancestor_taxon:Taxon)
     WHERE taxon.name = "${taxon}" OR ancestor_taxon.name = "${taxon}"` :
@@ -189,6 +190,7 @@ const searchQuery = function(state) {
 
   return `
     MATCH (n:Page)
+    WHERE NOT n.documentType IN ['gone', 'redirect', 'placeholder', 'placeholder_person']
     ${inclusionClause}
     ${exclusionClause}
     ${localeClause}
