@@ -12,7 +12,7 @@ import { splitKeywords } from './utils.js';
 const queryGraph = async function(state, callback) {
   const metaSearchQuery = `
     MATCH (b)
-    WHERE (b:BankHoliday OR b:Person OR b:Organisation)
+    WHERE (b:BankHoliday OR b:Person OR b:Organisation OR b:Role)
     AND toLower(b.name) CONTAINS toLower($keywords)
     RETURN b`;
 
@@ -94,14 +94,36 @@ const buildMetaboxInfo = async function(info) {
          RETURN p,l,t,l2,o,h`,
         { name: info.name }
       );
-      result.homePage = resultsRoles.records[0]?._fields[5].properties.url;
+      result.homepage = resultsRoles.records[0]?._fields[5].properties.url;
       result.roles = resultsRoles.records.map(result => {
         return {
           name: result._fields[2].properties.name,
           orgName: result._fields[4].properties.name,
           orgUrl: result._fields[4].properties.url,
-          startDate: result._fields[1].properties.startDate,
-          endDate: result._fields[1].properties.endDate
+          startDate: formattedDate(result._fields[1].properties.startDate),
+          endDate: formattedDate(result._fields[1].properties.endDate)
+        };
+      });
+    });
+    break;
+  case 'Role':
+    // We found a Role, so we need to run a further query to
+    // Find the person holding that role (as well as previous people)
+    // Find the organisation for this role
+    await state.neo4jSession.readTransaction(async txc => {
+      const resultsRoles = await txc.run(
+        `MATCH (person:Person)-[has_role:HAS_ROLE]->(role:Role)
+         MATCH (person:Person)-[:HAS_HOMEPAGE]->(homepage:Page)
+         WHERE role.name = $name
+         RETURN person, has_role, homepage`,
+        { name: info.name }
+      );
+      result.persons = resultsRoles.records.map(result => {
+        return {
+          personName: result._fields[0].properties.name,
+          personHomepage: result._fields[2].properties.url,
+          roleStartDate: formattedDate(result._fields[1].properties.startDate),
+          roleEndDate: formattedDate(result._fields[1].properties.endDate)
         };
       });
     });
@@ -120,7 +142,7 @@ const buildMetaboxInfo = async function(info) {
         { name: info.name }
       );
       result.status = resultsSubOrgs.records[0]._fields[0].properties.status;
-      result.homePage = resultsSubOrgs.records[0]._fields[3].properties.url;
+      result.homepage = resultsSubOrgs.records[0]._fields[3].properties.url;
       result.description = resultsSubOrgs.records[0]._fields[3].properties.description;
       result.subOrgs = resultsSubOrgs.records
         .map(result => result._fields[2]?.properties)
@@ -248,6 +270,10 @@ const formattedMetaSearchResults = neo4jResults =>
         type: 'Person',
         name: result._fields[0].properties.name
       }
+      case 'Role': return {
+        type: 'Role',
+        name: result._fields[0].properties.name
+      }
       case 'Organisation': return {
         type: 'Organisation',
         name: result._fields[0].properties.name
@@ -270,4 +296,21 @@ const formattedMainSearchResults = neo4jResults => {
   });
 };
 
-export { searchQuery, queryGraph };
+
+const formattedDate = neo4jDateTime => {
+  if (!neo4jDateTime) return null;
+  const { year, month, day, hour, minute, second, nanosecond } = neo4jDateTime;
+  const date = new Date(
+    year.toInt(),
+    month.toInt() - 1, // neo4j dates start at 1, js dates start at 0
+    day.toInt(),
+    hour.toInt(),
+    minute.toInt(),
+    second.toInt(),
+    nanosecond.toInt() / 1000000 // js dates use milliseconds
+  );
+  return date;
+};
+
+
+export { searchQuery, queryGraph, formattedDate };
