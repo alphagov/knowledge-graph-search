@@ -64,8 +64,11 @@ const viewBankHolidayDetails = function(holiday) {
 
 const viewBankHoliday = record =>
   `<div class="meta-results-panel">
-     <h1 class="govuk-heading-m">${record.name}</h1>
-       ${viewBankHolidayDetails(record)}
+     <h1 class="govuk-heading-m">
+       ${record.name}
+     </h1>
+     <p class="govuk-body">Bank holiday</p>
+     ${viewBankHolidayDetails(record)}
      </div>
   `;
 
@@ -82,6 +85,7 @@ const viewOrg = record =>
      <h1 class="govuk-heading-m">
        <a class="govuk-link" href="${record.homePage}">${record.name}</a>
      </h1>
+     <p class="govuk-body">Government organisation</p>
      <p class="govuk-body">${record.description}</p>
      ${record.subOrgs && record.subOrgs.length > 0 ?
        viewOrgSubOrgs(record.subOrgs) :
