@@ -24,7 +24,7 @@ const queryGraph = async function(state, callback) {
     const allPromises = [mainQueryPromise];
 
     const searchKeywords = state.selectedWords.replace(/"/g,'');
-    if (searchKeywords.length > 5) {
+    if (searchKeywords.length >= 5) {
       console.log('running meta cypher query', metaSearchQuery);
       const metaQueryPromise = txc.run(
         metaSearchQuery,
