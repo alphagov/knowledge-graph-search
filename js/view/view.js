@@ -326,10 +326,10 @@ const viewSearchResults = () => {
     return viewWaiting();
   case 'results':
     document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraph search`;
-    return `${viewMetaResults()} ${viewResults()}`;
+    return `${viewMetaResults() || ''} ${viewResults()}`; // FIXME - avoid || ''
   case 'no-results':
     document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraph search`;
-    return `${viewMetaResults()} ${viewNoResults()}`;
+    return `${viewMetaResults() || ''} ${viewNoResults()}`; // FIXME - avoid || ''
   default:
     document.title = 'GovGraph search';
     return '';
