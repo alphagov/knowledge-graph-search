@@ -37,9 +37,16 @@ const queryGraph = async function(state, callback) {
     Promise.allSettled(allPromises)
       .then(async results => {
         const mainResults = formattedMainSearchResults(results[0].value);
-        const metaResults = results.length === 2 ? formattedMetaSearchResults(results[1].value) : []
+        let metaResults = results.length === 2 ? formattedMetaSearchResults(results[1].value) : [];
+
+        // If there's an exact match, just keep it
+        const exactMetaResults = metaResults.filter(result => result.name.toLowerCase() === searchKeywords.toLowerCase());
+        if (exactMetaResults.length === 1) {
+          metaResults = exactMetaResults;
+        }
+
         if (metaResults.length === 1) {
-          // one meta results: show the knowledge panel
+          // one meta result: show the knowledge panel
           const fullMetaResults = await buildMetaboxInfo(metaResults[0]);
           callback({type:'neo4j-callback-ok', results: { main: mainResults, meta: [fullMetaResults] }});
         } else if (metaResults.length >= 1) {
@@ -141,7 +148,7 @@ const buildMetaboxInfo = async function(info) {
          OPTIONAL MATCH (n:Organisation)-[:HAS_CHILD]->(o)
          OPTIONAL MATCH (n:Organisation)-[:HAS_HOMEPAGE]->(nh)
          OPTIONAL MATCH (o)-[l:HAS_CHILD]->(c:Organisation)
-         WHERE n.status <> "closed"
+         WHERE c.status <> "closed"
          RETURN o, l, c, h, n, nh`,
         { name: info.name }
       );

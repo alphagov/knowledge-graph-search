@@ -1,9 +1,10 @@
 import { state } from '../state.js';
+import { viewMetaLink } from './view-components.js';
 
 
 const viewOrgSubOrg = function(subOrg) {
-  return `<li><a class="govuk-link" href="${subOrg.url}">${subOrg.name}</a></li>`;
-};
+  return `<li>${viewMetaLink(subOrg.name)}</li>`;
+}
 
 
 const viewOrgSubOrgs = function(subOrgList) {
@@ -58,10 +59,18 @@ const viewRolePersons = persons => {
     '<p class="govuk-body">No previous holders</p>' :
     (previous.length === 1 ? `
      <p class="govuk-body">Previous holder: ${formatPerson(previous[0])}</p>` : `
-      <p class="govuk-body">Previous holders:</p>
-      <ul class="govuk-list govuk-list--bullet">
-        ${previous.sort((a,b) => b.roleStartDate.getTime() - a.roleStartDate.getTime()).map(person => `<li>${formatPerson(person)}</li>`).join('')}
-    </ul>
+      <details class="govuk-details" data-module="govuk-details">
+        <summary class="govuk-details__summary">
+          <span class="govuk-details__summary-text">
+            Previous holders
+          </span>
+        </summary>
+        <div class="govuk-details__text">
+          <ul class="govuk-list govuk-list--bullet">
+            ${previous.sort((a,b) => b.roleStartDate.getTime() - a.roleStartDate.getTime()).map(person => `<li>${formatPerson(person)}</li>`).join('')}
+          </ul>
+        </div>
+      </details>
   `);
 
   return `${currentsHtml} ${previousHtml}`;
@@ -122,7 +131,7 @@ const viewRole = function(record) {
   const nameHtml = record.homePage ?
     `<a class="govuk-link" href="${record.homepage}">${record.name}</a>` :
      record.name;
-  const orgsHtml = record.orgNames.map(name => `<a href="?selected-words=${encodeURIComponent(name)}">${name}</a>`).join(', ');
+  const orgsHtml = record.orgNames.map(viewMetaLink).join(', ');
 
   return `
     <div class="meta-results-panel">
@@ -140,7 +149,7 @@ const viewOrg = record =>
        <a class="govuk-link" href="${record.homepage}">${record.name}</a>
      </h1>
      <p class="govuk-body">
-       Government organisation${record.parentName ? `, part of <a href="${record.parentHomepage}">${record.parentName}</a>` : ''}
+       Government organisation${record.parentName ? `, part of ${viewMetaLink(record.parentName)}` : ''}
      </p>
      <p class="govuk-body">${record.description}</p>
      ${record.subOrgs && record.subOrgs.length > 0 ?
@@ -167,7 +176,7 @@ const viewMetaResults = function() {
         <div class="meta-results-panel__collapsible ${expandedClass}">
           <h2 class="govuk-heading-s">"${state.selectedWords}" can refer to:</h2>
           <ul class="govuk-list govuk-list--bullet">
-            ${state.metaSearchResults.map(result => `<li><a class="govuk-link" href="/?selected-words=${encodeURIComponent(`"${result.name}"`)}">${result.name}</a> (${result.type.toLowerCase()})</li>`).join('')}
+            ${state.metaSearchResults.map(result => `<li>${viewMetaLink(result.name)} (${result.type.toLowerCase()})</li>`).join('')}
           </ul>
         </div>
         ${viewMetaResultsExpandToggle()}

@@ -32,4 +32,7 @@ const viewFeedbackBanner = function() {
     </div>`;
 }
 
-export { viewInfoButton, viewFeedbackBanner };
+const viewMetaLink = text =>
+  `<a class="govuk-link" href="/?selected-words=${encodeURIComponent(`"${text}"`)}">${text}</a>`;
+
+export { viewInfoButton, viewFeedbackBanner, viewMetaLink };
