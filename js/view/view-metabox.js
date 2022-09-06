@@ -122,12 +122,14 @@ const viewRole = function(record) {
   const nameHtml = record.homePage ?
     `<a class="govuk-link" href="${record.homepage}">${record.name}</a>` :
      record.name;
+  const orgsHtml = record.orgNames.map(name => `<a href="?selected-words=${encodeURIComponent(name)}">${name}</a>`).join(', ');
 
   return `
     <div class="meta-results-panel">
       <h1 class="govuk-heading-m">${nameHtml}</h1>
-      <p class="govuk-body">Official role</p>
+      <p class="govuk-body">Official role under ${orgsHtml}</p>
       ${record.persons && record.persons.length > 0 ? viewRolePersons(record.persons) : '' }
+
     </div>`
 };
 
@@ -137,7 +139,9 @@ const viewOrg = record =>
      <h1 class="govuk-heading-m">
        <a class="govuk-link" href="${record.homepage}">${record.name}</a>
      </h1>
-     <p class="govuk-body">Government organisation</p>
+     <p class="govuk-body">
+       Government organisation${record.parentName ? `, part of <a href="${record.parentHomepage}">${record.parentName}</a>` : ''}
+     </p>
      <p class="govuk-body">${record.description}</p>
      ${record.subOrgs && record.subOrgs.length > 0 ?
        viewOrgSubOrgs(record.subOrgs) :

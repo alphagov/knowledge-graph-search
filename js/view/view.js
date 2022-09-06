@@ -268,8 +268,6 @@ const viewResults = function() {
   }
 */
 
-  html.push(viewMetaResults());
-
   if (nbRecords < state.nbResultsLimit) {
     html.push(`
       <h2 tabindex="0" id="results-heading" class="govuk-heading-l">${nbRecords} result${nbRecords!==0 ? 's' : ''}</h2>`);
@@ -328,10 +326,10 @@ const viewSearchResults = () => {
     return viewWaiting();
   case 'results':
     document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraph search`;
-    return viewResults();
+    return `${viewMetaResults()} ${viewResults()}`;
   case 'no-results':
     document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraph search`;
-    return viewNoResults();
+    return `${viewMetaResults()} ${viewNoResults()}`;
   default:
     document.title = 'GovGraph search';
     return '';

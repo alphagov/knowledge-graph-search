@@ -14,7 +14,8 @@ const queryGraph = async function(state, callback) {
     MATCH (b)
     WHERE (b:BankHoliday OR b:Person OR b:Organisation OR b:Role)
     AND toLower(b.name) CONTAINS toLower($keywords)
-    RETURN b`;
+    OPTIONAL MATCH (b)-[:HAS_HOMEPAGE]->(p:Page)
+    RETURN b,p`;
 
   state.neo4jSession.readTransaction(txc => {
     const mainCypherQuery = searchQuery(state);
@@ -112,16 +113,18 @@ const buildMetaboxInfo = async function(info) {
     // Find the organisation for this role
     await state.neo4jSession.readTransaction(async txc => {
       const resultsRoles = await txc.run(
-        `MATCH (person:Person)-[has_role:HAS_ROLE]->(role:Role)
+        `MATCH (person:Person)-[has_role:HAS_ROLE]->(role:Role)-[belongs_to:BELONGS_TO]->(org:Organisation)
          MATCH (person:Person)-[:HAS_HOMEPAGE]->(homepage:Page)
          WHERE role.name = $name
-         RETURN person, has_role, homepage`,
+         RETURN person, has_role, homepage, COLLECT (DISTINCT org) as orgs`,
         { name: info.name }
       );
+      result.orgNames = resultsRoles.records[0]._fields[3].map(org => org.properties.name);
       result.persons = resultsRoles.records.map(result => {
         return {
           personName: result._fields[0].properties.name,
           personHomepage: result._fields[2].properties.url,
+
           roleStartDate: formattedDate(result._fields[1].properties.startDate),
           roleEndDate: formattedDate(result._fields[1].properties.endDate)
         };
@@ -135,13 +138,18 @@ const buildMetaboxInfo = async function(info) {
       const resultsSubOrgs = await txc.run(
         `MATCH (o:Organisation)-[:HAS_HOMEPAGE]->(h:Page)
          WHERE o.name = $name
-         WITH o, h
-         OPTIONAL MATCH (o)-[l:HAS_CHILD]->(n:Organisation)
+         OPTIONAL MATCH (n:Organisation)-[:HAS_CHILD]->(o)
+         OPTIONAL MATCH (n:Organisation)-[:HAS_HOMEPAGE]->(nh)
+         OPTIONAL MATCH (o)-[l:HAS_CHILD]->(c:Organisation)
          WHERE n.status <> "closed"
-         RETURN o, l, n, h`,
+         RETURN o, l, c, h, n, nh`,
         { name: info.name }
       );
-      result.status = resultsSubOrgs.records[0]._fields[0].properties.status;
+
+      // if there are no suborgs then we can't read the status of the
+      // parent org
+      result.parentName = resultsSubOrgs.records[0]._fields[4]?.properties.name;
+      result.parentHomepage = resultsSubOrgs.records[0]._fields[5]?.properties.url;
       result.homepage = resultsSubOrgs.records[0]._fields[3].properties.url;
       result.description = resultsSubOrgs.records[0]._fields[3].properties.description;
       result.subOrgs = resultsSubOrgs.records
@@ -265,28 +273,12 @@ const returnClause = function() {
 
 const formattedMetaSearchResults = neo4jResults =>
   neo4jResults.records.map(result => {
-    switch (result._fields[0].labels[0]) {
-      case 'Person': return {
-        type: 'Person',
-        name: result._fields[0].properties.name
-      }
-      case 'Role': return {
-        type: 'Role',
-        name: result._fields[0].properties.name
-      }
-      case 'Organisation': return {
-        type: 'Organisation',
-        name: result._fields[0].properties.name
-      }
-      case 'BankHoliday': return {
-        type: 'BankHoliday',
-        name: result._fields[0].properties.name
-      }
-      default: return {
-        type: 'unknown'
-      }
+    return {
+      type: result._fields[0].labels[0],
+      ...result._fields[0].properties
     }
   });
+
 
 const formattedMainSearchResults = neo4jResults => {
   return neo4jResults.records.map(result => {
