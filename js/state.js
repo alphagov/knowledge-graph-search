@@ -24,6 +24,7 @@ const initialSearchParams = {
   displayFeedbackBanner: true, // whether we should show the banner requesting feedback from user.
 };
 
+
 const state = {
   ...initialSearchParams,
   user: '',
@@ -39,12 +40,9 @@ const state = {
   metaSearchResults: null,
   skip: 0, // where to start the pagination (number of results)
   resultsPerPage: 10, // number of results per page
-  showFields: { // what result fields to show by default
-    url: true,
-    title: true
-  },
   waiting: false, // whether we're waiting for a request to return,
-  disamBoxExpanded: false // if there's a resizeable disamb meta box, whether it's expanded or not
+  disamBoxExpanded: false, // if there's a resizeable disamb meta box, whether it's expanded or not
+  showPageWithIndex: null // if non-null and a number, show information about the page displayed in the results with that index
 };
 
 

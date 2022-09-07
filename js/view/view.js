@@ -10,6 +10,9 @@ import { viewFeedbackBanner } from './view-components.js';
 const view = () => {
   console.log('view')
   document.title = 'GovGraph search';
+
+  const showPage = Number.isInteger(state.showPageWithIndex) && state.searchResults;
+
   id('page-content').innerHTML = `
     <main class="govuk-main-wrapper" id="main-content" role="main">
       ${state.displayFeedbackBanner ? viewFeedbackBanner() : ''}
@@ -18,11 +21,10 @@ const view = () => {
           <h1 class="govuk-heading-xl main-title">
             GovGraph Search
           </h1>
-          ${viewSearchTypeSelector()}
-          ${viewErrorBanner()}
+          ${showPage ? '' : `${viewSearchTypeSelector()}${viewErrorBanner()}`}
        </div>
       </div>
-      ${viewMainLayout()}
+      ${showPage ? viewPageDetails() : viewMainLayout()}
     </main>
   `;
 
@@ -33,7 +35,7 @@ const view = () => {
       event => handleEvent({type: 'dom', id: event.target.getAttribute('id')})));
 
   // Not sure this is even fired, since browser blocks submit because "the form is not connected"
-  document.getElementById('search-form').addEventListener(
+  id('search-form')?.addEventListener(
     'submit',
     event => {
       event.preventDefault();
@@ -48,7 +50,7 @@ const view = () => {
     });
 
 
-  document.getElementById('meta-results-expand')?.addEventListener(
+  id('meta-results-expand')?.addEventListener(
     'click',
     () => handleEvent({type: 'dom', id: 'toggleDisamBox'})
   );
@@ -56,6 +58,18 @@ const view = () => {
   // focus on the results heading if present
   id('results-heading')?.focus();
 
+};
+
+
+const viewPageDetails = () => {
+  const pageData = state.searchResults[state.showPageWithIndex + state.skip];
+  return `
+    <h1 class="govuk-heading-l">${pageData.title}</h1>
+    <ul class="govuk-list--bullet">
+      ${Object.keys(pageData).map(key => `<li>${fieldName(key)}: ${fieldFormat(key, pageData[key])}</li>`).join('')}
+    </ul>
+    <button class="govuk-button" id="close-page-button">Back to results</button>
+  `;
 };
 
 
@@ -87,7 +101,7 @@ const viewMainLayout = () => {
             ${viewSearchPanel(state.searchType)}
           </div>
           <div class="govuk-grid-column-two-thirds">
-            ${viewSearchResults(state.searchResults, state.showFields)}
+            ${viewSearchResults()}
           </div>
         </div>`;
     }
@@ -98,7 +112,7 @@ const viewMainLayout = () => {
           ${viewSearchPanel(state.searchType)}
         </div>
       </div>
-      ${viewSearchResults(state.searchResults, state.showFields)}
+      ${viewSearchResults()}
     `;
   }
 };
@@ -204,45 +218,33 @@ const viewSearchResultsTable = () => {
   const recordsToShow = state.searchResults.slice(state.skip, state.skip + state.resultsPerPage);
   html.push(`
     <div class="govuk-body">
-      <fieldset class="govuk-fieldset" ${state.waiting && 'disabled="disabled"'}>
-        <legend class="govuk-fieldset__legend">For each result, display:</legend>
-        <ul class="kg-checkboxes" id="show-fields">`);
-  html.push(Object.keys(state.searchResults[0]).map(key => `
-          <li class="kg-checkboxes__item">
-            <input class="kg-checkboxes__input"
-                   data-interactive="true"
-                   type="checkbox" id="show-field-${key}"
-              ${state.showFields[key] ? 'checked' : ''}/>
-            <label for="show-field-${key}" class="kg-label kg-checkboxes__label">${fieldName(key)}</label>
-          </li>`).join(''));
-  html.push(`
-        </ul>
-      </fieldset>
       <table id="results-table" class="govuk-table">
         <tbody class="govuk-table__body">
-        <tr class="govuk-table__row">
-          <th scope="col" class="a11y-hidden">Page</th>`);
-  Object.keys(state.showFields).forEach(key => {
-    if (state.showFields[key]) {
-      html.push(`<th scope="col" class="govuk-table__header">${fieldName(key)}</th>`);
-    }
-  });
+          <tr class="govuk-table__row">
+            <th scope="col" class="a11y-hidden">Page</th>
+            <th scope="col" class="govuk-table__header">Page title</th>
+            <th scope="col" class="govuk-table__header"></th>
+          </tr>
+    `);
 
   recordsToShow.forEach((record, recordIndex) => {
     html.push(`
-      <tr class="govuk-table__row">
-        <th class="a11y-hidden">${recordIndex}</th>`);
-    Object.keys(state.showFields).forEach(key => {
-      if (state.showFields[key]) {
-        html.push(`<td class="govuk-table__cell">${fieldFormat(key, record[key])}</td>`);
-      }
-    });
-    html.push(`</tr>`);
+          <tr class="govuk-table__row">
+            <th class="a11y-hidden">${recordIndex}</th>
+            <td class="govuk-table__cell">
+              <a class="govuk-link" href="${record['url']}">${fieldFormat('title', record['title'])}
+            </td>
+            <td class="govuk-table__cell">
+              <button type="button" class="govuk-button" id="page-details-${recordIndex}">Details</button>
+            </td>
+          </tr>
+   `);
   });
   html.push(`
         </tbody>
       </table>
-    </div>`);
+    </div>
+  `);
   return html.join('');
 };
 
@@ -367,10 +369,10 @@ const viewSearchResults = () => {
 
 
 // Remove duplicates - but should be fixed in cypher
-const formatNames = array => [...new Set(array)].join(', ');
+const formatNames = array => [...new Set(array)].map(x => `"${x}"`).join(', ');
 
 
-const formatDateTime = date => `${date.slice(0,10)}<br/>${date.slice(12, 16)}`;
+const formatDateTime = date => `${date.slice(0,10)} at ${date.slice(12, 16)}`;
 
 
 const fieldFormatters = {
@@ -408,7 +410,7 @@ const fieldFormatters = {
   },
   'withdrawn_at' : {
     name: 'Withdrawn at',
-    format: date => date ? formatDateTime(date) : "Not withdrawn"
+    format: date => date ? formatDateTime(date) : "not withdrawn"
   },
   'withdrawn_explanation' : {
     name: 'Withdrawn reason',
