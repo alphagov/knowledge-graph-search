@@ -30,7 +30,7 @@ const state = {
   errorText: null,
   userErrors: null, // error codes due to user not entering valid search criteria
   neo4jSession: null,
-  nbResultsLimit: 1000, // limit queries to this number of results
+  nbResultsLimit: 50000, // limit queries to this number of results
   searchResults: null,
   metaSearchResults: null,
   skip: 0, // where to start the pagination (number of results)

@@ -52,7 +52,10 @@ Otherwise there's probably a problem. Please contact the Data Products team.`;
   }
 
   console.log('starting neo4j session');
-  state.neo4jSession = state.neo4jDriver.session({ defaultAccessMode: neo4j.session.READ });
+  state.neo4jSession = state.neo4jDriver.session({
+    defaultAccessMode: neo4j.session.READ,
+    fetchSize: 50000
+  });
   state.errorText = null;
 
   // if page is unloaded then close the neo4j connection
