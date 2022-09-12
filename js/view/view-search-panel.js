@@ -10,7 +10,7 @@ const viewSearchPanel = (searchType) => {
     return `
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
-          <h2 class="govuk-heading-m">Mixed search</h2>
+          <h1 class="govuk-heading-xl">Mixed search</h1>
           ${viewKeywordsInput()}
           ${viewKeywordsCombinator()}
           ${viewExclusionsInput()}
@@ -160,6 +160,9 @@ const viewTaxonSelector = () => `
       <label class="govuk-label label--bold" for="taxon">
         Search for taxons
       </label>
+      <div class="govuk-hint">
+        Type the first letters of a taxon or select from the dropdown
+      </div>
       <datalist id="taxonList">
         ${state.taxons.map(taxon => `<option>${taxon}</option>`)}
       </datalist>
@@ -184,6 +187,9 @@ const viewLocaleSelector = () => {
       <label class="govuk-label label--bold" for="locale">
         Search for languages
       </label>
+      <div class="govuk-hint">
+        Type the first letters of a language or select from the dropdown
+      </div>
       <datalist id="localeList">
   `];
   html.push(...state.locales.map(code => `<option data-value="${code}" ${state.selectedLocale==code ? 'selected' : ''}>${languageName(code)}</option>`))

@@ -109,9 +109,9 @@ const viewBankHolidayDetails = function(holiday) {
 
 const viewBankHoliday = record =>
   `<div class="meta-results-panel">
-     <h1 class="govuk-heading-m">
+     <h2 class="govuk-heading-m">
        ${record.name}
-     </h1>
+     </h2>
      <p class="govuk-body">Bank holiday</p>
      ${viewBankHolidayDetails(record)}
      </div>
@@ -120,9 +120,9 @@ const viewBankHoliday = record =>
 
 const viewPerson = record =>
   `<div class="meta-results-panel">
-     <h1 class="govuk-heading-m">
+     <h2 class="govuk-heading-m">
        <a class="govuk-link" href="${record.homepage}">${record.name}</a>
-     </h1>
+     </h2>
      ${record.roles && record.roles.length > 0 ? viewPersonRoles(record.roles) : ''}
    </div>`;
 
@@ -135,7 +135,7 @@ const viewRole = function(record) {
 
   return `
     <div class="meta-results-panel">
-      <h1 class="govuk-heading-m">${nameHtml}</h1>
+      <h2 class="govuk-heading-m">${nameHtml}</h2>
       <p class="govuk-body">Official role under ${orgsHtml}</p>
       ${record.persons && record.persons.length > 0 ? viewRolePersons(record.persons) : '' }
 
@@ -145,9 +145,9 @@ const viewRole = function(record) {
 
 const viewOrg = record =>
   `<div class="meta-results-panel">
-     <h1 class="govuk-heading-m">
+     <h2 class="govuk-heading-m">
        <a class="govuk-link" href="${record.homepage}">${record.name}</a>
-     </h1>
+     </h2>
      <p class="govuk-body">
        Government organisation${record.parentName ? `, part of ${viewMetaLink(record.parentName)}` : ''}
      </p>

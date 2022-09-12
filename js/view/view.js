@@ -10,23 +10,33 @@ import { viewFeedbackBanner } from './view-components.js';
 const view = () => {
   console.log('view')
   document.title = 'GovGraph search';
+  const html = [];
+  const showPageDetails = Number.isInteger(state.showPageWithIndex) && state.searchResults;
 
-  const showPage = Number.isInteger(state.showPageWithIndex) && state.searchResults;
-
-  id('page-content').innerHTML = `
+  html.push(`
     <main class="govuk-main-wrapper" id="main-content" role="main">
       ${state.displayFeedbackBanner ? viewFeedbackBanner() : ''}
+      ${viewErrorBanner()}
+  `);
+
+  if (showPageDetails) {
+    html.push(viewPageDetails());
+  } else {
+    html.push(`
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-          <h1 class="govuk-heading-xl main-title">
-            GovGraph Search
-          </h1>
-          ${showPage ? '' : `${viewSearchTypeSelector()}${viewErrorBanner()}`}
-       </div>
+          ${viewSearchTypeSelector()}
+        </div>
       </div>
-      ${showPage ? viewPageDetails() : viewMainLayout()}
+      ${viewMainLayout()}
+    `);
+  }
+
+  html.push(`
     </main>
-  `;
+  `);
+
+  id('page-content').innerHTML = html.join('');
 
   // Add event handlers
   document.querySelectorAll('#dismiss-feedback-banner, button, input[type=checkbox][data-interactive=true]')
@@ -65,7 +75,7 @@ const viewPageDetails = () => {
   const pageData = state.searchResults[state.showPageWithIndex + state.skip];
   return `
     <h1 class="govuk-heading-l">${pageData.title}</h1>
-    <ul class="govuk-list--bullet">
+    <ul class="govuk-list govuk-list--bullet">
       ${Object.keys(pageData).map(key => `<li>${fieldName(key)}: ${fieldFormat(key, pageData[key])}</li>`).join('')}
     </ul>
     <button class="govuk-button" id="close-page-button">Back to results</button>
@@ -89,7 +99,7 @@ const viewMainLayout = () => {
   if (state.searchType === 'mixed') {
     if (!state.searchResults) {
       return `
-        <div class="govuk-grid-row">
+        <div class="govuk-grid-row mixed-layout--no-results">
           <div class="govuk-grid-column-two-thirds">
             ${viewSearchPanel(state.searchType)}
           </div>
@@ -107,7 +117,7 @@ const viewMainLayout = () => {
     }
   } else {
     return `
-      <div class="govuk-grid-row">
+      <div class="govuk-grid-row simple-search">
         <div class="govuk-grid-column-two-thirds">
           ${viewSearchPanel(state.searchType)}
         </div>
@@ -163,7 +173,7 @@ const viewQueryDescription = (includeMarkup = true) => {
     clauses[0] :
     `${clauses.slice(0, clauses.length - 1).join(', ')} and ${clauses[clauses.length - 1]}`;
 
-  return `pages that ${joinedClauses}, in descending popularity`;
+  return `pages that ${joinedClauses}`;
 };
 
 
@@ -176,15 +186,15 @@ const viewErrorBanner = () => {
 
     if (state.errorText) {
       html.push(`
-        <h2 class="govuk-error-summary__title" id="error-summary-title">System error</h2>
+        <h1 class="govuk-error-summary__title" id="error-summary-title">System error</h1>
         <p class="govuk-body">${state.errorText}</p>
       `);
     } else {
       if (state.userErrors) {
         html.push(`
-          <h2 class="govuk-error-summary__title" id="error-summary-title">
+          <h1 class="govuk-error-summary__title" id="error-summary-title">
             There is a problem
-          </h2>
+          </h1>
           <ul class="govuk-error-summary__list">
         `);
         state.userErrors.forEach(userError => {
@@ -221,16 +231,16 @@ const viewSearchResultsTable = () => {
       <table id="results-table" class="govuk-table">
         <tbody class="govuk-table__body">
           <tr class="govuk-table__row">
-            <th scope="col" class="a11y-hidden">Page</th>
-            <th scope="col" class="govuk-table__header">Page title</th>
-            <th scope="col" class="govuk-table__header"></th>
+            <th scope="col" class="a11y-hidden">Result number</th>
+            <th scope="col" class="a11y-hidden">Page title</th>
+            <th scope="col" class="a11y-hidden"></th>
           </tr>
     `);
 
   recordsToShow.forEach((record, recordIndex) => {
     html.push(`
           <tr class="govuk-table__row">
-            <th class="a11y-hidden">${recordIndex}</th>
+            <td class="govuk-table__cell">${recordIndex + 1 + state.skip}</td>
             <td class="govuk-table__cell">
               <a class="govuk-link" href="${record['url']}">${fieldFormat('title', record['title'])}
             </td>
@@ -301,7 +311,7 @@ const viewResults = function() {
 
   if (nbRecords < state.nbResultsLimit) {
     html.push(`
-      <h2 tabindex="0" id="results-heading" class="govuk-heading-l">${nbRecords} result${nbRecords!==0 ? 's' : ''}</h2>`);
+      <h1 tabindex="0" id="results-heading" class="govuk-heading-l">${nbRecords} result${nbRecords!==0 ? 's' : ''}</h1>`);
   } else {
     html.push(`
       <div class="govuk-warning-text">
@@ -318,7 +328,7 @@ const viewResults = function() {
 
   if (nbRecords >= state.resultsPerPage) {
     html.push(`
-      <p class="govuk-body">Showing results ${state.skip + 1} to ${Math.min(nbRecords, state.skip + state.resultsPerPage)}</p>
+      <p class="govuk-body">Showing results ${state.skip + 1} to ${Math.min(nbRecords, state.skip + state.resultsPerPage)}, in descending popularity</p>
       <a class="govuk-skip-link" href="#results-table">Skip to results</a>
       <a class="govuk-skip-link" href="#search-form">Back to search filters</a>
 `);
@@ -344,7 +354,7 @@ const viewResults = function() {
 
 const viewNoResults = () => {
   return `
-    <h2 tabindex="0" id="results-heading" class="govuk-heading-l">No results</h2>
+    <h1 tabindex="0" id="results-heading" class="govuk-heading-l">No results</h1>
     <div class="govuk-body">for ${viewQueryDescription()}</div>
   `;
 };

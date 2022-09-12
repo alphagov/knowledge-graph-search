@@ -10,6 +10,18 @@
   margin-right: 20px;
 }
 
+.govuk-header {
+  margin-bottom: 20px;
+}
+
+.govuk-header__link--service-name {
+  font-size: 200%;
+}
+
+.govuk-error-summary {
+  margin-top: 20px;
+}
+
 .govuk-hint {
   margin-bottom: 0;
 }
@@ -47,6 +59,9 @@ body {
   margin-top: 10px;
 }
 
+.govuk-table__body {
+  margin-top: 1px solid #b1b4b6;
+
 svg {
   border: 1px solid black;
 }
@@ -55,33 +70,8 @@ pre {
   background: #ddd;
 }
 
-.kg-checkboxes, .kg-radios {
-  padding: 0;
-  display: inline;
-  line-height: 1.2;
-  .kg-checkboxes__item, .kg-radios__item {
-    display: inline-block;
-    padding: 0 1em 0 0;
-    background: #ddd;
-    label {
-      font-weight: normal;
-    }
-  }
-}
-
-.mode-buttons {
-  margin-bottom: 0;
-  button {
-    font-size: 19px;
-    border: 1px solid black;
-    background: #ddd;
-    &.search-active {
-      border-width: 3px;
-    }
-  }
-}
-
 .search-selector {
+  margin-bottom: 30px;
   button {
     font-size: 19px;
     border: 0;
@@ -95,12 +85,8 @@ pre {
   }
 }
 
-h2:focus-visible {
+h1:focus-visible, h2:focus-visible {
   outline: none;
-}
-
-label.govuk-label.label--bold, legend.govuk-fieldset__legend {
-  font-weight: bold;
 }
 
 .mixed-layout .meta-results-panel {
