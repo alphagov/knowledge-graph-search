@@ -98,4 +98,23 @@ const searchState = function() {
   return { code: 'ready-to-search' };
 };
 
-export { state, setQueryParamsFromQS, searchState };
+
+const resetSearch = function() {
+  state.selectedWords = '';
+  state.excludedWords = '';
+  state.selectedTaxon = '';
+  state.selectedLocale = '';
+  state.whereToSearch.title = true;
+  state.whereToSearch.text = false;
+  state.caseSensitive = false;
+  state.linkSearchUrl = '';
+  state.skip = 0; // reset to first page
+  state.areaToSearch = 'any';
+  state.searchResults = null;
+  state.searchQuery = '';
+  state.waiting = false;
+  state.combinator = 'all';
+};
+
+
+export { state, setQueryParamsFromQS, searchState, resetSearch };

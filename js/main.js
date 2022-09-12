@@ -1,7 +1,7 @@
 /* global neo4j */
 
 import { view } from './view/view.js';
-import { state, setQueryParamsFromQS } from './state.js';
+import { state, setQueryParamsFromQS, resetSearch } from './state.js';
 import { searchButtonClicked } from './events.js';
 
 
@@ -38,16 +38,18 @@ const init = async function() {
   );
 
   try {
+    console.log('Testing connectivity with the Knowledge Graph');
     await state.neo4jDriver.verifyConnectivity(
       { database: state.server }
     );
   } catch (e) {
     console.log('connectivity check failed', e);
-    state.errorText = `Error connecting to the GovGraph.<br/>
+    state.errorText = `Error connecting to the GovGraph.<br/></br/>
 Possible causes:<br/>
 - You're not on the VPN<br/>
-- The GovGraph only runs on weekdays from 9 to 7<br/>
+- The GovGraph only runs on weekdays from 9an to 7pm<br/><br/>
 Otherwise there's probably a problem. Please contact the Data Products team.`;
+    resetSearch();
     return;
   }
 
@@ -99,7 +101,9 @@ Otherwise there's probably a problem. Please contact the Data Products team.`;
 
 (async () => {
   await init();
-  setQueryParamsFromQS();
-  searchButtonClicked();
+  if (!state.errorText) {
+    setQueryParamsFromQS();
+    searchButtonClicked();
+  }
   view();
 })();

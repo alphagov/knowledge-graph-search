@@ -1,4 +1,4 @@
-import { state, searchState } from './state.js';
+import { state, searchState, resetSearch } from './state.js';
 import { id, getFormInputValue } from './utils.js';
 import { view } from './view/view.js';
 import { languageCode } from './lang.js';
@@ -52,23 +52,23 @@ const handleEvent = async function(event) {
         state.disambBoxExpanded = !state.disambBoxExpanded;
         break;
       case 'search-keyword':
-        clearAllFilters();
+        resetSearch();
         state.searchType = 'keyword';
         break;
       case 'search-link':
-        clearAllFilters();
+        resetSearch();
         state.searchType = 'link';
         break;
       case 'search-taxon':
-        clearAllFilters();
+        resetSearch();
         state.searchType = 'taxon';
         break;
       case 'search-language':
-        clearAllFilters();
+        resetSearch();
         state.searchType = 'language';
         break;
       case 'search-mixed':
-        clearAllFilters();
+        resetSearch();
         state.searchType = 'mixed';
         break;
       case 'close-page-button':
@@ -140,23 +140,6 @@ const searchButtonClicked = async function() {
   }
 };
 
-
-const clearAllFilters = function() {
-  state.selectedWords = '';
-  state.excludedWords = '';
-  state.selectedTaxon = '';
-  state.selectedLocale = '';
-  state.whereToSearch.title = true;
-  state.whereToSearch.text = false;
-  state.caseSensitive = false;
-  state.linkSearchUrl = '';
-  state.skip = 0; // reset to first page
-  state.areaToSearch = 'any';
-  state.searchResults = null;
-  state.searchQuery = '';
-  state.waiting = false;
-  state.combinator = 'all';
-};
 
 
 const updateUrl = function() {
