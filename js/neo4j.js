@@ -25,7 +25,7 @@ const queryGraph = async function(state, callback) {
     const allPromises = [mainQueryPromise];
 
     const searchKeywords = state.selectedWords.replace(/"/g,'');
-    if (searchKeywords.length >= 5) {
+    if (searchKeywords.length >= 5 && searchKeywords.includes(' ')) {
       console.log('running meta cypher query', metaSearchQuery);
       const metaQueryPromise = txc.run(
         metaSearchQuery,
@@ -36,11 +36,16 @@ const queryGraph = async function(state, callback) {
     callback({type: 'neo4j-running'});
     Promise.allSettled(allPromises)
       .then(async results => {
+        console.log(`neo4j returned ${results.length} results`);
+
         const mainResults = formattedMainSearchResults(results[0].value);
         let metaResults = results.length === 2 ? formattedMetaSearchResults(results[1].value) : [];
 
         // If there's an exact match, just keep it
-        const exactMetaResults = metaResults.filter(result => result.name.toLowerCase() === searchKeywords.toLowerCase());
+        const exactMetaResults = metaResults.filter(result => {
+          return result.name.toLowerCase() === searchKeywords.toLowerCase()
+        });
+
         if (exactMetaResults.length === 1) {
           metaResults = exactMetaResults;
         }
@@ -54,7 +59,7 @@ const queryGraph = async function(state, callback) {
           callback({type:'neo4j-callback-ok', results: { main: mainResults, meta: metaResults }});
         } else {
           // no meta results
-          callback({type:'neo4j-callback-ok', results: { main: mainResults, meta: [] }});
+          callback({type:'neo4j-callback-ok', results: { main: mainResults, meta: null }});
         }
       })
       .catch(error => {
@@ -97,9 +102,10 @@ const buildMetaboxInfo = async function(info) {
     await state.neo4jSession.readTransaction(async txc => {
       const resultsRoles = await txc.run(
         `MATCH (p:Person)-[l]->(r:Role)-[l2]->(o:Organisation)
+         WHERE p.name = $name
+         WITH p, l, r, l2, o
          MATCH (p)-[:HAS_HOMEPAGE]->(ph:Page)
          OPTIONAL MATCH (r)-[:HAS_HOMEPAGE]->(rh:Page)
-         WHERE p.name = $name
          RETURN p,l,r,l2,o,ph,rh`,
         { name: info.name }
       );
@@ -109,8 +115,8 @@ const buildMetaboxInfo = async function(info) {
           name: result._fields[2].properties.name,
           orgName: result._fields[4].properties.name,
           orgUrl: result._fields[4].properties.url,
-          startDate: formattedDate(result._fields[1].properties.startDate),
-          endDate: formattedDate(result._fields[1].properties.endDate)
+          startDate: jsDate(result._fields[1].properties.startDate),
+          endDate: jsDate(result._fields[1].properties.endDate)
         };
       });
     });
@@ -133,8 +139,8 @@ const buildMetaboxInfo = async function(info) {
           personName: result._fields[0].properties.name,
           personHomepage: result._fields[2].properties.url,
 
-          roleStartDate: formattedDate(result._fields[1].properties.startDate),
-          roleEndDate: formattedDate(result._fields[1].properties.endDate)
+          roleStartDate: jsDate(result._fields[1].properties.startDate),
+          roleEndDate: jsDate(result._fields[1].properties.endDate)
         };
       });
     });
@@ -143,26 +149,44 @@ const buildMetaboxInfo = async function(info) {
     // We found an organisation, so we need to run a further query
     // to get the sub organisations
     await state.neo4jSession.readTransaction(async txc => {
-      const resultsSubOrgs = await txc.run(
-        `MATCH (o:Organisation)-[:HAS_HOMEPAGE]->(h:Page)
-         WHERE o.name = $name
-         OPTIONAL MATCH (n:Organisation)-[:HAS_CHILD]->(o)
-         OPTIONAL MATCH (n:Organisation)-[:HAS_HOMEPAGE]->(nh)
-         OPTIONAL MATCH (o)-[l:HAS_CHILD]->(c:Organisation)
-         WHERE c.status <> "closed"
-         RETURN o, l, c, h, n, nh`,
-        { name: info.name }
-      );
 
-      // if there are no suborgs then we can't read the status of the
-      // parent org
-      result.parentName = resultsSubOrgs.records[0]._fields[4]?.properties.name;
-      result.parentHomepage = resultsSubOrgs.records[0]._fields[5]?.properties.url;
-      result.homepage = resultsSubOrgs.records[0]._fields[3].properties.url;
-      result.description = resultsSubOrgs.records[0]._fields[3].properties.description;
-      result.subOrgs = resultsSubOrgs.records
-        .map(result => result._fields[2]?.properties)
-        .filter(org => org);
+      const orgDetails = await txc.run(`
+        MATCH (org:Organisation)-[:HAS_HOMEPAGE]->(homepage:Page)
+        WHERE org.name = $name
+        RETURN homepage.description, homepage.url
+      `, { name: info.name });
+
+      const personRoleDetails = await txc.run(`
+        MATCH (person:Person)-[hr:HAS_ROLE]->(role:Role)-[:BELONGS_TO]->(org:Organisation)
+        WHERE org.name = $name
+        AND hr.endDate IS NULL
+        RETURN person, role
+      `, { name: info.name });
+
+      const childDetails = await txc.run(`
+        MATCH (org:Organisation)-[:HAS_CHILD]->(childOrg:Organisation)
+        WHERE org.name = $name
+        AND childOrg.status <> "closed"
+        RETURN childOrg.name
+      `, { name: info.name });
+
+      const parentDetails = await txc.run(`
+        MATCH (org:Organisation)<-[:HAS_CHILD]-(parentOrg:Organisation)
+        WHERE org.name = $name
+        RETURN parentOrg.name
+      `, { name: info.name });
+
+      result.homepage = orgDetails.records[0]._fields[1];
+      result.description = orgDetails.records[0]._fields[0];
+
+      result.parentName = parentDetails.records.length === 1 ?
+        parentDetails.records[0]._fields[0] : null;
+
+      result.childOrgNames = childDetails.records.map(record=>record._fields[0]);
+      result.personRoleNames = personRoleDetails.records.map(record=>{ return {
+        personName: record._fields[0].properties.name,
+        roleName: record._fields[1].properties.name
+      }});
     });
     break;
   }
@@ -297,7 +321,7 @@ const formattedMainSearchResults = neo4jResults => {
 };
 
 
-const formattedDate = neo4jDateTime => {
+const jsDate = neo4jDateTime => {
   if (!neo4jDateTime) return null;
   const { year, month, day, hour, minute, second, nanosecond } = neo4jDateTime;
   const date = new Date(
@@ -313,4 +337,4 @@ const formattedDate = neo4jDateTime => {
 };
 
 
-export { searchQuery, queryGraph, formattedDate };
+export { searchQuery, queryGraph };

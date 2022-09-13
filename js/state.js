@@ -14,7 +14,7 @@ const initialSearchParams = {
   linkSearchUrl: '', // URL to find all pages linking to
   whereToSearch: {
     title: true, // whether search should include page titles
-    text: false  // whether search should include page content
+    text: true  // whether search should include page content
   },
   combinator: 'all', // whether the user wants all the keywords or any of them (can be 'any', 'all' or null if the user hasn't selected yet)
   // the publishing app to search in

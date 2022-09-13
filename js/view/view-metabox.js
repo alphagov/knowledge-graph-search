@@ -2,24 +2,36 @@ import { state } from '../state.js';
 import { viewMetaLink } from './view-components.js';
 
 
-const viewOrgSubOrg = function(subOrg) {
-  return `<li>${viewMetaLink(subOrg.name)}</li>`;
-}
+const viewOrgPersonRoles = (personRoles) =>
+  `<details class="govuk-details" data-module="govuk-details">
+     <summary class="govuk-details__summary">
+       <span class="govuk-details__summary-text">
+         ${personRoles.length} ${personRoles.length === 1 ? 'person' : 'people'}
+       </span>
+     </summary>
+     <div class="govuk-details__text">
+       <ul class="govuk-list govuk-list--bullet">
+         ${personRoles.map(personRole => `<li>${viewMetaLink(personRole.personName)} (${personRole.roleName})</li>`).join('')}
+       </ul>
+     </div>
+   </details>`;
 
 
-const viewOrgSubOrgs = function(subOrgList) {
-  return `
-    <details class="govuk-details" data-module="govuk-details">
-      <summary class="govuk-details__summary">
-        <span class="govuk-details__summary-text">
-          Sub organisations
-        </span>
-      </summary>
-      <div class="govuk-details__text">
-        <ul class="govuk-list govuk-list--bullet">${subOrgList.map(viewOrgSubOrg).join('')}</ul>
-      </div>
-    </details>`;
-};
+const viewOrgChild = subOrg =>
+  `<li>${viewMetaLink(subOrg)}</li>`;
+
+
+const viewOrgChildren = childOrgNames =>
+  `<details class="govuk-details" data-module="govuk-details">
+     <summary class="govuk-details__summary">
+       <span class="govuk-details__summary-text">
+         ${childOrgNames.length} sub-organisations
+       </span>
+     </summary>
+     <div class="govuk-details__text">
+       <ul class="govuk-list govuk-list--bullet">${childOrgNames.map(viewOrgChild).join('')}</ul>
+     </div>
+   </details>`;
 
 
 const viewPersonRoles = function(roles) {
@@ -31,14 +43,20 @@ const viewPersonRoles = function(roles) {
         </span>
       </summary>
       <div class="govuk-details__text">
-        <ul class="govuk-list govuk-list--bullet">${roles.map(role => `<li>${role.name} at <a class="govuk-link" href="${role.orgUrl}">${role.orgName}</a></li>`).join('')}</ul>
+        <ul class="govuk-list govuk-list--bullet">${roles.map(role => `
+          <li>${role.name} at ${viewMetaLink(role.orgName)}
+            (from ${role.startDate ? role.startDate.getFullYear() : ''}
+            to ${role.endDate ? role.endDate.getFullYear() : 'now'})
+          </li>`).join('')}
+        </ul>
       </div>
     </details>`;
-}
+};
+
 
 const viewRolePersons = persons => {
   const formatPerson = person => `
-    <a class="govuk-link" href="${person.personHomepage}">${person.personName}</a>
+    ${viewMetaLink(person.personName)}
     (from ${person.roleStartDate ? person.roleStartDate.getFullYear() : ''}
     to
     ${person.roleEndDate ? person.roleEndDate.getFullYear() : 'now'})
@@ -151,10 +169,13 @@ const viewOrg = record =>
      <p class="govuk-body">
        Government organisation${record.parentName ? `, part of ${viewMetaLink(record.parentName)}` : ''}
      </p>
-     <p class="govuk-body">${record.description}</p>
-     ${record.subOrgs && record.subOrgs.length > 0 ?
-       viewOrgSubOrgs(record.subOrgs) :
+     ${record.description ? `<p class="govuk-body">${record.description}</p>` : ''}
+     ${record.childOrgNames && record.childOrgNames.length > 0 ?
+       viewOrgChildren(record.childOrgNames) :
        '<p class="govuk-body">No sub-organisations</p>'
+     }
+     ${record.personRoleNames && record.personRoleNames.length > 0 ?
+       viewOrgPersonRoles(record.personRoleNames) : ''
      }
    </div>`;
 
@@ -169,7 +190,7 @@ const viewMetaResultsExpandToggle = () =>
 
 
 const viewMetaResults = function() {
-  if (state.metaSearchResults.length === 0) return;
+  if (!state.metaSearchResults) return;
   if (state.metaSearchResults.length > 1) {
     const expandedClass = state.metaSearchResults.length > 5 && !state.disambBoxExpanded ? 'meta-results-panel--collapsed' : '';
     return `
@@ -185,6 +206,7 @@ const viewMetaResults = function() {
     `;
   } else {
     const record = state.metaSearchResults[0];
+    console.log(`meta: found a ${record.type}`)
     switch (record.type) {
       case "BankHoliday": return viewBankHoliday(record);
       case "Organisation": return viewOrg(record);

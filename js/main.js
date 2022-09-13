@@ -46,8 +46,9 @@ const init = async function() {
     console.log('connectivity check failed', e);
     state.errorText = `Error connecting to the GovGraph.<br/></br/>
 Possible causes:<br/>
+<br/>
 - You're not on the VPN<br/>
-- The GovGraph only runs on weekdays from 9an to 7pm<br/><br/>
+- The GovGraph only runs on weekdays from 9am to 7pm<br/><br/>
 Otherwise there's probably a problem. Please contact the Data Products team.`;
     resetSearch();
     return;
