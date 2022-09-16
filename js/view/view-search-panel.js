@@ -3,8 +3,8 @@ import { state, searchState } from '../state.js';
 import { languageName } from '../lang.js';
 
 
-const viewSearchPanel = (searchType) => {
-  switch (searchType) {
+const viewSearchPanel = () => {
+  switch (state.searchType) {
   case 'mixed':
   case 'results':
     return `
@@ -104,6 +104,8 @@ const viewSearchPanel = (searchType) => {
           ${viewSearchButton()}
         </div>
       </form>`;
+  default:
+    console.log('viewSearchPanel: unknown value', searchType);
   }
 };
 
@@ -334,7 +336,7 @@ const viewKeywordsInput = () => `
   <div class="govuk-body">
     <label for="keyword" class="govuk-label label--bold">Search for keywords</label>
     <div class="govuk-hint">
-      For example: cat, dog, &quot;health certificate&quot;
+      For example: cat, dog, &quot;Department for Education&quot;
     </div>
     <input
       ${state.waiting && 'disabled="disabled"'}

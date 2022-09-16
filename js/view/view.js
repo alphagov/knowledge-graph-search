@@ -10,33 +10,14 @@ import { viewFeedbackBanner } from './view-components.js';
 const view = () => {
   console.log('view')
   document.title = 'GovGraph search';
-  const html = [];
-  const showPageDetails = Number.isInteger(state.showPageWithIndex) && state.searchResults;
-
-  html.push(`
+  id('page-content').innerHTML = `
     <main class="govuk-main-wrapper" id="main-content" role="main">
       ${state.displayFeedbackBanner ? viewFeedbackBanner() : ''}
       ${viewErrorBanner()}
-  `);
-
-  if (showPageDetails) {
-    html.push(viewPageDetails());
-  } else {
-    html.push(`
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
-          ${viewSearchTypeSelector()}
-        </div>
-      </div>
+      ${viewSearchTypeSelector()}
       ${viewMainLayout()}
-    `);
-  }
-
-  html.push(`
     </main>
-  `);
-
-  id('page-content').innerHTML = html.join('');
+  `;
 
   // Add event handlers
   document.querySelectorAll('#dismiss-feedback-banner, button, input[type=checkbox][data-interactive=true]')
@@ -68,18 +49,6 @@ const view = () => {
   // focus on the results heading if present
   id('results-heading')?.focus();
 
-};
-
-
-const viewPageDetails = () => {
-  const pageData = state.searchResults[state.showPageWithIndex + state.skip];
-  return `
-    <h1 class="govuk-heading-l">${pageData.title}</h1>
-    <ul class="govuk-list govuk-list--bullet">
-      ${Object.keys(pageData).map(key => `<li>${fieldName(key)}: ${fieldFormat(key, pageData[key])}</li>`).join('')}
-    </ul>
-    <button class="govuk-button" id="close-page-button">Back to results</button>
-  `;
 };
 
 
@@ -145,6 +114,7 @@ const viewContainDescription = (includeMarkup) => {
   }
   let combineOp = state.combinator === 'all' ? 'and' : 'or';
   let combinedWords = splitKeywords(state.selectedWords)
+    .filter(w => w.length > 2)
     .map(w=>makeBold(w, includeMarkup))
     .join(` ${combineOp} `);
   return state.selectedWords !== '' ? `${combinedWords} ${where}` : '';
@@ -228,33 +198,45 @@ const viewSearchResultsTable = () => {
   const recordsToShow = state.searchResults.slice(state.skip, state.skip + state.resultsPerPage);
   html.push(`
     <div class="govuk-body">
+      <fieldset class="govuk-fieldset" ${state.waiting && 'disabled="disabled"'}>
+        <legend class="govuk-fieldset__legend">For each result, display:</legend>
+        <ul class="kg-checkboxes" id="show-fields">`);
+  html.push(Object.keys(state.searchResults[0]).map(key => `
+          <li class="kg-checkboxes__item">
+            <input class="kg-checkboxes__input"
+                   data-interactive="true"
+                   type="checkbox" id="show-field-${key}"
+              ${state.showFields[key] ? 'checked' : ''}/>
+            <label for="show-field-${key}" class="kg-label kg-checkboxes__label">${fieldName(key)}</label>
+          </li>`).join(''));
+  html.push(`
+        </ul>
+      </fieldset>
       <table id="results-table" class="govuk-table">
         <tbody class="govuk-table__body">
-          <tr class="govuk-table__row">
-            <th scope="col" class="a11y-hidden">Result number</th>
-            <th scope="col" class="a11y-hidden">Page title</th>
-            <th scope="col" class="a11y-hidden"></th>
-          </tr>
-    `);
+        <tr class="govuk-table__row">
+          <th scope="col" class="a11y-hidden">Page</th>`);
+  Object.keys(state.showFields).forEach(key => {
+    if (state.showFields[key]) {
+      html.push(`<th scope="col" class="govuk-table__header">${fieldName(key)}</th>`);
+    }
+  });
 
   recordsToShow.forEach((record, recordIndex) => {
     html.push(`
-          <tr class="govuk-table__row">
-            <td class="govuk-table__cell">${recordIndex + 1 + state.skip}</td>
-            <td class="govuk-table__cell">
-              <a class="govuk-link" href="${record['url']}">${fieldFormat('title', record['title'])}
-            </td>
-            <td class="govuk-table__cell">
-              <button type="button" class="govuk-button" id="page-details-${recordIndex}">Details</button>
-            </td>
-          </tr>
-   `);
+      <tr class="govuk-table__row">
+        <th class="a11y-hidden">${recordIndex}</th>`);
+    Object.keys(state.showFields).forEach(key => {
+      if (state.showFields[key]) {
+        html.push(`<td class="govuk-table__cell">${fieldFormat(key, record[key])}</td>`);
+      }
+    });
+    html.push(`</tr>`);
   });
   html.push(`
         </tbody>
       </table>
-    </div>
-  `);
+    </div>`);
   return html.join('');
 };
 

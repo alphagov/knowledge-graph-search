@@ -98,6 +98,8 @@ h1:focus-visible, h2:focus-visible {
 .meta-results-panel {
   float: right;
   max-width: 30%;
+  max-height: 300px;
+  overflow-y: scroll;
   border: 3px solid black;
   padding: 20px 20px 4px 20px;
   margin-bottom: 20px;
@@ -172,9 +174,10 @@ h1:focus-visible, h2:focus-visible {
 
 .feedback-banner {
   background: $govuk-brand-colour;
-  margin-top: -10px;
+  margin-top: -30px;
   margin-left: -20px;
   margin-right: -20px;
+  margin-bottom: 30px;
   padding: 40px 20px 40px 20px;
   &-rule {
     border-top: 1px solid #ccc;

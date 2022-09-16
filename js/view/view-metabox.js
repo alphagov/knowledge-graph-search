@@ -3,7 +3,7 @@ import { viewMetaLink } from './view-components.js';
 
 
 const viewOrgPersonRoles = (personRoles) =>
-  `<details class="govuk-details" data-module="govuk-details">
+  `<details class="govuk-details">
      <summary class="govuk-details__summary">
        <span class="govuk-details__summary-text">
          ${personRoles.length} ${personRoles.length === 1 ? 'person' : 'people'}
@@ -22,7 +22,7 @@ const viewOrgChild = subOrg =>
 
 
 const viewOrgChildren = childOrgNames =>
-  `<details class="govuk-details" data-module="govuk-details">
+  `<details class="govuk-details">
      <summary class="govuk-details__summary">
        <span class="govuk-details__summary-text">
          ${childOrgNames.length} sub-organisations
@@ -36,7 +36,7 @@ const viewOrgChildren = childOrgNames =>
 
 const viewPersonRoles = function(roles) {
   return `
-    <details class="govuk-details" data-module="govuk-details">
+    <details class="govuk-details">
       <summary class="govuk-details__summary">
         <span class="govuk-details__summary-text">
           Roles
@@ -77,7 +77,7 @@ const viewRolePersons = persons => {
     '<p class="govuk-body">No previous holders</p>' :
     (previous.length === 1 ? `
      <p class="govuk-body">Previous holder: ${formatPerson(previous[0])}</p>` : `
-      <details class="govuk-details" data-module="govuk-details">
+      <details class="govuk-details">
         <summary class="govuk-details__summary">
           <span class="govuk-details__summary-text">
             Previous holders
@@ -97,7 +97,7 @@ const viewRolePersons = persons => {
 
 const viewBankHolidayDetails = function(holiday) {
   return `
-    <details class="govuk-details" data-module="govuk-details">
+    <details class="govuk-details">
       <summary class="govuk-details__summary">
         <span class="govuk-details__summary-text">
           Dates
@@ -109,7 +109,7 @@ const viewBankHolidayDetails = function(holiday) {
         </ul>
       </div>
     </details>
-    <details class="govuk-details" data-module="govuk-details">
+    <details class="govuk-details">
       <summary class="govuk-details__summary">
         <span class="govuk-details__summary-text">
           Observed in

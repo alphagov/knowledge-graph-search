@@ -40,6 +40,7 @@ const sanitiseOutput = function(text) {
 
 
 const splitKeywords = function(keywords) {
+  const wordsToIgnore = ['of', 'for', 'the'];
   const regexp = /[^\s,"]+|"([^"]*)"/gi;
   const output = [];
   let match;
@@ -49,7 +50,7 @@ const splitKeywords = function(keywords) {
         output.push(match[1] ? match[1] : match[0]);
     }
   } while (match);
-  return output.filter(d => d.length > 0);
+  return output.filter(d => d.length > 0 && !wordsToIgnore.includes(d));
 };
 
 

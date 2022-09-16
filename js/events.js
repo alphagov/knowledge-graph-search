@@ -5,7 +5,7 @@ import { languageCode } from './lang.js';
 import { queryGraph } from './neo4j.js';
 
 const handleEvent = async function(event) {
-  let pageDetailsMatches;
+  let fieldClicked;
   console.log('handleEvent:', event.type, event.id || '')
   switch(event.type) {
     case 'dom':
@@ -72,16 +72,14 @@ const handleEvent = async function(event) {
         resetSearch();
         state.searchType = 'mixed';
         break;
-      case 'close-page-button':
-        state.showPageWithIndex = null;
-        break;
       default:
-        pageDetailsMatches = event.id.match(/^page-details-(.+)$/);
-        if (pageDetailsMatches) {
-          state.showPageWithIndex = parseInt(pageDetailsMatches[1]);
+        fieldClicked = event.id.match(/show-field-(.*)/);
+        if (fieldClicked) {
+          state.showFields[fieldClicked[1]] = id(event.id).checked;
         } else {
           console.log('unknown DOM event received:', event);
         }
+        console.log('unknown DOM event received:', event);
       }
     break;
 
