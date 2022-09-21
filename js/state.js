@@ -14,7 +14,7 @@ const initialSearchParams = {
   linkSearchUrl: '', // URL to find all pages linking to
   whereToSearch: {
     title: true, // whether search should include page titles
-    text: true  // whether search should include page content
+    text: false  // whether search should include page content
   },
   combinator: 'all', // whether the user wants all the keywords or any of them (can be 'any', 'all' or null if the user hasn't selected yet)
   // the publishing app to search in
@@ -34,7 +34,6 @@ const state = {
   locales: [], // all the languages found in the content store
   errorText: null,
   userErrors: null, // error codes due to user not entering valid search criteria
-  neo4jSession: null,
   nbResultsLimit: 50000, // limit queries to this number of results
   searchResults: null,
   metaSearchResults: null,

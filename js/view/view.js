@@ -281,16 +281,6 @@ const viewResults = function() {
   const html = [];
   const nbRecords = state.searchResults.length;
 
-/*
-  if (state.metaSearchResults.length > 0) {
-    const names = state.metaSearchResults.map(result => result.name);
-    const uniqueNames = names.filter((v,i,a) => a.indexOf(v) === i);
-    if (uniqueNames.length === 1) {
-      html.push(viewMetaResults());
-    }
-  }
-*/
-
   if (nbRecords < state.nbResultsLimit) {
     html.push(`
       <h1 tabindex="0" id="results-heading" class="govuk-heading-l">${nbRecords} result${nbRecords!==0 ? 's' : ''}</h1>`);

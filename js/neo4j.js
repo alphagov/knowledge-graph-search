@@ -1,5 +1,3 @@
-/* global neo4j */
-
 //==================================================
 // Cypher query methods
 //==================================================
@@ -11,240 +9,228 @@ import { splitKeywords } from './utils.js';
 
 //=========== public methods ===========
 
-const initNeo4j = async function(user, password) {
-  // Initialise neo4j
-  console.log('starting neo4j driver');
-  state.neo4jDriver = neo4j.driver(
-    state.server,
-    neo4j.auth.basic(user, password),
-    { // see https://neo4j.com/docs/javascript-manual/current/client-applications/#js-driver-configuration
-      connectionTimeout: 5000
-    }
-  );
-
-  console.log('checking neo4j connectivity');
-  await state.neo4jDriver.verifyConnectivity(
-    { database: state.server }
-  );
-
-  console.log('starting neo4j session');
-  state.neo4jSession = state.neo4jDriver.session({
-    defaultAccessMode: neo4j.session.READ,
-    fetchSize: 50000
-  });
-
-  console.log('neo4j session started', state.neo4jSession);
-
-  // if page is unloaded then close the neo4j connection
-  window.addEventListener('beforeunload', async () => {
-    console.log('closing session and driver');
-    await state.neo4jSession.close();
-    await state.neo4jDriver.close();
-  });
-
-  try {
-    const taxons = await state.neo4jSession.readTransaction(tx =>
-      tx.run('MATCH (t:Taxon) RETURN t.name')
-    );
-    state.taxons = taxons.records.map(taxon => taxon._fields[0]).sort();
-  } catch (e) {
-    state.errorText = 'Error retrieving taxons.';
-  }
-
-  try {
-    const locales = await state.neo4jSession.readTransaction(tx =>
-      tx.run('MATCH (n:Page) WHERE n.locale <> "en" AND n.locale <> "cy" RETURN DISTINCT n.locale')
-    );
-    state.locales = locales.records.map(locale => locale._fields[0]).sort();
+const initNeo4j = async function() {
+  console.log('retrieving taxons and locales');
+  queryNeo4j([
+    { statement: 'MATCH (t:Taxon) RETURN t.name' },
+    { statement: 'MATCH (n:Page) WHERE n.locale <> "en" AND n.locale <> "cy" RETURN DISTINCT n.locale' }
+  ])
+  .then(response => response.json())
+  .then(json => {
+    state.taxons = json.results[0].data.map(d => d.row[0]).sort();
+    state.locales = json.results[1].data.map(l => l.row[0]).sort();
     state.locales = ['', 'en', 'cy'].concat(state.locales);
-  } catch (e) {
-    state.errorText = 'Error retrieving locales.';
-    console.log('Error retrieving locales:', e);
-  }
+    console.log(`successfully fetched ${state.taxons.length} taxons and ${state.locales.length} locales`);
+  })
+  .catch (error => {
+    state.errorText = 'Error retrieving taxons and locales';
+    console.log('Error retrieving taxons and locales', error);
+  });
 };
 
 
 const queryGraph = async function(state, callback) {
-  const metaSearchQuery = `
-    MATCH (b)
-    WHERE (b:BankHoliday OR b:Person OR b:Organisation OR b:Role)
-    AND toLower(b.name) CONTAINS toLower($keywords)
-    OPTIONAL MATCH (b)-[:HAS_HOMEPAGE]->(p:Page)
-    RETURN b,p`;
 
-  state.neo4jSession.readTransaction(txc => {
-    const mainCypherQuery = searchQuery(state);
-    console.log('running main cypher query', mainCypherQuery);
+  const mainCypherQuery = { statement: searchQuery(state) };
+  const searchKeywords = state.selectedWords.replace(/"/g, '');
 
-    const mainQueryPromise = txc.run(mainCypherQuery);
-    const allPromises = [mainQueryPromise];
+  const wholeQuery = [mainCypherQuery];
 
-    const searchKeywords = state.selectedWords.replace(/"/g,'');
-    if (searchKeywords.length >= 5 && searchKeywords.includes(' ')) {
-      console.log('running meta cypher query', metaSearchQuery);
-      const metaQueryPromise = txc.run(
-        metaSearchQuery,
-        { keywords: searchKeywords}
-      );
-      allPromises.push(metaQueryPromise);
+  if (searchKeywords.length >= 5 && searchKeywords.includes(' ')) {
+    const metaSearchQuery = {
+      statement: `
+        MATCH (node)
+        WHERE (node:BankHoliday OR node:Person OR node:Organisation OR node:Role)
+        AND toLower(node.name) CONTAINS toLower($keywords)
+        OPTIONAL MATCH (node)-[:HAS_HOMEPAGE]->(homepage:Page)
+        RETURN node, homepage, labels(node) as nodeType`,
+      parameters: {
+        keywords: searchKeywords
+      }
+    };
+    wholeQuery.push(metaSearchQuery);
+  }
+
+  callback({type: 'neo4j-running'});
+  queryNeo4j(wholeQuery)
+  .then(response => response.json())
+  .then(async json => {
+    const mainResults = formattedSearchResults(json.results[0]);
+    let metaResults = json.results[1].data.length > 0 ?
+        formattedSearchResults(json.results[1]) :
+        [];
+
+    // If there's an exact match, just keep it
+    const exactMetaResults = metaResults.filter(result => {
+      return result.node.name.toLowerCase() === searchKeywords.toLowerCase()
+    });
+
+    if (exactMetaResults.length === 1) {
+      metaResults = exactMetaResults;
     }
-    callback({type: 'neo4j-running'});
-    Promise.allSettled(allPromises)
-      .then(async results => {
-        console.log(`neo4j returned ${results.length} results`);
 
-        const mainResults = formattedMainSearchResults(results[0].value);
-        let metaResults = results.length === 2 ? formattedMetaSearchResults(results[1].value) : [];
-
-        // If there's an exact match, just keep it
-        const exactMetaResults = metaResults.filter(result => {
-          return result.name.toLowerCase() === searchKeywords.toLowerCase()
-        });
-
-        if (exactMetaResults.length === 1) {
-          metaResults = exactMetaResults;
-        }
-
-        if (metaResults.length === 1) {
-          // one meta result: show the knowledge panel
-          const fullMetaResults = await buildMetaboxInfo(metaResults[0]);
-          callback({type:'neo4j-callback-ok', results: { main: mainResults, meta: [fullMetaResults] }});
-        } else if (metaResults.length >= 1) {
-          // multiple meta results: we'll show a disambiguation page
-          callback({type:'neo4j-callback-ok', results: { main: mainResults, meta: metaResults }});
-        } else {
-          // no meta results
-          callback({type:'neo4j-callback-ok', results: { main: mainResults, meta: null }});
-        }
-      })
-      .catch(error => {
-        console.log('error', error);
-        callback({type:'neo4j-callback-fail', error })
-      });
-  });
+    if (metaResults.length === 1) {
+      // one meta result: show the knowledge panel (may require more neo4j queries)
+      const fullMetaResults = await buildMetaboxInfo(metaResults[0]);
+      callback({type:'neo4j-callback-ok', results: { main: mainResults, meta: [fullMetaResults] }});
+    } else if (metaResults.length >= 1) {
+      // multiple meta results: we'll show a disambiguation page
+      callback({type:'neo4j-callback-ok', results: { main: mainResults, meta: metaResults }});
+    } else {
+      // no meta results
+      callback({type:'neo4j-callback-ok', results: { main: mainResults, meta: null }});
+    }
+  })
+    .catch(error => {
+      console.log('error running main+meta queries', error);
+      callback({type:'neo4j-callback-fail', error })
+    });
 };
 
 //=========== private ===========
 
 const buildMetaboxInfo = async function(info) {
-  const result = info;
-  switch (info.type) {
+  console.log(`Found a ${info.nodeType[0]}. Running extra queries`);
+  const result = { type: info.nodeType[0], name: info.node.name };
+  let json;
+  let orgData, orgDetails, personRoleDetails, childDetails, parentDetails;
+  let holidayData, personData, roleData;
+
+  switch (info.nodeType[0]) {
     // We found a bank holiday, so we need to run 2 further queries
     // one to get the dates, the other to get the regions
   case 'BankHoliday':
-    await state.neo4jSession.readTransaction(async txc => {
-      const resultsDates = await txc.run(
-        `MATCH (b:BankHoliday)-[:IS_ON]->(d)
-         WHERE b.name = $name
-         RETURN d`,
-        { name: info.name }
-      );
-      result.dates = resultsDates.records.map(record => record._fields[0].properties.dateString);
-    });
-    await state.neo4jSession.readTransaction(async txc => {
-      const resultsRegions = await txc.run(
-        `MATCH (b:BankHoliday)-[:IS_OBSERVED_IN]->(r)
-         WHERE b.name = $name
-         RETURN r`,
-        { name: info.name }
-      );
-      result.regions = resultsRegions.records.map(record => record._fields[0].properties.name);
-    });
+    holidayData = await queryNeo4j([
+      {
+        statement: `
+          MATCH (b:BankHoliday)-[:IS_ON]->(d)
+          WHERE b.name = $name
+          RETURN d`,
+        parameters:
+          { name: info.node.name }
+      }, {
+        statement: `
+          MATCH (b:BankHoliday)-[:IS_OBSERVED_IN]->(r)
+          WHERE b.name = $name
+          RETURN r`,
+        parameters:
+          { name: info.node.name }
+      }
+    ]);
+
+    json = await holidayData.json();
+    result.dates = json.results[0].data.map(record => record.row[0]);
+    result.regions = json.results[1].data.map(record => record.row[0].name);
     break;
+
   case 'Person':
     // We found a person, so we need to run a further query
     // to get the person's roles and organisations
-    await state.neo4jSession.readTransaction(async txc => {
-      const resultsRoles = await txc.run(
-        `MATCH (p:Person)-[l]->(r:Role)-[l2]->(o:Organisation)
-         WHERE p.name = $name
-         WITH p, l, r, l2, o
-         MATCH (p)-[:HAS_HOMEPAGE]->(ph:Page)
-         OPTIONAL MATCH (r)-[:HAS_HOMEPAGE]->(rh:Page)
-         RETURN p,l,r,l2,o,ph,rh`,
-        { name: info.name }
-      );
-      result.homepage = resultsRoles.records[0]?._fields[5].properties.url;
-      result.roles = resultsRoles.records.map(result => {
-        return {
-          name: result._fields[2].properties.name,
-          orgName: result._fields[4].properties.name,
-          orgUrl: result._fields[4].properties.url,
-          startDate: jsDate(result._fields[1].properties.startDate),
-          endDate: jsDate(result._fields[1].properties.endDate)
-        };
-      });
+    personData = await queryNeo4j([
+      {
+        statement: `
+          MATCH (p:Person { name: $name })-[l]->(r:Role)
+          MATCH (p)-[:HAS_HOMEPAGE]->(ph:Page)
+          OPTIONAL MATCH (r)-[:BELONGS_TO]->(o:Organisation)
+          OPTIONAL MATCH (r)-[:HAS_HOMEPAGE]->(rh:Page)
+          RETURN p,l,r,o,ph,rh`,
+        parameters:
+          { name: info.node.name }
+      }
+    ]);
+
+    json = await personData.json();
+    result.homepage = json.results[0].data[0].row[0].url;
+    result.description = json.results[0].data[0].row[4].description;
+    result.roles = json.results[0].data.map(result => {
+      return {
+        name: result.row[2].name,
+        orgName: result.row[3]?.name,
+        orgUrl: result.row[3]?.homepage,
+        startDate: new Date(result.row[1].startDate),
+        endDate: new Date(result.row[1].endDate)
+      };
     });
     break;
   case 'Role':
     // We found a Role, so we need to run a further query to
     // Find the person holding that role (as well as previous people)
     // Find the organisation for this role
-    await state.neo4jSession.readTransaction(async txc => {
-      const resultsRoles = await txc.run(
-        `MATCH (person:Person)-[has_role:HAS_ROLE]->(role:Role)-[belongs_to:BELONGS_TO]->(org:Organisation)
-         MATCH (person:Person)-[:HAS_HOMEPAGE]->(homepage:Page)
-         WHERE role.name = $name
-         RETURN person, has_role, homepage, COLLECT (DISTINCT org) as orgs`,
-        { name: info.name }
-      );
-      result.orgNames = resultsRoles.records[0]._fields[3].map(org => org.properties.name);
-      result.persons = resultsRoles.records.map(result => {
-        return {
-          personName: result._fields[0].properties.name,
-          personHomepage: result._fields[2].properties.url,
+    roleData = await queryNeo4j([
+      {
+        statement: `
+          MATCH (role:Role { name: $name })
+          OPTIONAL MATCH (person:Person)-[has_role:HAS_ROLE]->(role)
+          OPTIONAL MATCH (role:Role)-[belongs_to:BELONGS_TO]->(org:Organisation)
+          RETURN role, COLLECT(DISTINCT person) as persons, COLLECT(DISTINCT org) as orgs`,
 
-          roleStartDate: jsDate(result._fields[1].properties.startDate),
-          roleEndDate: jsDate(result._fields[1].properties.endDate)
-        };
-      });
-    });
+        parameters: { name: info.node.name }
+      }
+    ])
+
+    json = await roleData.json();
+    console.log('json',json);
+    result.name = json.results[0].data[0].row[0].name;
+    result.orgNames = json.results[0].data[0].row[2].map(result => result.name);
+    result.personNames = json.results[0].data[0].row[1].map(result => result.name);
     break;
+
   case 'Organisation':
     // We found an organisation, so we need to run a further query
     // to get the sub organisations
-    await state.neo4jSession.readTransaction(async txc => {
+    orgData = await queryNeo4j([
+      {
+        statement: `
+          MATCH (org:Organisation)-[:HAS_HOMEPAGE]->(homepage:Page)
+          WHERE org.name = $name
+          RETURN homepage.description, homepage.url`,
+        parameters:
+          { name: info.node.name }
+      }, {
+        statement: `
+          MATCH (person:Person)-[hr:HAS_ROLE]->(role:Role)-[:BELONGS_TO]->(org:Organisation)
+          WHERE org.name = $name
+          AND hr.endDate IS NULL
+          RETURN person, role`,
+        parameters:
+          { name: info.node.name }
+      }, {
+        statement: `
+          MATCH (org:Organisation)-[:HAS_CHILD]->(childOrg:Organisation)
+          WHERE org.name = $name
+          AND childOrg.status <> "closed"
+          RETURN childOrg.name`,
+        parameters:
+          { name: info.node.name }
+      }, {
+        statement: `
+          MATCH (org:Organisation)<-[:HAS_CHILD]-(parentOrg:Organisation)
+          WHERE org.name = $name
+          RETURN parentOrg.name`,
+        parameters:
+          { name: info.node.name }
+      }
+    ]);
 
-      const orgDetails = await txc.run(`
-        MATCH (org:Organisation)-[:HAS_HOMEPAGE]->(homepage:Page)
-        WHERE org.name = $name
-        RETURN homepage.description, homepage.url
-      `, { name: info.name });
-
-      const personRoleDetails = await txc.run(`
-        MATCH (person:Person)-[hr:HAS_ROLE]->(role:Role)-[:BELONGS_TO]->(org:Organisation)
-        WHERE org.name = $name
-        AND hr.endDate IS NULL
-        RETURN person, role
-      `, { name: info.name });
-
-      const childDetails = await txc.run(`
-        MATCH (org:Organisation)-[:HAS_CHILD]->(childOrg:Organisation)
-        WHERE org.name = $name
-        AND childOrg.status <> "closed"
-        RETURN childOrg.name
-      `, { name: info.name });
-
-      const parentDetails = await txc.run(`
-        MATCH (org:Organisation)<-[:HAS_CHILD]-(parentOrg:Organisation)
-        WHERE org.name = $name
-        RETURN parentOrg.name
-      `, { name: info.name });
-
-      result.homepage = orgDetails.records[0]._fields[1];
-      result.description = orgDetails.records[0]._fields[0];
-
-      result.parentName = parentDetails.records.length === 1 ?
-        parentDetails.records[0]._fields[0] : null;
-
-      result.childOrgNames = childDetails.records.map(record=>record._fields[0]);
-      result.personRoleNames = personRoleDetails.records.map(record=>{ return {
-        personName: record._fields[0].properties.name,
-        roleName: record._fields[1].properties.name
-      }});
-    });
+    json = await orgData.json();
+    orgDetails = json.results[0].data[0].row;
+    personRoleDetails = json.results[1].data;
+    childDetails = json.results[2].data;
+    parentDetails = json.results[3].data;
+    result.homepage = orgDetails[1];
+    result.description = orgDetails[0];
+    result.parentName = parentDetails.length === 1 ?
+      parentDetails[0].row[0] : null;
+    result.childOrgNames = childDetails.map(child => child.row[0]);
+    result.personRoleNames = personRoleDetails.map(record=>{ return {
+      personName: record.row[0].name,
+      roleName: record.row[1].name
+    }});
     break;
+    default:
+    console.log('unknown meta node type', info.nodeType[0]);
   }
+  console.log('result', result);
   return result;
 };
 
@@ -322,6 +308,22 @@ const searchQuery = function(state) {
 
 //========== Private methods ==========
 
+const queryNeo4j = async function(queries) {
+  const headers = new Headers();
+  headers.set('Authorization', 'Basic ' + btoa(state.user + ":" + state.password));
+  headers.set('Content-type', 'application/json');
+
+  // TODO: send the OAuth token from the cookie
+  // probably GCP_IAAP_AUTH_TOKEN_FE35B168D3404A44
+
+  const body = `{"statements": ${JSON.stringify(queries)}}`;
+  return fetch(
+    'https://knowledge-graph.integration.govuk.digital:7473/db/neo4j/tx',
+    { method:'POST', headers, body }
+  );
+};
+
+
 const containsClause = function(field, word, caseSensitive) {
   return caseSensitive ?
     `(n.${field} CONTAINS "${word}")`
@@ -358,38 +360,16 @@ const returnClause = function() {
     LIMIT ${state.nbResultsLimit}`;
 };
 
-const formattedMetaSearchResults = neo4jResults =>
-  neo4jResults.records.map(result => {
-    return {
-      type: result._fields[0].labels[0],
-      ...result._fields[0].properties
-    }
+
+const formattedSearchResults = neo4jResults => {
+  const keys = neo4jResults.columns;
+  const results = [];
+  neo4jResults.data.forEach(val => {
+    const result = {};
+    keys.forEach((key, i) => result[key] = val.row[i]);
+    results.push(result);
   });
-
-
-const formattedMainSearchResults = neo4jResults => {
-  return neo4jResults.records.map(result => {
-    const resultAsRecord = {};
-    result.keys.forEach((key, idx) => resultAsRecord[key] = result._fields[idx]);
-    return resultAsRecord;
-  });
+  return results;
 };
-
-
-const jsDate = neo4jDateTime => {
-  if (!neo4jDateTime) return null;
-  const { year, month, day, hour, minute, second, nanosecond } = neo4jDateTime;
-  const date = new Date(
-    year.toInt(),
-    month.toInt() - 1, // neo4j dates start at 1, js dates start at 0
-    day.toInt(),
-    hour.toInt(),
-    minute.toInt(),
-    second.toInt(),
-    nanosecond.toInt() / 1000000 // js dates use milliseconds
-  );
-  return date;
-};
-
 
 export { searchQuery, queryGraph, initNeo4j };

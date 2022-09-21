@@ -18,20 +18,19 @@ const init = async function() {
   await fetch('params.json')
     .then(async response => {
       const data = await response.json();
-
       state.server = data.server;
       state.user = data.user;
       state.password = data.password;
     }).catch(error => {
       console.warn(error);
-      state.errorText = 'Failed to retrieve credentials to connect to the Knowledge Graph';
+      state.errorText = 'Failed to retrieve credentials to connect to the GovGraph';
     });
 
 
   try {
-    await initNeo4j(state.user, state.password);
+    await initNeo4j();
   } catch (e) {
-    console.log('connectivity check failed', e);
+    console.log('Failed to connect to the GovGraph', e);
     state.errorText = `Error connecting to the GovGraph.<br/></br/>
 Possible causes:<br/>
 <br/>
@@ -41,8 +40,6 @@ Otherwise there's probably a problem. Please contact the Data Products team.`;
     resetSearch();
     return;
   }
-
-  console.log('initok', state.neo4jSession);
 
   window.addEventListener('popstate', () => {
     setQueryParamsFromQS();

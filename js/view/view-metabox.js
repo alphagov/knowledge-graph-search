@@ -44,7 +44,7 @@ const viewPersonRoles = function(roles) {
       </summary>
       <div class="govuk-details__text">
         <ul class="govuk-list govuk-list--bullet">${roles.map(role => `
-          <li>${role.name} at ${viewMetaLink(role.orgName)}
+          <li>${viewMetaLink(role.name)} ${role.orgName ? ' at ' + viewMetaLink(role.orgName) : ''}
             (from ${role.startDate ? role.startDate.getFullYear() : ''}
             to ${role.endDate ? role.endDate.getFullYear() : 'now'})
           </li>`).join('')}
@@ -105,7 +105,7 @@ const viewBankHolidayDetails = function(holiday) {
       </summary>
       <div class="govuk-details__text">
         <ul class="govuk-list govuk-list--bullet">
-          ${holiday.dates.map(dateString => `<li>${dateString}</li>`).join('')}
+          ${holiday.dates.map(date => `<li>${date.dateString}</li>`).join('')}
         </ul>
       </div>
     </details>
@@ -141,22 +141,36 @@ const viewPerson = record =>
      <h2 class="govuk-heading-m">
        <a class="govuk-link" href="${record.homepage}">${record.name}</a>
      </h2>
+     <p class="govuk-body">${record.description}</p>
      ${record.roles && record.roles.length > 0 ? viewPersonRoles(record.roles) : ''}
    </div>`;
 
+
+const viewRoleOrgs = function(orgs) {
+  if (orgs.length === 0) return '';
+  return `
+    <details class="govuk-details">
+      <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">Organisations</span>
+      </summary>
+      <div class="govuk-details__text">
+        <ul class="govuk-list govuk-list--bullet">
+          ${orgs.map(name => `<li>${viewMetaLink(name)}</li>`).join('')}
+        </ul>
+      </div>
+    </details>`;
+};
 
 const viewRole = function(record) {
   const nameHtml = record.homePage ?
     `<a class="govuk-link" href="${record.homepage}">${record.name}</a>` :
      record.name;
-  const orgsHtml = record.orgNames.map(viewMetaLink).join(', ');
 
   return `
     <div class="meta-results-panel">
       <h2 class="govuk-heading-m">${nameHtml}</h2>
-      <p class="govuk-body">Official role under ${orgsHtml}</p>
-      ${record.persons && record.persons.length > 0 ? viewRolePersons(record.persons) : '' }
-
+      <p class="govuk-body">Official role</p>
+      ${viewRoleOrgs(record.orgNames)}
     </div>`
 };
 
