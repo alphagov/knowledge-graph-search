@@ -1,3 +1,5 @@
+/* global neo4j */
+
 //==================================================
 // Cypher query methods
 //==================================================
@@ -8,6 +10,59 @@ import { splitKeywords } from './utils.js';
 
 
 //=========== public methods ===========
+
+const initNeo4j = async function(user, password) {
+  // Initialise neo4j
+  console.log('starting neo4j driver');
+  state.neo4jDriver = neo4j.driver(
+    state.server,
+    neo4j.auth.basic(user, password),
+    { // see https://neo4j.com/docs/javascript-manual/current/client-applications/#js-driver-configuration
+      connectionTimeout: 5000
+    }
+  );
+
+  console.log('checking neo4j connectivity');
+  await state.neo4jDriver.verifyConnectivity(
+    { database: state.server }
+  );
+
+  console.log('starting neo4j session');
+  state.neo4jSession = state.neo4jDriver.session({
+    defaultAccessMode: neo4j.session.READ,
+    fetchSize: 50000
+  });
+
+  console.log('neo4j session started', state.neo4jSession);
+
+  // if page is unloaded then close the neo4j connection
+  window.addEventListener('beforeunload', async () => {
+    console.log('closing session and driver');
+    await state.neo4jSession.close();
+    await state.neo4jDriver.close();
+  });
+
+  try {
+    const taxons = await state.neo4jSession.readTransaction(tx =>
+      tx.run('MATCH (t:Taxon) RETURN t.name')
+    );
+    state.taxons = taxons.records.map(taxon => taxon._fields[0]).sort();
+  } catch (e) {
+    state.errorText = 'Error retrieving taxons.';
+  }
+
+  try {
+    const locales = await state.neo4jSession.readTransaction(tx =>
+      tx.run('MATCH (n:Page) WHERE n.locale <> "en" AND n.locale <> "cy" RETURN DISTINCT n.locale')
+    );
+    state.locales = locales.records.map(locale => locale._fields[0]).sort();
+    state.locales = ['', 'en', 'cy'].concat(state.locales);
+  } catch (e) {
+    state.errorText = 'Error retrieving locales.';
+    console.log('Error retrieving locales:', e);
+  }
+};
+
 
 const queryGraph = async function(state, callback) {
   const metaSearchQuery = `
@@ -337,4 +392,4 @@ const jsDate = neo4jDateTime => {
 };
 
 
-export { searchQuery, queryGraph };
+export { searchQuery, queryGraph, initNeo4j };
