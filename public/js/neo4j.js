@@ -309,18 +309,14 @@ const searchQuery = function(state) {
 //========== Private methods ==========
 
 const queryNeo4j = async function(queries) {
-  const headers = new Headers();
-  headers.set('Authorization', 'Basic ' + btoa(state.user + ":" + state.password));
-  headers.set('Content-type', 'application/json');
-
-  // TODO: send the OAuth token from the cookie
-  // probably GCP_IAAP_AUTH_TOKEN_FE35B168D3404A44
-
-  const body = `{"statements": ${JSON.stringify(queries)}}`;
-  return fetch(
-    'https://knowledge-graph.integration.govuk.digital:7473/db/neo4j/tx',
-    { method:'POST', headers, body }
-  );
+  const body = { statements: queries };
+  return fetch('/neo4j', {
+    method:'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
 };
 
 

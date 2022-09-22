@@ -4,7 +4,8 @@
   "description": "Web app to make the Knowledge Graph simpler to search",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.mjs"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,8 @@
   },
   "homepage": "https://github.com/alphagov/knowledge-graph-search#readme",
   "dependencies": {
+    "express": "^4.18.1",
+    "got": "^12.5.0",
     "govuk-frontend": "^3.14.0"
   }
 }

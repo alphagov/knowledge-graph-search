@@ -14,18 +14,6 @@ const init = async function() {
   state.errorText = null;
 
 
-  // Look if there's a file with authentication params
-  await fetch('params.json')
-    .then(async response => {
-      const data = await response.json();
-      state.server = data.server;
-      state.user = data.user;
-      state.password = data.password;
-    }).catch(error => {
-      console.warn(error);
-      state.errorText = 'Failed to retrieve credentials to connect to the GovGraph';
-    });
-
 
   try {
     await initNeo4j();
