@@ -1,3 +1,10 @@
-FROM nginx:latest
+FROM node:16
 
-COPY . /usr/share/nginx/html
+ENV PORT=8080
+ENV NEO4JSERVER=10.8.0.4
+
+COPY . .
+
+RUN npm i
+
+CMD npm start
