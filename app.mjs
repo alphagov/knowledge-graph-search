@@ -3,17 +3,14 @@ import got from 'got';
 
 const app = express();
 const port = process.env.PORT || 3000;
-const neo4jServer = process.env.NEO4JSERVER || "127.0.0.1";
-
 
 app.use(express.static('public'));
 app.use(express.json());
 
-// TODO: move to secrets
 const neo4jParams = {
-  endpoint: `http://${neo4jServer}:7474/db/neo4j/tx`,
-  user: process.env.NEO4JUSER || null,
-  password: process.env.NEO4JPWD || null
+  const url = process.env.NEO4J_URL || "http://127.0.0.1:7474/db/neo4j/tx",
+  const password = process.env.NEO4J_PASSWORD || null,
+  const username = process.env.NEO4J_USERNAME || null,
 };
 
 
@@ -23,11 +20,10 @@ app.post('/neo4j', async (req, res) => {
     // curl -d '{"statements": [{"statement": "MATCH (t:Taxon) RETURN t.name"}]}' -H "Authorization: Basic XXXXXXXXXXXX==" -H "Content-Type: application/json"  https://knowledge-graph.integration.govuk.digital:7473/db/neo4j/tx | jq .
 
     const headers = { 'Content-Type': 'application/json' }
-    if (neo4jParams.user || neo4jParams.password) {
-      headers.Authorization = 'Basic ' + btoa(neo4jParams.user + ":" + neo4jParams.password);
+    if (neo4jParams.username || neo4jParams.password) {
+      headers.Authorization = 'Basic ' + btoa(neo4jParams.username + ":" + neo4jParams.password);
     }
-
-    const data = await got.post(neo4jParams.endpoint, {
+    const data = await got.post(neo4jParams.url, {
       json: req.body,
       headers
     }).json();
