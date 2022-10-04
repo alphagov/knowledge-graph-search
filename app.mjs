@@ -8,9 +8,9 @@ app.use(express.static('public'));
 app.use(express.json());
 
 const neo4jParams = {
-  const url = process.env.NEO4J_URL || "http://127.0.0.1:7474/db/neo4j/tx",
-  const password = process.env.NEO4J_PASSWORD || null,
-  const username = process.env.NEO4J_USERNAME || null,
+  url: process.env.NEO4J_URL || "http://127.0.0.1:7474/db/neo4j/tx",
+  password: process.env.NEO4J_PASSWORD || null,
+  username: process.env.NEO4J_USERNAME || null
 };
 
 

@@ -25,7 +25,6 @@ const handleEvent = async function(event) {
         state.selectedLocale = getFormInputValue('locale');
         state.whereToSearch.title = id('search-title')?.checked;
         state.whereToSearch.text = id('search-text')?.checked;
-        console.log('sdf', state.whereToSearch)
         state.caseSensitive = id('case-sensitive')?.checked;
         state.linkSearchUrl = getFormInputValue('link-search');
         state.skip = 0; // reset to first page
