@@ -1,6 +1,0 @@
----
-applications:
-- name: knowledge-graph-search
-  memory: 64M
-  buildpacks:
-  - staticfile_buildpack

@@ -27,9 +27,6 @@ const initialSearchParams = {
 
 const state = {
   ...initialSearchParams,
-  user: '',
-  password: '',
-  server: '',
   taxons: [], // list of names of all the taxons
   locales: [], // all the languages found in the content store
   errorText: null,

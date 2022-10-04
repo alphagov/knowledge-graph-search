@@ -7,14 +7,13 @@ const neo4jServer = process.env.NEO4JSERVER || "127.0.0.1";
 
 
 app.use(express.static('public'));
-//app.use(express.raw());
 app.use(express.json());
 
 // TODO: move to secrets
 const neo4jParams = {
   endpoint: `http://${neo4jServer}:7474/db/neo4j/tx`,
-  user: null,
-  password: null
+  user: process.env.NEO4JUSER || null,
+  password: process.env.NEO4JPWD || null
 };
 
 
