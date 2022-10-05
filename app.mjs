@@ -19,10 +19,15 @@ app.post('/neo4j', async (req, res) => {
 
     // curl -d '{"statements": [{"statement": "MATCH (t:Taxon) RETURN t.name"}]}' -H "Authorization: Basic XXXXXXXXXXXX==" -H "Content-Type: application/json"  https://knowledge-graph.integration.govuk.digital:7473/db/neo4j/tx | jq .
 
+
     const headers = { 'Content-Type': 'application/json' }
     if (neo4jParams.username || neo4jParams.password) {
-      headers.Authorization = 'Basic ' + btoa(neo4jParams.username + ":" + neo4jParams.password);
+      headers.Authorization =
+        'Basic ' + Buffer.from(neo4jParams.username + ":" + neo4jParams.password, 'binary').toString('base64');
     }
+
+    console.log('url', neo4jParams.url);
+
     const data = await got.post(neo4jParams.url, {
       json: req.body,
       headers
