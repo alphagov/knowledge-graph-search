@@ -134,7 +134,7 @@ const buildMetaboxInfo = async function(info) {
           { name: info.node.name }
       }, {
         statement: `
-          MATCH (org:Organisation)-[:HAS_CHILD]->(childOrg:Organisation)
+          MATCH (org:Organisation)-[:HAS_CHILD_ORGANISATION]->(childOrg:Organisation)
           WHERE org.name = $name
           AND childOrg.status <> "closed"
           RETURN childOrg.name`,
@@ -142,7 +142,7 @@ const buildMetaboxInfo = async function(info) {
           { name: info.node.name }
       }, {
         statement: `
-          MATCH (org:Organisation)<-[:HAS_CHILD]-(parentOrg:Organisation)
+          MATCH (org:Organisation)-[:HAS_PARENT_ORGANISATION]->(parentOrg:Organisation)
           WHERE org.name = $name
           RETURN parentOrg.name`,
         parameters:
