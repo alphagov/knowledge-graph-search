@@ -71,6 +71,20 @@ pre {
   background: #ddd;
 }
 
+.kg-checkboxes, .kg-radios {
+  padding: 0;
+  display: inline;
+  line-height: 1.2;
+  .kg-checkboxes__item, .kg-radios__item {
+    display: inline-block;
+    padding: 0 1em 0 0;
+    background: #ddd;
+    label {
+      font-weight: normal;
+    }
+  }
+}
+
 .search-selector {
   margin-bottom: 30px;
   button {
