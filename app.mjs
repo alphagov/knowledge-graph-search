@@ -26,16 +26,13 @@ app.post('/neo4j', async (req, res) => {
         'Basic ' + Buffer.from(neo4jParams.username + ":" + neo4jParams.password, 'binary').toString('base64');
     }
 
-    console.log('url', neo4jParams.url);
-
     const data = await got.post(neo4jParams.url, {
       json: req.body,
       headers
     }).json();
     res.send(data);
   } catch (e) {
-    console.log('got fail', e);
-    res.send('got fail', e);
+    res.send('neo4j proxy fail', e);
   }
 });
 

@@ -6,26 +6,24 @@ import { state } from './state.js';
 import { languageCode } from './lang.js';
 import { splitKeywords } from './utils.js';
 
-
 //=========== public methods ===========
 
 const initNeo4j = async function() {
   console.log('retrieving taxons and locales');
-  queryNeo4j([
-    { statement: 'MATCH (t:Taxon) RETURN t.name' },
-    { statement: 'MATCH (n:Page) WHERE n.locale <> "en" AND n.locale <> "cy" RETURN DISTINCT n.locale' }
-  ])
-  .then(response => response.json())
-  .then(json => {
+  try {
+    const neo4jResponse = await queryNeo4j([
+      { statement: 'MATCH (t:Taxon) RETURN t.name' },
+      { statement: 'MATCH (n:Page) WHERE n.locale <> "en" AND n.locale <> "cy" RETURN DISTINCT n.locale' }
+    ])
+    const json = await neo4jResponse.json();
     state.taxons = json.results[0].data.map(d => d.row[0]).sort();
     state.locales = json.results[1].data.map(l => l.row[0]).sort();
     state.locales = ['', 'en', 'cy'].concat(state.locales);
     console.log(`successfully fetched ${state.taxons.length} taxons and ${state.locales.length} locales`);
-  })
-  .catch (error => {
+  } catch (error) {
     state.errorText = 'Error retrieving taxons and locales';
     console.log('Error retrieving taxons and locales', error);
-  });
+  }
 };
 
 
