@@ -4,10 +4,11 @@ import { languageName } from '../lang.js';
 
 
 const viewSearchPanel = () => {
+  const result = [];
   switch (state.searchType) {
   case 'mixed':
   case 'results':
-    return `
+    result.push(`
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
           <h1 class="govuk-heading-xl">Mixed search</h1>
@@ -23,9 +24,10 @@ const viewSearchPanel = () => {
           ${viewSearchButton()}
         </div>
       </form>
-    `;
+    `);
+    break;
   case 'keyword':
-    return `
+    result.push(`
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
           <a class="govuk-skip-link" href="#results-table">Skip to results</a>
@@ -46,9 +48,11 @@ const viewSearchPanel = () => {
           </details>
           ${viewSearchButton()}
         </div>
-      </form>`;
+      </form>
+    `);
+    break;
   case 'link':
-    return `
+    result.push(`
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
           <a class="govuk-skip-link" href="#results-table">Skip to results</a>
@@ -65,9 +69,11 @@ const viewSearchPanel = () => {
           </details>
           ${viewSearchButton()}
         </div>
-      </form>`;
+      </form>
+    `);
+    break;
   case 'taxon':
-    return `
+    result.push(`
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
           <a class="govuk-skip-link" href="#results-table">Skip to results</a>
@@ -84,9 +90,11 @@ const viewSearchPanel = () => {
           </details>
           ${viewSearchButton()}
         </div>
-      </form>`;
+      </form>
+    `);
+    break;
   case 'language':
-    return `
+    result.push(`
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
           <a class="govuk-skip-link" href="#results-table">Skip to results</a>
@@ -103,7 +111,9 @@ const viewSearchPanel = () => {
           </details>
           ${viewSearchButton()}
         </div>
-      </form>`;
+      </form>
+    `);
+    break;
   default:
     console.log('viewSearchPanel: unknown value', searchType);
   }

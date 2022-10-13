@@ -65,16 +65,18 @@ const viewSearchTypeSelector = () => `
 
 
 const viewMainLayout = () => {
+  const result = [];
   if (state.searchType === 'mixed') {
     if (!state.searchResults) {
-      return `
+      result.push(`
         <div class="govuk-grid-row mixed-layout--no-results">
           <div class="govuk-grid-column-two-thirds">
             ${viewSearchPanel(state.searchType)}
           </div>
-        </div>`;
+        </div>
+      `);
     } else {
-      return `
+      result.push(`
         <div class="govuk-grid-row mixed-layout">
           <div class="govuk-grid-column-one-third">
             ${viewSearchPanel(state.searchType)}
@@ -82,18 +84,20 @@ const viewMainLayout = () => {
           <div class="govuk-grid-column-two-thirds">
             ${viewSearchResults()}
           </div>
-        </div>`;
+        </div>
+      `);
     }
   } else {
-    return `
+    result.push(`
       <div class="govuk-grid-row simple-search">
         <div class="govuk-grid-column-two-thirds">
           ${viewSearchPanel(state.searchType)}
         </div>
       </div>
       ${viewSearchResults()}
-    `;
+    `);
   }
+  return result.join('');
 };
 
 
