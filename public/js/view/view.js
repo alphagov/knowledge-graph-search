@@ -273,7 +273,7 @@ const csvFromResults = function(searchResults) {
 
 const viewWaiting = () => `
   <div class="govuk-body">Searching for ${viewQueryDescription()}</div>
-  <p class="govuk-body-s">Please note that some queries take up to one minute</p>
+  <p class="govuk-body-s">Some queries may take up to a minute</p>
 `;
 
 
