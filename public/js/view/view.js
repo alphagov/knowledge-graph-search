@@ -392,7 +392,7 @@ const fieldFormatters = {
   },
   'pagerank' : {
     name: 'Popularity',
-    format: val => val.toFixed(2)
+    format: val => val ? val.toFixed(2) : 'n/a'
   },
   'withdrawn_at' : {
     name: 'Withdrawn at',
