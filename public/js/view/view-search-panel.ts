@@ -1,14 +1,15 @@
-import { sanitiseOutput } from '../utils.js';
-import { state, searchState } from '../state.js';
-import { languageName } from '../lang.js';
+import { sanitiseOutput } from '../utils';
+import { state, searchState } from '../state';
+import { languageName } from '../lang';
+import { SearchType } from '../state-types';
 
 
 const viewSearchPanel = () => {
   const result = [];
   switch (state.searchType) {
-  case 'mixed':
-  case 'results':
-    result.push(`
+    case SearchType.Mixed:
+    case SearchType.Results:
+      result.push(`
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
           <h1 class="govuk-heading-xl">Mixed search</h1>
@@ -25,9 +26,9 @@ const viewSearchPanel = () => {
         </div>
       </form>
     `);
-    break;
-  case 'keyword':
-    result.push(`
+      break;
+    case SearchType.Keyword:
+      result.push(`
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
           <a class="govuk-skip-link" href="#results-table">Skip to results</a>
@@ -50,9 +51,9 @@ const viewSearchPanel = () => {
         </div>
       </form>
     `);
-    break;
-  case 'link':
-    result.push(`
+      break;
+    case SearchType.Link:
+      result.push(`
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
           <a class="govuk-skip-link" href="#results-table">Skip to results</a>
@@ -71,9 +72,9 @@ const viewSearchPanel = () => {
         </div>
       </form>
     `);
-    break;
-  case 'taxon':
-    result.push(`
+      break;
+    case SearchType.Taxon:
+      result.push(`
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
           <a class="govuk-skip-link" href="#results-table">Skip to results</a>
@@ -92,9 +93,9 @@ const viewSearchPanel = () => {
         </div>
       </form>
     `);
-    break;
-  case 'language':
-    result.push(`
+      break;
+    case SearchType.Language:
+      result.push(`
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
           <a class="govuk-skip-link" href="#results-table">Skip to results</a>
@@ -113,14 +114,14 @@ const viewSearchPanel = () => {
         </div>
       </form>
     `);
-    break;
-  default:
-    console.log('viewSearchPanel: unknown value', searchType);
+      break;
+    default:
+      console.log('viewSearchPanel: unknown value', state.searchType);
   }
   result.push(`
     <p class="govuk-body-s">
-      Runs only between 9am and 7pm. 
-      Searches do not include history mode content, Mainstream GitHub smart answers or service domains. 
+      Runs only between 9am and 7pm.
+      Searches do not include history mode content, Mainstream GitHub smart answers or service domains.
       Popularity scores depend on cookie consent.
     </p>
   `);
@@ -128,14 +129,14 @@ const viewSearchPanel = () => {
 };
 
 
-const viewInlineError = (id, message) => `
+const viewInlineError = (id: string, message: string): string => `
   <p id="${id}" class="govuk-error-message">
     <span class="govuk-visually-hidden">Error:</span> ${message}
   </p>
 `;
 
 
-const viewScopeSelector = () => {
+const viewScopeSelector = (): string => {
   const errors = searchState()?.errors;
   const err = errors && errors.includes('missingWhereToSearch');
   return `
@@ -212,7 +213,7 @@ const viewLocaleSelector = () => {
       </div>
       <datalist id="localeList">
   `];
-  html.push(...state.locales.map(code => `<option data-value="${code}" ${state.selectedLocale==code ? 'selected' : ''}>${languageName(code)}</option>`))
+  html.push(...state.locales.map(code => `<option data-value="${code}" ${state.selectedLocale == code ? 'selected' : ''}>${languageName(code)}</option>`))
   html.push(`
       </datalist>
       <input type="text"
@@ -231,7 +232,7 @@ const viewSearchButton = () => `
   <p class="govuk-body">
     <button
       type="submit"
-      class="govuk-button ${state.waiting?'govuk-button--disabled':''}"
+      class="govuk-button ${state.waiting ? 'govuk-button--disabled' : ''}"
       ${state.waiting ? 'disabled="disabled"' : ''}
       id="search">
       ${state.waiting ? 'Searching <img src="assets/images/loader.gif" height="20px" alt="loader"/>' : 'Search'}
@@ -277,7 +278,7 @@ const viewCaseSensitiveSelector = () => `
 
 
 const viewKeywordsCombinator = () =>
-` <div class="govuk-form-group">
+  ` <div class="govuk-form-group">
     <fieldset
         class="govuk-fieldset"
         id="combinator-wrapper"
@@ -312,7 +313,7 @@ const viewKeywordsCombinator = () =>
 
 
 const viewPublishingAppSelector = () =>
-` <div class="govuk-form-group">
+  ` <div class="govuk-form-group">
     <fieldset
         class="govuk-fieldset"
         id="search-areas-wrapper"

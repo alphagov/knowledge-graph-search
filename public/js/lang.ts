@@ -2,18 +2,18 @@
 
 
 
-const languageCode = name =>
+const languageCode = (name: string): string =>
   // returns the language code from the language's full name
   Object.keys(languageNames).find(key => languageNames[key] === name) || name;
 
 
-const languageName = code =>
+const languageName = (code: string) =>
   // returns the language name from the language's code
   languageNames[code] || code;
 
 // IETF language codes https://en.wikipedia.org/wiki/IETF_language_tag
 // with additions
-const languageNames = {
+const languageNames: { [index: string]: any } = {
   '': 'All languages',
   'af': 'Afrikaans',
   'am': 'Amharic',

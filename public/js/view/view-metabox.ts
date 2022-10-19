@@ -1,13 +1,13 @@
-import { state } from '../state.js';
-import { viewMetaLink } from './view-components.js';
+import { state } from '../state';
+import { viewMetaLink } from './view-components';
+import { ResultDate, MetaResult } from '../neo4j-types';
 
 
-
-const viewOrgChild = subOrg =>
+const viewOrgChild = (subOrg: string) =>
   `<li>${viewMetaLink(subOrg)}</li>`;
 
 
-const viewOrgChildren = childOrgNames =>
+const viewOrgChildren = (childOrgNames: string[]) =>
   `<details class="govuk-details">
      <summary class="govuk-details__summary">
        <span class="govuk-details__summary-text">
@@ -20,7 +20,7 @@ const viewOrgChildren = childOrgNames =>
    </details>`;
 
 
-const viewBankHolidayDetails = function(holiday) {
+const viewBankHolidayDetails = function(holiday: any) {
   return `
     <details class="govuk-details">
       <summary class="govuk-details__summary">
@@ -30,7 +30,7 @@ const viewBankHolidayDetails = function(holiday) {
       </summary>
       <div class="govuk-details__text">
         <ul class="govuk-list govuk-list--bullet">
-          ${holiday.dates.map(date => `<li>${date.dateString}</li>`).join('')}
+          ${holiday.dates.map((date: ResultDate) => `<li>${date.dateString}</li>`).join('')}
         </ul>
       </div>
     </details>
@@ -42,7 +42,7 @@ const viewBankHolidayDetails = function(holiday) {
       </summary>
       <div class="govuk-details__text">
         <ul class="govuk-list govuk-list--bullet">
-          ${holiday.regions.map(region => `<li>${region}</li>`).join('')}
+          ${holiday.regions.map((region: string) => `<li>${region}</li>`).join('')}
         </ul>
       </div>
     </details>
@@ -50,7 +50,7 @@ const viewBankHolidayDetails = function(holiday) {
 };
 
 
-const viewBankHoliday = record =>
+const viewBankHoliday = (record: MetaResult): string =>
   `<div class="meta-results-panel">
      <h2 class="govuk-heading-m">
        ${record.name}
@@ -61,7 +61,7 @@ const viewBankHoliday = record =>
   `;
 
 
-const viewOrg = record =>
+const viewOrg = (record: MetaResult): string =>
   `<div class="meta-results-panel">
      <h2 class="govuk-heading-m">
        <a class="govuk-link" href="${record.homepage}">${record.name}</a>
@@ -71,9 +71,9 @@ const viewOrg = record =>
      </p>
      ${record.description ? `<p class="govuk-body">${record.description}</p>` : ''}
      ${record.childOrgNames && record.childOrgNames.length > 0 ?
-       viewOrgChildren(record.childOrgNames) :
-       '<p class="govuk-body">No sub-organisations</p>'
-     }
+    viewOrgChildren(record.childOrgNames) :
+    '<p class="govuk-body">No sub-organisations</p>'
+  }
    </div>`;
 
 
@@ -81,15 +81,15 @@ const viewOrg = record =>
 
 
 const viewMetaResultsExpandToggle = () =>
-  state.metaSearchResults.length > 5 ?
-    `<button id="meta-results-expand">${state.disambBoxExpanded ? 'show less' : 'show more'}</button>` :
+  state.metaSearchResults && state.metaSearchResults.length > 5 ?
+    `<button id="meta-results-expand">${state.disamboxExpanded ? 'show less' : 'show more'}</button>` :
     '';
 
 
 const viewMetaResults = function() {
   if (!state.metaSearchResults) return;
   if (state.metaSearchResults.length > 1) {
-    const expandedClass = state.metaSearchResults.length > 5 && !state.disambBoxExpanded ? 'meta-results-panel--collapsed' : '';
+    const expandedClass = state.metaSearchResults.length > 5 && !state.disamboxExpanded ? 'meta-results-panel--collapsed' : '';
     return `
       <div class="meta-results-panel">
         <div class="meta-results-panel__collapsible ${expandedClass}">

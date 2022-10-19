@@ -32,7 +32,7 @@ app.post('/neo4j', async (req, res) => {
     }).json();
     res.send(data);
   } catch (e) {
-    res.send('neo4j proxy fail', e);
+    res.status(500).send(`neo4j proxy fail: ${e}`);
   }
 });
 

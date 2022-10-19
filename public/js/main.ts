@@ -1,7 +1,7 @@
-import { view } from './view/view.js';
-import { state, setQueryParamsFromQS, resetSearch } from './state.js';
-import { searchButtonClicked } from './events.js';
-import { initNeo4j } from './neo4j.js';
+import { view } from './view/view';
+import { state, setQueryParamsFromQS, resetSearch } from './state';
+import { searchButtonClicked } from './events';
+import { initNeo4j } from './neo4j';
 
 
 //==================================================
