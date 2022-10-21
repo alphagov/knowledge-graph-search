@@ -184,13 +184,8 @@ const viewOrg = record =>
        Government organisation${record.parentName ? `, part of ${viewMetaLink(record.parentName)}` : ''}
      </p>
      ${record.description ? `<p class="govuk-body">${record.description}</p>` : ''}
-     ${record.childOrgNames && record.childOrgNames.length > 0 ?
-       viewOrgChildren(record.childOrgNames) :
-       '<p class="govuk-body">No sub-organisations</p>'
-     }
-     ${record.personRoleNames && record.personRoleNames.length > 0 ?
-       viewOrgPersonRoles(record.personRoleNames) : ''
-     }
+     ${record.childOrgNames && record.childOrgNames.length > 0 ? viewOrgChildren(record.childOrgNames) : '' }
+     ${record.personRoleNames && record.personRoleNames.length > 0 ? viewOrgPersonRoles(record.personRoleNames) : '' }
    </div>`;
 
 
