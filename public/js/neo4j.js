@@ -50,14 +50,14 @@ const queryGraph = async function(state, callback) {
   }
 
   callback({type: 'neo4j-running'});
+  console.log('running cypher', wholeQuery)
   queryNeo4j(wholeQuery)
   .then(response => response.json())
   .then(async json => {
     const mainResults = formattedSearchResults(json.results[0]);
-    let metaResults = json.results[1].data.length > 0 ?
+    let metaResults = json.results[1]?.data.length > 0 ?
         formattedSearchResults(json.results[1]) :
         [];
-
     // If there's an exact match, just keep it
     const exactMetaResults = metaResults.filter(result => {
       return result.node.name.toLowerCase() === searchKeywords.toLowerCase()
@@ -142,11 +142,11 @@ const buildMetaboxInfo = async function(info) {
     result.description = json.results[0].data[0].row[4].description;
     result.roles = json.results[0].data.map(result => {
       return {
-        name: result.row[2].name,
+        title: result.row[2].title,
         orgName: result.row[3]?.name,
         orgUrl: result.row[3]?.homepage,
         startDate: new Date(result.row[1].startDate),
-        endDate: new Date(result.row[1].endDate)
+        endDate: result.row[1].endDate ? new Date(result.row[1].endDate) : null
       };
     });
     break;
@@ -167,7 +167,6 @@ const buildMetaboxInfo = async function(info) {
     ])
 
     json = await roleData.json();
-    console.log('json',json);
     result.name = json.results[0].data[0].row[0].name;
     result.orgNames = json.results[0].data[0].row[2].map(result => result.name);
     result.personNames = json.results[0].data[0].row[1].map(result => result.name);
@@ -228,7 +227,6 @@ const buildMetaboxInfo = async function(info) {
     default:
     console.log('unknown meta node type', info.nodeType[0]);
   }
-  console.log('result', result);
   return result;
 };
 
@@ -307,6 +305,7 @@ const searchQuery = function(state) {
 //========== Private methods ==========
 
 const queryNeo4j = async function(queries) {
+  console.log('queryNeo4j', queries);
   const body = { statements: queries };
   return fetch('/neo4j', {
     method:'POST',

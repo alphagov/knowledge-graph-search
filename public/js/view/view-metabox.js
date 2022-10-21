@@ -44,9 +44,9 @@ const viewPersonRoles = function(roles) {
       </summary>
       <div class="govuk-details__text">
         <ul class="govuk-list govuk-list--bullet">${roles.map(role => `
-          <li>${viewMetaLink(role.name)} ${role.orgName ? ' at ' + viewMetaLink(role.orgName) : ''}
+          <li>${viewMetaLink(role.title)} ${role.orgName ? ' at ' + viewMetaLink(role.orgName) : ''}
             (from ${role.startDate ? role.startDate.getFullYear() : ''}
-            to ${role.endDate ? role.endDate.getFullYear() : 'now'})
+            to ${role.endDate ? role.endDate.getFullYear() : 'present'})
           </li>`).join('')}
         </ul>
       </div>
@@ -220,7 +220,7 @@ const viewMetaResults = function() {
     `;
   } else {
     const record = state.metaSearchResults[0];
-    console.log(`meta: found a ${record.type}`)
+    console.log(`meta: found a ${record.type}`);
     switch (record.type) {
       case "BankHoliday": return viewBankHoliday(record);
       case "Organisation": return viewOrg(record);
