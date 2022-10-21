@@ -43,6 +43,7 @@ Possible causes:<br/>
   await init();
   if (!state.errorText) {
     setQueryParamsFromQS();
+    view(); // needed to set the form input values from the state
     searchButtonClicked();
   }
   view();

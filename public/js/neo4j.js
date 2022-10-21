@@ -28,7 +28,6 @@ const initNeo4j = async function() {
 
 
 const queryGraph = async function(state, callback) {
-
   const mainCypherQuery = { statement: searchQuery(state) };
   const searchKeywords = state.selectedWords.replace(/"/g, '');
 

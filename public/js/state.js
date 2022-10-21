@@ -61,9 +61,10 @@ const setQueryParamsFromQS = function() {
   state.caseSensitive = maybeReplace('caseSensitive', 'case-sensitive');
   state.areaToSearch = maybeReplace('areaToSearch', 'area');
   state.combinator = maybeReplace('combinator', 'combinator');
-
-  state.whereToSearch.title = searchParams.get('search-in-title') !== null ? searchParams.get('search-in-title') : initialSearchParams.whereToSearch.title;
-  state.whereToSearch.text = searchParams.get('search-in-text') !== null ? searchParams.get('search-in-text') : initialSearchParams.whereToSearch.text;
+  state.whereToSearch.title = searchParams.get('search-in-title') === 'true' ?
+    true : initialSearchParams.whereToSearch.title;
+  state.whereToSearch.text = searchParams.get('search-in-text') === 'true' ?
+    true : initialSearchParams.whereToSearch.text;
 };
 
 const searchState = function() {

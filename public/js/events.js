@@ -19,6 +19,7 @@ const handleEvent = async function(event) {
         });
 
         // Update the state
+        // BUG: could override QSPs  with
         state.selectedWords = getFormInputValue('keyword');
         state.excludedWords = getFormInputValue('excluded-keyword');
         state.selectedTaxon = getFormInputValue('taxon');
@@ -113,6 +114,7 @@ const handleEvent = async function(event) {
 
 const searchButtonClicked = async function() {
   // update the state when the user clicked Search
+  console.log(13, state.whereToSearch);
   window.scrollTo(0, 0);
   state.errorText = null;
   state.userErrors = null;
