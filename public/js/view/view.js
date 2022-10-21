@@ -16,6 +16,12 @@ const view = () => {
       ${viewErrorBanner()}
       ${viewSearchTypeSelector()}
       ${viewMainLayout()}
+      <p class="govuk-body-s">
+        Runs only between 9am and 7pm.
+        Searches do not include history mode content, Mainstream GitHub smart
+        answers or service domains.
+        Popularity scores depend on cookie consent.
+      </p>
     </main>
   `;
 

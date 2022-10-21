@@ -117,13 +117,6 @@ const viewSearchPanel = () => {
   default:
     console.log('viewSearchPanel: unknown value', searchType);
   }
-  result.push(`
-    <p class="govuk-body-s">
-      Runs only between 9am and 7pm. 
-      Searches do not include history mode content, Mainstream GitHub smart answers or service domains. 
-      Popularity scores depend on cookie consent.
-    </p>
-  `);
   return result.join('');
 };
 
