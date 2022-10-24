@@ -220,7 +220,7 @@ const buildMetaboxInfo = async function(info) {
     result.childOrgNames = childDetails.map(child => child.row[0]);
     result.personRoleNames = personRoleDetails.map(record=>{ return {
       personName: record.row[0].name,
-      roleName: record.row[1].name
+      roleName: record.row[1].title
     }});
     break;
     default:
