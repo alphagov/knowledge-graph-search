@@ -17,7 +17,7 @@ const initNeo4j = async function() {
     const neo4jResponse: Response = await queryNeo4j([
       { statement: 'MATCH (t:Taxon) RETURN t.name' },
       { statement: 'MATCH (n:Page) WHERE n.locale <> "en" AND n.locale <> "cy" RETURN DISTINCT n.locale' }
-    ])
+    ], 10);
     const json: Neo4jResponse = await neo4jResponse.json();
     state.taxons = json.results[0].data.map((d: Neo4jResultData) => d.row[0]).sort();
     state.locales = json.results[1].data.map((d: Neo4jResultData) => d.row[0]).sort();
@@ -244,15 +244,19 @@ const searchQuery = function(state: State): string {
 
 //========== Private methods ==========
 
-const queryNeo4j: (queries: Neo4jQuery[]) => Promise<Response> = async function(queries) {
+const queryNeo4j: (queries: Neo4jQuery[], timeoutSeconds?: number) => Promise<Response> = async function(queries, timeoutSeconds = 60) {
   const body = { statements: queries };
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutSeconds * 1000)
+
   console.log('sending query to neo4j:', body);
   return fetch('/neo4j', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(body)
+    body: JSON.stringify(body),
+    signal: controller.signal
   });
 };
 
