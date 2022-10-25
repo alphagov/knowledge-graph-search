@@ -9,12 +9,7 @@ import { initNeo4j } from './neo4j';
 //==================================================
 
 const init = async function() {
-  // decide if we're showing the feedback banner
-  state.displayFeedbackBanner = !document.cookie.includes('feedback_banner_dismissed=true');
   state.errorText = null;
-
-
-
   try {
     await initNeo4j();
   } catch (e) {
@@ -43,6 +38,9 @@ Possible causes:<br/>
   await init();
   if (!state.errorText) {
     setQueryParamsFromQS();
+    view();
+    // the above is needed to set the form input values from the state in case it
+    // was modified by the query string
     searchButtonClicked();
   }
   view();

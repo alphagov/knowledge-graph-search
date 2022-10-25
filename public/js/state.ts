@@ -22,8 +22,7 @@ const initialSearchParams: SearchParams = {
   combinator: Combinator.Any,
   areaToSearch: SearchArea.Any,
 
-  caseSensitive: false, // whether the keyword search is case sensitive
-  displayFeedbackBanner: true, // whether we should show the banner requesting feedback from user.
+  caseSensitive: false // whether the keyword search is case sensitive
 };
 
 
@@ -64,12 +63,10 @@ const setQueryParamsFromQS = function(): void {
   state.areaToSearch = maybeReplace('areaToSearch', 'area');
   state.combinator = maybeReplace('combinator', 'combinator');
 
-  state.whereToSearch.title = searchParams.get('search-in-title') !== null ?
-    !!searchParams.get('search-in-title') :
-    initialSearchParams.whereToSearch.title;
-  state.whereToSearch.text = searchParams.get('search-in-text') !== null ?
-    !!searchParams.get('search-in-text') :
-    initialSearchParams.whereToSearch.text;
+  state.whereToSearch.title = searchParams.get('search-in-title') === 'true' ?
+    true : initialSearchParams.whereToSearch.title;
+  state.whereToSearch.text = searchParams.get('search-in-text') === 'true' ?
+    true : initialSearchParams.whereToSearch.text;
 };
 
 const searchState = function(): { code: string, errors: string[] } {

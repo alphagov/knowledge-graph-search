@@ -4,7 +4,6 @@ import { handleEvent } from '../events';
 import { languageName } from '../lang';
 import { viewMetaResults } from './view-metabox';
 import { viewSearchPanel } from './view-search-panel';
-import { viewFeedbackBanner } from './view-components';
 import { EventType } from '../event-types';
 
 
@@ -17,16 +16,20 @@ const view = () => {
   if (pageContent) {
     pageContent.innerHTML = `
       <main class="govuk-main-wrapper" id="main-content" role="main">
-        ${state.displayFeedbackBanner ? viewFeedbackBanner() : ''}
         ${viewErrorBanner()}
         ${viewSearchTypeSelector()}
         ${viewMainLayout()}
+        <p class="govuk-body-s">
+          Runs only between 9am and 7pm.
+          Searches do not include history mode content, Mainstream GitHub smart answers or service domains.
+          Popularity scores depend on cookie consent.
+        </p>
       </main>
     `;
   }
 
   // Add event handlers
-  document.querySelectorAll('#dismiss-feedback-banner, button, input[type=checkbox][data-interactive=true]')
+  document.querySelectorAll('button, input[type=checkbox][data-interactive=true]')
     .forEach(input => input.addEventListener(
       'click',
       event => handleEvent({ type: EventType.Dom, id: (event.target as HTMLElement).getAttribute('id') || undefined })));

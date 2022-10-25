@@ -32,8 +32,7 @@ export interface SearchParams {
   }, // what parts of the pages to search in
   combinator: Combinator, // all keywords or any keywords
   areaToSearch: SearchArea, // whitehall, mainstream, both
-  caseSensitive: boolean, // case sensitive keyword search?
-  displayFeedbackBanner: boolean // should we show the feedback banner
+  caseSensitive: boolean // case sensitive keyword search?
 }
 
 export interface State extends SearchParams {

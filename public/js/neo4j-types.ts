@@ -51,5 +51,9 @@ export interface MetaResult {
   homepage?: string,
   description?: string,
   parentName?: string,
-  childOrgNames?: string[]
+  childOrgNames?: string[],
+  personRoleNames?: string[],
+  roles?: string[],
+  orgNames?: string[],
+  personNames?: string[]
 }
