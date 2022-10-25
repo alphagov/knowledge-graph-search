@@ -1,196 +1,1755 @@
-/*
- * ATTENTION: The "eval" devtool has been used (maybe by default in mode: "development").
- * This devtool is neither made for production nor for readable output files.
- * It uses "eval()" calls to create a separate source file in the browser devtools.
- * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
- * or disable the default devtool with "devtool: false".
- * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
- */
-/******/ (() => { // webpackBootstrap
-/******/ 	"use strict";
-/******/ 	var __webpack_modules__ = ({
+(() => {
+    const defines = {};
+    const entry = [null];
+    function define(name, dependencies, factory) {
+        defines[name] = { dependencies, factory };
+        entry[0] = name;
+    }
+    define("require", ["exports"], (exports) => {
+        Object.defineProperty(exports, "__cjsModule", { value: true });
+        Object.defineProperty(exports, "default", { value: (name) => resolve(name) });
+    });
+    define("utils", ["require", "exports"], function (require, exports) {
+        "use strict";
+        Object.defineProperty(exports, "__esModule", { value: true });
+        exports.getFormInputValue = exports.splitKeywords = exports.sanitiseOutput = exports.sanitiseInput = exports.id = void 0;
+        const id = (x) => document.getElementById(x);
+        exports.id = id;
+        const tagBody = '(?:[^"\'>]|"[^"]*"|\'[^\']*\')*';
+        const tagOrComment = new RegExp('<(?:'
+            // Comment body.
+            + '!--(?:(?:-*[^->])*--+|-?)'
+            // Special "raw text" elements whose content should be elided.
+            + '|script\\b' + tagBody + '>[\\s\\S]*?</script\\s*'
+            + '|style\\b' + tagBody + '>[\\s\\S]*?</style\\s*'
+            // Regular name
+            + '|/?[a-z]'
+            + tagBody
+            + ')>', 'gi');
+        const getFormInputValue = (inputId) => { var _a; return sanitiseInput((_a = id(inputId)) === null || _a === void 0 ? void 0 : _a.value); };
+        exports.getFormInputValue = getFormInputValue;
+        const sanitiseInput = function (text) {
+            // remove text that could lead to script injections
+            if (!text)
+                return '';
+            let oldText;
+            do {
+                oldText = text;
+                text = text.replace(tagOrComment, '');
+            } while (text !== oldText);
+            return text.replace(/</g, '&lt;').replace(/""*/g, '"');
+        };
+        exports.sanitiseInput = sanitiseInput;
+        const sanitiseOutput = function (text) {
+            const escapeHTML = (str) => new Option(str).innerHTML;
+            return escapeHTML(text)
+                .replace(/'/g, '&apos;')
+                .replace(/"/g, '&quot;');
+        };
+        exports.sanitiseOutput = sanitiseOutput;
+        const splitKeywords = function (keywords) {
+            const wordsToIgnore = ['of', 'for', 'the'];
+            const regexp = /[^\s,"]+|"([^"]*)"/gi;
+            const output = [];
+            let match;
+            do {
+                match = regexp.exec(keywords);
+                if (match) {
+                    output.push(match[1] ? match[1] : match[0]);
+                }
+            } while (match);
+            return output.filter(d => d.length > 0 && !wordsToIgnore.includes(d));
+        };
+        exports.splitKeywords = splitKeywords;
+    });
+    // Functions to work with languages and language codes
+    define("lang", ["require", "exports"], function (require, exports) {
+        "use strict";
+        Object.defineProperty(exports, "__esModule", { value: true });
+        exports.languageName = exports.languageCode = void 0;
+        const languageCode = (name) => 
+        // returns the language code from the language's full name
+        Object.keys(languageNames).find(key => languageNames[key] === name) || name;
+        exports.languageCode = languageCode;
+        const languageName = (code) => 
+        // returns the language name from the language's code
+        languageNames[code] || code;
+        exports.languageName = languageName;
+        // IETF language codes https://en.wikipedia.org/wiki/IETF_language_tag
+        // with additions
+        const languageNames = {
+            '': 'All languages',
+            'af': 'Afrikaans',
+            'am': 'Amharic',
+            'ar': 'Arabic',
+            'arn': 'Mapudungun',
+            'as': 'Assamese',
+            'az': 'Azeri',
+            'ba': 'Bashkir',
+            'be': 'Belarusian',
+            'bg': 'Bulgarian',
+            'bn': 'Bengali',
+            'bo': 'Tibetan',
+            'br': 'Breton',
+            'bs': 'Bosnian',
+            'ca': 'Catalan',
+            'co': 'Corsican',
+            'cs': 'Czech',
+            'cy': 'Welsh',
+            'da': 'Danish',
+            'de': 'German',
+            'dr': 'Dari',
+            'dsb': 'Lower Sorbian',
+            'dv': 'Divehi',
+            'el': 'Greek',
+            'en': 'English',
+            'es': 'Spanish',
+            'es-419': 'Latin-american Spanish',
+            'et': 'Estonian',
+            'eu': 'Basque',
+            'fa': 'Persian',
+            'fi': 'Finnish',
+            'fil': 'Filipino',
+            'fo': 'Faroese',
+            'fr': 'French',
+            'fy': 'Frisian',
+            'ga': 'Irish',
+            'gd': 'Scottish Gaelic',
+            'gl': 'Galician',
+            'gsw': 'Alsatian',
+            'gu': 'Gujarati',
+            'ha': 'Hausa',
+            'he': 'Hebrew',
+            'hi': 'Hindi',
+            'hr': 'Croatian',
+            'hsb': 'Upper Sorbian',
+            'hu': 'Hungarian',
+            'hy': 'Armenian',
+            'id': 'Indonesian',
+            'ig': 'Igbo',
+            'ii': 'Yi',
+            'is': 'Icelandic',
+            'it': 'Italian',
+            'iu': 'Inuktitut',
+            'ja': 'Japanese',
+            'ka': 'Georgian',
+            'kk': 'Kazakh',
+            'kl': 'Greenlandic',
+            'km': 'Khmer',
+            'kn': 'Kannada',
+            'ko': 'Korean',
+            'kok': 'Konkani',
+            'ky': 'Kyrgyz',
+            'lb': 'Luxembourgish',
+            'lo': 'Lao',
+            'lt': 'Lithuanian',
+            'lv': 'Latvian',
+            'mi': 'Maori',
+            'mk': 'Macedonian',
+            'ml': 'Malayalam',
+            'mn': 'Mongolian',
+            'moh': 'Mohawk',
+            'mr': 'Marathi',
+            'ms': 'Malay',
+            'mt': 'Maltese',
+            'my': 'Burmese',
+            'nb': 'Norwegian (Bokmål)',
+            'ne': 'Nepali',
+            'nl': 'Dutch',
+            'nn': 'Norwegian (Nynorsk)',
+            'no': 'Norwegian',
+            'nso': 'Sesotho',
+            'oc': 'Occitan',
+            'or': 'Oriya',
+            'pa': 'Punjabi',
+            'pa-pk': 'Punjabi (Pakistan)',
+            'pl': 'Polish',
+            'prs': 'Dari',
+            'ps': 'Pashto',
+            'pt': 'Portuguese',
+            'qut': 'K\'iche',
+            'quz': 'Quechua',
+            'rm': 'Romansh',
+            'ro': 'Romanian',
+            'ru': 'Russian',
+            'rw': 'Kinyarwanda',
+            'sa': 'Sanskrit',
+            'sah': 'Yakut',
+            'se': 'Sami (Northern)',
+            'si': 'Sinhala',
+            'sk': 'Slovak',
+            'sl': 'Slovenian',
+            'sma': 'Sami (Southern)',
+            'smj': 'Sami (Lule)',
+            'smn': 'Sami (Inari)',
+            'sms': 'Sami (Skolt)',
+            'so': 'Somani',
+            'sq': 'Albanian',
+            'sr': 'Serbian',
+            'sv': 'Swedish',
+            'sw': 'Kiswahili',
+            'syr': 'Syriac',
+            'ta': 'Tamil',
+            'te': 'Telugu',
+            'tg': 'Tajik',
+            'th': 'Thai',
+            'tk': 'Turkmen',
+            'tn': 'Setswana',
+            'tr': 'Turkish',
+            'tt': 'Tatar',
+            'tzm': 'Tamazight',
+            'ug': 'Uyghur',
+            'uk': 'Ukrainian',
+            'ur': 'Urdu',
+            'uz': 'Uzbek',
+            'vi': 'Vietnamese',
+            'wo': 'Wolof',
+            'xh': 'isiXhosa',
+            'yi': 'Yiddish',
+            'yo': 'Yoruba',
+            'zh': 'Chinese',
+            'zh-hk': 'Chinese (Hong-Kong)',
+            'zh-tw': 'Chinese (Taiwan)',
+            'zu': 'isiZulu'
+        };
+    });
+    define("state-types", ["require", "exports"], function (require, exports) {
+        "use strict";
+        Object.defineProperty(exports, "__esModule", { value: true });
+        exports.SearchArea = exports.Combinator = exports.SearchType = void 0;
+        var SearchType;
+        (function (SearchType) {
+            SearchType["Keyword"] = "keyword";
+            SearchType["Link"] = "link";
+            SearchType["Taxon"] = "taxon";
+            SearchType["Language"] = "language";
+            SearchType["Mixed"] = "mixed";
+            SearchType["Results"] = "results";
+        })(SearchType = exports.SearchType || (exports.SearchType = {}));
+        ;
+        var Combinator;
+        (function (Combinator) {
+            Combinator["Any"] = "any";
+            Combinator["All"] = "all";
+            Combinator["NotSet"] = "notset";
+        })(Combinator = exports.Combinator || (exports.Combinator = {}));
+        var SearchArea;
+        (function (SearchArea) {
+            SearchArea["Any"] = "any";
+            SearchArea["Whitehall"] = "whitehall";
+            SearchArea["Mainstream"] = "mainstream";
+        })(SearchArea = exports.SearchArea || (exports.SearchArea = {}));
+    });
+    define("state", ["require", "exports", "lang", "state-types"], function (require, exports, lang_1, state_types_1) {
+        "use strict";
+        Object.defineProperty(exports, "__esModule", { value: true });
+        exports.resetSearch = exports.searchState = exports.setQueryParamsFromQS = exports.state = void 0;
+        // user inputs that are used to build the query.
+        // (basically, everything whose value could be found in the URL)
+        // Separate from (but included in)  state to make
+        // it easier to reset to those initial
+        // values only while keeping the rest of the state
+        const initialSearchParams = {
+            searchType: state_types_1.SearchType.Keyword,
+            selectedWords: '',
+            excludedWords: '',
+            selectedTaxon: '',
+            selectedLocale: '',
+            linkSearchUrl: '',
+            whereToSearch: {
+                title: true,
+                text: true // whether search should include page content
+            },
+            combinator: state_types_1.Combinator.Any,
+            areaToSearch: state_types_1.SearchArea.Any,
+            caseSensitive: false,
+            displayFeedbackBanner: true, // whether we should show the banner requesting feedback from user.
+        };
+        const state = Object.assign(Object.assign({}, initialSearchParams), { taxons: [], locales: [], errorText: null, userErrors: [], nbResultsLimit: 50000, searchResults: null, metaSearchResults: null, skip: 0, resultsPerPage: 10, showFields: {
+                url: true,
+                title: true
+            }, waiting: false, disamboxExpanded: false // if there's a resizeable disamb meta box, whether it's expanded or not
+         });
+        exports.state = state;
+        const setQueryParamsFromQS = function () {
+            const searchParams = new URLSearchParams(window.location.search);
+            const maybeReplace = (stateField, qspName) => searchParams.get(qspName) !== null ? searchParams.get(qspName) : initialSearchParams[stateField];
+            state.searchType = maybeReplace('searchType', 'search-type');
+            state.selectedWords = maybeReplace('selectedWords', 'selected-words');
+            state.excludedWords = maybeReplace('excludedWords', 'excluded-words');
+            state.linkSearchUrl = maybeReplace('linkSearchUrl', 'link-search-url');
+            state.selectedTaxon = maybeReplace('selectedTaxon', 'selected-taxon');
+            const lang = searchParams.get('lang');
+            state.selectedLocale = lang ? (0, lang_1.languageName)(lang) : initialSearchParams.selectedLocale;
+            state.caseSensitive = maybeReplace('caseSensitive', 'case-sensitive');
+            state.areaToSearch = maybeReplace('areaToSearch', 'area');
+            state.combinator = maybeReplace('combinator', 'combinator');
+            state.whereToSearch.title = searchParams.get('search-in-title') !== null ?
+                !!searchParams.get('search-in-title') :
+                initialSearchParams.whereToSearch.title;
+            state.whereToSearch.text = searchParams.get('search-in-text') !== null ?
+                !!searchParams.get('search-in-text') :
+                initialSearchParams.whereToSearch.text;
+        };
+        exports.setQueryParamsFromQS = setQueryParamsFromQS;
+        const searchState = function () {
+            // Find out what to display depending on state
+            // returns an object with a "code" field
+            // "no-results": there was a search but no results were returned
+            // "results": there was a search and there are results to display
+            // "initial": there weren't any search criteria specified
+            // "errors": the user didn't specify a valid query. In this case
+            //   we add a "errors" fiels containing an array with values among:
+            //   - "missingWhereToSearch": keywords were specified but not where to look for them on pages
+            //   - "missingArea": no publishing platform was specified
+            //   - "missingCombinator": no keyword combinator was specified
+            // "waiting": there's a query running
+            const errors = [];
+            if (state.waiting)
+                return { code: 'waiting', errors };
+            if (state.selectedWords === '' && state.excludedWords === '' && state.selectedTaxon === '' && state.selectedLocale === '' && state.linkSearchUrl === '' && state.whereToSearch.title === false && state.whereToSearch.text === false) {
+                return { code: 'initial', errors };
+            }
+            if (state.selectedWords !== '') {
+                if (!state.whereToSearch.title && !state.whereToSearch.text) {
+                    errors.push('missingWhereToSearch');
+                }
+            }
+            if (errors.length > 0)
+                return { code: 'error', errors };
+            if (state.searchResults && state.searchResults.length > 0)
+                return { code: 'results', errors };
+            if (state.searchResults && state.searchResults.length === 0)
+                return { code: 'no-results', errors };
+            return { code: 'ready-to-search', errors };
+        };
+        exports.searchState = searchState;
+        const resetSearch = function () {
+            state.selectedWords = '';
+            state.excludedWords = '';
+            state.selectedTaxon = '';
+            state.selectedLocale = '';
+            state.whereToSearch.title = true;
+            state.whereToSearch.text = false;
+            state.caseSensitive = false;
+            state.linkSearchUrl = '';
+            state.skip = 0; // reset to first page
+            state.areaToSearch = state_types_1.SearchArea.Any;
+            state.searchResults = null;
+            state.waiting = false;
+            state.combinator = state_types_1.Combinator.All;
+        };
+        exports.resetSearch = resetSearch;
+    });
+    define("event-types", ["require", "exports"], function (require, exports) {
+        "use strict";
+        Object.defineProperty(exports, "__esModule", { value: true });
+        exports.EventType = void 0;
+        var EventType;
+        (function (EventType) {
+            EventType[EventType["Dom"] = 0] = "Dom";
+            EventType[EventType["Neo4jRunning"] = 1] = "Neo4jRunning";
+            EventType[EventType["Neo4jCallbackOk"] = 2] = "Neo4jCallbackOk";
+            EventType[EventType["Neo4jCallbackFail"] = 3] = "Neo4jCallbackFail";
+        })(EventType = exports.EventType || (exports.EventType = {}));
+    });
+    define("neo4j-types", ["require", "exports"], function (require, exports) {
+        "use strict";
+        Object.defineProperty(exports, "__esModule", { value: true });
+    });
+    //==================================================
+    // Cypher query methods
+    //==================================================
+    define("neo4j", ["require", "exports", "state", "lang", "utils", "event-types"], function (require, exports, state_1, lang_2, utils_1, event_types_1) {
+        "use strict";
+        Object.defineProperty(exports, "__esModule", { value: true });
+        exports.initNeo4j = exports.queryGraph = exports.searchQuery = void 0;
+        //=========== public methods ===========
+        const initNeo4j = async function () {
+            console.log('retrieving taxons and locales');
+            try {
+                const neo4jResponse = await queryNeo4j([
+                    { statement: 'MATCH (t:Taxon) RETURN t.name' },
+                    { statement: 'MATCH (n:Page) WHERE n.locale <> "en" AND n.locale <> "cy" RETURN DISTINCT n.locale' }
+                ], 10);
+                const json = await neo4jResponse.json();
+                state_1.state.taxons = json.results[0].data.map((d) => d.row[0]).sort();
+                state_1.state.locales = json.results[1].data.map((d) => d.row[0]).sort();
+                state_1.state.locales = ['', 'en', 'cy'].concat(state_1.state.locales);
+                console.log(`successfully fetched ${state_1.state.taxons.length} taxons and ${state_1.state.locales.length} locales`);
+            }
+            catch (error) {
+                state_1.state.errorText = 'Error retrieving taxons and locales';
+                console.log('Error retrieving taxons and locales', error);
+            }
+        };
+        exports.initNeo4j = initNeo4j;
+        const queryGraph = async function (state, callback) {
+            const mainCypherQuery = { statement: searchQuery(state) };
+            const searchKeywords = state.selectedWords.replace(/"/g, '');
+            const wholeQuery = [mainCypherQuery];
+            if (searchKeywords.length >= 5 && searchKeywords.includes(' ')) {
+                const metaSearchQuery = {
+                    statement: `
+            MATCH (node)
+            WHERE (node:BankHoliday OR node:Organisation)
+            AND toLower(node.name) CONTAINS toLower($keywords)
+            OPTIONAL MATCH (node)-[:HAS_HOMEPAGE]->(homepage:Page)
+            RETURN node, homepage, labels(node) as nodeType`,
+                    parameters: {
+                        keywords: searchKeywords
+                    }
+                };
+                wholeQuery.push(metaSearchQuery);
+            }
+            callback({ type: event_types_1.EventType.Neo4jRunning });
+            queryNeo4j(wholeQuery)
+                .then(response => response.json())
+                .then(async (json) => {
+                const mainResults = formattedSearchResults(json.results[0]);
+                let metaResults = json.results.length > 1 && json.results[1].data.length > 0 ?
+                    formattedSearchResults(json.results[1]) :
+                    [];
+                // If there's an exact match, just keep it
+                const exactMetaResults = metaResults.filter((result) => {
+                    return result.node.name.toLowerCase() === searchKeywords.toLowerCase();
+                });
+                if (exactMetaResults.length === 1) {
+                    metaResults = exactMetaResults;
+                }
+                if (metaResults.length === 1) {
+                    // one meta result: show the knowledge panel (may require more neo4j queries)
+                    const fullMetaResults = await buildMetaboxInfo(metaResults[0]);
+                    callback({ type: event_types_1.EventType.Neo4jCallbackOk, results: { main: mainResults, meta: [fullMetaResults] } });
+                }
+                else if (metaResults.length >= 1) {
+                    // multiple meta results: we'll show a disambiguation page
+                    callback({ type: event_types_1.EventType.Neo4jCallbackOk, results: { main: mainResults, meta: metaResults } });
+                }
+                else {
+                    // no meta results
+                    callback({ type: event_types_1.EventType.Neo4jCallbackOk, results: { main: mainResults, meta: null } });
+                }
+            })
+                .catch(error => {
+                console.log('error running main+meta queries', error);
+                callback({ type: event_types_1.EventType.Neo4jCallbackFail, error });
+            });
+        };
+        exports.queryGraph = queryGraph;
+        //=========== private ===========
+        const buildMetaboxInfo = async function (info) {
+            console.log(`Found a ${info.nodeType[0]}. Running extra queries`);
+            const result = { type: info.nodeType[0], name: info.node.name };
+            let json;
+            let orgData, orgDetails, childDetails, parentDetails;
+            let holidayData;
+            switch (info.nodeType[0]) {
+                // We found a bank holiday, so we need to run 2 further queries
+                // one to get the dates, the other to get the regions
+                case 'BankHoliday':
+                    holidayData = await queryNeo4j([
+                        {
+                            statement: `
+              MATCH (b:BankHoliday)-[:IS_ON]->(d)
+              WHERE b.name = $name
+              RETURN d`,
+                            parameters: { name: info.node.name }
+                        }, {
+                            statement: `
+              MATCH (b:BankHoliday)-[:IS_OBSERVED_IN]->(r)
+              WHERE b.name = $name
+              RETURN r`,
+                            parameters: { name: info.node.name }
+                        }
+                    ]);
+                    json = await holidayData.json();
+                    result.dates = json.results[0].data.map((record) => record.row[0]);
+                    result.regions = json.results[1].data.map((record) => record.row[0].name);
+                    break;
+                case 'Organisation':
+                    // We found an organisation, so we need to run a further query
+                    // to get the sub organisations
+                    orgData = await queryNeo4j([
+                        {
+                            statement: `
+              MATCH (org:Organisation)-[:HAS_HOMEPAGE]->(homepage:Page)
+              WHERE org.name = $name
+              RETURN homepage.description, homepage.url`,
+                            parameters: { name: info.node.name }
+                        }, {
+                            statement: `
+              MATCH (org:Organisation)-[:HAS_CHILD_ORGANISATION]->(childOrg:Organisation)
+              WHERE org.name = $name
+              AND childOrg.status <> "closed"
+              RETURN childOrg.name`,
+                            parameters: { name: info.node.name }
+                        }, {
+                            statement: `
+              MATCH (org:Organisation)-[:HAS_PARENT_ORGANISATION]->(parentOrg:Organisation)
+              WHERE org.name = $name
+              RETURN parentOrg.name`,
+                            parameters: { name: info.node.name }
+                        }
+                    ]);
+                    json = await orgData.json();
+                    orgDetails = json.results[0].data[0].row;
+                    childDetails = json.results[1].data;
+                    parentDetails = json.results[2].data;
+                    result.homepage = orgDetails[1];
+                    result.description = orgDetails[0];
+                    result.parentName = parentDetails.length === 1 ?
+                        parentDetails[0].row[0] : null;
+                    result.childOrgNames = childDetails.map((child) => child.row[0]);
+                    break;
+                default:
+                    console.log('unknown meta node type', info.nodeType[0]);
+            }
+            console.log('result', result);
+            return result;
+        };
+        const searchQuery = function (state) {
+            const fieldsToSearch = [];
+            const keywords = (0, utils_1.splitKeywords)(state.selectedWords);
+            const excludedKeywords = (0, utils_1.splitKeywords)(state.excludedWords);
+            const combinator = state.combinator === 'any' ? 'OR' : 'AND';
+            if (state.whereToSearch.title)
+                fieldsToSearch.push('title');
+            if (state.whereToSearch.text)
+                fieldsToSearch.push('text', 'description');
+            let inclusionClause = '';
+            if (keywords.length > 0) {
+                inclusionClause = 'WITH * WHERE\n' +
+                    keywords
+                        .map(word => multiContainsClause(fieldsToSearch, word, state.caseSensitive))
+                        .join(`\n ${combinator}`);
+            }
+            const exclusionClause = excludedKeywords.length ?
+                ('WITH * WHERE NOT ' + excludedKeywords.map(word => multiContainsClause(fieldsToSearch, word, state.caseSensitive)).join(`\n OR `)) : '';
+            let areaClause = '';
+            if (state.areaToSearch === 'mainstream') {
+                areaClause = 'WITH * WHERE n.publishingApp = "publisher"';
+            }
+            else if (state.areaToSearch === 'whitehall') {
+                areaClause = 'WITH * WHERE n.publishingApp = "whitehall"';
+            }
+            let localeClause = '';
+            if (state.selectedLocale !== '') {
+                localeClause = `WITH * WHERE n.locale = "${(0, lang_2.languageCode)(state.selectedLocale)}"\n`;
+            }
+            const taxon = state.selectedTaxon;
+            const taxonClause = taxon ? `
+        WITH n
+        MATCH (n:Page)-[:IS_TAGGED_TO]->(taxon:Taxon)
+        MATCH (taxon:Taxon)-[:HAS_PARENT*]->(ancestor_taxon:Taxon)
+        WHERE taxon.name = "${taxon}" OR ancestor_taxon.name = "${taxon}"` :
+                `OPTIONAL MATCH (n:Page)-[:IS_TAGGED_TO]->(taxon:Taxon)`;
+            let linkClause = '';
+            if (state.linkSearchUrl.length > 0) {
+                // We need to determine if the link is internal or external
+                const internalLinkRexExp = /^((https:\/\/)?((www\.)?gov\.uk))?\//;
+                if (internalLinkRexExp.test(state.linkSearchUrl)) {
+                    linkClause = `
+            WITH n, taxon
+            MATCH (n:Page)-[:HYPERLINKS_TO]->(n2:Page)
+            WHERE n2.url = "https://www.gov.uk${state.linkSearchUrl.replace(internalLinkRexExp, '/')}"`;
+                }
+                else {
+                    linkClause = `
+            WITH n, taxon
+            MATCH (n:Page) -[:HYPERLINKS_TO]-> (e:ExternalPage)
+            WHERE e.url CONTAINS "${state.linkSearchUrl}"`;
+                }
+            }
+            return `
+        MATCH (n:Page)
+        WHERE NOT n.documentType IN ['gone', 'redirect', 'placeholder', 'placeholder_person']
+        ${inclusionClause}
+        ${exclusionClause}
+        ${localeClause}
+        ${areaClause}
+        ${taxonClause}
+        ${linkClause}
+        OPTIONAL MATCH (n:Page)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
+        OPTIONAL MATCH (n:Page)-[:HAS_ORGANISATIONS]->(o2:Organisation)
+        ${returnClause()}`;
+        };
+        exports.searchQuery = searchQuery;
+        //========== Private methods ==========
+        const queryNeo4j = async function (queries, timeoutSeconds = 60) {
+            const body = { statements: queries };
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeoutSeconds * 1000);
+            console.log('sending query to neo4j:', body);
+            return fetch('/neo4j', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(body),
+                signal: controller.signal
+            });
+        };
+        const containsClause = function (field, word, caseSensitive) {
+            return caseSensitive ?
+                `(n.${field} CONTAINS "${word}")`
+                :
+                    `(toLower(n.${field}) CONTAINS toLower("${word}"))`;
+        };
+        const multiContainsClause = function (fields, word, caseSensitive) {
+            return '(' + fields
+                .map(field => containsClause(field, word, caseSensitive))
+                .join(' OR ') + ')';
+        };
+        const returnClause = function () {
+            return `RETURN
+        n.url as url,
+        n.title AS title,
+        n.documentType AS documentType,
+        n.contentID AS contentID,
+        n.locale AS locale,
+        n.publishingApp AS publishing_app,
+        n.firstPublishedAt AS first_published_at,
+        n.publicUpdatedAt AS public_updated_at,
+        n.withdrawnAt AS withdrawn_at,
+        n.withdrawnExplanation AS withdrawn_explanation,
+        n.pagerank AS pagerank,
+        COLLECT (distinct taxon.name) AS taxons,
+        COLLECT (distinct o.name) AS primary_organisation,
+        COLLECT (distinct o2.name) AS all_organisations
+        ORDER BY n.pagerank DESC
+        LIMIT ${state_1.state.nbResultsLimit}`;
+        };
+        const formattedSearchResults = (neo4jResults) => {
+            const keys = neo4jResults.columns;
+            const results = [];
+            neo4jResults.data.forEach(val => {
+                const result = {};
+                keys.forEach((key, i) => result[key] = val.row[i]);
+                results.push(result);
+            });
+            return results;
+        };
+    });
+    define("events", ["require", "exports", "state", "utils", "view/view", "lang", "neo4j", "event-types", "state-types"], function (require, exports, state_2, utils_2, view_1, lang_3, neo4j_1, event_types_2, state_types_2) {
+        "use strict";
+        Object.defineProperty(exports, "__esModule", { value: true });
+        exports.searchButtonClicked = exports.handleEvent = void 0;
+        const handleEvent = async function (event) {
+            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+            let fieldClicked;
+            console.log('handleEvent:', event.type, event.id || '');
+            switch (event.type) {
+                case event_types_2.EventType.Dom:
+                    switch (event.id) {
+                        case 'search':
+                            // Tell GTM a search is starting
+                            (_a = window.dataLayer) === null || _a === void 0 ? void 0 : _a.push({
+                                'event': 'formSubmission',
+                                'formType': 'Search',
+                                'formPosition': 'Page'
+                            });
+                            // Update the state
+                            state_2.state.selectedWords = (0, utils_2.getFormInputValue)('keyword');
+                            state_2.state.excludedWords = (0, utils_2.getFormInputValue)('excluded-keyword');
+                            state_2.state.selectedTaxon = (0, utils_2.getFormInputValue)('taxon');
+                            state_2.state.selectedLocale = (0, utils_2.getFormInputValue)('locale');
+                            state_2.state.whereToSearch.title = (_b = (0, utils_2.id)('search-title')) === null || _b === void 0 ? void 0 : _b.checked;
+                            state_2.state.whereToSearch.text = (_c = (0, utils_2.id)('search-text')) === null || _c === void 0 ? void 0 : _c.checked;
+                            state_2.state.caseSensitive = (_d = (0, utils_2.id)('case-sensitive')) === null || _d === void 0 ? void 0 : _d.checked;
+                            state_2.state.linkSearchUrl = (0, utils_2.getFormInputValue)('link-search');
+                            state_2.state.skip = 0; // reset to first page
+                            if ((_e = (0, utils_2.id)('area-mainstream')) === null || _e === void 0 ? void 0 : _e.checked)
+                                state_2.state.areaToSearch = state_types_2.SearchArea.Mainstream;
+                            if ((_f = (0, utils_2.id)('area-whitehall')) === null || _f === void 0 ? void 0 : _f.checked)
+                                state_2.state.areaToSearch = state_types_2.SearchArea.Whitehall;
+                            if ((_g = (0, utils_2.id)('area-any')) === null || _g === void 0 ? void 0 : _g.checked)
+                                state_2.state.areaToSearch = state_types_2.SearchArea.Any;
+                            if ((_h = (0, utils_2.id)('combinator-any')) === null || _h === void 0 ? void 0 : _h.checked)
+                                state_2.state.combinator = state_types_2.Combinator.Any;
+                            if ((_j = (0, utils_2.id)('combinator-all')) === null || _j === void 0 ? void 0 : _j.checked)
+                                state_2.state.combinator = state_types_2.Combinator.All;
+                            state_2.state.searchResults = null;
+                            searchButtonClicked();
+                            break;
+                        case 'button-next-page':
+                            state_2.state.skip = state_2.state.skip + state_2.state.resultsPerPage;
+                            updateUrl();
+                            break;
+                        case 'button-prev-page':
+                            state_2.state.skip = Math.max(state_2.state.skip - state_2.state.resultsPerPage, 0);
+                            updateUrl();
+                            break;
+                        case 'dismiss-feedback-banner':
+                            state_2.state.displayFeedbackBanner = false;
+                            document.cookie = 'feedback_banner_dismissed=true';
+                            break;
+                        case 'toggleDisamBox':
+                            state_2.state.disamboxExpanded = !state_2.state.disamboxExpanded;
+                            break;
+                        case 'search-keyword':
+                            (0, state_2.resetSearch)();
+                            state_2.state.searchType = state_types_2.SearchType.Keyword;
+                            break;
+                        case 'search-link':
+                            (0, state_2.resetSearch)();
+                            state_2.state.searchType = state_types_2.SearchType.Link;
+                            break;
+                        case 'search-taxon':
+                            (0, state_2.resetSearch)();
+                            state_2.state.searchType = state_types_2.SearchType.Taxon;
+                            break;
+                        case 'search-language':
+                            (0, state_2.resetSearch)();
+                            state_2.state.searchType = state_types_2.SearchType.Language;
+                            break;
+                        case 'search-mixed':
+                            (0, state_2.resetSearch)();
+                            state_2.state.searchType = state_types_2.SearchType.Mixed;
+                            break;
+                        default:
+                            fieldClicked = event.id ? event.id.match(/show-field-(.*)/) : null;
+                            if (fieldClicked && event.id) {
+                                state_2.state.showFields[fieldClicked[1]] = (_k = (0, utils_2.id)(event.id)) === null || _k === void 0 ? void 0 : _k.checked;
+                            }
+                            else {
+                                console.log('unknown DOM event received:', event);
+                            }
+                            console.log('unknown DOM event received:', event);
+                    }
+                    break;
+                // non-dom events
+                case event_types_2.EventType.Neo4jRunning:
+                    state_2.state.waiting = true;
+                    break;
+                case event_types_2.EventType.Neo4jCallbackOk:
+                    state_2.state.searchResults = (_l = event.results) === null || _l === void 0 ? void 0 : _l.main.sort((a, b) => b.pagerank - a.pagerank);
+                    state_2.state.metaSearchResults = (_m = event.results) === null || _m === void 0 ? void 0 : _m.meta;
+                    state_2.state.waiting = false;
+                    state_2.state.errorText = null;
+                    break;
+                case event_types_2.EventType.Neo4jCallbackFail:
+                    state_2.state.searchResults = null;
+                    state_2.state.waiting = false;
+                    state_2.state.errorText = 'There was a problem querying the GovGraph. Please contact the Data Products team.';
+                    console.log('neo4j-callback-fail:', event.error);
+                    break;
+                default:
+                    console.log('unknown event type:', event);
+            }
+            updateUrl();
+            (0, view_1.view)();
+            // scroll to the top of the page when paginating
+            if (event.id === 'button-next-page' || event.id === 'button-prev-page') {
+                window.scrollTo(0, 0);
+            }
+        };
+        exports.handleEvent = handleEvent;
+        const searchButtonClicked = async function () {
+            // update the state when the user clicked Search
+            window.scrollTo(0, 0);
+            state_2.state.errorText = null;
+            state_2.state.userErrors = [];
+            const searchStatus = (0, state_2.searchState)();
+            switch (searchStatus.code) {
+                case 'ready-to-search':
+                    if (state_2.state.selectedWords !== '' || state_2.state.selectedLocale !== '' || state_2.state.selectedTaxon !== '' || state_2.state.linkSearchUrl !== '') {
+                        state_2.state.waiting = true;
+                        (0, neo4j_1.queryGraph)(state_2.state, handleEvent);
+                    }
+                    break;
+                case 'error':
+                    state_2.state.userErrors = searchStatus.errors;
+                    break;
+                case 'waiting':
+                case 'initial':
+                case 'no-results':
+                case 'results':
+                    break;
+                default:
+                    console.log('unknown value for searchState', (0, state_2.searchState)());
+                    break;
+            }
+        };
+        exports.searchButtonClicked = searchButtonClicked;
+        const updateUrl = function () {
+            if ('URLSearchParams' in window) {
+                var searchParams = new URLSearchParams();
+                if (state_2.state.searchType !== state_types_2.SearchType.Keyword)
+                    searchParams.set('search-type', state_2.state.searchType);
+                if (state_2.state.selectedWords !== '')
+                    searchParams.set('selected-words', state_2.state.selectedWords);
+                if (state_2.state.excludedWords !== '')
+                    searchParams.set('excluded-words', state_2.state.excludedWords);
+                if (state_2.state.selectedTaxon !== '')
+                    searchParams.set('selected-taxon', state_2.state.selectedTaxon);
+                if (state_2.state.selectedLocale !== '')
+                    searchParams.set('lang', (0, lang_3.languageCode)(state_2.state.selectedLocale));
+                if (state_2.state.caseSensitive)
+                    searchParams.set('case-sensitive', state_2.state.caseSensitive.toString());
+                if (state_2.state.whereToSearch.title)
+                    searchParams.set('search-in-title', 'true');
+                if (state_2.state.whereToSearch.text)
+                    searchParams.set('search-in-text', 'true');
+                if (state_2.state.areaToSearch !== state_types_2.SearchArea.Any)
+                    searchParams.set('area', state_2.state.areaToSearch);
+                if (state_2.state.combinator !== 'all')
+                    searchParams.set('combinator', state_2.state.combinator);
+                if (state_2.state.linkSearchUrl !== '')
+                    searchParams.set('link-search-url', state_2.state.linkSearchUrl);
+                let newRelativePathQuery = window.location.pathname;
+                if (searchParams.toString().length > 0) {
+                    newRelativePathQuery += '?' + searchParams.toString();
+                }
+                history.pushState(null, '', newRelativePathQuery);
+            }
+        };
+    });
+    define("view/view-components", ["require", "exports"], function (require, exports) {
+        "use strict";
+        Object.defineProperty(exports, "__esModule", { value: true });
+        exports.viewMetaLink = exports.viewFeedbackBanner = void 0;
+        const viewFeedbackBanner = function () {
+            return `
+        <div class="govuk-grid-row feedback-banner">
+          <div class="feedback-banner-rule"></div>
+          <div class="govuk-grid-column-two-thirds">
+            <h2 class="govuk-heading-xl">Help us improve GovGraph</h2>
+            <p class="govuk-body">
+              Hello, we want to understand how you use Govgraph app to make sure it works well for you and we’d love your feedback. You can tell us about your experience of using the app by completing this short questionnaire. It will take about 5 minutes and most questions are multiple choice.
+            </p>
+            <p class="govuk-body">
+              <a class="govuk-button" href="https://surveys.publishing.service.gov.uk/s/WUKRCT/">View questionnaire</a>
+              <button id="dismiss-feedback-banner">Hide this</button>
+            </p>
+          </div>
+        </div>`;
+        };
+        exports.viewFeedbackBanner = viewFeedbackBanner;
+        const viewMetaLink = (text) => `<a class="govuk-link" href="/?selected-words=${encodeURIComponent(`"${text}"`)}">${text}</a>`;
+        exports.viewMetaLink = viewMetaLink;
+    });
+    define("view/view-metabox", ["require", "exports", "state", "view/view-components"], function (require, exports, state_3, view_components_1) {
+        "use strict";
+        Object.defineProperty(exports, "__esModule", { value: true });
+        exports.viewMetaResults = void 0;
+        const viewOrgChild = (subOrg) => `<li>${(0, view_components_1.viewMetaLink)(subOrg)}</li>`;
+        const viewOrgChildren = (childOrgNames) => `<details class="govuk-details">
+         <summary class="govuk-details__summary">
+           <span class="govuk-details__summary-text">
+             ${childOrgNames.length} sub-organisations
+           </span>
+         </summary>
+         <div class="govuk-details__text">
+           <ul class="govuk-list govuk-list--bullet">${childOrgNames.map(viewOrgChild).join('')}</ul>
+         </div>
+       </details>`;
+        const viewBankHolidayDetails = function (holiday) {
+            return `
+        <details class="govuk-details">
+          <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+              Dates
+            </span>
+          </summary>
+          <div class="govuk-details__text">
+            <ul class="govuk-list govuk-list--bullet">
+              ${holiday.dates.map((date) => `<li>${date.dateString}</li>`).join('')}
+            </ul>
+          </div>
+        </details>
+        <details class="govuk-details">
+          <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+              Observed in
+            </span>
+          </summary>
+          <div class="govuk-details__text">
+            <ul class="govuk-list govuk-list--bullet">
+              ${holiday.regions.map((region) => `<li>${region}</li>`).join('')}
+            </ul>
+          </div>
+        </details>
+      `;
+        };
+        const viewBankHoliday = (record) => `<div class="meta-results-panel">
+         <h2 class="govuk-heading-m">
+           ${record.name}
+         </h2>
+         <p class="govuk-body">Bank holiday</p>
+         ${viewBankHolidayDetails(record)}
+         </div>
+      `;
+        const viewOrg = (record) => `<div class="meta-results-panel">
+         <h2 class="govuk-heading-m">
+           <a class="govuk-link" href="${record.homepage}">${record.name}</a>
+         </h2>
+         <p class="govuk-body">
+           Government organisation${record.parentName ? `, part of ${(0, view_components_1.viewMetaLink)(record.parentName)}` : ''}
+         </p>
+         ${record.description ? `<p class="govuk-body">${record.description}</p>` : ''}
+         ${record.childOrgNames && record.childOrgNames.length > 0 ?
+            viewOrgChildren(record.childOrgNames) :
+            '<p class="govuk-body">No sub-organisations</p>'}
+       </div>`;
+        //=================== public ====================
+        const viewMetaResultsExpandToggle = () => state_3.state.metaSearchResults && state_3.state.metaSearchResults.length > 5 ?
+            `<button id="meta-results-expand">${state_3.state.disamboxExpanded ? 'show less' : 'show more'}</button>` :
+            '';
+        const viewMetaResults = function () {
+            if (!state_3.state.metaSearchResults)
+                return;
+            if (state_3.state.metaSearchResults.length > 1) {
+                const expandedClass = state_3.state.metaSearchResults.length > 5 && !state_3.state.disamboxExpanded ? 'meta-results-panel--collapsed' : '';
+                return `
+          <div class="meta-results-panel">
+            <div class="meta-results-panel__collapsible ${expandedClass}">
+              <h2 class="govuk-heading-s">"${state_3.state.selectedWords.replace(/"/g, '')}" can refer to:</h2>
+              <ul class="govuk-list govuk-list--bullet">
+                ${state_3.state.metaSearchResults.map(result => `<li>${(0, view_components_1.viewMetaLink)(result.name)} (${result.type.toLowerCase()})</li>`).join('')}
+              </ul>
+            </div>
+            ${viewMetaResultsExpandToggle()}
+          </div>
+        `;
+            }
+            else {
+                const record = state_3.state.metaSearchResults[0];
+                console.log(`meta: found a ${record.type}`);
+                switch (record.type) {
+                    case "BankHoliday": return viewBankHoliday(record);
+                    case "Organisation": return viewOrg(record);
+                    default:
+                        console.log(`unknown record type: ${record.type}`);
+                        return ``;
+                }
+            }
+        };
+        exports.viewMetaResults = viewMetaResults;
+    });
+    define("view/view-search-panel", ["require", "exports", "utils", "state", "lang", "state-types"], function (require, exports, utils_3, state_4, lang_4, state_types_3) {
+        "use strict";
+        Object.defineProperty(exports, "__esModule", { value: true });
+        exports.viewSearchPanel = void 0;
+        const viewSearchPanel = () => {
+            const result = [];
+            switch (state_4.state.searchType) {
+                case state_types_3.SearchType.Mixed:
+                case state_types_3.SearchType.Results:
+                    result.push(`
+          <form id="search-form" class="search-panel govuk-form">
+            <div class="search-mode-panel">
+              <h1 class="govuk-heading-xl">Mixed search</h1>
+              ${viewKeywordsInput()}
+              ${viewKeywordsCombinator()}
+              ${viewExclusionsInput()}
+              ${viewCaseSensitiveSelector()}
+              ${viewScopeSelector()}
+              ${viewLinkSearch()}
+              ${viewPublishingAppSelector()}
+              ${viewTaxonSelector()}
+              ${viewLocaleSelector()}
+              ${viewSearchButton()}
+            </div>
+          </form>
+        `);
+                    break;
+                case state_types_3.SearchType.Keyword:
+                    result.push(`
+          <form id="search-form" class="search-panel govuk-form">
+            <div class="search-mode-panel">
+              <a class="govuk-skip-link" href="#results-table">Skip to results</a>
+              ${viewKeywordsInput()}
+              <details class="govuk-details" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                  <span class="govuk-details__summary-text">
+                    Filters
+                  </span>
+                </summary>
+                <div class="govuk-details__text">
+                  ${viewKeywordsCombinator()}
+                  ${viewExclusionsInput()}
+                  ${viewCaseSensitiveSelector()}
+                  ${viewScopeSelector()}
+                  ${viewPublishingAppSelector()}
+                </div>
+              </details>
+              ${viewSearchButton()}
+            </div>
+          </form>
+        `);
+                    break;
+                case state_types_3.SearchType.Link:
+                    result.push(`
+          <form id="search-form" class="search-panel govuk-form">
+            <div class="search-mode-panel">
+              <a class="govuk-skip-link" href="#results-table">Skip to results</a>
+              ${viewLinkSearch()}
+              <details class="govuk-details" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                  <span class="govuk-details__summary-text">
+                    Filters
+                  </span>
+                </summary>
+                <div class="govuk-details__text">
+                  ${viewPublishingAppSelector()}
+                </div>
+              </details>
+              ${viewSearchButton()}
+            </div>
+          </form>
+        `);
+                    break;
+                case state_types_3.SearchType.Taxon:
+                    result.push(`
+          <form id="search-form" class="search-panel govuk-form">
+            <div class="search-mode-panel">
+              <a class="govuk-skip-link" href="#results-table">Skip to results</a>
+              ${viewTaxonSelector()}
+              <details class="govuk-details" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                  <span class="govuk-details__summary-text">
+                    Filters
+                  </span>
+                </summary>
+                <div class="govuk-details__text">
+                  ${viewPublishingAppSelector()}
+                </div>
+              </details>
+              ${viewSearchButton()}
+            </div>
+          </form>
+        `);
+                    break;
+                case state_types_3.SearchType.Language:
+                    result.push(`
+          <form id="search-form" class="search-panel govuk-form">
+            <div class="search-mode-panel">
+              <a class="govuk-skip-link" href="#results-table">Skip to results</a>
+              ${viewLocaleSelector()}
+              <details class="govuk-details" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                  <span class="govuk-details__summary-text">
+                    Filters
+                  </span>
+                </summary>
+                <div class="govuk-details__text">
+                  ${viewPublishingAppSelector()}
+                </div>
+              </details>
+              ${viewSearchButton()}
+            </div>
+          </form>
+        `);
+                    break;
+                default:
+                    console.log('viewSearchPanel: unknown value', state_4.state.searchType);
+            }
+            result.push(`
+        <p class="govuk-body-s">
+          Runs only between 9am and 7pm.
+          Searches do not include history mode content, Mainstream GitHub smart answers or service domains.
+          Popularity scores depend on cookie consent.
+        </p>
+      `);
+            return result.join('');
+        };
+        exports.viewSearchPanel = viewSearchPanel;
+        const viewInlineError = (id, message) => `
+      <p id="${id}" class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span> ${message}
+      </p>
+    `;
+        const viewScopeSelector = () => {
+            var _a;
+            const errors = (_a = (0, state_4.searchState)()) === null || _a === void 0 ? void 0 : _a.errors;
+            const err = errors && errors.includes('missingWhereToSearch');
+            return `
+      <div class="govuk-form-group ${err ? 'govuk-form-group--error' : ''}">
+        <fieldset
+            class="govuk-fieldset"
+            ${state_4.state.waiting && 'disabled="disabled"'}
+            id="search-scope-wrapper"
+            ${err ? 'aria-describedby="scope-error"' : ''}>
+          <legend class="govuk-fieldset__legend">
+            Keyword location
+          </legend>
+          ${err ? viewInlineError('scope-error', 'Please choose at least one option') : ''}
+          <div class="govuk-checkboxes" id="search-locations">
+            <div class="govuk-checkboxes__item">
+              <input
+                  class="govuk-checkboxes__input"
+                  type="checkbox" id="search-title"
+                  ${state_4.state.whereToSearch.title ? 'checked' : ''}/>
+              <label for="search-title" class="govuk-label govuk-checkboxes__label">title</label>
+            </div>
+            <div class="govuk-checkboxes__item">
+              <input
+                  class="govuk-checkboxes__input"
+                  type="checkbox"
+                  id="search-text"
+                ${state_4.state.whereToSearch.text ? 'checked' : ''}/>
+              <label for="search-text" class="govuk-label govuk-checkboxes__label">
+                body content and description
+              </label>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+      `;
+        };
+        const viewTaxonSelector = () => `
+      <div class="govuk-body">
+        <div class="taxon-facet">
+          <label class="govuk-label label--bold" for="taxon">
+            Search for taxons
+          </label>
+          <div class="govuk-hint">
+            Type the first letters of a taxon or select from the dropdown
+          </div>
+          <datalist id="taxonList">
+            ${state_4.state.taxons.map(taxon => `<option>${taxon}</option>`)}
+          </datalist>
+          <div>
+          <input
+            ${state_4.state.waiting && 'disabled="disabled"'}
+            style="display: inline-block"
+            list="taxonList"
+            value="${state_4.state.selectedTaxon}"
+            class="govuk-input"
+            id="taxon"
+            autocomplete="off" />
+          </div>
+        </div>
+      </div>
+    `;
+        const viewLocaleSelector = () => {
+            const html = [`
+        <div class="govuk-body taxon-facet">
+          <label class="govuk-label label--bold" for="locale">
+            Search for languages
+          </label>
+          <div class="govuk-hint">
+            Type the first letters of a language or select from the dropdown
+          </div>
+          <datalist id="localeList">
+      `];
+            html.push(...state_4.state.locales.map(code => `<option data-value="${code}" ${state_4.state.selectedLocale == code ? 'selected' : ''}>${(0, lang_4.languageName)(code)}</option>`));
+            html.push(`
+          </datalist>
+          <input type="text"
+             ${state_4.state.waiting && 'disabled="disabled"'}
+             value="${state_4.state.selectedLocale}"
+             class="govuk-input"
+             list="localeList"
+             id="locale" name="locale"
+             autocomplete="off" />
+        </div>`);
+            return html.join('');
+        };
+        const viewSearchButton = () => `
+      <p class="govuk-body">
+        <button
+          type="submit"
+          class="govuk-button ${state_4.state.waiting ? 'govuk-button--disabled' : ''}"
+          ${state_4.state.waiting ? 'disabled="disabled"' : ''}
+          id="search">
+          ${state_4.state.waiting ? 'Searching <img src="assets/images/loader.gif" height="20px" alt="loader"/>' : 'Search'}
+        </button>
+      </p>
+    `;
+        const viewLinkSearch = () => `
+      <div class="govuk-body">
+        <label class="govuk-label label--bold" for="link-search">
+          Search for links
+        </label>
+        <div class="govuk-hint">
+          For example: /maternity-pay-leave or youtube.com
+        </div>
+        <input
+            class="govuk-input"
+            id="link-search"
+            ${state_4.state.waiting && 'disabled="disabled"'}
+            value="${state_4.state.linkSearchUrl}"
+         />
+      </div>
+    `;
+        const viewCaseSensitiveSelector = () => `
+      <div class="govuk-body">
+        <div class="govuk-checkboxes">
+          <div class="govuk-checkboxes__item">
+            <input
+                class="govuk-checkboxes__input"
+                ${state_4.state.waiting && 'disabled="disabled"'}
+                type="checkbox"
+                id="case-sensitive"
+                ${state_4.state.caseSensitive ? 'checked' : ''}
+            />
+            <label for="case-sensitive" class="govuk-label govuk-checkboxes__label">case-sensitive search</label>
+          </div>
+        </div>
+      </div>
+    `;
+        const viewKeywordsCombinator = () => ` <div class="govuk-form-group">
+        <fieldset
+            class="govuk-fieldset"
+            id="combinator-wrapper"
+            ${state_4.state.waiting && 'disabled="disabled"'}>
+    
+          <legend class="govuk-fieldset__legend">
+            Search for
+          </legend>
+          <div class="govuk-radios" id="combinators">
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input"
+                     type="radio" id="combinator-any"
+                     name="combinator"
+                ${state_4.state.combinator === 'any' ? 'checked' : ''}/>
+              <label for="combinator-any" class="govuk-label govuk-radios__label">
+                any keyword
+              </label>
+            </div>
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input"
+                     type="radio" id="combinator-all"
+                     name="combinator"
+                ${state_4.state.combinator === 'all' ? 'checked' : ''}/>
+              <label for="combinator-all" class="govuk-label govuk-radios__label">
+                all keywords
+              </label>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+    `;
+        const viewPublishingAppSelector = () => ` <div class="govuk-form-group">
+        <fieldset
+            class="govuk-fieldset"
+            id="search-areas-wrapper"
+            ${state_4.state.waiting && 'disabled="disabled"'}>
+          <legend class="govuk-fieldset__legend">
+            Limit search
+          </legend>
+          <div class="govuk-radios" id="site-areas">
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input"
+                     type="radio" id="area-mainstream"
+                     name="area"
+                ${state_4.state.areaToSearch === 'mainstream' ? 'checked' : ''}/>
+              <label for="area-mainstream" class="govuk-label govuk-radios__label">
+                Mainstream Publisher
+              </label>
+            </div>
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input"
+                     type="radio" id="area-whitehall"
+                     name="area"
+                ${state_4.state.areaToSearch === 'whitehall' ? 'checked' : ''}/>
+              <label for="area-whitehall" class="govuk-label govuk-radios__label">Whitehall</label>
+            </div>
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input"
+                     type="radio" id="area-any"
+                     name="area"
+                ${state_4.state.areaToSearch === 'any' ? 'checked' : ''}/>
+              <label for="area-any" class="govuk-label govuk-radios__label">All publishing applications</label>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+    `;
+        const viewKeywordsInput = () => `
+      <div class="govuk-body">
+        <label for="keyword" class="govuk-label label--bold">Search for keywords</label>
+        <div class="govuk-hint">
+          For example: cat, dog, &quot;Department for Education&quot;
+        </div>
+        <input
+          ${state_4.state.waiting && 'disabled="disabled"'}
+          class="govuk-input"
+          id="keyword"
+          value='${(0, utils_3.sanitiseOutput)(state_4.state.selectedWords)}'
+        />
+      </div>
+    `;
+        const viewExclusionsInput = () => `
+      <div class="govuk-body">
+        <label for="excluded-keyword" class="govuk-label label--bold">
+          Exclude keywords
+        </label>
+        <div class="govuk-hint">
+          For example: passport
+        </div>
+        <input class="govuk-input"
+            ${state_4.state.waiting && 'disabled="disabled"'}
+            id="excluded-keyword"
+            value='${(0, utils_3.sanitiseOutput)(state_4.state.excludedWords).replace('"', '&quot;')}'/>
+      </div>
+    `;
+    });
+    define("view/view", ["require", "exports", "utils", "state", "events", "lang", "view/view-metabox", "view/view-search-panel", "view/view-components", "event-types"], function (require, exports, utils_4, state_5, events_1, lang_5, view_metabox_1, view_search_panel_1, view_components_2, event_types_3) {
+        "use strict";
+        Object.defineProperty(exports, "__esModule", { value: true });
+        exports.view = void 0;
+        const view = () => {
+            var _a, _b, _c;
+            console.log('view');
+            document.title = 'GovGraph search';
+            const pageContent = (0, utils_4.id)('page-content');
+            if (pageContent) {
+                pageContent.innerHTML = `
+          <main class="govuk-main-wrapper" id="main-content" role="main">
+            ${state_5.state.displayFeedbackBanner ? (0, view_components_2.viewFeedbackBanner)() : ''}
+            ${viewErrorBanner()}
+            ${viewSearchTypeSelector()}
+            ${viewMainLayout()}
+          </main>
+        `;
+            }
+            // Add event handlers
+            document.querySelectorAll('#dismiss-feedback-banner, button, input[type=checkbox][data-interactive=true]')
+                .forEach(input => input.addEventListener('click', event => (0, events_1.handleEvent)({ type: event_types_3.EventType.Dom, id: event.target.getAttribute('id') || undefined })));
+            // Not sure this is even fired, since browser blocks submit because "the form is not connected"
+            (_a = (0, utils_4.id)('search-form')) === null || _a === void 0 ? void 0 : _a.addEventListener('submit', event => {
+                event.preventDefault();
+                // Tell GTM the form was submitted
+                window.dataLayer = window.dataLayer || [];
+                window.dataLayer.push({
+                    'event': 'formSubmission',
+                    'formType': 'Search',
+                    'formPosition': 'Page'
+                });
+                (0, events_1.handleEvent)({ type: event_types_3.EventType.Dom, id: 'search' });
+            });
+            (_b = (0, utils_4.id)('meta-results-expand')) === null || _b === void 0 ? void 0 : _b.addEventListener('click', () => (0, events_1.handleEvent)({ type: event_types_3.EventType.Dom, id: 'toggleDisamBox' }));
+            // focus on the results heading if present
+            (_c = (0, utils_4.id)('results-heading')) === null || _c === void 0 ? void 0 : _c.focus();
+        };
+        exports.view = view;
+        const viewSearchTypeSelector = () => `
+        <p class="govuk-body search-selector">
+          Search for:
+          <button class="${state_5.state.searchType === 'keyword' ? 'active' : ''}" id="search-keyword">Keywords</button>
+          <button class="${state_5.state.searchType === 'link' ? 'active' : ''}" id="search-link">Links</button>
+          <button class="${state_5.state.searchType === 'taxon' ? 'active' : ''}" id="search-taxon">Taxons</button>
+          <button class="${state_5.state.searchType === 'language' ? 'active' : ''}" id="search-language">Languages</button>
+          <button class="${state_5.state.searchType === 'mixed' ? 'active' : ''}" id="search-mixed">Mixed</button>
+        </p>
+      `;
+        const viewMainLayout = () => {
+            const result = [];
+            if (state_5.state.searchType === 'mixed') {
+                if (!state_5.state.searchResults) {
+                    result.push(`
+            <div class="govuk-grid-row mixed-layout--no-results">
+              <div class="govuk-grid-column-two-thirds">
+                ${(0, view_search_panel_1.viewSearchPanel)()}
+              </div>
+            </div>
+          `);
+                }
+                else {
+                    result.push(`
+            <div class="govuk-grid-row mixed-layout">
+              <div class="govuk-grid-column-one-third">
+                ${(0, view_search_panel_1.viewSearchPanel)()}
+              </div>
+              <div class="govuk-grid-column-two-thirds">
+                ${viewSearchResults()}
+              </div>
+            </div>
+          `);
+                }
+            }
+            else {
+                result.push(`
+          <div class="govuk-grid-row simple-search">
+            <div class="govuk-grid-column-two-thirds">
+              ${(0, view_search_panel_1.viewSearchPanel)()}
+            </div>
+          </div>
+          ${viewSearchResults()}
+        `);
+            }
+            return result.join('');
+        };
+        const makeBold = (text, includeMarkup) => includeMarkup ?
+            `<span class="govuk-!-font-weight-bold">${text}</span>` :
+            `"${text}"`;
+        const viewContainDescription = (includeMarkup) => {
+            let where;
+            if (state_5.state.whereToSearch.title && state_5.state.whereToSearch.text) {
+                where = '';
+            }
+            else if (state_5.state.whereToSearch.title) {
+                where = 'in their title';
+            }
+            else {
+                where = 'in their body content';
+            }
+            let combineOp = state_5.state.combinator === 'all' ? 'and' : 'or';
+            let combinedWords = (0, utils_4.splitKeywords)(state_5.state.selectedWords)
+                .filter(w => w.length > 2)
+                .map(w => makeBold(w, includeMarkup))
+                .join(` ${combineOp} `);
+            return state_5.state.selectedWords !== '' ? `${combinedWords} ${where}` : '';
+        };
+        const viewQueryDescription = (includeMarkup = true) => {
+            const clauses = [];
+            if (state_5.state.selectedWords !== '') {
+                let keywords = `contain ${viewContainDescription(includeMarkup)}`;
+                if (state_5.state.excludedWords !== '') {
+                    keywords = `${keywords} (but don't contain ${makeBold(state_5.state.excludedWords, includeMarkup)})`;
+                }
+                clauses.push(keywords);
+            }
+            if (state_5.state.selectedTaxon !== '')
+                clauses.push(`belong to the ${makeBold(state_5.state.selectedTaxon, includeMarkup)} taxon (or its sub-taxons)`);
+            if (state_5.state.selectedLocale !== '')
+                clauses.push(`are in ${makeBold((0, lang_5.languageName)(state_5.state.selectedLocale), includeMarkup)}`);
+            if (state_5.state.linkSearchUrl !== '')
+                clauses.push(`link to ${makeBold(state_5.state.linkSearchUrl, includeMarkup)}`);
+            if (state_5.state.areaToSearch === 'whitehall' || state_5.state.areaToSearch === 'mainstream')
+                clauses.push(`are published using ${makeBold(state_5.state.areaToSearch, includeMarkup)}`);
+            const joinedClauses = (clauses.length === 1) ?
+                clauses[0] :
+                `${clauses.slice(0, clauses.length - 1).join(', ')} and ${clauses[clauses.length - 1]}`;
+            return `pages that ${joinedClauses}`;
+        };
+        const viewErrorBanner = () => {
+            const html = [];
+            if (state_5.state.errorText || state_5.state.userErrors.length > 0) {
+                html.push(`
+            <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">`);
+                if (state_5.state.errorText) {
+                    html.push(`
+              <h1 class="govuk-error-summary__title" id="error-summary-title">System error</h1>
+              <p class="govuk-body">${state_5.state.errorText}</p>
+            `);
+                }
+                else {
+                    if (state_5.state.userErrors.length > 0) {
+                        html.push(`
+                <h1 class="govuk-error-summary__title" id="error-summary-title">
+                  There is a problem
+                </h1>
+                <ul class="govuk-error-summary__list">
+              `);
+                        state_5.state.userErrors.forEach(userError => {
+                            switch (userError) {
+                                case 'missingWhereToSearch':
+                                    html.push(`
+                  <li><a href="#search-locations-wrapper">You need to select a keyword location</a></li>`);
+                                    break;
+                                case 'missingArea':
+                                    html.push(`
+                  <li><a href="#search-scope-wrapper">You need to select a publishing application</a></li>`);
+                                    break;
+                                default:
+                                    console.log('unknown user error code:', userError);
+                            }
+                        });
+                        html.push(`
+                </ul>`);
+                    }
+                }
+                html.push(`
+            </div>
+          `);
+            }
+            return html.join('');
+        };
+        const viewSearchResultsTable = () => {
+            var _a, _b;
+            const html = [];
+            if (state_5.state.searchResults && ((_a = state_5.state.searchResults) === null || _a === void 0 ? void 0 : _a.length) > 0) {
+                const recordsToShow = (_b = state_5.state.searchResults) === null || _b === void 0 ? void 0 : _b.slice(state_5.state.skip, state_5.state.skip + state_5.state.resultsPerPage);
+                html.push(`
+          <div class="govuk-body">
+            <fieldset class="govuk-fieldset" ${state_5.state.waiting && 'disabled="disabled"'}>
+              <legend class="govuk-fieldset__legend">For each result, display:</legend>
+              <ul class="kg-checkboxes" id="show-fields">`);
+                html.push(Object.keys(state_5.state.searchResults[0]).map(key => `
+                <li class="kg-checkboxes__item">
+                  <input class="kg-checkboxes__input"
+                         data-interactive="true"
+                         type="checkbox" id="show-field-${key}"
+                    ${state_5.state.showFields[key] ? 'checked' : ''}/>
+                  <label for="show-field-${key}" class="kg-label kg-checkboxes__label">${fieldName(key)}</label>
+                </li>`).join(''));
+                html.push(`
+              </ul>
+            </fieldset>
+            <table id="results-table" class="govuk-table">
+              <tbody class="govuk-table__body">
+              <tr class="govuk-table__row">
+                <th scope="col" class="a11y-hidden">Page</th>`);
+                Object.keys(state_5.state.showFields).forEach(key => {
+                    if (state_5.state.showFields[key]) {
+                        html.push(`<th scope="col" class="govuk-table__header">${fieldName(key)}</th>`);
+                    }
+                });
+                recordsToShow.forEach((record, recordIndex) => {
+                    html.push(`
+            <tr class="govuk-table__row">
+              <th class="a11y-hidden">${recordIndex}</th>`);
+                    Object.keys(state_5.state.showFields).forEach(key => {
+                        if (state_5.state.showFields[key]) {
+                            html.push(`<td class="govuk-table__cell">${fieldFormat(key, record[key])}</td>`);
+                        }
+                    });
+                    html.push(`</tr>`);
+                });
+                html.push(`
+              </tbody>
+            </table>
+          </div>`);
+                return html.join('');
+            }
+            else {
+                return '';
+            }
+        };
+        const csvFromResults = function (searchResults) {
+            const csv = [];
+            if (searchResults && searchResults.length > 0) {
+                // column headings: take them from the first record
+                csv.push(Object.keys(searchResults[0]).map(fieldName).join());
+                // rows:
+                searchResults.forEach((record) => {
+                    const line = [];
+                    Object.values(record).forEach((field) => {
+                        if (field) {
+                            field = field.toString();
+                            if (field.includes(',')) {
+                                field = `"${field.replace('"', '""')}"`;
+                            }
+                            else {
+                                if (field.includes('"')) {
+                                    field = '"' + field.replace('"', '""') + '"';
+                                }
+                            }
+                        }
+                        else {
+                            field = '';
+                        }
+                        line.push(field);
+                    });
+                    csv.push(line.join());
+                });
+            }
+            return csv.join('\n');
+        };
+        const viewWaiting = () => `
+      <div class="govuk-body">Searching for ${viewQueryDescription()}</div>
+      <p class="govuk-body-s">Some queries may take up to a minute</p>
+    `;
+        const viewResults = function () {
+            if (state_5.state.searchResults) {
+                const html = [];
+                const nbRecords = state_5.state.searchResults.length;
+                if (nbRecords < state_5.state.nbResultsLimit) {
+                    html.push(`
+            <h1 tabindex="0" id="results-heading" class="govuk-heading-l">${nbRecords} result${nbRecords !== 0 ? 's' : ''}</h1>`);
+                }
+                else {
+                    html.push(`
+            <div class="govuk-warning-text">
+              <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+              <strong class="govuk-warning-text__text">
+                <span class="govuk-warning-text__assistive">Warning</span>
+                There are more than ${state_5.state.nbResultsLimit} results. Try to narrow down your search.
+              </strong>
+            </div>
+          `);
+                }
+                html.push(`<div class="govuk-body">for ${viewQueryDescription()}</div>`);
+                if (nbRecords >= state_5.state.resultsPerPage) {
+                    html.push(`
+            <p class="govuk-body">Showing results ${state_5.state.skip + 1} to ${Math.min(nbRecords, state_5.state.skip + state_5.state.resultsPerPage)}, in descending popularity</p>
+            <a class="govuk-skip-link" href="#results-table">Skip to results</a>
+            <a class="govuk-skip-link" href="#search-form">Back to search filters</a>
+      `);
+                }
+                html.push(viewSearchResultsTable());
+                if (nbRecords >= state_5.state.resultsPerPage) {
+                    html.push(`
+            <p class="govuk-body">
+              <button type="button" class="govuk-button" id="button-prev-page">Previous</button>
+              <button type="button" class="govuk-button" id="button-next-page">Next</button>
+            </p>`);
+                }
+                const csv = csvFromResults(state_5.state.searchResults);
+                const file = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(file); // TODO: use window.URL.revokeObjectURL(url);  after
+                html.push(`
+            <p class="govuk-body"><a class="govuk-link" href="${url}" download="export.csv">Download all ${state_5.state.searchResults.length} records in CSV</a></p>`);
+                return html.join('');
+            }
+            else {
+                return '';
+            }
+        };
+        const viewNoResults = () => {
+            return `
+        <h1 tabindex="0" id="results-heading" class="govuk-heading-l">No results</h1>
+        <div class="govuk-body">for ${viewQueryDescription()}</div>
+      `;
+        };
+        const viewSearchResults = () => {
+            switch ((0, state_5.searchState)().code) {
+                case 'waiting':
+                    document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraph search`;
+                    return viewWaiting();
+                case 'results':
+                    document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraph search`;
+                    return `${(0, view_metabox_1.viewMetaResults)() || ''} ${viewResults()}`; // FIXME - avoid || ''
+                case 'no-results':
+                    document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraph search`;
+                    return `${(0, view_metabox_1.viewMetaResults)() || ''} ${viewNoResults()}`; // FIXME - avoid || ''
+                default:
+                    document.title = 'GovGraph search';
+                    return '';
+            }
+        };
+        // Remove duplicates - but should be fixed in cypher
+        const formatNames = (array) => [...new Set(array)].map(x => `"${x}"`).join(', ');
+        const formatDateTime = (date) => `${date.slice(0, 10)} at ${date.slice(12, 16)}`;
+        const fieldFormatters = {
+            'url': {
+                name: 'URL',
+                format: (url) => `<a class="govuk-link" href="${url}">${url}</a>`
+            },
+            'title': { name: 'Title' },
+            'locale': { name: 'Language', format: lang_5.languageName },
+            'documentType': { name: 'Document type' },
+            'publishing_app': { name: 'Publishing app' },
+            'first_published_at': {
+                name: 'First published',
+                format: formatDateTime
+            },
+            'public_updated_at': {
+                name: 'Last major update',
+                format: formatDateTime,
+            },
+            'taxons': {
+                name: 'Taxons',
+                format: formatNames
+            },
+            'primary_organisation': {
+                name: 'Primary publishing organisations',
+                format: formatNames
+            },
+            'all_organisations': {
+                name: 'All publishing organisations',
+                format: formatNames
+            },
+            'pagerank': {
+                name: 'Popularity',
+                format: (val) => val ? val.toFixed(2) : 'n/a'
+            },
+            'withdrawn_at': {
+                name: 'Withdrawn at',
+                format: (date) => date ? formatDateTime(date) : "not withdrawn"
+            },
+            'withdrawn_explanation': {
+                name: 'Withdrawn reason',
+                format: (text) => text || 'n/a'
+            }
+        };
+        const fieldName = function (key) {
+            const f = fieldFormatters[key];
+            return f ? f.name : key;
+        };
+        const fieldFormat = function (key, val) {
+            const f = fieldFormatters[key];
+            return (f && f.format) ? f.format(val) : val;
+        };
+    });
+    define("main", ["require", "exports", "view/view", "state", "events", "neo4j"], function (require, exports, view_2, state_6, events_2, neo4j_2) {
+        "use strict";
+        Object.defineProperty(exports, "__esModule", { value: true });
+        //==================================================
+        // INIT
+        //==================================================
+        const init = async function () {
+            // decide if we're showing the feedback banner
+            state_6.state.displayFeedbackBanner = !document.cookie.includes('feedback_banner_dismissed=true');
+            state_6.state.errorText = null;
+            try {
+                await (0, neo4j_2.initNeo4j)();
+            }
+            catch (e) {
+                console.log('Failed to connect to the GovGraph', e);
+                state_6.state.errorText = `Error connecting to the GovGraph.<br/></br/>
+    Possible causes:<br/>
+    <br/>
+    - The GovGraph only runs on weekdays from 9am to 7pm<br/><br/>
+    - There's a problem with GovGraph. Please contact the Data Products team.`;
+                (0, state_6.resetSearch)();
+                return;
+            }
+            window.addEventListener('popstate', () => {
+                (0, state_6.setQueryParamsFromQS)();
+                (0, view_2.view)();
+            });
+        };
+        //==================================================
+        // START
+        //==================================================
+        (async () => {
+            await init();
+            if (!state_6.state.errorText) {
+                (0, state_6.setQueryParamsFromQS)();
+                (0, events_2.searchButtonClicked)();
+            }
+            (0, view_2.view)();
+        })();
+    });
+    
+    'marker:resolver';
 
-/***/ "./public/js/event-types.ts":
-/*!**********************************!*\
-  !*** ./public/js/event-types.ts ***!
-  \**********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"EventType\": () => (/* binding */ EventType)\n/* harmony export */ });\nvar EventType;\n(function (EventType) {\n    EventType[EventType[\"Dom\"] = 0] = \"Dom\";\n    EventType[EventType[\"Neo4jRunning\"] = 1] = \"Neo4jRunning\";\n    EventType[EventType[\"Neo4jCallbackOk\"] = 2] = \"Neo4jCallbackOk\";\n    EventType[EventType[\"Neo4jCallbackFail\"] = 3] = \"Neo4jCallbackFail\";\n})(EventType || (EventType = {}));\n\n\n//# sourceURL=webpack://knowledge-graph-search/./public/js/event-types.ts?");
-
-/***/ }),
-
-/***/ "./public/js/events.ts":
-/*!*****************************!*\
-  !*** ./public/js/events.ts ***!
-  \*****************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"handleEvent\": () => (/* binding */ handleEvent),\n/* harmony export */   \"searchButtonClicked\": () => (/* binding */ searchButtonClicked)\n/* harmony export */ });\n/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./state */ \"./public/js/state.ts\");\n/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ \"./public/js/utils.ts\");\n/* harmony import */ var _view_view__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./view/view */ \"./public/js/view/view.ts\");\n/* harmony import */ var _lang__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./lang */ \"./public/js/lang.ts\");\n/* harmony import */ var _neo4j__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./neo4j */ \"./public/js/neo4j.ts\");\n/* harmony import */ var _event_types__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./event-types */ \"./public/js/event-types.ts\");\n/* harmony import */ var _state_types__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./state-types */ \"./public/js/state-types.ts\");\n\n\n\n\n\n\n\nconst handleEvent = async function (event) {\n    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;\n    let fieldClicked;\n    console.log('handleEvent:', event.type, event.id || '');\n    switch (event.type) {\n        case _event_types__WEBPACK_IMPORTED_MODULE_5__.EventType.Dom:\n            switch (event.id) {\n                case 'search':\n                    // Tell GTM a search is starting\n                    (_a = window.dataLayer) === null || _a === void 0 ? void 0 : _a.push({\n                        'event': 'formSubmission',\n                        'formType': 'Search',\n                        'formPosition': 'Page'\n                    });\n                    // Update the state\n                    _state__WEBPACK_IMPORTED_MODULE_0__.state.selectedWords = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.getFormInputValue)('keyword');\n                    _state__WEBPACK_IMPORTED_MODULE_0__.state.excludedWords = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.getFormInputValue)('excluded-keyword');\n                    _state__WEBPACK_IMPORTED_MODULE_0__.state.selectedTaxon = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.getFormInputValue)('taxon');\n                    _state__WEBPACK_IMPORTED_MODULE_0__.state.selectedLocale = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.getFormInputValue)('locale');\n                    _state__WEBPACK_IMPORTED_MODULE_0__.state.whereToSearch.title = (_b = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.id)('search-title')) === null || _b === void 0 ? void 0 : _b.checked;\n                    _state__WEBPACK_IMPORTED_MODULE_0__.state.whereToSearch.text = (_c = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.id)('search-text')) === null || _c === void 0 ? void 0 : _c.checked;\n                    _state__WEBPACK_IMPORTED_MODULE_0__.state.caseSensitive = (_d = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.id)('case-sensitive')) === null || _d === void 0 ? void 0 : _d.checked;\n                    _state__WEBPACK_IMPORTED_MODULE_0__.state.linkSearchUrl = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.getFormInputValue)('link-search');\n                    _state__WEBPACK_IMPORTED_MODULE_0__.state.skip = 0; // reset to first page\n                    if ((_e = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.id)('area-mainstream')) === null || _e === void 0 ? void 0 : _e.checked)\n                        _state__WEBPACK_IMPORTED_MODULE_0__.state.areaToSearch = _state_types__WEBPACK_IMPORTED_MODULE_6__.SearchArea.Mainstream;\n                    if ((_f = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.id)('area-whitehall')) === null || _f === void 0 ? void 0 : _f.checked)\n                        _state__WEBPACK_IMPORTED_MODULE_0__.state.areaToSearch = _state_types__WEBPACK_IMPORTED_MODULE_6__.SearchArea.Whitehall;\n                    if ((_g = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.id)('area-any')) === null || _g === void 0 ? void 0 : _g.checked)\n                        _state__WEBPACK_IMPORTED_MODULE_0__.state.areaToSearch = _state_types__WEBPACK_IMPORTED_MODULE_6__.SearchArea.Any;\n                    if ((_h = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.id)('combinator-any')) === null || _h === void 0 ? void 0 : _h.checked)\n                        _state__WEBPACK_IMPORTED_MODULE_0__.state.combinator = _state_types__WEBPACK_IMPORTED_MODULE_6__.Combinator.Any;\n                    if ((_j = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.id)('combinator-all')) === null || _j === void 0 ? void 0 : _j.checked)\n                        _state__WEBPACK_IMPORTED_MODULE_0__.state.combinator = _state_types__WEBPACK_IMPORTED_MODULE_6__.Combinator.All;\n                    _state__WEBPACK_IMPORTED_MODULE_0__.state.searchResults = null;\n                    searchButtonClicked();\n                    break;\n                case 'button-next-page':\n                    _state__WEBPACK_IMPORTED_MODULE_0__.state.skip = _state__WEBPACK_IMPORTED_MODULE_0__.state.skip + _state__WEBPACK_IMPORTED_MODULE_0__.state.resultsPerPage;\n                    updateUrl();\n                    break;\n                case 'button-prev-page':\n                    _state__WEBPACK_IMPORTED_MODULE_0__.state.skip = Math.max(_state__WEBPACK_IMPORTED_MODULE_0__.state.skip - _state__WEBPACK_IMPORTED_MODULE_0__.state.resultsPerPage, 0);\n                    updateUrl();\n                    break;\n                case 'dismiss-feedback-banner':\n                    _state__WEBPACK_IMPORTED_MODULE_0__.state.displayFeedbackBanner = false;\n                    document.cookie = 'feedback_banner_dismissed=true';\n                    break;\n                case 'toggleDisamBox':\n                    _state__WEBPACK_IMPORTED_MODULE_0__.state.disamboxExpanded = !_state__WEBPACK_IMPORTED_MODULE_0__.state.disamboxExpanded;\n                    break;\n                case 'search-keyword':\n                    (0,_state__WEBPACK_IMPORTED_MODULE_0__.resetSearch)();\n                    _state__WEBPACK_IMPORTED_MODULE_0__.state.searchType = _state_types__WEBPACK_IMPORTED_MODULE_6__.SearchType.Keyword;\n                    break;\n                case 'search-link':\n                    (0,_state__WEBPACK_IMPORTED_MODULE_0__.resetSearch)();\n                    _state__WEBPACK_IMPORTED_MODULE_0__.state.searchType = _state_types__WEBPACK_IMPORTED_MODULE_6__.SearchType.Link;\n                    break;\n                case 'search-taxon':\n                    (0,_state__WEBPACK_IMPORTED_MODULE_0__.resetSearch)();\n                    _state__WEBPACK_IMPORTED_MODULE_0__.state.searchType = _state_types__WEBPACK_IMPORTED_MODULE_6__.SearchType.Taxon;\n                    break;\n                case 'search-language':\n                    (0,_state__WEBPACK_IMPORTED_MODULE_0__.resetSearch)();\n                    _state__WEBPACK_IMPORTED_MODULE_0__.state.searchType = _state_types__WEBPACK_IMPORTED_MODULE_6__.SearchType.Language;\n                    break;\n                case 'search-mixed':\n                    (0,_state__WEBPACK_IMPORTED_MODULE_0__.resetSearch)();\n                    _state__WEBPACK_IMPORTED_MODULE_0__.state.searchType = _state_types__WEBPACK_IMPORTED_MODULE_6__.SearchType.Mixed;\n                    break;\n                default:\n                    fieldClicked = event.id ? event.id.match(/show-field-(.*)/) : null;\n                    if (fieldClicked && event.id) {\n                        _state__WEBPACK_IMPORTED_MODULE_0__.state.showFields[fieldClicked[1]] = (_k = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.id)(event.id)) === null || _k === void 0 ? void 0 : _k.checked;\n                    }\n                    else {\n                        console.log('unknown DOM event received:', event);\n                    }\n                    console.log('unknown DOM event received:', event);\n            }\n            break;\n        // non-dom events\n        case _event_types__WEBPACK_IMPORTED_MODULE_5__.EventType.Neo4jRunning:\n            _state__WEBPACK_IMPORTED_MODULE_0__.state.waiting = true;\n            break;\n        case _event_types__WEBPACK_IMPORTED_MODULE_5__.EventType.Neo4jCallbackOk:\n            _state__WEBPACK_IMPORTED_MODULE_0__.state.searchResults = (_l = event.results) === null || _l === void 0 ? void 0 : _l.main.sort((a, b) => b.pagerank - a.pagerank);\n            _state__WEBPACK_IMPORTED_MODULE_0__.state.metaSearchResults = (_m = event.results) === null || _m === void 0 ? void 0 : _m.meta;\n            _state__WEBPACK_IMPORTED_MODULE_0__.state.waiting = false;\n            _state__WEBPACK_IMPORTED_MODULE_0__.state.errorText = null;\n            break;\n        case _event_types__WEBPACK_IMPORTED_MODULE_5__.EventType.Neo4jCallbackFail:\n            _state__WEBPACK_IMPORTED_MODULE_0__.state.searchResults = null;\n            _state__WEBPACK_IMPORTED_MODULE_0__.state.waiting = false;\n            _state__WEBPACK_IMPORTED_MODULE_0__.state.errorText = 'There was a problem querying the GovGraph. Please contact the Data Products team.';\n            console.log('neo4j-callback-fail:', event.error);\n            break;\n        default:\n            console.log('unknown event type:', event);\n    }\n    updateUrl();\n    (0,_view_view__WEBPACK_IMPORTED_MODULE_2__.view)();\n    // scroll to the top of the page when paginating\n    if (event.id === 'button-next-page' || event.id === 'button-prev-page') {\n        window.scrollTo(0, 0);\n    }\n};\nconst searchButtonClicked = async function () {\n    // update the state when the user clicked Search\n    window.scrollTo(0, 0);\n    _state__WEBPACK_IMPORTED_MODULE_0__.state.errorText = null;\n    _state__WEBPACK_IMPORTED_MODULE_0__.state.userErrors = [];\n    const searchStatus = (0,_state__WEBPACK_IMPORTED_MODULE_0__.searchState)();\n    switch (searchStatus.code) {\n        case 'ready-to-search':\n            if (_state__WEBPACK_IMPORTED_MODULE_0__.state.selectedWords !== '' || _state__WEBPACK_IMPORTED_MODULE_0__.state.selectedLocale !== '' || _state__WEBPACK_IMPORTED_MODULE_0__.state.selectedTaxon !== '' || _state__WEBPACK_IMPORTED_MODULE_0__.state.linkSearchUrl !== '') {\n                _state__WEBPACK_IMPORTED_MODULE_0__.state.waiting = true;\n                (0,_neo4j__WEBPACK_IMPORTED_MODULE_4__.queryGraph)(_state__WEBPACK_IMPORTED_MODULE_0__.state, handleEvent);\n            }\n            break;\n        case 'error':\n            _state__WEBPACK_IMPORTED_MODULE_0__.state.userErrors = searchStatus.errors;\n            break;\n        case 'waiting':\n        case 'initial':\n        case 'no-results':\n        case 'results':\n            break;\n        default:\n            console.log('unknown value for searchState', (0,_state__WEBPACK_IMPORTED_MODULE_0__.searchState)());\n            break;\n    }\n};\nconst updateUrl = function () {\n    if ('URLSearchParams' in window) {\n        var searchParams = new URLSearchParams();\n        if (_state__WEBPACK_IMPORTED_MODULE_0__.state.searchType !== _state_types__WEBPACK_IMPORTED_MODULE_6__.SearchType.Keyword)\n            searchParams.set('search-type', _state__WEBPACK_IMPORTED_MODULE_0__.state.searchType);\n        if (_state__WEBPACK_IMPORTED_MODULE_0__.state.selectedWords !== '')\n            searchParams.set('selected-words', _state__WEBPACK_IMPORTED_MODULE_0__.state.selectedWords);\n        if (_state__WEBPACK_IMPORTED_MODULE_0__.state.excludedWords !== '')\n            searchParams.set('excluded-words', _state__WEBPACK_IMPORTED_MODULE_0__.state.excludedWords);\n        if (_state__WEBPACK_IMPORTED_MODULE_0__.state.selectedTaxon !== '')\n            searchParams.set('selected-taxon', _state__WEBPACK_IMPORTED_MODULE_0__.state.selectedTaxon);\n        if (_state__WEBPACK_IMPORTED_MODULE_0__.state.selectedLocale !== '')\n            searchParams.set('lang', (0,_lang__WEBPACK_IMPORTED_MODULE_3__.languageCode)(_state__WEBPACK_IMPORTED_MODULE_0__.state.selectedLocale));\n        if (_state__WEBPACK_IMPORTED_MODULE_0__.state.caseSensitive)\n            searchParams.set('case-sensitive', _state__WEBPACK_IMPORTED_MODULE_0__.state.caseSensitive.toString());\n        if (_state__WEBPACK_IMPORTED_MODULE_0__.state.whereToSearch.title)\n            searchParams.set('search-in-title', 'true');\n        if (_state__WEBPACK_IMPORTED_MODULE_0__.state.whereToSearch.text)\n            searchParams.set('search-in-text', 'true');\n        if (_state__WEBPACK_IMPORTED_MODULE_0__.state.areaToSearch !== _state_types__WEBPACK_IMPORTED_MODULE_6__.SearchArea.Any)\n            searchParams.set('area', _state__WEBPACK_IMPORTED_MODULE_0__.state.areaToSearch);\n        if (_state__WEBPACK_IMPORTED_MODULE_0__.state.combinator !== 'all')\n            searchParams.set('combinator', _state__WEBPACK_IMPORTED_MODULE_0__.state.combinator);\n        if (_state__WEBPACK_IMPORTED_MODULE_0__.state.linkSearchUrl !== '')\n            searchParams.set('link-search-url', _state__WEBPACK_IMPORTED_MODULE_0__.state.linkSearchUrl);\n        let newRelativePathQuery = window.location.pathname;\n        if (searchParams.toString().length > 0) {\n            newRelativePathQuery += '?' + searchParams.toString();\n        }\n        history.pushState(null, '', newRelativePathQuery);\n    }\n};\n\n\n\n//# sourceURL=webpack://knowledge-graph-search/./public/js/events.ts?");
-
-/***/ }),
-
-/***/ "./public/js/lang.ts":
-/*!***************************!*\
-  !*** ./public/js/lang.ts ***!
-  \***************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"languageCode\": () => (/* binding */ languageCode),\n/* harmony export */   \"languageName\": () => (/* binding */ languageName)\n/* harmony export */ });\n// Functions to work with languages and language codes\nconst languageCode = (name) => \n// returns the language code from the language's full name\nObject.keys(languageNames).find(key => languageNames[key] === name) || name;\nconst languageName = (code) => \n// returns the language name from the language's code\nlanguageNames[code] || code;\n// IETF language codes https://en.wikipedia.org/wiki/IETF_language_tag\n// with additions\nconst languageNames = {\n    '': 'All languages',\n    'af': 'Afrikaans',\n    'am': 'Amharic',\n    'ar': 'Arabic',\n    'arn': 'Mapudungun',\n    'as': 'Assamese',\n    'az': 'Azeri',\n    'ba': 'Bashkir',\n    'be': 'Belarusian',\n    'bg': 'Bulgarian',\n    'bn': 'Bengali',\n    'bo': 'Tibetan',\n    'br': 'Breton',\n    'bs': 'Bosnian',\n    'ca': 'Catalan',\n    'co': 'Corsican',\n    'cs': 'Czech',\n    'cy': 'Welsh',\n    'da': 'Danish',\n    'de': 'German',\n    'dr': 'Dari',\n    'dsb': 'Lower Sorbian',\n    'dv': 'Divehi',\n    'el': 'Greek',\n    'en': 'English',\n    'es': 'Spanish',\n    'es-419': 'Latin-american Spanish',\n    'et': 'Estonian',\n    'eu': 'Basque',\n    'fa': 'Persian',\n    'fi': 'Finnish',\n    'fil': 'Filipino',\n    'fo': 'Faroese',\n    'fr': 'French',\n    'fy': 'Frisian',\n    'ga': 'Irish',\n    'gd': 'Scottish Gaelic',\n    'gl': 'Galician',\n    'gsw': 'Alsatian',\n    'gu': 'Gujarati',\n    'ha': 'Hausa',\n    'he': 'Hebrew',\n    'hi': 'Hindi',\n    'hr': 'Croatian',\n    'hsb': 'Upper Sorbian',\n    'hu': 'Hungarian',\n    'hy': 'Armenian',\n    'id': 'Indonesian',\n    'ig': 'Igbo',\n    'ii': 'Yi',\n    'is': 'Icelandic',\n    'it': 'Italian',\n    'iu': 'Inuktitut',\n    'ja': 'Japanese',\n    'ka': 'Georgian',\n    'kk': 'Kazakh',\n    'kl': 'Greenlandic',\n    'km': 'Khmer',\n    'kn': 'Kannada',\n    'ko': 'Korean',\n    'kok': 'Konkani',\n    'ky': 'Kyrgyz',\n    'lb': 'Luxembourgish',\n    'lo': 'Lao',\n    'lt': 'Lithuanian',\n    'lv': 'Latvian',\n    'mi': 'Maori',\n    'mk': 'Macedonian',\n    'ml': 'Malayalam',\n    'mn': 'Mongolian',\n    'moh': 'Mohawk',\n    'mr': 'Marathi',\n    'ms': 'Malay',\n    'mt': 'Maltese',\n    'my': 'Burmese',\n    'nb': 'Norwegian (Bokmål)',\n    'ne': 'Nepali',\n    'nl': 'Dutch',\n    'nn': 'Norwegian (Nynorsk)',\n    'no': 'Norwegian',\n    'nso': 'Sesotho',\n    'oc': 'Occitan',\n    'or': 'Oriya',\n    'pa': 'Punjabi',\n    'pa-pk': 'Punjabi (Pakistan)',\n    'pl': 'Polish',\n    'prs': 'Dari',\n    'ps': 'Pashto',\n    'pt': 'Portuguese',\n    'qut': 'K\\'iche',\n    'quz': 'Quechua',\n    'rm': 'Romansh',\n    'ro': 'Romanian',\n    'ru': 'Russian',\n    'rw': 'Kinyarwanda',\n    'sa': 'Sanskrit',\n    'sah': 'Yakut',\n    'se': 'Sami (Northern)',\n    'si': 'Sinhala',\n    'sk': 'Slovak',\n    'sl': 'Slovenian',\n    'sma': 'Sami (Southern)',\n    'smj': 'Sami (Lule)',\n    'smn': 'Sami (Inari)',\n    'sms': 'Sami (Skolt)',\n    'so': 'Somani',\n    'sq': 'Albanian',\n    'sr': 'Serbian',\n    'sv': 'Swedish',\n    'sw': 'Kiswahili',\n    'syr': 'Syriac',\n    'ta': 'Tamil',\n    'te': 'Telugu',\n    'tg': 'Tajik',\n    'th': 'Thai',\n    'tk': 'Turkmen',\n    'tn': 'Setswana',\n    'tr': 'Turkish',\n    'tt': 'Tatar',\n    'tzm': 'Tamazight',\n    'ug': 'Uyghur',\n    'uk': 'Ukrainian',\n    'ur': 'Urdu',\n    'uz': 'Uzbek',\n    'vi': 'Vietnamese',\n    'wo': 'Wolof',\n    'xh': 'isiXhosa',\n    'yi': 'Yiddish',\n    'yo': 'Yoruba',\n    'zh': 'Chinese',\n    'zh-hk': 'Chinese (Hong-Kong)',\n    'zh-tw': 'Chinese (Taiwan)',\n    'zu': 'isiZulu'\n};\n\n\n\n//# sourceURL=webpack://knowledge-graph-search/./public/js/lang.ts?");
-
-/***/ }),
-
-/***/ "./public/js/main.ts":
-/*!***************************!*\
-  !*** ./public/js/main.ts ***!
-  \***************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _view_view__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./view/view */ \"./public/js/view/view.ts\");\n/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./state */ \"./public/js/state.ts\");\n/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./events */ \"./public/js/events.ts\");\n/* harmony import */ var _neo4j__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./neo4j */ \"./public/js/neo4j.ts\");\n\n\n\n\n//==================================================\n// INIT\n//==================================================\nconst init = async function () {\n    // decide if we're showing the feedback banner\n    _state__WEBPACK_IMPORTED_MODULE_1__.state.displayFeedbackBanner = !document.cookie.includes('feedback_banner_dismissed=true');\n    _state__WEBPACK_IMPORTED_MODULE_1__.state.errorText = null;\n    try {\n        await (0,_neo4j__WEBPACK_IMPORTED_MODULE_3__.initNeo4j)();\n    }\n    catch (e) {\n        console.log('Failed to connect to the GovGraph', e);\n        _state__WEBPACK_IMPORTED_MODULE_1__.state.errorText = `Error connecting to the GovGraph.<br/></br/>\nPossible causes:<br/>\n<br/>\n- The GovGraph only runs on weekdays from 9am to 7pm<br/><br/>\n- There's a problem with GovGraph. Please contact the Data Products team.`;\n        (0,_state__WEBPACK_IMPORTED_MODULE_1__.resetSearch)();\n        return;\n    }\n    window.addEventListener('popstate', () => {\n        (0,_state__WEBPACK_IMPORTED_MODULE_1__.setQueryParamsFromQS)();\n        (0,_view_view__WEBPACK_IMPORTED_MODULE_0__.view)();\n    });\n};\n//==================================================\n// START\n//==================================================\n(async () => {\n    await init();\n    if (!_state__WEBPACK_IMPORTED_MODULE_1__.state.errorText) {\n        (0,_state__WEBPACK_IMPORTED_MODULE_1__.setQueryParamsFromQS)();\n        (0,_events__WEBPACK_IMPORTED_MODULE_2__.searchButtonClicked)();\n    }\n    (0,_view_view__WEBPACK_IMPORTED_MODULE_0__.view)();\n})();\n\n\n//# sourceURL=webpack://knowledge-graph-search/./public/js/main.ts?");
-
-/***/ }),
-
-/***/ "./public/js/neo4j.ts":
-/*!****************************!*\
-  !*** ./public/js/neo4j.ts ***!
-  \****************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"initNeo4j\": () => (/* binding */ initNeo4j),\n/* harmony export */   \"queryGraph\": () => (/* binding */ queryGraph),\n/* harmony export */   \"searchQuery\": () => (/* binding */ searchQuery)\n/* harmony export */ });\n/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./state */ \"./public/js/state.ts\");\n/* harmony import */ var _lang__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lang */ \"./public/js/lang.ts\");\n/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils */ \"./public/js/utils.ts\");\n/* harmony import */ var _event_types__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./event-types */ \"./public/js/event-types.ts\");\n//==================================================\n// Cypher query methods\n//==================================================\n\n\n\n\n//=========== public methods ===========\nconst initNeo4j = async function () {\n    console.log('retrieving taxons and locales');\n    try {\n        const neo4jResponse = await queryNeo4j([\n            { statement: 'MATCH (t:Taxon) RETURN t.name' },\n            { statement: 'MATCH (n:Page) WHERE n.locale <> \"en\" AND n.locale <> \"cy\" RETURN DISTINCT n.locale' }\n        ], 10);\n        const json = await neo4jResponse.json();\n        _state__WEBPACK_IMPORTED_MODULE_0__.state.taxons = json.results[0].data.map((d) => d.row[0]).sort();\n        _state__WEBPACK_IMPORTED_MODULE_0__.state.locales = json.results[1].data.map((d) => d.row[0]).sort();\n        _state__WEBPACK_IMPORTED_MODULE_0__.state.locales = ['', 'en', 'cy'].concat(_state__WEBPACK_IMPORTED_MODULE_0__.state.locales);\n        console.log(`successfully fetched ${_state__WEBPACK_IMPORTED_MODULE_0__.state.taxons.length} taxons and ${_state__WEBPACK_IMPORTED_MODULE_0__.state.locales.length} locales`);\n    }\n    catch (error) {\n        _state__WEBPACK_IMPORTED_MODULE_0__.state.errorText = 'Error retrieving taxons and locales';\n        console.log('Error retrieving taxons and locales', error);\n    }\n};\nconst queryGraph = async function (state, callback) {\n    const mainCypherQuery = { statement: searchQuery(state) };\n    const searchKeywords = state.selectedWords.replace(/\"/g, '');\n    const wholeQuery = [mainCypherQuery];\n    if (searchKeywords.length >= 5 && searchKeywords.includes(' ')) {\n        const metaSearchQuery = {\n            statement: `\n        MATCH (node)\n        WHERE (node:BankHoliday OR node:Organisation)\n        AND toLower(node.name) CONTAINS toLower($keywords)\n        OPTIONAL MATCH (node)-[:HAS_HOMEPAGE]->(homepage:Page)\n        RETURN node, homepage, labels(node) as nodeType`,\n            parameters: {\n                keywords: searchKeywords\n            }\n        };\n        wholeQuery.push(metaSearchQuery);\n    }\n    callback({ type: _event_types__WEBPACK_IMPORTED_MODULE_3__.EventType.Neo4jRunning });\n    queryNeo4j(wholeQuery)\n        .then(response => response.json())\n        .then(async (json) => {\n        const mainResults = formattedSearchResults(json.results[0]);\n        let metaResults = json.results.length > 1 && json.results[1].data.length > 0 ?\n            formattedSearchResults(json.results[1]) :\n            [];\n        // If there's an exact match, just keep it\n        const exactMetaResults = metaResults.filter((result) => {\n            return result.node.name.toLowerCase() === searchKeywords.toLowerCase();\n        });\n        if (exactMetaResults.length === 1) {\n            metaResults = exactMetaResults;\n        }\n        if (metaResults.length === 1) {\n            // one meta result: show the knowledge panel (may require more neo4j queries)\n            const fullMetaResults = await buildMetaboxInfo(metaResults[0]);\n            callback({ type: _event_types__WEBPACK_IMPORTED_MODULE_3__.EventType.Neo4jCallbackOk, results: { main: mainResults, meta: [fullMetaResults] } });\n        }\n        else if (metaResults.length >= 1) {\n            // multiple meta results: we'll show a disambiguation page\n            callback({ type: _event_types__WEBPACK_IMPORTED_MODULE_3__.EventType.Neo4jCallbackOk, results: { main: mainResults, meta: metaResults } });\n        }\n        else {\n            // no meta results\n            callback({ type: _event_types__WEBPACK_IMPORTED_MODULE_3__.EventType.Neo4jCallbackOk, results: { main: mainResults, meta: null } });\n        }\n    })\n        .catch(error => {\n        console.log('error running main+meta queries', error);\n        callback({ type: _event_types__WEBPACK_IMPORTED_MODULE_3__.EventType.Neo4jCallbackFail, error });\n    });\n};\n//=========== private ===========\nconst buildMetaboxInfo = async function (info) {\n    console.log(`Found a ${info.nodeType[0]}. Running extra queries`);\n    const result = { type: info.nodeType[0], name: info.node.name };\n    let json;\n    let orgData, orgDetails, childDetails, parentDetails;\n    let holidayData;\n    switch (info.nodeType[0]) {\n        // We found a bank holiday, so we need to run 2 further queries\n        // one to get the dates, the other to get the regions\n        case 'BankHoliday':\n            holidayData = await queryNeo4j([\n                {\n                    statement: `\n          MATCH (b:BankHoliday)-[:IS_ON]->(d)\n          WHERE b.name = $name\n          RETURN d`,\n                    parameters: { name: info.node.name }\n                }, {\n                    statement: `\n          MATCH (b:BankHoliday)-[:IS_OBSERVED_IN]->(r)\n          WHERE b.name = $name\n          RETURN r`,\n                    parameters: { name: info.node.name }\n                }\n            ]);\n            json = await holidayData.json();\n            result.dates = json.results[0].data.map((record) => record.row[0]);\n            result.regions = json.results[1].data.map((record) => record.row[0].name);\n            break;\n        case 'Organisation':\n            // We found an organisation, so we need to run a further query\n            // to get the sub organisations\n            orgData = await queryNeo4j([\n                {\n                    statement: `\n          MATCH (org:Organisation)-[:HAS_HOMEPAGE]->(homepage:Page)\n          WHERE org.name = $name\n          RETURN homepage.description, homepage.url`,\n                    parameters: { name: info.node.name }\n                }, {\n                    statement: `\n          MATCH (org:Organisation)-[:HAS_CHILD_ORGANISATION]->(childOrg:Organisation)\n          WHERE org.name = $name\n          AND childOrg.status <> \"closed\"\n          RETURN childOrg.name`,\n                    parameters: { name: info.node.name }\n                }, {\n                    statement: `\n          MATCH (org:Organisation)-[:HAS_PARENT_ORGANISATION]->(parentOrg:Organisation)\n          WHERE org.name = $name\n          RETURN parentOrg.name`,\n                    parameters: { name: info.node.name }\n                }\n            ]);\n            json = await orgData.json();\n            orgDetails = json.results[0].data[0].row;\n            childDetails = json.results[1].data;\n            parentDetails = json.results[2].data;\n            result.homepage = orgDetails[1];\n            result.description = orgDetails[0];\n            result.parentName = parentDetails.length === 1 ?\n                parentDetails[0].row[0] : null;\n            result.childOrgNames = childDetails.map((child) => child.row[0]);\n            break;\n        default:\n            console.log('unknown meta node type', info.nodeType[0]);\n    }\n    console.log('result', result);\n    return result;\n};\nconst searchQuery = function (state) {\n    const fieldsToSearch = [];\n    const keywords = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.splitKeywords)(state.selectedWords);\n    const excludedKeywords = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.splitKeywords)(state.excludedWords);\n    const combinator = state.combinator === 'any' ? 'OR' : 'AND';\n    if (state.whereToSearch.title)\n        fieldsToSearch.push('title');\n    if (state.whereToSearch.text)\n        fieldsToSearch.push('text', 'description');\n    let inclusionClause = '';\n    if (keywords.length > 0) {\n        inclusionClause = 'WITH * WHERE\\n' +\n            keywords\n                .map(word => multiContainsClause(fieldsToSearch, word, state.caseSensitive))\n                .join(`\\n ${combinator}`);\n    }\n    const exclusionClause = excludedKeywords.length ?\n        ('WITH * WHERE NOT ' + excludedKeywords.map(word => multiContainsClause(fieldsToSearch, word, state.caseSensitive)).join(`\\n OR `)) : '';\n    let areaClause = '';\n    if (state.areaToSearch === 'mainstream') {\n        areaClause = 'WITH * WHERE n.publishingApp = \"publisher\"';\n    }\n    else if (state.areaToSearch === 'whitehall') {\n        areaClause = 'WITH * WHERE n.publishingApp = \"whitehall\"';\n    }\n    let localeClause = '';\n    if (state.selectedLocale !== '') {\n        localeClause = `WITH * WHERE n.locale = \"${(0,_lang__WEBPACK_IMPORTED_MODULE_1__.languageCode)(state.selectedLocale)}\"\\n`;\n    }\n    const taxon = state.selectedTaxon;\n    const taxonClause = taxon ? `\n    WITH n\n    MATCH (n:Page)-[:IS_TAGGED_TO]->(taxon:Taxon)\n    MATCH (taxon:Taxon)-[:HAS_PARENT*]->(ancestor_taxon:Taxon)\n    WHERE taxon.name = \"${taxon}\" OR ancestor_taxon.name = \"${taxon}\"` :\n        `OPTIONAL MATCH (n:Page)-[:IS_TAGGED_TO]->(taxon:Taxon)`;\n    let linkClause = '';\n    if (state.linkSearchUrl.length > 0) {\n        // We need to determine if the link is internal or external\n        const internalLinkRexExp = /^((https:\\/\\/)?((www\\.)?gov\\.uk))?\\//;\n        if (internalLinkRexExp.test(state.linkSearchUrl)) {\n            linkClause = `\n        WITH n, taxon\n        MATCH (n:Page)-[:HYPERLINKS_TO]->(n2:Page)\n        WHERE n2.url = \"https://www.gov.uk${state.linkSearchUrl.replace(internalLinkRexExp, '/')}\"`;\n        }\n        else {\n            linkClause = `\n        WITH n, taxon\n        MATCH (n:Page) -[:HYPERLINKS_TO]-> (e:ExternalPage)\n        WHERE e.url CONTAINS \"${state.linkSearchUrl}\"`;\n        }\n    }\n    return `\n    MATCH (n:Page)\n    WHERE NOT n.documentType IN ['gone', 'redirect', 'placeholder', 'placeholder_person']\n    ${inclusionClause}\n    ${exclusionClause}\n    ${localeClause}\n    ${areaClause}\n    ${taxonClause}\n    ${linkClause}\n    OPTIONAL MATCH (n:Page)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)\n    OPTIONAL MATCH (n:Page)-[:HAS_ORGANISATIONS]->(o2:Organisation)\n    ${returnClause()}`;\n};\n//========== Private methods ==========\nconst queryNeo4j = async function (queries, timeoutSeconds = 60) {\n    const body = { statements: queries };\n    const controller = new AbortController();\n    const timeoutId = setTimeout(() => controller.abort(), timeoutSeconds * 1000);\n    console.log('sending query to neo4j:', body);\n    return fetch('/neo4j', {\n        method: 'POST',\n        headers: {\n            'Content-Type': 'application/json'\n        },\n        body: JSON.stringify(body),\n        signal: controller.signal\n    });\n};\nconst containsClause = function (field, word, caseSensitive) {\n    return caseSensitive ?\n        `(n.${field} CONTAINS \"${word}\")`\n        :\n            `(toLower(n.${field}) CONTAINS toLower(\"${word}\"))`;\n};\nconst multiContainsClause = function (fields, word, caseSensitive) {\n    return '(' + fields\n        .map(field => containsClause(field, word, caseSensitive))\n        .join(' OR ') + ')';\n};\nconst returnClause = function () {\n    return `RETURN\n    n.url as url,\n    n.title AS title,\n    n.documentType AS documentType,\n    n.contentID AS contentID,\n    n.locale AS locale,\n    n.publishingApp AS publishing_app,\n    n.firstPublishedAt AS first_published_at,\n    n.publicUpdatedAt AS public_updated_at,\n    n.withdrawnAt AS withdrawn_at,\n    n.withdrawnExplanation AS withdrawn_explanation,\n    n.pagerank AS pagerank,\n    COLLECT (distinct taxon.name) AS taxons,\n    COLLECT (distinct o.name) AS primary_organisation,\n    COLLECT (distinct o2.name) AS all_organisations\n    ORDER BY n.pagerank DESC\n    LIMIT ${_state__WEBPACK_IMPORTED_MODULE_0__.state.nbResultsLimit}`;\n};\nconst formattedSearchResults = (neo4jResults) => {\n    const keys = neo4jResults.columns;\n    const results = [];\n    neo4jResults.data.forEach(val => {\n        const result = {};\n        keys.forEach((key, i) => result[key] = val.row[i]);\n        results.push(result);\n    });\n    return results;\n};\n\n\n\n//# sourceURL=webpack://knowledge-graph-search/./public/js/neo4j.ts?");
-
-/***/ }),
-
-/***/ "./public/js/state-types.ts":
-/*!**********************************!*\
-  !*** ./public/js/state-types.ts ***!
-  \**********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"Combinator\": () => (/* binding */ Combinator),\n/* harmony export */   \"SearchArea\": () => (/* binding */ SearchArea),\n/* harmony export */   \"SearchType\": () => (/* binding */ SearchType)\n/* harmony export */ });\nvar SearchType;\n(function (SearchType) {\n    SearchType[\"Keyword\"] = \"keyword\";\n    SearchType[\"Link\"] = \"link\";\n    SearchType[\"Taxon\"] = \"taxon\";\n    SearchType[\"Language\"] = \"language\";\n    SearchType[\"Mixed\"] = \"mixed\";\n    SearchType[\"Results\"] = \"results\";\n})(SearchType || (SearchType = {}));\n;\nvar Combinator;\n(function (Combinator) {\n    Combinator[\"Any\"] = \"any\";\n    Combinator[\"All\"] = \"all\";\n    Combinator[\"NotSet\"] = \"notset\";\n})(Combinator || (Combinator = {}));\nvar SearchArea;\n(function (SearchArea) {\n    SearchArea[\"Any\"] = \"any\";\n    SearchArea[\"Whitehall\"] = \"whitehall\";\n    SearchArea[\"Mainstream\"] = \"mainstream\";\n})(SearchArea || (SearchArea = {}));\n\n\n//# sourceURL=webpack://knowledge-graph-search/./public/js/state-types.ts?");
-
-/***/ }),
-
-/***/ "./public/js/state.ts":
-/*!****************************!*\
-  !*** ./public/js/state.ts ***!
-  \****************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"resetSearch\": () => (/* binding */ resetSearch),\n/* harmony export */   \"searchState\": () => (/* binding */ searchState),\n/* harmony export */   \"setQueryParamsFromQS\": () => (/* binding */ setQueryParamsFromQS),\n/* harmony export */   \"state\": () => (/* binding */ state)\n/* harmony export */ });\n/* harmony import */ var _lang__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lang */ \"./public/js/lang.ts\");\n/* harmony import */ var _state_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./state-types */ \"./public/js/state-types.ts\");\n\n\n// user inputs that are used to build the query.\n// (basically, everything whose value could be found in the URL)\n// Separate from (but included in)  state to make\n// it easier to reset to those initial\n// values only while keeping the rest of the state\nconst initialSearchParams = {\n    searchType: _state_types__WEBPACK_IMPORTED_MODULE_1__.SearchType.Keyword,\n    selectedWords: '',\n    excludedWords: '',\n    selectedTaxon: '',\n    selectedLocale: '',\n    linkSearchUrl: '',\n    whereToSearch: {\n        title: true,\n        text: true // whether search should include page content\n    },\n    combinator: _state_types__WEBPACK_IMPORTED_MODULE_1__.Combinator.Any,\n    areaToSearch: _state_types__WEBPACK_IMPORTED_MODULE_1__.SearchArea.Any,\n    caseSensitive: false,\n    displayFeedbackBanner: true, // whether we should show the banner requesting feedback from user.\n};\nconst state = Object.assign(Object.assign({}, initialSearchParams), { taxons: [], locales: [], errorText: null, userErrors: [], nbResultsLimit: 50000, searchResults: null, metaSearchResults: null, skip: 0, resultsPerPage: 10, showFields: {\n        url: true,\n        title: true\n    }, waiting: false, disamboxExpanded: false // if there's a resizeable disamb meta box, whether it's expanded or not\n });\nconst setQueryParamsFromQS = function () {\n    const searchParams = new URLSearchParams(window.location.search);\n    const maybeReplace = (stateField, qspName) => searchParams.get(qspName) !== null ? searchParams.get(qspName) : initialSearchParams[stateField];\n    state.searchType = maybeReplace('searchType', 'search-type');\n    state.selectedWords = maybeReplace('selectedWords', 'selected-words');\n    state.excludedWords = maybeReplace('excludedWords', 'excluded-words');\n    state.linkSearchUrl = maybeReplace('linkSearchUrl', 'link-search-url');\n    state.selectedTaxon = maybeReplace('selectedTaxon', 'selected-taxon');\n    const lang = searchParams.get('lang');\n    state.selectedLocale = lang ? (0,_lang__WEBPACK_IMPORTED_MODULE_0__.languageName)(lang) : initialSearchParams.selectedLocale;\n    state.caseSensitive = maybeReplace('caseSensitive', 'case-sensitive');\n    state.areaToSearch = maybeReplace('areaToSearch', 'area');\n    state.combinator = maybeReplace('combinator', 'combinator');\n    state.whereToSearch.title = searchParams.get('search-in-title') !== null ?\n        !!searchParams.get('search-in-title') :\n        initialSearchParams.whereToSearch.title;\n    state.whereToSearch.text = searchParams.get('search-in-text') !== null ?\n        !!searchParams.get('search-in-text') :\n        initialSearchParams.whereToSearch.text;\n};\nconst searchState = function () {\n    // Find out what to display depending on state\n    // returns an object with a \"code\" field\n    // \"no-results\": there was a search but no results were returned\n    // \"results\": there was a search and there are results to display\n    // \"initial\": there weren't any search criteria specified\n    // \"errors\": the user didn't specify a valid query. In this case\n    //   we add a \"errors\" fiels containing an array with values among:\n    //   - \"missingWhereToSearch\": keywords were specified but not where to look for them on pages\n    //   - \"missingArea\": no publishing platform was specified\n    //   - \"missingCombinator\": no keyword combinator was specified\n    // \"waiting\": there's a query running\n    const errors = [];\n    if (state.waiting)\n        return { code: 'waiting', errors };\n    if (state.selectedWords === '' && state.excludedWords === '' && state.selectedTaxon === '' && state.selectedLocale === '' && state.linkSearchUrl === '' && state.whereToSearch.title === false && state.whereToSearch.text === false) {\n        return { code: 'initial', errors };\n    }\n    if (state.selectedWords !== '') {\n        if (!state.whereToSearch.title && !state.whereToSearch.text) {\n            errors.push('missingWhereToSearch');\n        }\n    }\n    if (errors.length > 0)\n        return { code: 'error', errors };\n    if (state.searchResults && state.searchResults.length > 0)\n        return { code: 'results', errors };\n    if (state.searchResults && state.searchResults.length === 0)\n        return { code: 'no-results', errors };\n    return { code: 'ready-to-search', errors };\n};\nconst resetSearch = function () {\n    state.selectedWords = '';\n    state.excludedWords = '';\n    state.selectedTaxon = '';\n    state.selectedLocale = '';\n    state.whereToSearch.title = true;\n    state.whereToSearch.text = false;\n    state.caseSensitive = false;\n    state.linkSearchUrl = '';\n    state.skip = 0; // reset to first page\n    state.areaToSearch = _state_types__WEBPACK_IMPORTED_MODULE_1__.SearchArea.Any;\n    state.searchResults = null;\n    state.waiting = false;\n    state.combinator = _state_types__WEBPACK_IMPORTED_MODULE_1__.Combinator.All;\n};\n\n\n\n//# sourceURL=webpack://knowledge-graph-search/./public/js/state.ts?");
-
-/***/ }),
-
-/***/ "./public/js/utils.ts":
-/*!****************************!*\
-  !*** ./public/js/utils.ts ***!
-  \****************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"getFormInputValue\": () => (/* binding */ getFormInputValue),\n/* harmony export */   \"id\": () => (/* binding */ id),\n/* harmony export */   \"sanitiseInput\": () => (/* binding */ sanitiseInput),\n/* harmony export */   \"sanitiseOutput\": () => (/* binding */ sanitiseOutput),\n/* harmony export */   \"splitKeywords\": () => (/* binding */ splitKeywords)\n/* harmony export */ });\nconst id = (x) => document.getElementById(x);\nconst tagBody = '(?:[^\"\\'>]|\"[^\"]*\"|\\'[^\\']*\\')*';\nconst tagOrComment = new RegExp('<(?:'\n    // Comment body.\n    + '!--(?:(?:-*[^->])*--+|-?)'\n    // Special \"raw text\" elements whose content should be elided.\n    + '|script\\\\b' + tagBody + '>[\\\\s\\\\S]*?</script\\\\s*'\n    + '|style\\\\b' + tagBody + '>[\\\\s\\\\S]*?</style\\\\s*'\n    // Regular name\n    + '|/?[a-z]'\n    + tagBody\n    + ')>', 'gi');\nconst getFormInputValue = (inputId) => { var _a; return sanitiseInput((_a = id(inputId)) === null || _a === void 0 ? void 0 : _a.value); };\nconst sanitiseInput = function (text) {\n    // remove text that could lead to script injections\n    if (!text)\n        return '';\n    let oldText;\n    do {\n        oldText = text;\n        text = text.replace(tagOrComment, '');\n    } while (text !== oldText);\n    return text.replace(/</g, '&lt;').replace(/\"\"*/g, '\"');\n};\nconst sanitiseOutput = function (text) {\n    const escapeHTML = (str) => new Option(str).innerHTML;\n    return escapeHTML(text)\n        .replace(/'/g, '&apos;')\n        .replace(/\"/g, '&quot;');\n};\nconst splitKeywords = function (keywords) {\n    const wordsToIgnore = ['of', 'for', 'the'];\n    const regexp = /[^\\s,\"]+|\"([^\"]*)\"/gi;\n    const output = [];\n    let match;\n    do {\n        match = regexp.exec(keywords);\n        if (match) {\n            output.push(match[1] ? match[1] : match[0]);\n        }\n    } while (match);\n    return output.filter(d => d.length > 0 && !wordsToIgnore.includes(d));\n};\n\n\n\n//# sourceURL=webpack://knowledge-graph-search/./public/js/utils.ts?");
-
-/***/ }),
-
-/***/ "./public/js/view/view-components.ts":
-/*!*******************************************!*\
-  !*** ./public/js/view/view-components.ts ***!
-  \*******************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"viewFeedbackBanner\": () => (/* binding */ viewFeedbackBanner),\n/* harmony export */   \"viewMetaLink\": () => (/* binding */ viewMetaLink)\n/* harmony export */ });\nconst viewFeedbackBanner = function () {\n    return `\n    <div class=\"govuk-grid-row feedback-banner\">\n      <div class=\"feedback-banner-rule\"></div>\n      <div class=\"govuk-grid-column-two-thirds\">\n        <h2 class=\"govuk-heading-xl\">Help us improve GovGraph</h2>\n        <p class=\"govuk-body\">\n          Hello, we want to understand how you use Govgraph app to make sure it works well for you and we’d love your feedback. You can tell us about your experience of using the app by completing this short questionnaire. It will take about 5 minutes and most questions are multiple choice.\n        </p>\n        <p class=\"govuk-body\">\n          <a class=\"govuk-button\" href=\"https://surveys.publishing.service.gov.uk/s/WUKRCT/\">View questionnaire</a>\n          <button id=\"dismiss-feedback-banner\">Hide this</button>\n        </p>\n      </div>\n    </div>`;\n};\nconst viewMetaLink = (text) => `<a class=\"govuk-link\" href=\"/?selected-words=${encodeURIComponent(`\"${text}\"`)}\">${text}</a>`;\n\n\n\n//# sourceURL=webpack://knowledge-graph-search/./public/js/view/view-components.ts?");
-
-/***/ }),
-
-/***/ "./public/js/view/view-metabox.ts":
-/*!****************************************!*\
-  !*** ./public/js/view/view-metabox.ts ***!
-  \****************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"viewMetaResults\": () => (/* binding */ viewMetaResults)\n/* harmony export */ });\n/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../state */ \"./public/js/state.ts\");\n/* harmony import */ var _view_components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./view-components */ \"./public/js/view/view-components.ts\");\n\n\nconst viewOrgChild = (subOrg) => `<li>${(0,_view_components__WEBPACK_IMPORTED_MODULE_1__.viewMetaLink)(subOrg)}</li>`;\nconst viewOrgChildren = (childOrgNames) => `<details class=\"govuk-details\">\n     <summary class=\"govuk-details__summary\">\n       <span class=\"govuk-details__summary-text\">\n         ${childOrgNames.length} sub-organisations\n       </span>\n     </summary>\n     <div class=\"govuk-details__text\">\n       <ul class=\"govuk-list govuk-list--bullet\">${childOrgNames.map(viewOrgChild).join('')}</ul>\n     </div>\n   </details>`;\nconst viewBankHolidayDetails = function (holiday) {\n    return `\n    <details class=\"govuk-details\">\n      <summary class=\"govuk-details__summary\">\n        <span class=\"govuk-details__summary-text\">\n          Dates\n        </span>\n      </summary>\n      <div class=\"govuk-details__text\">\n        <ul class=\"govuk-list govuk-list--bullet\">\n          ${holiday.dates.map((date) => `<li>${date.dateString}</li>`).join('')}\n        </ul>\n      </div>\n    </details>\n    <details class=\"govuk-details\">\n      <summary class=\"govuk-details__summary\">\n        <span class=\"govuk-details__summary-text\">\n          Observed in\n        </span>\n      </summary>\n      <div class=\"govuk-details__text\">\n        <ul class=\"govuk-list govuk-list--bullet\">\n          ${holiday.regions.map((region) => `<li>${region}</li>`).join('')}\n        </ul>\n      </div>\n    </details>\n  `;\n};\nconst viewBankHoliday = (record) => `<div class=\"meta-results-panel\">\n     <h2 class=\"govuk-heading-m\">\n       ${record.name}\n     </h2>\n     <p class=\"govuk-body\">Bank holiday</p>\n     ${viewBankHolidayDetails(record)}\n     </div>\n  `;\nconst viewOrg = (record) => `<div class=\"meta-results-panel\">\n     <h2 class=\"govuk-heading-m\">\n       <a class=\"govuk-link\" href=\"${record.homepage}\">${record.name}</a>\n     </h2>\n     <p class=\"govuk-body\">\n       Government organisation${record.parentName ? `, part of ${(0,_view_components__WEBPACK_IMPORTED_MODULE_1__.viewMetaLink)(record.parentName)}` : ''}\n     </p>\n     ${record.description ? `<p class=\"govuk-body\">${record.description}</p>` : ''}\n     ${record.childOrgNames && record.childOrgNames.length > 0 ?\n    viewOrgChildren(record.childOrgNames) :\n    '<p class=\"govuk-body\">No sub-organisations</p>'}\n   </div>`;\n//=================== public ====================\nconst viewMetaResultsExpandToggle = () => _state__WEBPACK_IMPORTED_MODULE_0__.state.metaSearchResults && _state__WEBPACK_IMPORTED_MODULE_0__.state.metaSearchResults.length > 5 ?\n    `<button id=\"meta-results-expand\">${_state__WEBPACK_IMPORTED_MODULE_0__.state.disamboxExpanded ? 'show less' : 'show more'}</button>` :\n    '';\nconst viewMetaResults = function () {\n    if (!_state__WEBPACK_IMPORTED_MODULE_0__.state.metaSearchResults)\n        return;\n    if (_state__WEBPACK_IMPORTED_MODULE_0__.state.metaSearchResults.length > 1) {\n        const expandedClass = _state__WEBPACK_IMPORTED_MODULE_0__.state.metaSearchResults.length > 5 && !_state__WEBPACK_IMPORTED_MODULE_0__.state.disamboxExpanded ? 'meta-results-panel--collapsed' : '';\n        return `\n      <div class=\"meta-results-panel\">\n        <div class=\"meta-results-panel__collapsible ${expandedClass}\">\n          <h2 class=\"govuk-heading-s\">\"${_state__WEBPACK_IMPORTED_MODULE_0__.state.selectedWords.replace(/\"/g, '')}\" can refer to:</h2>\n          <ul class=\"govuk-list govuk-list--bullet\">\n            ${_state__WEBPACK_IMPORTED_MODULE_0__.state.metaSearchResults.map(result => `<li>${(0,_view_components__WEBPACK_IMPORTED_MODULE_1__.viewMetaLink)(result.name)} (${result.type.toLowerCase()})</li>`).join('')}\n          </ul>\n        </div>\n        ${viewMetaResultsExpandToggle()}\n      </div>\n    `;\n    }\n    else {\n        const record = _state__WEBPACK_IMPORTED_MODULE_0__.state.metaSearchResults[0];\n        console.log(`meta: found a ${record.type}`);\n        switch (record.type) {\n            case \"BankHoliday\": return viewBankHoliday(record);\n            case \"Organisation\": return viewOrg(record);\n            default:\n                console.log(`unknown record type: ${record.type}`);\n                return ``;\n        }\n    }\n};\n\n\n\n//# sourceURL=webpack://knowledge-graph-search/./public/js/view/view-metabox.ts?");
-
-/***/ }),
-
-/***/ "./public/js/view/view-search-panel.ts":
-/*!*********************************************!*\
-  !*** ./public/js/view/view-search-panel.ts ***!
-  \*********************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"viewSearchPanel\": () => (/* binding */ viewSearchPanel)\n/* harmony export */ });\n/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils */ \"./public/js/utils.ts\");\n/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../state */ \"./public/js/state.ts\");\n/* harmony import */ var _lang__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../lang */ \"./public/js/lang.ts\");\n/* harmony import */ var _state_types__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../state-types */ \"./public/js/state-types.ts\");\n\n\n\n\nconst viewSearchPanel = () => {\n    const result = [];\n    switch (_state__WEBPACK_IMPORTED_MODULE_1__.state.searchType) {\n        case _state_types__WEBPACK_IMPORTED_MODULE_3__.SearchType.Mixed:\n        case _state_types__WEBPACK_IMPORTED_MODULE_3__.SearchType.Results:\n            result.push(`\n      <form id=\"search-form\" class=\"search-panel govuk-form\">\n        <div class=\"search-mode-panel\">\n          <h1 class=\"govuk-heading-xl\">Mixed search</h1>\n          ${viewKeywordsInput()}\n          ${viewKeywordsCombinator()}\n          ${viewExclusionsInput()}\n          ${viewCaseSensitiveSelector()}\n          ${viewScopeSelector()}\n          ${viewLinkSearch()}\n          ${viewPublishingAppSelector()}\n          ${viewTaxonSelector()}\n          ${viewLocaleSelector()}\n          ${viewSearchButton()}\n        </div>\n      </form>\n    `);\n            break;\n        case _state_types__WEBPACK_IMPORTED_MODULE_3__.SearchType.Keyword:\n            result.push(`\n      <form id=\"search-form\" class=\"search-panel govuk-form\">\n        <div class=\"search-mode-panel\">\n          <a class=\"govuk-skip-link\" href=\"#results-table\">Skip to results</a>\n          ${viewKeywordsInput()}\n          <details class=\"govuk-details\" data-module=\"govuk-details\">\n            <summary class=\"govuk-details__summary\">\n              <span class=\"govuk-details__summary-text\">\n                Filters\n              </span>\n            </summary>\n            <div class=\"govuk-details__text\">\n              ${viewKeywordsCombinator()}\n              ${viewExclusionsInput()}\n              ${viewCaseSensitiveSelector()}\n              ${viewScopeSelector()}\n              ${viewPublishingAppSelector()}\n            </div>\n          </details>\n          ${viewSearchButton()}\n        </div>\n      </form>\n    `);\n            break;\n        case _state_types__WEBPACK_IMPORTED_MODULE_3__.SearchType.Link:\n            result.push(`\n      <form id=\"search-form\" class=\"search-panel govuk-form\">\n        <div class=\"search-mode-panel\">\n          <a class=\"govuk-skip-link\" href=\"#results-table\">Skip to results</a>\n          ${viewLinkSearch()}\n          <details class=\"govuk-details\" data-module=\"govuk-details\">\n            <summary class=\"govuk-details__summary\">\n              <span class=\"govuk-details__summary-text\">\n                Filters\n              </span>\n            </summary>\n            <div class=\"govuk-details__text\">\n              ${viewPublishingAppSelector()}\n            </div>\n          </details>\n          ${viewSearchButton()}\n        </div>\n      </form>\n    `);\n            break;\n        case _state_types__WEBPACK_IMPORTED_MODULE_3__.SearchType.Taxon:\n            result.push(`\n      <form id=\"search-form\" class=\"search-panel govuk-form\">\n        <div class=\"search-mode-panel\">\n          <a class=\"govuk-skip-link\" href=\"#results-table\">Skip to results</a>\n          ${viewTaxonSelector()}\n          <details class=\"govuk-details\" data-module=\"govuk-details\">\n            <summary class=\"govuk-details__summary\">\n              <span class=\"govuk-details__summary-text\">\n                Filters\n              </span>\n            </summary>\n            <div class=\"govuk-details__text\">\n              ${viewPublishingAppSelector()}\n            </div>\n          </details>\n          ${viewSearchButton()}\n        </div>\n      </form>\n    `);\n            break;\n        case _state_types__WEBPACK_IMPORTED_MODULE_3__.SearchType.Language:\n            result.push(`\n      <form id=\"search-form\" class=\"search-panel govuk-form\">\n        <div class=\"search-mode-panel\">\n          <a class=\"govuk-skip-link\" href=\"#results-table\">Skip to results</a>\n          ${viewLocaleSelector()}\n          <details class=\"govuk-details\" data-module=\"govuk-details\">\n            <summary class=\"govuk-details__summary\">\n              <span class=\"govuk-details__summary-text\">\n                Filters\n              </span>\n            </summary>\n            <div class=\"govuk-details__text\">\n              ${viewPublishingAppSelector()}\n            </div>\n          </details>\n          ${viewSearchButton()}\n        </div>\n      </form>\n    `);\n            break;\n        default:\n            console.log('viewSearchPanel: unknown value', _state__WEBPACK_IMPORTED_MODULE_1__.state.searchType);\n    }\n    result.push(`\n    <p class=\"govuk-body-s\">\n      Runs only between 9am and 7pm.\n      Searches do not include history mode content, Mainstream GitHub smart answers or service domains.\n      Popularity scores depend on cookie consent.\n    </p>\n  `);\n    return result.join('');\n};\nconst viewInlineError = (id, message) => `\n  <p id=\"${id}\" class=\"govuk-error-message\">\n    <span class=\"govuk-visually-hidden\">Error:</span> ${message}\n  </p>\n`;\nconst viewScopeSelector = () => {\n    var _a;\n    const errors = (_a = (0,_state__WEBPACK_IMPORTED_MODULE_1__.searchState)()) === null || _a === void 0 ? void 0 : _a.errors;\n    const err = errors && errors.includes('missingWhereToSearch');\n    return `\n  <div class=\"govuk-form-group ${err ? 'govuk-form-group--error' : ''}\">\n    <fieldset\n        class=\"govuk-fieldset\"\n        ${_state__WEBPACK_IMPORTED_MODULE_1__.state.waiting && 'disabled=\"disabled\"'}\n        id=\"search-scope-wrapper\"\n        ${err ? 'aria-describedby=\"scope-error\"' : ''}>\n      <legend class=\"govuk-fieldset__legend\">\n        Keyword location\n      </legend>\n      ${err ? viewInlineError('scope-error', 'Please choose at least one option') : ''}\n      <div class=\"govuk-checkboxes\" id=\"search-locations\">\n        <div class=\"govuk-checkboxes__item\">\n          <input\n              class=\"govuk-checkboxes__input\"\n              type=\"checkbox\" id=\"search-title\"\n              ${_state__WEBPACK_IMPORTED_MODULE_1__.state.whereToSearch.title ? 'checked' : ''}/>\n          <label for=\"search-title\" class=\"govuk-label govuk-checkboxes__label\">title</label>\n        </div>\n        <div class=\"govuk-checkboxes__item\">\n          <input\n              class=\"govuk-checkboxes__input\"\n              type=\"checkbox\"\n              id=\"search-text\"\n            ${_state__WEBPACK_IMPORTED_MODULE_1__.state.whereToSearch.text ? 'checked' : ''}/>\n          <label for=\"search-text\" class=\"govuk-label govuk-checkboxes__label\">\n            body content and description\n          </label>\n        </div>\n      </div>\n    </fieldset>\n  </div>\n  `;\n};\nconst viewTaxonSelector = () => `\n  <div class=\"govuk-body\">\n    <div class=\"taxon-facet\">\n      <label class=\"govuk-label label--bold\" for=\"taxon\">\n        Search for taxons\n      </label>\n      <div class=\"govuk-hint\">\n        Type the first letters of a taxon or select from the dropdown\n      </div>\n      <datalist id=\"taxonList\">\n        ${_state__WEBPACK_IMPORTED_MODULE_1__.state.taxons.map(taxon => `<option>${taxon}</option>`)}\n      </datalist>\n      <div>\n      <input\n        ${_state__WEBPACK_IMPORTED_MODULE_1__.state.waiting && 'disabled=\"disabled\"'}\n        style=\"display: inline-block\"\n        list=\"taxonList\"\n        value=\"${_state__WEBPACK_IMPORTED_MODULE_1__.state.selectedTaxon}\"\n        class=\"govuk-input\"\n        id=\"taxon\"\n        autocomplete=\"off\" />\n      </div>\n    </div>\n  </div>\n`;\nconst viewLocaleSelector = () => {\n    const html = [`\n    <div class=\"govuk-body taxon-facet\">\n      <label class=\"govuk-label label--bold\" for=\"locale\">\n        Search for languages\n      </label>\n      <div class=\"govuk-hint\">\n        Type the first letters of a language or select from the dropdown\n      </div>\n      <datalist id=\"localeList\">\n  `];\n    html.push(..._state__WEBPACK_IMPORTED_MODULE_1__.state.locales.map(code => `<option data-value=\"${code}\" ${_state__WEBPACK_IMPORTED_MODULE_1__.state.selectedLocale == code ? 'selected' : ''}>${(0,_lang__WEBPACK_IMPORTED_MODULE_2__.languageName)(code)}</option>`));\n    html.push(`\n      </datalist>\n      <input type=\"text\"\n         ${_state__WEBPACK_IMPORTED_MODULE_1__.state.waiting && 'disabled=\"disabled\"'}\n         value=\"${_state__WEBPACK_IMPORTED_MODULE_1__.state.selectedLocale}\"\n         class=\"govuk-input\"\n         list=\"localeList\"\n         id=\"locale\" name=\"locale\"\n         autocomplete=\"off\" />\n    </div>`);\n    return html.join('');\n};\nconst viewSearchButton = () => `\n  <p class=\"govuk-body\">\n    <button\n      type=\"submit\"\n      class=\"govuk-button ${_state__WEBPACK_IMPORTED_MODULE_1__.state.waiting ? 'govuk-button--disabled' : ''}\"\n      ${_state__WEBPACK_IMPORTED_MODULE_1__.state.waiting ? 'disabled=\"disabled\"' : ''}\n      id=\"search\">\n      ${_state__WEBPACK_IMPORTED_MODULE_1__.state.waiting ? 'Searching <img src=\"assets/images/loader.gif\" height=\"20px\" alt=\"loader\"/>' : 'Search'}\n    </button>\n  </p>\n`;\nconst viewLinkSearch = () => `\n  <div class=\"govuk-body\">\n    <label class=\"govuk-label label--bold\" for=\"link-search\">\n      Search for links\n    </label>\n    <div class=\"govuk-hint\">\n      For example: /maternity-pay-leave or youtube.com\n    </div>\n    <input\n        class=\"govuk-input\"\n        id=\"link-search\"\n        ${_state__WEBPACK_IMPORTED_MODULE_1__.state.waiting && 'disabled=\"disabled\"'}\n        value=\"${_state__WEBPACK_IMPORTED_MODULE_1__.state.linkSearchUrl}\"\n     />\n  </div>\n`;\nconst viewCaseSensitiveSelector = () => `\n  <div class=\"govuk-body\">\n    <div class=\"govuk-checkboxes\">\n      <div class=\"govuk-checkboxes__item\">\n        <input\n            class=\"govuk-checkboxes__input\"\n            ${_state__WEBPACK_IMPORTED_MODULE_1__.state.waiting && 'disabled=\"disabled\"'}\n            type=\"checkbox\"\n            id=\"case-sensitive\"\n            ${_state__WEBPACK_IMPORTED_MODULE_1__.state.caseSensitive ? 'checked' : ''}\n        />\n        <label for=\"case-sensitive\" class=\"govuk-label govuk-checkboxes__label\">case-sensitive search</label>\n      </div>\n    </div>\n  </div>\n`;\nconst viewKeywordsCombinator = () => ` <div class=\"govuk-form-group\">\n    <fieldset\n        class=\"govuk-fieldset\"\n        id=\"combinator-wrapper\"\n        ${_state__WEBPACK_IMPORTED_MODULE_1__.state.waiting && 'disabled=\"disabled\"'}>\n\n      <legend class=\"govuk-fieldset__legend\">\n        Search for\n      </legend>\n      <div class=\"govuk-radios\" id=\"combinators\">\n        <div class=\"govuk-radios__item\">\n          <input class=\"govuk-radios__input\"\n                 type=\"radio\" id=\"combinator-any\"\n                 name=\"combinator\"\n            ${_state__WEBPACK_IMPORTED_MODULE_1__.state.combinator === 'any' ? 'checked' : ''}/>\n          <label for=\"combinator-any\" class=\"govuk-label govuk-radios__label\">\n            any keyword\n          </label>\n        </div>\n        <div class=\"govuk-radios__item\">\n          <input class=\"govuk-radios__input\"\n                 type=\"radio\" id=\"combinator-all\"\n                 name=\"combinator\"\n            ${_state__WEBPACK_IMPORTED_MODULE_1__.state.combinator === 'all' ? 'checked' : ''}/>\n          <label for=\"combinator-all\" class=\"govuk-label govuk-radios__label\">\n            all keywords\n          </label>\n        </div>\n      </div>\n    </fieldset>\n  </div>\n`;\nconst viewPublishingAppSelector = () => ` <div class=\"govuk-form-group\">\n    <fieldset\n        class=\"govuk-fieldset\"\n        id=\"search-areas-wrapper\"\n        ${_state__WEBPACK_IMPORTED_MODULE_1__.state.waiting && 'disabled=\"disabled\"'}>\n      <legend class=\"govuk-fieldset__legend\">\n        Limit search\n      </legend>\n      <div class=\"govuk-radios\" id=\"site-areas\">\n        <div class=\"govuk-radios__item\">\n          <input class=\"govuk-radios__input\"\n                 type=\"radio\" id=\"area-mainstream\"\n                 name=\"area\"\n            ${_state__WEBPACK_IMPORTED_MODULE_1__.state.areaToSearch === 'mainstream' ? 'checked' : ''}/>\n          <label for=\"area-mainstream\" class=\"govuk-label govuk-radios__label\">\n            Mainstream Publisher\n          </label>\n        </div>\n        <div class=\"govuk-radios__item\">\n          <input class=\"govuk-radios__input\"\n                 type=\"radio\" id=\"area-whitehall\"\n                 name=\"area\"\n            ${_state__WEBPACK_IMPORTED_MODULE_1__.state.areaToSearch === 'whitehall' ? 'checked' : ''}/>\n          <label for=\"area-whitehall\" class=\"govuk-label govuk-radios__label\">Whitehall</label>\n        </div>\n        <div class=\"govuk-radios__item\">\n          <input class=\"govuk-radios__input\"\n                 type=\"radio\" id=\"area-any\"\n                 name=\"area\"\n            ${_state__WEBPACK_IMPORTED_MODULE_1__.state.areaToSearch === 'any' ? 'checked' : ''}/>\n          <label for=\"area-any\" class=\"govuk-label govuk-radios__label\">All publishing applications</label>\n        </div>\n      </div>\n    </fieldset>\n  </div>\n`;\nconst viewKeywordsInput = () => `\n  <div class=\"govuk-body\">\n    <label for=\"keyword\" class=\"govuk-label label--bold\">Search for keywords</label>\n    <div class=\"govuk-hint\">\n      For example: cat, dog, &quot;Department for Education&quot;\n    </div>\n    <input\n      ${_state__WEBPACK_IMPORTED_MODULE_1__.state.waiting && 'disabled=\"disabled\"'}\n      class=\"govuk-input\"\n      id=\"keyword\"\n      value='${(0,_utils__WEBPACK_IMPORTED_MODULE_0__.sanitiseOutput)(_state__WEBPACK_IMPORTED_MODULE_1__.state.selectedWords)}'\n    />\n  </div>\n`;\nconst viewExclusionsInput = () => `\n  <div class=\"govuk-body\">\n    <label for=\"excluded-keyword\" class=\"govuk-label label--bold\">\n      Exclude keywords\n    </label>\n    <div class=\"govuk-hint\">\n      For example: passport\n    </div>\n    <input class=\"govuk-input\"\n        ${_state__WEBPACK_IMPORTED_MODULE_1__.state.waiting && 'disabled=\"disabled\"'}\n        id=\"excluded-keyword\"\n        value='${(0,_utils__WEBPACK_IMPORTED_MODULE_0__.sanitiseOutput)(_state__WEBPACK_IMPORTED_MODULE_1__.state.excludedWords).replace('\"', '&quot;')}'/>\n  </div>\n`;\n\n\n\n//# sourceURL=webpack://knowledge-graph-search/./public/js/view/view-search-panel.ts?");
-
-/***/ }),
-
-/***/ "./public/js/view/view.ts":
-/*!********************************!*\
-  !*** ./public/js/view/view.ts ***!
-  \********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"view\": () => (/* binding */ view)\n/* harmony export */ });\n/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils */ \"./public/js/utils.ts\");\n/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../state */ \"./public/js/state.ts\");\n/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../events */ \"./public/js/events.ts\");\n/* harmony import */ var _lang__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../lang */ \"./public/js/lang.ts\");\n/* harmony import */ var _view_metabox__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./view-metabox */ \"./public/js/view/view-metabox.ts\");\n/* harmony import */ var _view_search_panel__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./view-search-panel */ \"./public/js/view/view-search-panel.ts\");\n/* harmony import */ var _view_components__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./view-components */ \"./public/js/view/view-components.ts\");\n/* harmony import */ var _event_types__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../event-types */ \"./public/js/event-types.ts\");\n\n\n\n\n\n\n\n\nconst view = () => {\n    var _a, _b, _c;\n    console.log('view');\n    document.title = 'GovGraph search';\n    const pageContent = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.id)('page-content');\n    if (pageContent) {\n        pageContent.innerHTML = `\n      <main class=\"govuk-main-wrapper\" id=\"main-content\" role=\"main\">\n        ${_state__WEBPACK_IMPORTED_MODULE_1__.state.displayFeedbackBanner ? (0,_view_components__WEBPACK_IMPORTED_MODULE_6__.viewFeedbackBanner)() : ''}\n        ${viewErrorBanner()}\n        ${viewSearchTypeSelector()}\n        ${viewMainLayout()}\n      </main>\n    `;\n    }\n    // Add event handlers\n    document.querySelectorAll('#dismiss-feedback-banner, button, input[type=checkbox][data-interactive=true]')\n        .forEach(input => input.addEventListener('click', event => (0,_events__WEBPACK_IMPORTED_MODULE_2__.handleEvent)({ type: _event_types__WEBPACK_IMPORTED_MODULE_7__.EventType.Dom, id: event.target.getAttribute('id') || undefined })));\n    // Not sure this is even fired, since browser blocks submit because \"the form is not connected\"\n    (_a = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.id)('search-form')) === null || _a === void 0 ? void 0 : _a.addEventListener('submit', event => {\n        event.preventDefault();\n        // Tell GTM the form was submitted\n        window.dataLayer = window.dataLayer || [];\n        window.dataLayer.push({\n            'event': 'formSubmission',\n            'formType': 'Search',\n            'formPosition': 'Page'\n        });\n        (0,_events__WEBPACK_IMPORTED_MODULE_2__.handleEvent)({ type: _event_types__WEBPACK_IMPORTED_MODULE_7__.EventType.Dom, id: 'search' });\n    });\n    (_b = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.id)('meta-results-expand')) === null || _b === void 0 ? void 0 : _b.addEventListener('click', () => (0,_events__WEBPACK_IMPORTED_MODULE_2__.handleEvent)({ type: _event_types__WEBPACK_IMPORTED_MODULE_7__.EventType.Dom, id: 'toggleDisamBox' }));\n    // focus on the results heading if present\n    (_c = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.id)('results-heading')) === null || _c === void 0 ? void 0 : _c.focus();\n};\nconst viewSearchTypeSelector = () => `\n    <p class=\"govuk-body search-selector\">\n      Search for:\n      <button class=\"${_state__WEBPACK_IMPORTED_MODULE_1__.state.searchType === 'keyword' ? 'active' : ''}\" id=\"search-keyword\">Keywords</button>\n      <button class=\"${_state__WEBPACK_IMPORTED_MODULE_1__.state.searchType === 'link' ? 'active' : ''}\" id=\"search-link\">Links</button>\n      <button class=\"${_state__WEBPACK_IMPORTED_MODULE_1__.state.searchType === 'taxon' ? 'active' : ''}\" id=\"search-taxon\">Taxons</button>\n      <button class=\"${_state__WEBPACK_IMPORTED_MODULE_1__.state.searchType === 'language' ? 'active' : ''}\" id=\"search-language\">Languages</button>\n      <button class=\"${_state__WEBPACK_IMPORTED_MODULE_1__.state.searchType === 'mixed' ? 'active' : ''}\" id=\"search-mixed\">Mixed</button>\n    </p>\n  `;\nconst viewMainLayout = () => {\n    const result = [];\n    if (_state__WEBPACK_IMPORTED_MODULE_1__.state.searchType === 'mixed') {\n        if (!_state__WEBPACK_IMPORTED_MODULE_1__.state.searchResults) {\n            result.push(`\n        <div class=\"govuk-grid-row mixed-layout--no-results\">\n          <div class=\"govuk-grid-column-two-thirds\">\n            ${(0,_view_search_panel__WEBPACK_IMPORTED_MODULE_5__.viewSearchPanel)()}\n          </div>\n        </div>\n      `);\n        }\n        else {\n            result.push(`\n        <div class=\"govuk-grid-row mixed-layout\">\n          <div class=\"govuk-grid-column-one-third\">\n            ${(0,_view_search_panel__WEBPACK_IMPORTED_MODULE_5__.viewSearchPanel)()}\n          </div>\n          <div class=\"govuk-grid-column-two-thirds\">\n            ${viewSearchResults()}\n          </div>\n        </div>\n      `);\n        }\n    }\n    else {\n        result.push(`\n      <div class=\"govuk-grid-row simple-search\">\n        <div class=\"govuk-grid-column-two-thirds\">\n          ${(0,_view_search_panel__WEBPACK_IMPORTED_MODULE_5__.viewSearchPanel)()}\n        </div>\n      </div>\n      ${viewSearchResults()}\n    `);\n    }\n    return result.join('');\n};\nconst makeBold = (text, includeMarkup) => includeMarkup ?\n    `<span class=\"govuk-!-font-weight-bold\">${text}</span>` :\n    `\"${text}\"`;\nconst viewContainDescription = (includeMarkup) => {\n    let where;\n    if (_state__WEBPACK_IMPORTED_MODULE_1__.state.whereToSearch.title && _state__WEBPACK_IMPORTED_MODULE_1__.state.whereToSearch.text) {\n        where = '';\n    }\n    else if (_state__WEBPACK_IMPORTED_MODULE_1__.state.whereToSearch.title) {\n        where = 'in their title';\n    }\n    else {\n        where = 'in their body content';\n    }\n    let combineOp = _state__WEBPACK_IMPORTED_MODULE_1__.state.combinator === 'all' ? 'and' : 'or';\n    let combinedWords = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.splitKeywords)(_state__WEBPACK_IMPORTED_MODULE_1__.state.selectedWords)\n        .filter(w => w.length > 2)\n        .map(w => makeBold(w, includeMarkup))\n        .join(` ${combineOp} `);\n    return _state__WEBPACK_IMPORTED_MODULE_1__.state.selectedWords !== '' ? `${combinedWords} ${where}` : '';\n};\nconst viewQueryDescription = (includeMarkup = true) => {\n    const clauses = [];\n    if (_state__WEBPACK_IMPORTED_MODULE_1__.state.selectedWords !== '') {\n        let keywords = `contain ${viewContainDescription(includeMarkup)}`;\n        if (_state__WEBPACK_IMPORTED_MODULE_1__.state.excludedWords !== '') {\n            keywords = `${keywords} (but don't contain ${makeBold(_state__WEBPACK_IMPORTED_MODULE_1__.state.excludedWords, includeMarkup)})`;\n        }\n        clauses.push(keywords);\n    }\n    if (_state__WEBPACK_IMPORTED_MODULE_1__.state.selectedTaxon !== '')\n        clauses.push(`belong to the ${makeBold(_state__WEBPACK_IMPORTED_MODULE_1__.state.selectedTaxon, includeMarkup)} taxon (or its sub-taxons)`);\n    if (_state__WEBPACK_IMPORTED_MODULE_1__.state.selectedLocale !== '')\n        clauses.push(`are in ${makeBold((0,_lang__WEBPACK_IMPORTED_MODULE_3__.languageName)(_state__WEBPACK_IMPORTED_MODULE_1__.state.selectedLocale), includeMarkup)}`);\n    if (_state__WEBPACK_IMPORTED_MODULE_1__.state.linkSearchUrl !== '')\n        clauses.push(`link to ${makeBold(_state__WEBPACK_IMPORTED_MODULE_1__.state.linkSearchUrl, includeMarkup)}`);\n    if (_state__WEBPACK_IMPORTED_MODULE_1__.state.areaToSearch === 'whitehall' || _state__WEBPACK_IMPORTED_MODULE_1__.state.areaToSearch === 'mainstream')\n        clauses.push(`are published using ${makeBold(_state__WEBPACK_IMPORTED_MODULE_1__.state.areaToSearch, includeMarkup)}`);\n    const joinedClauses = (clauses.length === 1) ?\n        clauses[0] :\n        `${clauses.slice(0, clauses.length - 1).join(', ')} and ${clauses[clauses.length - 1]}`;\n    return `pages that ${joinedClauses}`;\n};\nconst viewErrorBanner = () => {\n    const html = [];\n    if (_state__WEBPACK_IMPORTED_MODULE_1__.state.errorText || _state__WEBPACK_IMPORTED_MODULE_1__.state.userErrors.length > 0) {\n        html.push(`\n        <div class=\"govuk-error-summary\" aria-labelledby=\"error-summary-title\" role=\"alert\" tabindex=\"-1\" data-module=\"govuk-error-summary\">`);\n        if (_state__WEBPACK_IMPORTED_MODULE_1__.state.errorText) {\n            html.push(`\n          <h1 class=\"govuk-error-summary__title\" id=\"error-summary-title\">System error</h1>\n          <p class=\"govuk-body\">${_state__WEBPACK_IMPORTED_MODULE_1__.state.errorText}</p>\n        `);\n        }\n        else {\n            if (_state__WEBPACK_IMPORTED_MODULE_1__.state.userErrors.length > 0) {\n                html.push(`\n            <h1 class=\"govuk-error-summary__title\" id=\"error-summary-title\">\n              There is a problem\n            </h1>\n            <ul class=\"govuk-error-summary__list\">\n          `);\n                _state__WEBPACK_IMPORTED_MODULE_1__.state.userErrors.forEach(userError => {\n                    switch (userError) {\n                        case 'missingWhereToSearch':\n                            html.push(`\n              <li><a href=\"#search-locations-wrapper\">You need to select a keyword location</a></li>`);\n                            break;\n                        case 'missingArea':\n                            html.push(`\n              <li><a href=\"#search-scope-wrapper\">You need to select a publishing application</a></li>`);\n                            break;\n                        default:\n                            console.log('unknown user error code:', userError);\n                    }\n                });\n                html.push(`\n            </ul>`);\n            }\n        }\n        html.push(`\n        </div>\n      `);\n    }\n    return html.join('');\n};\nconst viewSearchResultsTable = () => {\n    var _a, _b;\n    const html = [];\n    if (_state__WEBPACK_IMPORTED_MODULE_1__.state.searchResults && ((_a = _state__WEBPACK_IMPORTED_MODULE_1__.state.searchResults) === null || _a === void 0 ? void 0 : _a.length) > 0) {\n        const recordsToShow = (_b = _state__WEBPACK_IMPORTED_MODULE_1__.state.searchResults) === null || _b === void 0 ? void 0 : _b.slice(_state__WEBPACK_IMPORTED_MODULE_1__.state.skip, _state__WEBPACK_IMPORTED_MODULE_1__.state.skip + _state__WEBPACK_IMPORTED_MODULE_1__.state.resultsPerPage);\n        html.push(`\n      <div class=\"govuk-body\">\n        <fieldset class=\"govuk-fieldset\" ${_state__WEBPACK_IMPORTED_MODULE_1__.state.waiting && 'disabled=\"disabled\"'}>\n          <legend class=\"govuk-fieldset__legend\">For each result, display:</legend>\n          <ul class=\"kg-checkboxes\" id=\"show-fields\">`);\n        html.push(Object.keys(_state__WEBPACK_IMPORTED_MODULE_1__.state.searchResults[0]).map(key => `\n            <li class=\"kg-checkboxes__item\">\n              <input class=\"kg-checkboxes__input\"\n                     data-interactive=\"true\"\n                     type=\"checkbox\" id=\"show-field-${key}\"\n                ${_state__WEBPACK_IMPORTED_MODULE_1__.state.showFields[key] ? 'checked' : ''}/>\n              <label for=\"show-field-${key}\" class=\"kg-label kg-checkboxes__label\">${fieldName(key)}</label>\n            </li>`).join(''));\n        html.push(`\n          </ul>\n        </fieldset>\n        <table id=\"results-table\" class=\"govuk-table\">\n          <tbody class=\"govuk-table__body\">\n          <tr class=\"govuk-table__row\">\n            <th scope=\"col\" class=\"a11y-hidden\">Page</th>`);\n        Object.keys(_state__WEBPACK_IMPORTED_MODULE_1__.state.showFields).forEach(key => {\n            if (_state__WEBPACK_IMPORTED_MODULE_1__.state.showFields[key]) {\n                html.push(`<th scope=\"col\" class=\"govuk-table__header\">${fieldName(key)}</th>`);\n            }\n        });\n        recordsToShow.forEach((record, recordIndex) => {\n            html.push(`\n        <tr class=\"govuk-table__row\">\n          <th class=\"a11y-hidden\">${recordIndex}</th>`);\n            Object.keys(_state__WEBPACK_IMPORTED_MODULE_1__.state.showFields).forEach(key => {\n                if (_state__WEBPACK_IMPORTED_MODULE_1__.state.showFields[key]) {\n                    html.push(`<td class=\"govuk-table__cell\">${fieldFormat(key, record[key])}</td>`);\n                }\n            });\n            html.push(`</tr>`);\n        });\n        html.push(`\n          </tbody>\n        </table>\n      </div>`);\n        return html.join('');\n    }\n    else {\n        return '';\n    }\n};\nconst csvFromResults = function (searchResults) {\n    const csv = [];\n    if (searchResults && searchResults.length > 0) {\n        // column headings: take them from the first record\n        csv.push(Object.keys(searchResults[0]).map(fieldName).join());\n        // rows:\n        searchResults.forEach((record) => {\n            const line = [];\n            Object.values(record).forEach((field) => {\n                if (field) {\n                    field = field.toString();\n                    if (field.includes(',')) {\n                        field = `\"${field.replace('\"', '\"\"')}\"`;\n                    }\n                    else {\n                        if (field.includes('\"')) {\n                            field = '\"' + field.replace('\"', '\"\"') + '\"';\n                        }\n                    }\n                }\n                else {\n                    field = '';\n                }\n                line.push(field);\n            });\n            csv.push(line.join());\n        });\n    }\n    return csv.join('\\n');\n};\nconst viewWaiting = () => `\n  <div class=\"govuk-body\">Searching for ${viewQueryDescription()}</div>\n  <p class=\"govuk-body-s\">Some queries may take up to a minute</p>\n`;\nconst viewResults = function () {\n    if (_state__WEBPACK_IMPORTED_MODULE_1__.state.searchResults) {\n        const html = [];\n        const nbRecords = _state__WEBPACK_IMPORTED_MODULE_1__.state.searchResults.length;\n        if (nbRecords < _state__WEBPACK_IMPORTED_MODULE_1__.state.nbResultsLimit) {\n            html.push(`\n        <h1 tabindex=\"0\" id=\"results-heading\" class=\"govuk-heading-l\">${nbRecords} result${nbRecords !== 0 ? 's' : ''}</h1>`);\n        }\n        else {\n            html.push(`\n        <div class=\"govuk-warning-text\">\n          <span class=\"govuk-warning-text__icon\" aria-hidden=\"true\">!</span>\n          <strong class=\"govuk-warning-text__text\">\n            <span class=\"govuk-warning-text__assistive\">Warning</span>\n            There are more than ${_state__WEBPACK_IMPORTED_MODULE_1__.state.nbResultsLimit} results. Try to narrow down your search.\n          </strong>\n        </div>\n      `);\n        }\n        html.push(`<div class=\"govuk-body\">for ${viewQueryDescription()}</div>`);\n        if (nbRecords >= _state__WEBPACK_IMPORTED_MODULE_1__.state.resultsPerPage) {\n            html.push(`\n        <p class=\"govuk-body\">Showing results ${_state__WEBPACK_IMPORTED_MODULE_1__.state.skip + 1} to ${Math.min(nbRecords, _state__WEBPACK_IMPORTED_MODULE_1__.state.skip + _state__WEBPACK_IMPORTED_MODULE_1__.state.resultsPerPage)}, in descending popularity</p>\n        <a class=\"govuk-skip-link\" href=\"#results-table\">Skip to results</a>\n        <a class=\"govuk-skip-link\" href=\"#search-form\">Back to search filters</a>\n  `);\n        }\n        html.push(viewSearchResultsTable());\n        if (nbRecords >= _state__WEBPACK_IMPORTED_MODULE_1__.state.resultsPerPage) {\n            html.push(`\n        <p class=\"govuk-body\">\n          <button type=\"button\" class=\"govuk-button\" id=\"button-prev-page\">Previous</button>\n          <button type=\"button\" class=\"govuk-button\" id=\"button-next-page\">Next</button>\n        </p>`);\n        }\n        const csv = csvFromResults(_state__WEBPACK_IMPORTED_MODULE_1__.state.searchResults);\n        const file = new Blob([csv], { type: 'text/csv' });\n        const url = URL.createObjectURL(file); // TODO: use window.URL.revokeObjectURL(url);  after\n        html.push(`\n        <p class=\"govuk-body\"><a class=\"govuk-link\" href=\"${url}\" download=\"export.csv\">Download all ${_state__WEBPACK_IMPORTED_MODULE_1__.state.searchResults.length} records in CSV</a></p>`);\n        return html.join('');\n    }\n    else {\n        return '';\n    }\n};\nconst viewNoResults = () => {\n    return `\n    <h1 tabindex=\"0\" id=\"results-heading\" class=\"govuk-heading-l\">No results</h1>\n    <div class=\"govuk-body\">for ${viewQueryDescription()}</div>\n  `;\n};\nconst viewSearchResults = () => {\n    switch ((0,_state__WEBPACK_IMPORTED_MODULE_1__.searchState)().code) {\n        case 'waiting':\n            document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraph search`;\n            return viewWaiting();\n        case 'results':\n            document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraph search`;\n            return `${(0,_view_metabox__WEBPACK_IMPORTED_MODULE_4__.viewMetaResults)() || ''} ${viewResults()}`; // FIXME - avoid || ''\n        case 'no-results':\n            document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraph search`;\n            return `${(0,_view_metabox__WEBPACK_IMPORTED_MODULE_4__.viewMetaResults)() || ''} ${viewNoResults()}`; // FIXME - avoid || ''\n        default:\n            document.title = 'GovGraph search';\n            return '';\n    }\n};\n// Remove duplicates - but should be fixed in cypher\nconst formatNames = (array) => [...new Set(array)].map(x => `\"${x}\"`).join(', ');\nconst formatDateTime = (date) => `${date.slice(0, 10)} at ${date.slice(12, 16)}`;\nconst fieldFormatters = {\n    'url': {\n        name: 'URL',\n        format: (url) => `<a class=\"govuk-link\" href=\"${url}\">${url}</a>`\n    },\n    'title': { name: 'Title' },\n    'locale': { name: 'Language', format: _lang__WEBPACK_IMPORTED_MODULE_3__.languageName },\n    'documentType': { name: 'Document type' },\n    'publishing_app': { name: 'Publishing app' },\n    'first_published_at': {\n        name: 'First published',\n        format: formatDateTime\n    },\n    'public_updated_at': {\n        name: 'Last major update',\n        format: formatDateTime,\n    },\n    'taxons': {\n        name: 'Taxons',\n        format: formatNames\n    },\n    'primary_organisation': {\n        name: 'Primary publishing organisations',\n        format: formatNames\n    },\n    'all_organisations': {\n        name: 'All publishing organisations',\n        format: formatNames\n    },\n    'pagerank': {\n        name: 'Popularity',\n        format: (val) => val ? val.toFixed(2) : 'n/a'\n    },\n    'withdrawn_at': {\n        name: 'Withdrawn at',\n        format: (date) => date ? formatDateTime(date) : \"not withdrawn\"\n    },\n    'withdrawn_explanation': {\n        name: 'Withdrawn reason',\n        format: (text) => text || 'n/a'\n    }\n};\nconst fieldName = function (key) {\n    const f = fieldFormatters[key];\n    return f ? f.name : key;\n};\nconst fieldFormat = function (key, val) {\n    const f = fieldFormatters[key];\n    return (f && f.format) ? f.format(val) : val;\n};\n\n\n\n//# sourceURL=webpack://knowledge-graph-search/./public/js/view/view.ts?");
-
-/***/ })
-
-/******/ 	});
-/************************************************************************/
-/******/ 	// The module cache
-/******/ 	var __webpack_module_cache__ = {};
-/******/ 	
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/ 		// Check if module is in cache
-/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
-/******/ 		if (cachedModule !== undefined) {
-/******/ 			return cachedModule.exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
-/******/ 			// no module.loaded needed
-/******/ 			exports: {}
-/******/ 		};
-/******/ 	
-/******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/ 	
-/************************************************************************/
-/******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__webpack_require__.d = (exports, definition) => {
-/******/ 			for(var key in definition) {
-/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 				}
-/******/ 			}
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/make namespace object */
-/******/ 	(() => {
-/******/ 		// define __esModule on exports
-/******/ 		__webpack_require__.r = (exports) => {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/************************************************************************/
-/******/ 	
-/******/ 	// startup
-/******/ 	// Load entry module and return exports
-/******/ 	// This entry module can't be inlined because the eval devtool is used.
-/******/ 	var __webpack_exports__ = __webpack_require__("./public/js/main.ts");
-/******/ 	
-/******/ })()
-;
+    function get_define(name) {
+        if (defines[name]) {
+            return defines[name];
+        }
+        else if (defines[name + '/index']) {
+            return defines[name + '/index'];
+        }
+        else {
+            const dependencies = ['exports'];
+            const factory = (exports) => {
+                try {
+                    Object.defineProperty(exports, "__cjsModule", { value: true });
+                    Object.defineProperty(exports, "default", { value: require(name) });
+                }
+                catch (_a) {
+                    throw Error(['module "', name, '" not found.'].join(''));
+                }
+            };
+            return { dependencies, factory };
+        }
+    }
+    const instances = {};
+    function resolve(name) {
+        if (instances[name]) {
+            return instances[name];
+        }
+        if (name === 'exports') {
+            return {};
+        }
+        const define = get_define(name);
+        if (typeof define.factory !== 'function') {
+            return define.factory;
+        }
+        instances[name] = {};
+        const dependencies = define.dependencies.map(name => resolve(name));
+        define.factory(...dependencies);
+        const exports = dependencies[define.dependencies.indexOf('exports')];
+        instances[name] = (exports['__cjsModule']) ? exports.default : exports;
+        return instances[name];
+    }
+    if (entry[0] !== null) {
+        return resolve(entry[0]);
+    }
+})();
