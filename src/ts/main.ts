@@ -12,8 +12,12 @@ const init = async function() {
   state.systemErrorText = null;
   try {
     await initNeo4j();
-  } catch (errorText) {
-    state.systemErrorText = errorText;
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      state.systemErrorText = 'It looks like GovGraph is not responding.';
+    } else {
+      state.systemErrorText = error;
+    }
     resetSearch();
     return;
   }

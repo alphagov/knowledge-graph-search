@@ -326,7 +326,7 @@ const queryNeo4j: (queries: Neo4jQuery[], timeoutSeconds?: number) => Promise<Re
   console.log('queryNeo4j', queries);
   const body = { statements: queries };
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutSeconds * 1000)
+  setTimeout(() => controller.abort(), timeoutSeconds * 1000)
 
   console.log('sending query to neo4j:', body);
   return fetch('/neo4j', {

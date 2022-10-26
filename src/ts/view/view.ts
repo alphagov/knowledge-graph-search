@@ -170,7 +170,7 @@ const viewErrorBanner = () => {
       html.push(`
           <h1 class="govuk-error-summary__title" id="error-summary-title">System error</h1>
           <p class="govuk-body">${state.systemErrorText}</p>
-          <p class="govuk-body">Please contact the Data Products team if the problem persists</p>
+          <p class="govuk-body">Please contact the Data Products team if the problem persists.</p>
         `);
     } else {
       if (state.userErrors.length > 0) {
