@@ -30,7 +30,7 @@ const state: State = {
   ...initialSearchParams,
   taxons: [], // list of names of all the taxons
   locales: [], // all the languages found in the content store
-  errorText: null,
+  systemErrorText: null,
   userErrors: [], // error codes due to user not entering valid search criteria
   nbResultsLimit: 50000, // limit queries to this number of results
   searchResults: null,

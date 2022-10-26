@@ -13,19 +13,30 @@ import { State } from './state-types';
 
 const initNeo4j = async function() {
   console.log('retrieving taxons and locales');
+  const neo4jResponse: Response = await queryNeo4j([
+    { statement: 'MATCH (t:Taxon) RETURN t.name' },
+    { statement: 'MATCH (n:Page) WHERE n.locale <> "en" AND n.locale <> "cy" RETURN DISTINCT n.locale' }
+  ], 10);
+  if (!neo4jResponse.ok) {
+    throw 'Failed to connect to GovGraph';
+  }
+  let json: Neo4jResponse;
   try {
-    const neo4jResponse: Response = await queryNeo4j([
-      { statement: 'MATCH (t:Taxon) RETURN t.name' },
-      { statement: 'MATCH (n:Page) WHERE n.locale <> "en" AND n.locale <> "cy" RETURN DISTINCT n.locale' }
-    ], 10);
-    const json: Neo4jResponse = await neo4jResponse.json();
+    json = await neo4jResponse.json();
+  } catch (error) {
+    console.log('Got an invalid json answer from Neo4j', JSON.stringify(error));
+    throw 'Received invalid data from GovGraph';
+  }
+  if (json.results[0].data.length === 0 || json.results[1].data.length === 0) {
+    state.taxons = [];
+    state.locales = [];
+    console.log('Retrieved no taxons or no locales');
+    throw 'Received no data from GovGraph. It might still be loading.';
+  } else {
     state.taxons = json.results[0].data.map((d: Neo4jResultData) => d.row[0]).sort();
     state.locales = json.results[1].data.map((d: Neo4jResultData) => d.row[0]).sort();
     state.locales = ['', 'en', 'cy'].concat(state.locales);
     console.log(`successfully fetched ${state.taxons.length} taxons and ${state.locales.length} locales`);
-  } catch (error) {
-    state.errorText = 'Error retrieving taxons and locales';
-    console.log('Error retrieving taxons and locales', error);
   }
 };
 

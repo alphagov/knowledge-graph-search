@@ -92,12 +92,12 @@ const handleEvent: Neo4jCallback = async function(event) {
       state.searchResults = event.results?.main.sort((a: any, b: any) => b.pagerank - a.pagerank);
       state.metaSearchResults = event.results?.meta;
       state.waiting = false;
-      state.errorText = null;
+      state.systemErrorText = null;
       break;
     case EventType.Neo4jCallbackFail:
       state.searchResults = null;
       state.waiting = false;
-      state.errorText = 'There was a problem querying the GovGraph. Please contact the Data Products team.';
+      state.systemErrorText = 'There was a problem querying the GovGraph.';
       console.log('neo4j-callback-fail:', event.error);
       break;
     default:
@@ -116,7 +116,7 @@ const handleEvent: Neo4jCallback = async function(event) {
 const searchButtonClicked = async function(): Promise<void> {
   // update the state when the user clicked Search
   window.scrollTo(0, 0);
-  state.errorText = null;
+  state.systemErrorText = null;
   state.userErrors = [];
   const searchStatus = searchState();
   switch (searchStatus.code) {

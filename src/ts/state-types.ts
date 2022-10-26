@@ -38,7 +38,7 @@ export interface SearchParams {
 export interface State extends SearchParams {
   taxons: string[],
   locales: string[],
-  errorText: string | null,
+  systemErrorText: string | null,
   userErrors: string[],
   nbResultsLimit: number,
   searchResults: any[] | null,

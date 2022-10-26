@@ -160,17 +160,17 @@ const viewQueryDescription = (includeMarkup = true) => {
 };
 
 
-
 const viewErrorBanner = () => {
   const html = [];
-  if (state.errorText || state.userErrors.length > 0) {
+  if (state.systemErrorText || state.userErrors.length > 0) {
     html.push(`
         <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">`);
 
-    if (state.errorText) {
+    if (state.systemErrorText) {
       html.push(`
           <h1 class="govuk-error-summary__title" id="error-summary-title">System error</h1>
-          <p class="govuk-body">${state.errorText}</p>
+          <p class="govuk-body">${state.systemErrorText}</p>
+          <p class="govuk-body">Please contact the Data Products team if the problem persists</p>
         `);
     } else {
       if (state.userErrors.length > 0) {
