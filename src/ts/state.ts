@@ -63,10 +63,10 @@ const setQueryParamsFromQS = function(): void {
   state.areaToSearch = maybeReplace('areaToSearch', 'area');
   state.combinator = maybeReplace('combinator', 'combinator');
 
-  state.whereToSearch.title = searchParams.get('search-in-title') === 'true' ?
-    true : initialSearchParams.whereToSearch.title;
-  state.whereToSearch.text = searchParams.get('search-in-text') === 'true' ?
-    true : initialSearchParams.whereToSearch.text;
+  state.whereToSearch.title = searchParams.get('search-in-title') === 'false' ?
+    false : initialSearchParams.whereToSearch.title;
+  state.whereToSearch.text = searchParams.get('search-in-text') === 'false' ?
+    false : initialSearchParams.whereToSearch.text;
 };
 
 const searchState = function(): { code: string, errors: string[] } {
@@ -109,7 +109,7 @@ const resetSearch = function(): void {
   state.selectedTaxon = '';
   state.selectedLocale = '';
   state.whereToSearch.title = true;
-  state.whereToSearch.text = false;
+  state.whereToSearch.text = true;
   state.caseSensitive = false;
   state.linkSearchUrl = '';
   state.skip = 0; // reset to first page

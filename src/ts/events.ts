@@ -146,14 +146,16 @@ const updateUrl = function() {
   if ('URLSearchParams' in window) {
     var searchParams = new URLSearchParams();
 
+    // if the state differs from the default, then set parameter
+
     if (state.searchType !== SearchType.Keyword) searchParams.set('search-type', state.searchType);
     if (state.selectedWords !== '') searchParams.set('selected-words', state.selectedWords);
     if (state.excludedWords !== '') searchParams.set('excluded-words', state.excludedWords);
     if (state.selectedTaxon !== '') searchParams.set('selected-taxon', state.selectedTaxon);
     if (state.selectedLocale !== '') searchParams.set('lang', languageCode(state.selectedLocale));
     if (state.caseSensitive) searchParams.set('case-sensitive', state.caseSensitive.toString());
-    if (state.whereToSearch.title) searchParams.set('search-in-title', 'true');
-    if (state.whereToSearch.text) searchParams.set('search-in-text', 'true');
+    if (!state.whereToSearch.title) searchParams.set('search-in-title', 'false');
+    if (!state.whereToSearch.text) searchParams.set('search-in-text', 'false');
     if (state.areaToSearch !== SearchArea.Any) searchParams.set('area', state.areaToSearch);
     if (state.combinator !== 'all') searchParams.set('combinator', state.combinator);
     if (state.linkSearchUrl !== '') searchParams.set('link-search-url', state.linkSearchUrl);
