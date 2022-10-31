@@ -48,7 +48,7 @@ const queryGraph: (state: State, callback: Neo4jCallback) => Promise<void> = asy
 
   const wholeQuery: Neo4jQuery[] = [mainCypherQuery];
 
-  if (searchKeywords.length >= 5 && searchKeywords.includes(' ')) {
+  if (false && searchKeywords.length >= 5 && searchKeywords.includes(' ')) {
     const metaSearchQuery: Neo4jQuery = {
       statement: `
         MATCH (node)
