@@ -3,56 +3,50 @@ import { viewMetaLink } from './view-components';
 import { ResultDate, MetaResult } from '../neo4j-types';
 
 
-const viewOrgPersonRoles = (personRoles) =>
-  `<details class="govuk-details">
-     <summary class="govuk-details__summary">
-       <span class="govuk-details__summary-text">
-         ${personRoles.length} ${personRoles.length === 1 ? 'person' : 'people'}
-       </span>
-     </summary>
-     <div class="govuk-details__text">
-       <ul class="govuk-list govuk-list--bullet">
-         ${personRoles.map(personRole => `<li>${viewMetaLink(personRole.personName)} (${personRole.roleName})</li>`).join('')}
-       </ul>
-     </div>
-   </details>`;
-
-
-const viewOrgChild = (subOrg: string) =>
-  `<li>${viewMetaLink(subOrg)}</li>`;
-
-
-const viewOrgChildren = (childOrgNames: string[]) =>
-  `<details class="govuk-details">
-     <summary class="govuk-details__summary">
-       <span class="govuk-details__summary-text">
-         ${childOrgNames.length} sub-organisations
-       </span>
-     </summary>
-     <div class="govuk-details__text">
-       <ul class="govuk-list govuk-list--bullet">${childOrgNames.map(viewOrgChild).join('')}</ul>
-     </div>
-   </details>`;
-
-
-const viewPersonRoles = function(roles) {
+const viewDetails = (title: string, list: any[], itemFormatFn: (item: any) => string) => {
+  if (list.length === 0) return '';
   return `
     <details class="govuk-details">
       <summary class="govuk-details__summary">
         <span class="govuk-details__summary-text">
-          Roles
+          ${title}
         </span>
       </summary>
       <div class="govuk-details__text">
-        <ul class="govuk-list govuk-list--bullet">${roles.map(role => `
-          <li>${viewMetaLink(role.title)} ${role.orgName ? ' at ' + viewMetaLink(role.orgName) : ''}
-            (from ${role.startDate ? role.startDate.getFullYear() : ''}
-            to ${role.endDate ? role.endDate.getFullYear() : 'present'})
-          </li>`).join('')}
+        <ul class="govuk-list govuk-list--bullet">
+          ${list.map(item => `<li>${itemFormatFn(item)}</li>`).join('')}
         </ul>
       </div>
-    </details>`;
+    </details>
+  `;
 };
+
+
+const viewOrgPersonRoles = (personRoles: any[]) =>
+  viewDetails(
+    `${personRoles.length} ${personRoles.length === 1 ? 'person' : 'people'}`,
+    personRoles,
+    personRole => `${viewMetaLink(personRole.personName)} (${personRole.roleName})`
+  );
+
+
+const viewOrgChildren = (childOrgNames: string[]) =>
+  viewDetails(
+    `${childOrgNames.length} sub-organisations`,
+    childOrgNames,
+    viewMetaLink
+  );
+
+
+const viewPersonRoles = function(roles: any[]) {
+  const title: string = roles.length === 1 ? 'Role' : 'Roles';
+  const roleFormatter: (role: any) => string = role => `
+    ${viewMetaLink(role.title)} ${role.orgName ? ' at ' + viewMetaLink(role.orgName) : ''}
+    (from ${role.startDate ? role.startDate.getFullYear() : ''}
+    to ${role.endDate ? role.endDate.getFullYear() : 'present'})`;
+  return viewDetails(title, roles, roleFormatter);
+};
+
 
 
 /*
@@ -98,32 +92,17 @@ const viewRolePersons = persons => {
 */
 
 const viewBankHolidayDetails = function(holiday: any) {
-  return `
-    <details class="govuk-details">
-      <summary class="govuk-details__summary">
-        <span class="govuk-details__summary-text">
-          Dates
-        </span>
-      </summary>
-      <div class="govuk-details__text">
-        <ul class="govuk-list govuk-list--bullet">
-          ${holiday.dates.map((date: ResultDate) => `<li>${date.dateString}</li>`).join('')}
-        </ul>
-      </div>
-    </details>
-    <details class="govuk-details">
-      <summary class="govuk-details__summary">
-        <span class="govuk-details__summary-text">
-          Observed in
-        </span>
-      </summary>
-      <div class="govuk-details__text">
-        <ul class="govuk-list govuk-list--bullet">
-          ${holiday.regions.map((region: string) => `<li>${region}</li>`).join('')}
-        </ul>
-      </div>
-    </details>
-  `;
+  const datesDetails: string = viewDetails(
+    'dates',
+    holiday.dates,
+    date => date.dateString
+  );
+  const regionDetails: string = viewDetails(
+    'Observed in',
+    holiday.regions,
+    region => region
+  );
+  return `${datesDetails}${regionDetails}`;
 };
 
 
@@ -147,35 +126,20 @@ const viewPerson = record =>
    </div>`;
 
 
-const viewRoleOrgs = function(orgs) {
-  if (orgs.length === 0) return '';
-  return `
-    <details class="govuk-details">
-      <summary class="govuk-details__summary">
-        <span class="govuk-details__summary-text">Organisations</span>
-      </summary>
-      <div class="govuk-details__text">
-        <ul class="govuk-list govuk-list--bullet">
-          ${orgs.map(name => `<li>${viewMetaLink(name)}</li>`).join('')}
-        </ul>
-      </div>
-    </details>`;
-};
+const viewRoleOrgs = (orgs: any[]) =>
+  viewDetails(
+    `${orgs.length} ${orgs.length === 1 ? 'organisation' : 'organisations'}`,
+    orgs,
+    viewMetaLink
+  );
 
-const viewRolePersons = function(persons) {
-  if (persons.length === 0) return '';
-  return `
-    <details class="govuk-details">
-      <summary class="govuk-details__summary">
-        <span class="govuk-details__summary-text">People</span>
-      </summary>
-      <div class="govuk-details__text">
-        <ul class="govuk-list govuk-list--bullet">
-          ${persons.map(name => `<li>${viewMetaLink(name)}</li>`).join('')}
-        </ul>
-      </div>
-    </details>`;
-};
+
+const viewRolePersons = (persons: any[]) =>
+  viewDetails(
+    `${persons.length} ${persons.length === 1 ? 'person' : 'people'}`,
+    persons,
+    viewMetaLink
+  );
 
 
 const viewRole = function(record) {
