@@ -48,7 +48,7 @@ const queryGraph: (state: State, callback: Neo4jCallback) => Promise<void> = asy
 
   const wholeQuery: Neo4jQuery[] = [mainCypherQuery];
 
-  if (false && searchKeywords.length >= 5 && searchKeywords.includes(' ')) {
+  if (searchKeywords.length >= 5 && searchKeywords.includes(' ')) {
     const metaSearchQuery: Neo4jQuery = {
       statement: `
         MATCH (node)
@@ -152,11 +152,11 @@ const buildMetaboxInfo = async function(info: any) {
       ]);
 
       json = await personData.json();
-      result.homepage = json.results[0].data[0].row[0].url;
+      result.homepage = json.results[0].data[0].row[4].url;
       result.description = json.results[0].data[0].row[4].description;
       result.roles = json.results[0].data.map(result => {
         return {
-          title: result.row[2].title,
+          title: result.row[2].name,
           orgName: result.row[3]?.name,
           orgUrl: result.row[3]?.homepage,
           startDate: new Date(result.row[1].startDate),
@@ -174,17 +174,17 @@ const buildMetaboxInfo = async function(info: any) {
           MATCH (role:Role { name: $name })
           OPTIONAL MATCH (person:Person)-[has_role:HAS_ROLE]->(role)
           OPTIONAL MATCH (role:Role)-[belongs_to:BELONGS_TO]->(org:Organisation)
-          RETURN role, COLLECT(DISTINCT person) as persons, COLLECT(DISTINCT org) as orgs`,
-
+          RETURN role, COLLECT(DISTINCT person), COLLECT(DISTINCT org)`,
           parameters: { name: info.node.name }
         }
       ])
 
       json = await roleData.json();
-      console.log('json', json);
       result.name = json.results[0].data[0].row[0].name;
+      result.description = json.results[0].data[0].row[0].description;
       result.orgNames = json.results[0].data[0].row[2].map(result => result.name);
       result.personNames = json.results[0].data[0].row[1].map(result => result.name);
+
       break;
 
     case 'Organisation':
@@ -237,7 +237,7 @@ const buildMetaboxInfo = async function(info: any) {
       result.personRoleNames = personRoleDetails.map(record => {
         return {
           personName: record.row[0].name,
-          roleName: record.row[1].title
+          roleName: record.row[1].name
         }
       });
       break;

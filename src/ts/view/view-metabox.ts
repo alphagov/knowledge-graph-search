@@ -55,6 +55,7 @@ const viewPersonRoles = function(roles) {
 };
 
 
+/*
 const viewRolePersons = persons => {
   const formatPerson = person => `
     ${viewMetaLink(person.personName)}
@@ -94,7 +95,7 @@ const viewRolePersons = persons => {
 
   return `${currentsHtml} ${previousHtml}`;
 };
-
+*/
 
 const viewBankHolidayDetails = function(holiday: any) {
   return `
@@ -161,6 +162,21 @@ const viewRoleOrgs = function(orgs) {
     </details>`;
 };
 
+const viewRolePersons = function(persons) {
+  if (persons.length === 0) return '';
+  return `
+    <details class="govuk-details">
+      <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">People</span>
+      </summary>
+      <div class="govuk-details__text">
+        <ul class="govuk-list govuk-list--bullet">
+          ${persons.map(name => `<li>${viewMetaLink(name)}</li>`).join('')}
+        </ul>
+      </div>
+    </details>`;
+};
+
 
 const viewRole = function(record) {
   const nameHtml = record.homePage ?
@@ -171,7 +187,9 @@ const viewRole = function(record) {
     <div class="meta-results-panel">
       <h2 class="govuk-heading-m">${nameHtml}</h2>
       <p class="govuk-body">Official role</p>
+      <p class="govuk-body">${record.description}</p>
       ${viewRoleOrgs(record.orgNames)}
+      ${viewRolePersons(record.personNames)}
     </div>`
 };
 
@@ -186,8 +204,7 @@ const viewOrg = (record: MetaResult): string =>
      </p>
      ${record.description ? `<p class="govuk-body">${record.description}</p>` : ''}
      ${record.childOrgNames && record.childOrgNames.length > 0 ?
-    viewOrgChildren(record.childOrgNames) :
-    '<p class="govuk-body">No sub-organisations</p>'}
+    viewOrgChildren(record.childOrgNames) : ''}
      ${record.personRoleNames && record.personRoleNames.length > 0 ?
     viewOrgPersonRoles(record.personRoleNames) : ''}
    </div>`;
@@ -211,7 +228,7 @@ const viewMetaResults = function() {
         <div class="meta-results-panel__collapsible ${expandedClass}">
           <h2 class="govuk-heading-s">"${state.selectedWords.replace(/"/g, '')}" can refer to:</h2>
           <ul class="govuk-list govuk-list--bullet">
-            ${state.metaSearchResults.map(result => `<li>${viewMetaLink(result.name)} (${result.type.toLowerCase()})</li>`).join('')}
+            ${state.metaSearchResults.map(result => `<li>${viewMetaLink(result.name)}: (${result.type.toLowerCase()})</li>`).join('')}
           </ul>
         </div>
         ${viewMetaResultsExpandToggle()}
