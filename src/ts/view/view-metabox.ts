@@ -26,7 +26,7 @@ const viewOrgPersonRoles = (personRoles: any[]) =>
   viewDetails(
     `${personRoles.length} ${personRoles.length === 1 ? 'person' : 'people'}`,
     personRoles,
-    personRole => `${viewMetaLink(personRole.personName)} (${personRole.roleName})`
+    personRole => `${viewMetaLink(personRole.personName)} (${viewMetaLink(personRole.roleName)})`
   );
 
 
@@ -48,48 +48,49 @@ const viewPersonRoles = function(roles: any[]) {
 };
 
 
-
-/*
 const viewRolePersons = persons => {
-  const formatPerson = person => `
-    ${viewMetaLink(person.personName)}
-    (from ${person.roleStartDate ? person.roleStartDate.getFullYear() : ''}
+  const formatPerson = person => {
+    return `
+    ${viewMetaLink(person.name)}
+    (from ${person.startDate ? person.startDate.getFullYear() : ''}
     to
-    ${person.roleEndDate ? person.roleEndDate.getFullYear() : 'now'})
-  `;
-  const currents = persons.filter(person => person.roleEndDate === null);
-  const previous = persons.filter(person => person.roleEndDate !== null);
-
+    ${person.endDate ? person.endDate.getFullYear() : 'now'})
+  `};
+  const currents = persons.filter(person => person.endDate === null);
+  const previous = persons.filter(person => person.endDate !== null);
   const currentsHtml = currents.length === 0 ?
     '<p class="govuk-body-l">No current holder</p>' :
     (currents.length === 1 ?
-      `<p class="govuk-body-l">${formatPerson(currents[0])}</p>` :
-      `<ul class="govuk-list govuk-list--bullet">
-         ${currents.sort((a, b) => b.roleStartDate.getTime() - a.roleStartDate.getTime()).map(person => `<li>${formatPerson(person)}</li>`).join('')}
-       </ul>
-  `);
+      `<p class="govuk-body">Current holder:</p>
+       <p class="govuk-body-l"><a href="${currents[0].homepage}">${currents[0].name}</a></p>
+       <p class="govuk-body">(since ${currents[0].startDate.getFullYear()})</p>
+        ` :
+      `<ul class="govuk-list govuk-list--bullet" >
+    ${currents.sort((a, b) => b.startDate.getTime() - a.startDate.getTime()).map(person => `<li>${formatPerson(person)}</li>`).join('')}
+  </ul>
+    `);
 
   const previousHtml = previous.length === 0 ?
     '<p class="govuk-body">No previous holders</p>' :
     (previous.length === 1 ? `
-     <p class="govuk-body">Previous holder: ${formatPerson(previous[0])}</p>` : `
-      <details class="govuk-details">
-        <summary class="govuk-details__summary">
-          <span class="govuk-details__summary-text">
+    <p class="govuk-body" > Previous holder: ${formatPerson(previous[0])} </p>` : `
+      <details class="govuk-details" >
+        <summary class="govuk-details__summary" >
+          <span class="govuk-details__summary-text" >
             Previous holders
-          </span>
-        </summary>
-        <div class="govuk-details__text">
-          <ul class="govuk-list govuk-list--bullet">
-            ${previous.sort((a, b) => b.roleStartDate.getTime() - a.roleStartDate.getTime()).map(person => `<li>${formatPerson(person)}</li>`).join('')}
-          </ul>
-        </div>
-      </details>
-  `);
+              </span>
+              </summary>
+              <div class="govuk-details__text" >
+                <ul class="govuk-list govuk-list--bullet" >
+                  ${previous.sort((a, b) => b.startDate.getTime() - a.startDate.getTime()).map(person => `<li>${formatPerson(person)}</li>`).join('')}
+  </ul>
+    </div>
+    </details>
+      `);
 
-  return `${currentsHtml} ${previousHtml}`;
+  return `${currentsHtml} ${previousHtml} `;
 };
-*/
+
 
 const viewBankHolidayDetails = function(holiday: any) {
   const datesDetails: string = viewDetails(
@@ -102,45 +103,46 @@ const viewBankHolidayDetails = function(holiday: any) {
     holiday.regions,
     region => region
   );
-  return `${datesDetails}${regionDetails}`;
+  return `${datesDetails}${regionDetails} `;
 };
 
 
 const viewBankHoliday = (record: MetaResult): string =>
-  `<div class="meta-results-panel">
-     <h2 class="govuk-heading-m">
-       ${record.name}
-     </h2>
-     <p class="govuk-body">Bank holiday</p>
+  `<div class="meta-results-panel" >
+    <h2 class="govuk-heading-m" >
+      ${record.name}
+  </h2>
+    <p class="govuk-body" > Bank holiday </p>
      ${viewBankHolidayDetails(record)}
-     </div>
-  `;
+  </div>
+    `;
 
 const viewPerson = record =>
-  `<div class="meta-results-panel">
-     <h2 class="govuk-heading-m">
-       <a class="govuk-link" href="${record.homepage}">${record.name}</a>
-     </h2>
-     <p class="govuk-body">${record.description}</p>
+  `<div class="meta-results-panel" >
+    <h2 class="govuk-heading-m" >
+      <a class="govuk-link" href="${record.homepage}" > ${record.name} </a>
+        </h2>
+        <p class="govuk-body" > ${record.description} </p>
      ${record.roles && record.roles.length > 0 ? viewPersonRoles(record.roles) : ''}
-   </div>`;
+  </div>`;
 
 
 const viewRoleOrgs = (orgs: any[]) =>
   viewDetails(
-    `${orgs.length} ${orgs.length === 1 ? 'organisation' : 'organisations'}`,
+    `belongs to ${orgs.length} ${orgs.length === 1 ? 'organisation' : 'organisations'}`,
     orgs,
     viewMetaLink
   );
 
 
+/*
 const viewRolePersons = (persons: any[]) =>
   viewDetails(
     `${persons.length} ${persons.length === 1 ? 'person' : 'people'}`,
     persons,
     viewMetaLink
   );
-
+*/
 
 const viewRole = function(record) {
   const nameHtml = record.homePage ?
@@ -151,7 +153,7 @@ const viewRole = function(record) {
     <div class="meta-results-panel">
       <h2 class="govuk-heading-m">${nameHtml}</h2>
       <p class="govuk-body">Official role</p>
-      <p class="govuk-body">${record.description}</p>
+      ${record.description ? `<p class="govuk-body">${record.description}</p>` : ''}
       ${viewRoleOrgs(record.orgNames)}
       ${viewRolePersons(record.personNames)}
     </div>`

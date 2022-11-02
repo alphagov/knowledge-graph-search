@@ -170,37 +170,51 @@ const buildMetaboxInfo = async function(info: any) {
       // Find the organisation for this role
       roleData = await queryNeo4j([
         {
+          statement: `MATCH (r:Role { name: $name }) RETURN r`,
+          parameters: { name: info.node.name }
+        },
+        {
           statement: `
-          MATCH (role:Role { name: $name })
-          OPTIONAL MATCH (person:Person)-[has_role:HAS_ROLE]->(role)
-          OPTIONAL MATCH (role:Role)-[belongs_to:BELONGS_TO]->(org:Organisation)
-          RETURN role, COLLECT(DISTINCT person), COLLECT(DISTINCT org)`,
+            MATCH (p:Person)-[h:HAS_ROLE]->(Role { name: $name })
+            MATCH (p:Person)-[:HAS_HOMEPAGE]->(hp:Page)
+            RETURN p,h,hp.url`,
+          parameters: { name: info.node.name }
+        },
+        {
+          statement: `MATCH (Role { name: $name })-[:BELONGS_TO]->(o:Organisation) RETURN o`,
           parameters: { name: info.node.name }
         }
-      ])
-
+      ]);
       json = await roleData.json();
-      result.name = json.results[0].data[0].row[0].name;
-      result.description = json.results[0].data[0].row[0].description;
-      result.orgNames = json.results[0].data[0].row[2].map(result => result.name);
-      result.personNames = json.results[0].data[0].row[1].map(result => result.name);
-
+      const role = json.results[0].data[0];
+      const persons = json.results[1];
+      const orgs = json.results[2];
+      result.name = role.row[0].name;
+      result.description = role.row[0].description;
+      result.personNames = persons.data.map(person => {
+        return {
+          name: person.row[0].name,
+          homepage: person.row[2],
+          startDate: new Date(person.row[1].startDate),
+          endDate: person.row[1].endDate ? new Date(person.row[1].endDate) : null
+        }
+      });
+      result.orgNames = orgs.data.map(result => result.row[0].name);
       break;
-
     case 'Organisation':
       // We found an organisation, so we need to run a further query
       // to get the sub organisations
       orgData = await queryNeo4j([
         {
           statement: `
-          MATCH (org:Organisation)-[:HAS_HOMEPAGE]->(homepage:Page)
+      MATCH(org: Organisation) - [: HAS_HOMEPAGE] -> (homepage:Page)
           WHERE org.name = $name
           RETURN homepage.description, homepage.url`,
           parameters:
             { name: info.node.name }
         }, {
           statement: `
-          MATCH (person:Person)-[hr:HAS_ROLE]->(role:Role)-[:BELONGS_TO]->(org:Organisation)
+      MATCH(person: Person) - [hr: HAS_ROLE] -> (role:Role) -[: BELONGS_TO] -> (org:Organisation)
           WHERE org.name = $name
           AND hr.endDate IS NULL
           RETURN person, role`,
@@ -208,7 +222,7 @@ const buildMetaboxInfo = async function(info: any) {
             { name: info.node.name }
         }, {
           statement: `
-          MATCH (org:Organisation)-[:HAS_CHILD_ORGANISATION]->(childOrg:Organisation)
+      MATCH(org: Organisation) - [: HAS_CHILD_ORGANISATION] -> (childOrg:Organisation)
           WHERE org.name = $name
           AND childOrg.status <> "closed"
           RETURN childOrg.name`,
@@ -216,7 +230,7 @@ const buildMetaboxInfo = async function(info: any) {
             { name: info.node.name }
         }, {
           statement: `
-          MATCH (org:Organisation)-[:HAS_PARENT_ORGANISATION]->(parentOrg:Organisation)
+      MATCH(org: Organisation) - [: HAS_PARENT_ORGANISATION] -> (parentOrg:Organisation)
           WHERE org.name = $name
           RETURN parentOrg.name`,
           parameters:
@@ -261,7 +275,7 @@ const searchQuery = function(state: State): string {
     inclusionClause = 'WITH * WHERE\n' +
       keywords
         .map(word => multiContainsClause(fieldsToSearch, word, state.caseSensitive))
-        .join(`\n ${combinator}`);
+        .join(`\n ${combinator} `);
   }
 
   const exclusionClause = excludedKeywords.length ?
@@ -282,10 +296,10 @@ const searchQuery = function(state: State): string {
   const taxon = state.selectedTaxon;
   const taxonClause = taxon ? `
     WITH n
-    MATCH (n:Page)-[:IS_TAGGED_TO]->(taxon:Taxon)
-    MATCH (taxon:Taxon)-[:HAS_PARENT*]->(ancestor_taxon:Taxon)
+      MATCH(n: Page) - [: IS_TAGGED_TO] -> (taxon:Taxon)
+      MATCH(taxon: Taxon) - [: HAS_PARENT *] -> (ancestor_taxon:Taxon)
     WHERE taxon.name = "${taxon}" OR ancestor_taxon.name = "${taxon}"` :
-    `OPTIONAL MATCH (n:Page)-[:IS_TAGGED_TO]->(taxon:Taxon)`;
+    `OPTIONAL MATCH(n: Page) - [: IS_TAGGED_TO] -> (taxon:Taxon)`;
 
   let linkClause = '';
 
@@ -295,28 +309,28 @@ const searchQuery = function(state: State): string {
     if (internalLinkRexExp.test(state.linkSearchUrl)) {
       linkClause = `
         WITH n, taxon
-        MATCH (n:Page)-[:HYPERLINKS_TO]->(n2:Page)
+      MATCH(n: Page) - [: HYPERLINKS_TO] -> (n2:Page)
         WHERE n2.url = "https://www.gov.uk${state.linkSearchUrl.replace(internalLinkRexExp, '/')}"`
     } else {
       linkClause = `
         WITH n, taxon
-        MATCH (n:Page) -[:HYPERLINKS_TO]-> (e:ExternalPage)
+      MATCH(n: Page) - [: HYPERLINKS_TO] -> (e:ExternalPage)
         WHERE e.url CONTAINS "${state.linkSearchUrl}"`
     }
   }
 
   return `
-    MATCH (n:Page)
-    WHERE NOT n.documentType IN ['gone', 'redirect', 'placeholder', 'placeholder_person']
+      MATCH(n: Page)
+    WHERE NOT n.documentType IN['gone', 'redirect', 'placeholder', 'placeholder_person']
     ${inclusionClause}
     ${exclusionClause}
     ${localeClause}
     ${areaClause}
     ${taxonClause}
     ${linkClause}
-    OPTIONAL MATCH (n:Page)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
-    OPTIONAL MATCH (n:Page)-[:HAS_ORGANISATIONS]->(o2:Organisation)
-    ${returnClause()}`;
+    OPTIONAL MATCH(n: Page) - [r: HAS_PRIMARY_PUBLISHING_ORGANISATION] -> (o:Organisation)
+    OPTIONAL MATCH(n: Page) - [: HAS_ORGANISATIONS] -> (o2:Organisation)
+    ${returnClause()} `;
 };
 
 
@@ -358,22 +372,22 @@ const multiContainsClause = function(fields: string[], word: string, caseSensiti
 
 const returnClause = function() {
   return `RETURN
-    n.url as url,
-    n.title AS title,
-    n.documentType AS documentType,
-    n.contentID AS contentID,
-    n.locale AS locale,
-    n.publishingApp AS publishing_app,
-    n.firstPublishedAt AS first_published_at,
-    n.publicUpdatedAt AS public_updated_at,
-    n.withdrawnAt AS withdrawn_at,
-    n.withdrawnExplanation AS withdrawn_explanation,
-    n.pagerank AS pagerank,
-    COLLECT (distinct taxon.name) AS taxons,
-    COLLECT (distinct o.name) AS primary_organisation,
-    COLLECT (distinct o2.name) AS all_organisations
+      n.url as url,
+        n.title AS title,
+          n.documentType AS documentType,
+            n.contentID AS contentID,
+              n.locale AS locale,
+                n.publishingApp AS publishing_app,
+                  n.firstPublishedAt AS first_published_at,
+                    n.publicUpdatedAt AS public_updated_at,
+                      n.withdrawnAt AS withdrawn_at,
+                        n.withdrawnExplanation AS withdrawn_explanation,
+                          n.pagerank AS pagerank,
+                            COLLECT(distinct taxon.name) AS taxons,
+                              COLLECT(distinct o.name) AS primary_organisation,
+                                COLLECT(distinct o2.name) AS all_organisations
     ORDER BY n.pagerank DESC
-    LIMIT ${state.nbResultsLimit}`;
+    LIMIT ${state.nbResultsLimit} `;
 };
 
 
