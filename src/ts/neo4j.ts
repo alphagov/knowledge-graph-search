@@ -104,9 +104,9 @@ const queryGraph: (state: State, callback: Neo4jCallback) => Promise<void> = asy
 const buildMetaboxInfo = async function(info: any) {
   console.log(`Found a ${info.nodeType[0]}. Running extra queries`);
   const result: MetaResult = { type: info.nodeType[0], name: info.node.name };
-  let json;
-  let orgData, orgDetails, personRoleDetails, childDetails, parentDetails;
-  let holidayData, personData, roleData;
+  let json: any;
+  let orgData: any, orgDetails: any, personRoleDetails: any, childDetails: any, parentDetails: any;
+  let holidayData: any, personData: any, roleData: any;
 
   switch (info.nodeType[0]) {
     // We found a bank holiday, so we need to run 2 further queries
@@ -154,7 +154,7 @@ const buildMetaboxInfo = async function(info: any) {
       json = await personData.json();
       result.homepage = json.results[0].data[0].row[4].url;
       result.description = json.results[0].data[0].row[4].description;
-      result.roles = json.results[0].data.map(result => {
+      result.roles = json.results[0].data.map((result: any) => {
         return {
           title: result.row[2].name,
           orgName: result.row[3]?.name,
@@ -191,7 +191,7 @@ const buildMetaboxInfo = async function(info: any) {
       const orgs = json.results[2];
       result.name = role.row[0].name;
       result.description = role.row[0].description;
-      result.personNames = persons.data.map(person => {
+      result.personNames = persons.data.map((person: any) => {
         return {
           name: person.row[0].name,
           homepage: person.row[2],
@@ -199,7 +199,7 @@ const buildMetaboxInfo = async function(info: any) {
           endDate: person.row[1].endDate ? new Date(person.row[1].endDate) : null
         }
       });
-      result.orgNames = orgs.data.map(result => result.row[0].name);
+      result.orgNames = orgs.data.map((result: any) => result.row[0].name);
       break;
     case 'Organisation':
       // We found an organisation, so we need to run a further query
@@ -248,7 +248,7 @@ const buildMetaboxInfo = async function(info: any) {
       result.parentName = parentDetails.length === 1 ?
         parentDetails[0].row[0] : null;
       result.childOrgNames = childDetails.map((child: Neo4jResultData) => child.row[0]);
-      result.personRoleNames = personRoleDetails.map(record => {
+      result.personRoleNames = personRoleDetails.map((record: any) => {
         return {
           personName: record.row[0].name,
           roleName: record.row[1].name

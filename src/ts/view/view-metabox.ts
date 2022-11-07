@@ -1,6 +1,6 @@
 import { state } from '../state';
 import { viewMetaLink } from './view-components';
-import { ResultDate, MetaResult } from '../neo4j-types';
+import { MetaResult } from '../neo4j-types';
 
 
 const viewDetails = (title: string, list: any[], itemFormatFn: (item: any) => string) => {
@@ -48,16 +48,16 @@ const viewPersonRoles = function(roles: any[]) {
 };
 
 
-const viewRolePersons = persons => {
-  const formatPerson = person => {
+const viewRolePersons = (persons: any[]) => {
+  const formatPerson = (person: any) => {
     return `
     ${viewMetaLink(person.name)}
     (from ${person.startDate ? person.startDate.getFullYear() : ''}
     to
     ${person.endDate ? person.endDate.getFullYear() : 'now'})
   `};
-  const currents = persons.filter(person => person.endDate === null);
-  const previous = persons.filter(person => person.endDate !== null);
+  const currents = persons.filter((person: any) => person.endDate === null);
+  const previous = persons.filter((person: any) => person.endDate !== null);
   const currentsHtml = currents.length === 0 ?
     '<p class="govuk-body-l">No current holder</p>' :
     (currents.length === 1 ?
@@ -117,7 +117,7 @@ const viewBankHoliday = (record: MetaResult): string =>
   </div>
     `;
 
-const viewPerson = record =>
+const viewPerson = (record: any) =>
   `<div class="meta-results-panel" >
     <h2 class="govuk-heading-m" >
       <a class="govuk-link" href="${record.homepage}" > ${record.name} </a>
@@ -144,7 +144,7 @@ const viewRolePersons = (persons: any[]) =>
   );
 */
 
-const viewRole = function(record) {
+const viewRole = function(record: any) {
   const nameHtml = record.homePage ?
     `<a class="govuk-link" href="${record.homepage}">${record.name}</a>` :
     record.name;
