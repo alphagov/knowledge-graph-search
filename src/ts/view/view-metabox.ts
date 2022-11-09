@@ -176,6 +176,16 @@ const viewOrg = (record: MetaResult): string =>
    </div>`;
 
 
+const viewTransaction = (record: MetaResult): string =>
+  `<div class="meta-results-panel">
+     <h2 class="govuk-heading-m">
+       <a class="govuk-link" href="${record.homepage}">${record.name}</a>
+     </h2>
+     <p class="govuk-body">Online government service</p>
+     ${record.description ? `<p class="govuk-body">${record.description}</p>` : ''}
+   </div>`;
+
+
 //=================== public ====================
 
 
@@ -208,6 +218,7 @@ const viewMetaResults = function() {
       case "Organisation": return viewOrg(record);
       case "Person": return viewPerson(record);
       case "Role": return viewRole(record);
+      case "Transaction": return viewTransaction(record);
       default: console.log(`unknown record type: ${record.type}`); return ``;
     }
   }

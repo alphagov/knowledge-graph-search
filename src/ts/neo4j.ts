@@ -52,9 +52,9 @@ const queryGraph: (state: State, callback: Neo4jCallback) => Promise<void> = asy
     const metaSearchQuery: Neo4jQuery = {
       statement: `
         MATCH (node)
-        WHERE (node:BankHoliday OR node:Person OR node:Organisation OR node:Role)
+        WHERE (node:BankHoliday OR node:Person OR node:Organisation OR node:Role OR node:Transaction)
         AND toLower(node.name) CONTAINS toLower($keywords)
-        OPTIONAL MATCH (node)-[:HAS_HOMEPAGE]->(homepage:Page)
+        OPTIONAL MATCH (node)-[:HAS_HOMEPAGE|HAS_START_PAGE]->(homepage:Page)
         RETURN node, homepage, labels(node) as nodeType`,
       parameters: {
         keywords: searchKeywords
@@ -254,6 +254,10 @@ const buildMetaboxInfo = async function(info: any) {
           roleName: record.row[1].name
         }
       });
+      break;
+    case 'Transaction':
+      result.homepage = info.homepage.url;
+      result.description = info.node.description;
       break;
     default:
       console.log('unknown meta node type', info.nodeType[0]);
