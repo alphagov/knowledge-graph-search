@@ -325,7 +325,7 @@ const searchQuery = function(state: State): string {
 
   return `
       MATCH(n: Page)
-    WHERE NOT n.documentType IN['gone', 'redirect', 'placeholder', 'placeholder_person']
+    WHERE n.documentType IS null OR NOT n.documentType IN['gone', 'redirect', 'placeholder', 'placeholder_person']
     ${inclusionClause}
     ${exclusionClause}
     ${localeClause}
