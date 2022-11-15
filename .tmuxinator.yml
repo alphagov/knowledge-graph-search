@@ -51,7 +51,7 @@ windows:
       # 'before' represents legacy functionality and will be deprecated in a future release, in favour of 'after'
       # synchronize: after
       panes:
-        - TERM=xterm-emacs-leg emacs -nw .
-        - cd public && ls main.scss | entr -dr sass main.scss > main.css
-        - npm start
-        - zsh
+        - emacs -nw .
+        - cd src/scss && ls main.scss | entr -dr sass main.scss > ../../public/main.css
+        - npx webpack -w
+        - NEO4J_URL=https://govgraph.dev:7473/db/neo4j/tx npm start npm start
