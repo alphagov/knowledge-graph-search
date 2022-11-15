@@ -286,7 +286,7 @@ const searchQuery = function(state: State): string {
     ('WITH * WHERE NOT ' + excludedKeywords.map(word => multiContainsClause(fieldsToSearch, word, state.caseSensitive)).join(`\n OR `)) : '';
 
   let areaClause = '';
-  if (state.areaToSearch === 'mainstream') {
+  if (state.areaToSearch === 'publisher') {
     areaClause = 'WITH * WHERE n.publishingApp = "publisher"';
   } else if (state.areaToSearch === 'whitehall') {
     areaClause = 'WITH * WHERE n.publishingApp = "whitehall"';

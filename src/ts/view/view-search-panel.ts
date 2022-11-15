@@ -317,11 +317,11 @@ const viewPublishingAppSelector = () =>
       <div class="govuk-radios" id="site-areas">
         <div class="govuk-radios__item">
           <input class="govuk-radios__input"
-                 type="radio" id="area-mainstream"
+                 type="radio" id="area-publisher"
                  name="area"
-            ${state.areaToSearch === 'mainstream' ? 'checked' : ''}/>
-          <label for="area-mainstream" class="govuk-label govuk-radios__label">
-            Mainstream Publisher
+            ${state.areaToSearch === 'publisher' ? 'checked' : ''}/>
+          <label for="area-publisher" class="govuk-label govuk-radios__label">
+            Publisher
           </label>
         </div>
         <div class="govuk-radios__item">

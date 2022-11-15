@@ -21,7 +21,7 @@ const view = () => {
         ${viewMainLayout()}
         <p class="govuk-body-s">
           Runs only between 9am and 7pm.
-          Searches do not include history mode content, Mainstream GitHub smart answers or service domains.
+          Searches do not include history mode content, Publisher GitHub smart answers or service domains.
           Popularity scores depend on cookie consent.
         </p>
       </main>
@@ -149,7 +149,7 @@ const viewQueryDescription = (includeMarkup = true) => {
     clauses.push(`are in ${makeBold(languageName(state.selectedLocale), includeMarkup)}`);
   if (state.linkSearchUrl !== '')
     clauses.push(`link to ${makeBold(state.linkSearchUrl, includeMarkup)}`);
-  if (state.areaToSearch === 'whitehall' || state.areaToSearch === 'mainstream')
+  if (state.areaToSearch === 'whitehall' || state.areaToSearch === 'publisher')
     clauses.push(`are published using ${makeBold(state.areaToSearch, includeMarkup)}`);
 
   const joinedClauses = (clauses.length === 1) ?

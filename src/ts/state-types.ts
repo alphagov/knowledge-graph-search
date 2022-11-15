@@ -16,7 +16,7 @@ export enum Combinator {
 export enum SearchArea {
   Any = 'any',
   Whitehall = 'whitehall',
-  Mainstream = 'mainstream'
+  Publisher = 'publisher'
 }
 
 export interface SearchParams {
@@ -31,7 +31,7 @@ export interface SearchParams {
     text: boolean
   }, // what parts of the pages to search in
   combinator: Combinator, // all keywords or any keywords
-  areaToSearch: SearchArea, // whitehall, mainstream, both
+  areaToSearch: SearchArea, // whitehall, publisher, both
   caseSensitive: boolean // case sensitive keyword search?
 }
 
