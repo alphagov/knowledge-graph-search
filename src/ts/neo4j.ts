@@ -301,7 +301,7 @@ const searchQuery = function(state: State): string {
   const taxonClause = taxon ? `
     WITH n
       MATCH(n: Page) - [: IS_TAGGED_TO] -> (taxon:Taxon)
-      MATCH(taxon: Taxon) - [: HAS_PARENT *] -> (ancestor_taxon:Taxon)
+      OPTIONAL MATCH(taxon: Taxon) - [: HAS_PARENT *] -> (ancestor_taxon:Taxon)
     WHERE taxon.name = "${taxon}" OR ancestor_taxon.name = "${taxon}"` :
     `OPTIONAL MATCH(n: Page) - [: IS_TAGGED_TO] -> (taxon:Taxon)`;
 
