@@ -115,16 +115,16 @@ const buildMetaboxInfo = async function(info: any) {
       holidayData = await queryNeo4j([
         {
           statement: `
-          MATCH (b:BankHoliday)-[:IS_ON]->(d)
-          WHERE b.name = $name
-          RETURN d`,
+            MATCH (b:BankHoliday)-[:IS_ON]->(d)
+            WHERE b.name = $name
+            RETURN d`,
           parameters:
             { name: info.node.name }
         }, {
           statement: `
-          MATCH (b:BankHoliday)-[:IS_OBSERVED_IN]->(r)
-          WHERE b.name = $name
-          RETURN r`,
+            MATCH (b:BankHoliday)-[:IS_OBSERVED_IN]->(r)
+            WHERE b.name = $name
+            RETURN r`,
           parameters:
             { name: info.node.name }
         }
@@ -141,11 +141,11 @@ const buildMetaboxInfo = async function(info: any) {
       personData = await queryNeo4j([
         {
           statement: `
-          MATCH (p:Person { name: $name })-[l]->(r:Role)
-          MATCH (p)-[:HAS_HOMEPAGE]->(ph:Page)
-          OPTIONAL MATCH (r)-[:BELONGS_TO]->(o:Organisation)
-          OPTIONAL MATCH (r)-[:HAS_HOMEPAGE]->(rh:Page)
-          RETURN p,l,r,o,ph,rh`,
+            MATCH (p:Person { name: $name })-[l]->(r:Role)
+            MATCH (p)-[:HAS_HOMEPAGE]->(ph:Page)
+            OPTIONAL MATCH (r)-[:BELONGS_TO]->(o:Organisation)
+            OPTIONAL MATCH (r)-[:HAS_HOMEPAGE]->(rh:Page)
+            RETURN p,l,r,o,ph,rh`,
           parameters:
             { name: info.node.name }
         }
@@ -207,32 +207,32 @@ const buildMetaboxInfo = async function(info: any) {
       orgData = await queryNeo4j([
         {
           statement: `
-      MATCH(org: Organisation) - [: HAS_HOMEPAGE] -> (homepage:Page)
-          WHERE org.name = $name
-          RETURN homepage.description, homepage.url`,
+            MATCH (org:Organisation)-[:HAS_HOMEPAGE]->(homepage:Page)
+            WHERE org.name = $name
+            RETURN homepage.description, homepage.url`,
           parameters:
             { name: info.node.name }
         }, {
           statement: `
-      MATCH(person: Person) - [hr: HAS_ROLE] -> (role:Role) -[: BELONGS_TO] -> (org:Organisation)
-          WHERE org.name = $name
-          AND hr.endDate IS NULL
-          RETURN person, role`,
+            MATCH (person:Person)-[hr:HAS_ROLE]->(role:Role)-[:BELONGS_TO]->(org:Organisation)
+            WHERE org.name = $name
+            AND hr.endDate IS NULL
+            RETURN person, role`,
           parameters:
             { name: info.node.name }
         }, {
           statement: `
-      MATCH(org: Organisation) - [: HAS_CHILD_ORGANISATION] -> (childOrg:Organisation)
-          WHERE org.name = $name
-          AND childOrg.status <> "closed"
-          RETURN childOrg.name`,
+            MATCH (org:Organisation)-[:HAS_CHILD_ORGANISATION]->(childOrg:Organisation)
+            WHERE org.name = $name
+            AND childOrg.status <> "closed"
+            RETURN childOrg.name`,
           parameters:
             { name: info.node.name }
         }, {
           statement: `
-      MATCH(org: Organisation) - [: HAS_PARENT_ORGANISATION] -> (parentOrg:Organisation)
-          WHERE org.name = $name
-          RETURN parentOrg.name`,
+            MATCH (org:Organisation)-[:HAS_PARENT_ORGANISATION]->(parentOrg:Organisation)
+            WHERE org.name = $name
+            RETURN parentOrg.name`,
           parameters:
             { name: info.node.name }
         }
@@ -276,7 +276,7 @@ const searchQuery = function(state: State): string {
   if (state.whereToSearch.text) fieldsToSearch.push('text', 'description');
   let inclusionClause = '';
   if (keywords.length > 0) {
-    inclusionClause = 'WITH * WHERE\n' +
+    inclusionClause = 'WITH *\nWHERE ' +
       keywords
         .map(word => multiContainsClause(fieldsToSearch, word, state.caseSensitive))
         .join(`\n ${combinator} `);
@@ -300,10 +300,10 @@ const searchQuery = function(state: State): string {
   const taxon = state.selectedTaxon;
   const taxonClause = taxon ? `
     WITH n
-      MATCH(n: Page) - [: IS_TAGGED_TO] -> (taxon:Taxon)
-      OPTIONAL MATCH(taxon: Taxon) - [: HAS_PARENT *] -> (ancestor_taxon:Taxon)
+    MATCH (n:Page)-[:IS_TAGGED_TO]->(taxon:Taxon)
+    OPTIONAL MATCH (taxon:Taxon)-[:HAS_PARENT*]->(ancestor_taxon:Taxon)
     WHERE taxon.name = "${taxon}" OR ancestor_taxon.name = "${taxon}"` :
-    `OPTIONAL MATCH(n: Page) - [: IS_TAGGED_TO] -> (taxon:Taxon)`;
+    `OPTIONAL MATCH (n:Page)-[:IS_TAGGED_TO]->(taxon:Taxon)`;
 
   let linkClause = '';
 
@@ -313,28 +313,28 @@ const searchQuery = function(state: State): string {
     if (internalLinkRexExp.test(state.linkSearchUrl)) {
       linkClause = `
         WITH n, taxon
-      MATCH(n: Page) - [: HYPERLINKS_TO] -> (n2:Page)
+        MATCH (n:Page)-[:HYPERLINKS_TO]->(n2:Page)
         WHERE n2.url = "https://www.gov.uk${state.linkSearchUrl.replace(internalLinkRexExp, '/')}"`
     } else {
       linkClause = `
         WITH n, taxon
-      MATCH(n: Page) - [: HYPERLINKS_TO] -> (e:ExternalPage)
+        MATCH (n:Page)-[:HYPERLINKS_TO]->(e:ExternalPage)
         WHERE e.url CONTAINS "${state.linkSearchUrl}"`
     }
   }
 
   return `
-      MATCH(n: Page)
-    WHERE n.documentType IS null OR NOT n.documentType IN['gone', 'redirect', 'placeholder', 'placeholder_person']
-    ${inclusionClause}
-    ${exclusionClause}
-    ${localeClause}
-    ${areaClause}
-    ${taxonClause}
-    ${linkClause}
-    OPTIONAL MATCH(n: Page) - [r: HAS_PRIMARY_PUBLISHING_ORGANISATION] -> (o:Organisation)
-    OPTIONAL MATCH(n: Page) - [: HAS_ORGANISATIONS] -> (o2:Organisation)
-    ${returnClause()} `;
+      MATCH (n:Page)
+      WHERE n.documentType IS null OR NOT n.documentType IN['gone', 'redirect', 'placeholder', 'placeholder_person']
+      ${inclusionClause}
+      ${exclusionClause}
+      ${localeClause}
+      ${areaClause}
+      ${taxonClause}
+      ${linkClause}
+      OPTIONAL MATCH (n:Page)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
+      OPTIONAL MATCH (n:Page)-[:HAS_ORGANISATIONS]->(o2:Organisation)
+      ${returnClause()} `;
 };
 
 
@@ -375,23 +375,24 @@ const multiContainsClause = function(fields: string[], word: string, caseSensiti
 
 
 const returnClause = function() {
-  return `RETURN
-      n.url as url,
-        n.title AS title,
-          n.documentType AS documentType,
-            n.contentID AS contentID,
-              n.locale AS locale,
-                n.publishingApp AS publishing_app,
-                  n.firstPublishedAt AS first_published_at,
-                    n.publicUpdatedAt AS public_updated_at,
-                      n.withdrawnAt AS withdrawn_at,
-                        n.withdrawnExplanation AS withdrawn_explanation,
-                          n.pagerank AS pagerank,
-                            COLLECT(distinct taxon.name) AS taxons,
-                              COLLECT(distinct o.name) AS primary_organisation,
-                                COLLECT(distinct o2.name) AS all_organisations
+  return `
+    RETURN
+    n.url as url,
+    n.title AS title,
+    n.documentType AS documentType,
+    n.contentID AS contentID,
+    n.locale AS locale,
+    n.publishingApp AS publishing_app,
+    n.firstPublishedAt AS first_published_at,
+    n.publicUpdatedAt AS public_updated_at,
+    n.withdrawnAt AS withdrawn_at,
+    n.withdrawnExplanation AS withdrawn_explanation,
+    n.pagerank AS pagerank,
+    COLLECT(distinct taxon.name) AS taxons,
+    COLLECT(distinct o.name) AS primary_organisation,
+    COLLECT(distinct o2.name) AS all_organisations
     ORDER BY n.pagerank DESC
-    LIMIT ${state.nbResultsLimit} `;
+    LIMIT ${state.nbResultsLimit}`;
 };
 
 
