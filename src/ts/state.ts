@@ -76,11 +76,8 @@ const searchState = function(): { code: string, errors: string[] } {
   // "results": there was a search and there are results to display
   // "initial": there weren't any search criteria specified
   // "errors": the user didn't specify a valid query. In this case
-  //   we add a "errors" fiels containing an array with values among:
+  //   we add a "errors" field containing an array with values among:
   //   - "missingWhereToSearch": keywords were specified but not where to look for them on pages
-  //   - "missingArea": no publishing platform was specified
-  //   - "missingCombinator": no keyword combinator was specified
-
   // "waiting": there's a query running
   const errors: string[] = [];
 
