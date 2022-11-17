@@ -52,7 +52,7 @@ sed -i".bak" -e "s/${GTM_HEAD_PLACEHOLDER}/${GTM_HEAD_SNIPPET}/" -e"s/${GTM_BODY
 
 echo "Pushing app"
 
-gcloud run deploy govuk-knowledge-graph-search --source .
+gcloud run deploy govuk-knowledge-graph-search --project govuk-knowledge-graph --source .
 mv public/index.html.bak public/index.html
 
 echo "Done"
