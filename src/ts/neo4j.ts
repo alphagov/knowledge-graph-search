@@ -297,13 +297,10 @@ const searchQuery = function(state: State): string {
     localeClause = `WITH * WHERE n.locale = "${languageCode(state.selectedLocale)}"\n`
   }
 
-  const taxon = state.selectedTaxon;
-  const taxonClause = taxon ? `
+  const taxonClause = state.selectedTaxon ? `
     WITH n
-    MATCH (n:Page)-[:IS_TAGGED_TO]->(taxon:Taxon)
-    OPTIONAL MATCH (taxon:Taxon)-[:HAS_PARENT*]->(ancestor_taxon:Taxon)
-    WHERE taxon.name = "${taxon}" OR ancestor_taxon.name = "${taxon}"` :
-    `OPTIONAL MATCH (n:Page)-[:IS_TAGGED_TO]->(taxon:Taxon)`;
+    MATCH (n:Page)-[:IS_TAGGED_TO]->(taxon:Taxon)-[:HAS_PARENT*0..]->(:Taxon { name: "${state.selectedTaxon}" })` :
+    `MATCH (n:Page)-[:IS_TAGGED_TO]->(taxon:Taxon)`;
 
   let linkClause = '';
 
