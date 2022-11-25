@@ -300,7 +300,7 @@ const searchQuery = function(state: State): string {
   const taxonClause = state.selectedTaxon ? `
     WITH n
     MATCH (n:Page)-[:IS_TAGGED_TO]->(taxon:Taxon)-[:HAS_PARENT*0..]->(:Taxon { name: "${state.selectedTaxon}" })` :
-    `MATCH (n:Page)-[:IS_TAGGED_TO]->(taxon:Taxon)`;
+    `OPTIONAL MATCH (n:Page)-[:IS_TAGGED_TO]->(taxon:Taxon)`;
 
   let linkClause = '';
 
