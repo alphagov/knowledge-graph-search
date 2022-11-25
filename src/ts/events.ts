@@ -157,7 +157,7 @@ const updateUrl = function() {
     if (!state.whereToSearch.title) searchParams.set('search-in-title', 'false');
     if (!state.whereToSearch.text) searchParams.set('search-in-text', 'false');
     if (state.areaToSearch !== SearchArea.Any) searchParams.set('area', state.areaToSearch);
-    if (state.combinator !== 'all') searchParams.set('combinator', state.combinator);
+    if (state.combinator !== Combinator.Any) searchParams.set('combinator', state.combinator);
     if (state.linkSearchUrl !== '') searchParams.set('link-search-url', state.linkSearchUrl);
 
     let newRelativePathQuery = window.location.pathname;
