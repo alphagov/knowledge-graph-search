@@ -44,7 +44,8 @@ const viewPersonRoles = function(roles: any[]) {
     ${viewMetaLink(role.title)} ${role.orgName ? ' at ' + viewMetaLink(role.orgName) : ''}
     (from ${role.startDate ? role.startDate.getFullYear() : ''}
     to ${role.endDate ? role.endDate.getFullYear() : 'present'})`;
-  return viewDetails(title, roles, roleFormatter);
+  const rolesInDateOrder = roles.sort((r1, r2) => r2.startDate - r1.startDate);
+  return viewDetails(title, rolesInDateOrder, roleFormatter);
 };
 
 
