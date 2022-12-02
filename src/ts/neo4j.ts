@@ -52,7 +52,7 @@ const queryGraph: (state: State, callback: Neo4jCallback) => Promise<void> = asy
     const metaSearchQuery: Neo4jQuery = {
       statement: `
         MATCH (node)
-        WHERE (node:BankHoliday OR node:Person OR node:Organisation OR node:Role OR node:Transaction)
+        WHERE (node:BankHoliday OR node:Person OR node:Organisation OR node:Role OR node:Transaction OR node:Taxon)
         AND toLower(node.name) CONTAINS toLower($keywords)
         OPTIONAL MATCH (node)-[:HAS_HOMEPAGE|HAS_START_PAGE]->(homepage:Page)
         RETURN node, homepage, labels(node) as nodeType`,
@@ -106,7 +106,7 @@ const buildMetaboxInfo = async function(info: any) {
   const result: MetaResult = { type: info.nodeType[0], name: info.node.name };
   let json: any;
   let orgData: any, orgDetails: any, personRoleDetails: any, childDetails: any, parentDetails: any;
-  let holidayData: any, personData: any, roleData: any;
+  let holidayData: any, personData: any, roleData: any, taxonData: any;
 
   switch (info.nodeType[0]) {
     // We found a bank holiday, so we need to run 2 further queries
@@ -259,6 +259,50 @@ const buildMetaboxInfo = async function(info: any) {
       result.homepage = info.homepage.url;
       result.description = info.node.description;
       break;
+    case 'Taxon':
+      // We found a taxon so we need to find its homepage
+      console.log('TAXON');
+      taxonData = await queryNeo4j([
+        { // Get details about this taxon
+          statement: `
+            MATCH (p:Page)<-[:HAS_HOMEPAGE]-(t:Taxon { name: $name })
+            RETURN p.description, p.url`,
+          parameters:
+            { name: info.node.name }
+        },
+        { // Get list of ancestor taxons
+          statement: `
+            MATCH (h:Page)<-[:HAS_HOMEPAGE]-(:Taxon)<-[:HAS_PARENT*]-(:Taxon { name: $name })
+            RETURN h.url, h.title`,
+          parameters:
+            { name: info.node.name }
+        },
+        { // Get list of child taxons
+          statement: `
+            MATCH (h:Page)<-[:HAS_HOMEPAGE]-(:Taxon)-[:HAS_PARENT]->(:Taxon { name: $name })
+            RETURN h.url, h.title`,
+          parameters:
+            { name: info.node.name }
+        }
+
+      ]);
+      json = await taxonData.json();
+      console.log('>>>', json.results)
+      result.description = json.results[0].data[0].row[0];
+      result.homepage = json.results[0].data[0].row[1];
+      result.ancestorTaxons = json.results[1].data.map(ancestor => {
+        return {
+          url: ancestor.row[0],
+          name: ancestor.row[1]
+        }
+      });
+      result.childTaxons = json.results[2].data.map(ancestor => {
+        return {
+          url: ancestor.row[0],
+          name: ancestor.row[1]
+        }
+      });
+      break;
     default:
       console.log('unknown meta node type', info.nodeType[0]);
   }
@@ -283,7 +327,7 @@ const searchQuery = function(state: State): string {
   }
 
   const exclusionClause = excludedKeywords.length ?
-    ('WITH * WHERE NOT ' + excludedKeywords.map(word => multiContainsClause(fieldsToSearch, word, state.caseSensitive)).join(`\n OR `)) : '';
+    ('WITH * WHERE NOT ' + excludedKeywords.map(word => multiContainsClause(fieldsToSearch, word, state.caseSensitive)).join(`\n OR`)) : '';
 
   let areaClause = '';
   if (state.areaToSearch === 'publisher') {
@@ -299,8 +343,8 @@ const searchQuery = function(state: State): string {
 
   const taxonClause = state.selectedTaxon ? `
     WITH n
-    MATCH (n:Page)-[:IS_TAGGED_TO]->(taxon:Taxon)-[:HAS_PARENT*0..]->(:Taxon { name: "${state.selectedTaxon}" })` :
-    `OPTIONAL MATCH (n:Page)-[:IS_TAGGED_TO]->(taxon:Taxon)`;
+    MATCH(n: Page) - [: IS_TAGGED_TO] -> (taxon: Taxon) - [: HAS_PARENT * 0..] -> (:Taxon { name: "${state.selectedTaxon}" })` :
+    `OPTIONAL MATCH(n: Page) - [: IS_TAGGED_TO] -> (taxon:Taxon)`;
 
   let linkClause = '';
 
@@ -310,18 +354,18 @@ const searchQuery = function(state: State): string {
     if (internalLinkRexExp.test(state.linkSearchUrl)) {
       linkClause = `
         WITH n, taxon
-        MATCH (n:Page)-[:HYPERLINKS_TO]->(n2:Page)
+      MATCH(n: Page) - [: HYPERLINKS_TO] -> (n2:Page)
         WHERE n2.url = "https://www.gov.uk${state.linkSearchUrl.replace(internalLinkRexExp, '/')}"`
     } else {
       linkClause = `
         WITH n, taxon
-        MATCH (n:Page)-[:HYPERLINKS_TO]->(e:ExternalPage)
+      MATCH(n: Page) - [: HYPERLINKS_TO] -> (e:ExternalPage)
         WHERE e.url CONTAINS "${state.linkSearchUrl}"`
     }
   }
 
   return `
-      MATCH (n:Page)
+      MATCH(n: Page)
       WHERE n.documentType IS null OR NOT n.documentType IN['gone', 'redirect', 'placeholder', 'placeholder_person']
       ${inclusionClause}
       ${exclusionClause}
@@ -329,8 +373,8 @@ const searchQuery = function(state: State): string {
       ${areaClause}
       ${taxonClause}
       ${linkClause}
-      OPTIONAL MATCH (n:Page)-[r:HAS_PRIMARY_PUBLISHING_ORGANISATION]->(o:Organisation)
-      OPTIONAL MATCH (n:Page)-[:HAS_ORGANISATIONS]->(o2:Organisation)
+      OPTIONAL MATCH(n: Page) - [r: HAS_PRIMARY_PUBLISHING_ORGANISATION] -> (o:Organisation)
+      OPTIONAL MATCH(n: Page) - [: HAS_ORGANISATIONS] -> (o2:Organisation)
       ${returnClause()} `;
 };
 
@@ -373,23 +417,23 @@ const multiContainsClause = function(fields: string[], word: string, caseSensiti
 
 const returnClause = function() {
   return `
-    RETURN
-    n.url as url,
-    n.title AS title,
-    n.documentType AS documentType,
-    n.contentID AS contentID,
-    n.locale AS locale,
-    n.publishingApp AS publishing_app,
-    n.firstPublishedAt AS first_published_at,
-    n.publicUpdatedAt AS public_updated_at,
-    n.withdrawnAt AS withdrawn_at,
-    n.withdrawnExplanation AS withdrawn_explanation,
-    n.pagerank AS pagerank,
-    COLLECT(distinct taxon.name) AS taxons,
-    COLLECT(distinct o.name) AS primary_organisation,
-    COLLECT(distinct o2.name) AS all_organisations
+      RETURN
+      n.url as url,
+        n.title AS title,
+          n.documentType AS documentType,
+            n.contentID AS contentID,
+              n.locale AS locale,
+                n.publishingApp AS publishing_app,
+                  n.firstPublishedAt AS first_published_at,
+                    n.publicUpdatedAt AS public_updated_at,
+                      n.withdrawnAt AS withdrawn_at,
+                        n.withdrawnExplanation AS withdrawn_explanation,
+                          n.pagerank AS pagerank,
+                            COLLECT(distinct taxon.name) AS taxons,
+                              COLLECT(distinct o.name) AS primary_organisation,
+                                COLLECT(distinct o2.name) AS all_organisations
     ORDER BY n.pagerank DESC
-    LIMIT ${state.nbResultsLimit}`;
+    LIMIT ${state.nbResultsLimit} `;
 };
 
 

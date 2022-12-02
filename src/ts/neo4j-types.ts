@@ -43,6 +43,11 @@ export interface ResultDate {
   dateString: string
 }
 
+export interface ResultTaxon {
+  name: string,
+  url: string
+}
+
 export interface MetaResult {
   type: string,
   name: string,
@@ -55,5 +60,7 @@ export interface MetaResult {
   personRoleNames?: string[],
   roles?: string[],
   orgNames?: string[],
-  personNames?: string[]
+  personNames?: string[],
+  ancestorTaxons?: ResultTaxon[]
+  childTaxons?: ResultTaxon[]
 }

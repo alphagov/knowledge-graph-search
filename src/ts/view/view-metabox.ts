@@ -1,6 +1,6 @@
 import { state } from '../state';
 import { viewMetaLink } from './view-components';
-import { MetaResult } from '../neo4j-types';
+import { MetaResult, ResultTaxon } from '../neo4j-types';
 
 
 const viewDetails = (title: string, list: any[], itemFormatFn: (item: any) => string) => {
@@ -187,12 +187,45 @@ const viewTransaction = (record: MetaResult): string =>
    </div>`;
 
 
+const viewTaxon = (record: MetaResult): string =>
+  `<div class="meta-results-panel">
+     <div class="govuk-breadcrumbs">
+       <ol class="govuk-breadcrumbs__list">
+         ${record.ancestorTaxons.map(taxon => `
+         <li class="govuk-breadcrumbs__list-item">
+           ${viewMetaLink(taxon.name, 'govuk-breadcrumbs__link')}
+         </li>
+         `)}
+       </ol>
+     </div>
+     <h2 class="govuk-heading-m">
+       <a class="govuk-link" href="${record.homepage}">${record.name}</a>
+     </h2>
+     <p class="govuk-body">GOV.UK Taxon</p>
+     ${record.description ? `<p class="govuk-body">${record.description}</p>` : ''}
+     ${record.childTaxons?.length ? viewTaxonChildren(record.childTaxons) : ''}
+   </div>`;
+
+
+const viewTaxonAncestors = (records: ResultTaxon[]): string =>
+  records.map(taxon => viewMetaLink(taxon.name) + ' > ').join('');
+
+
+
+const viewTaxonChildren = (records: ResultTaxon[]): string =>
+  viewDetails(
+    'Subtaxons',
+    records,
+    taxon => viewMetaLink(taxon.name)
+  );
+
+
 //=================== public ====================
 
 
 const viewMetaResultsExpandToggle = () =>
   state.metaSearchResults && state.metaSearchResults.length > 5 ?
-    `<button id="meta-results-expand">${state.disamboxExpanded ? 'show less' : 'show more'}</button>` :
+    `< button id = "meta-results-expand" > ${state.disamboxExpanded ? 'show less' : 'show more'} < /button>` :
     '';
 
 
@@ -220,6 +253,7 @@ const viewMetaResults = function() {
       case "Person": return viewPerson(record);
       case "Role": return viewRole(record);
       case "Transaction": return viewTransaction(record);
+      case "Taxon": return viewTaxon(record);
       default: console.log(`unknown record type: ${record.type}`); return ``;
     }
   }
