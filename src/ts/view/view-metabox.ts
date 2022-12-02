@@ -207,11 +207,6 @@ const viewTaxon = (record: MetaResult): string =>
    </div>`;
 
 
-const viewTaxonAncestors = (records: ResultTaxon[]): string =>
-  records.map(taxon => viewMetaLink(taxon.name) + ' > ').join('');
-
-
-
 const viewTaxonChildren = (records: ResultTaxon[]): string =>
   viewDetails(
     'Subtaxons',
@@ -231,32 +226,32 @@ const viewMetaResultsExpandToggle = () =>
 
 const viewMetaResults = function() {
   if (!state.metaSearchResults) return;
-  if (state.metaSearchResults.length > 1) {
-    const expandedClass = state.metaSearchResults.length > 5 && !state.disamboxExpanded ? 'meta-results-panel--collapsed' : '';
-    return `
-      <div class="meta-results-panel">
-        <div class="meta-results-panel__collapsible ${expandedClass}">
-          <h2 class="govuk-heading-s">"${state.selectedWords.replace(/"/g, '')}" can refer to:</h2>
-          <ul class="govuk-list govuk-list--bullet">
-            ${state.metaSearchResults.map(result => `<li>${viewMetaLink(result.name)}: (${result.type.toLowerCase()})</li>`).join('')}
-          </ul>
-        </div>
-        ${viewMetaResultsExpandToggle()}
-      </div>
-    `;
-  } else {
-    const record = state.metaSearchResults[0];
-    console.log(`meta: found a ${record.type}`)
-    switch (record.type) {
-      case "BankHoliday": return viewBankHoliday(record);
-      case "Organisation": return viewOrg(record);
-      case "Person": return viewPerson(record);
-      case "Role": return viewRole(record);
-      case "Transaction": return viewTransaction(record);
-      case "Taxon": return viewTaxon(record);
-      default: console.log(`unknown record type: ${record.type}`); return ``;
-    }
+  //  if (state.metaSearchResults.length > 1) {
+  //    const expandedClass = state.metaSearchResults.length > 5 && !state.disamboxExpanded ? 'meta-results-panel--collapsed' : '';
+  //    return `
+  //      <div class="meta-results-panel">
+  //        <div class="meta-results-panel__collapsible ${expandedClass}">
+  //          <h2 class="govuk-heading-s">"${state.selectedWords.replace(/"/g, '')}" can refer to:</h2>
+  //          <ul class="govuk-list govuk-list--bullet">
+  //            ${state.metaSearchResults.map(result => `<li>${viewMetaLink(result.name)}: (${result.type.toLowerCase()})</li>`).join('')}
+  //          </ul>
+  //        </div>
+  //        ${viewMetaResultsExpandToggle()}
+  //      </div>
+  //    `;
+  //  } else {
+  const record = state.metaSearchResults[0];
+  console.log(`meta: found a ${record.type}`)
+  switch (record.type) {
+    case "BankHoliday": return viewBankHoliday(record);
+    case "Organisation": return viewOrg(record);
+    case "Person": return viewPerson(record);
+    case "Role": return viewRole(record);
+    case "Transaction": return viewTransaction(record);
+    case "Taxon": return viewTaxon(record);
+    default: console.log(`unknown record type: ${record.type}`); return ``;
   }
+  //}
 };
 
 

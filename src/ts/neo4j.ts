@@ -287,7 +287,6 @@ const buildMetaboxInfo = async function(info: any) {
 
       ]);
       json = await taxonData.json();
-      console.log('>>>', json.results)
       result.description = json.results[0].data[0].row[0];
       result.homepage = json.results[0].data[0].row[1];
       result.ancestorTaxons = json.results[1].data.map(ancestor => {
