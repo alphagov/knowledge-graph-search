@@ -11,7 +11,9 @@ import { initNeo4j } from './neo4j';
 const init = async function() {
   state.systemErrorText = null;
   try {
-    await initNeo4j();
+    const neo4jInitResults = await initNeo4j();
+    state.taxons = neo4jInitResults.taxons;
+    state.locales = neo4jInitResults.locales;
   } catch (error) {
     if (error instanceof DOMException && error.name === "AbortError") {
       state.systemErrorText = 'It looks like GovGraph is not responding.';

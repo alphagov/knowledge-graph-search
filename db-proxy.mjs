@@ -12,18 +12,10 @@ const postToNeo4j = async function(body) {
     headers.Authorization =
       'Basic ' + Buffer.from(neo4jParams.username + ":" + neo4jParams.password, 'binary').toString('base64');
   }
-
-  console.log('nok2', body)
-
   const data = await got.post(neo4jParams.url, {
     json: body,
     headers
   });
-
-//  console.log(data)
-
-//  console.log('nok22', data)
-
   return JSON.parse(data.body);
 }
 

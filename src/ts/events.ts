@@ -5,7 +5,7 @@ import { languageCode } from './lang';
 import { queryGraph } from './neo4j';
 import { EventType } from './event-types';
 import { Neo4jCallback } from './neo4j-types';
-import { SearchType, SearchArea, Combinator } from './state-types';
+import { SearchType, SearchArea, Combinator } from './search-types';
 
 
 declare const window: any;
@@ -25,20 +25,20 @@ const handleEvent: Neo4jCallback = async function(event) {
           });
 
           // Update the state
-          state.selectedWords = getFormInputValue('keyword');
-          state.excludedWords = getFormInputValue('excluded-keyword');
-          state.selectedTaxon = getFormInputValue('taxon');
-          state.selectedLocale = getFormInputValue('locale');
-          state.whereToSearch.title = (<HTMLInputElement>id('search-title'))?.checked;
-          state.whereToSearch.text = (<HTMLInputElement>id('search-text'))?.checked;
-          state.caseSensitive = (<HTMLInputElement>id('case-sensitive'))?.checked;
-          state.linkSearchUrl = getFormInputValue('link-search');
+          state.searchParams.selectedWords = getFormInputValue('keyword');
+          state.searchParams.excludedWords = getFormInputValue('excluded-keyword');
+          state.searchParams.selectedTaxon = getFormInputValue('taxon');
+          state.searchParams.selectedLocale = getFormInputValue('locale');
+          state.searchParams.whereToSearch.title = (<HTMLInputElement>id('search-title'))?.checked;
+          state.searchParams.whereToSearch.text = (<HTMLInputElement>id('search-text'))?.checked;
+          state.searchParams.caseSensitive = (<HTMLInputElement>id('case-sensitive'))?.checked;
+          state.searchParams.linkSearchUrl = getFormInputValue('link-search');
           state.skip = 0; // reset to first page
-          if ((<HTMLInputElement>id('area-publisher'))?.checked) state.areaToSearch = SearchArea.Publisher;
-          if ((<HTMLInputElement>id('area-whitehall'))?.checked) state.areaToSearch = SearchArea.Whitehall;
-          if ((<HTMLInputElement>id('area-any'))?.checked) state.areaToSearch = SearchArea.Any;
-          if ((<HTMLInputElement>id('combinator-any'))?.checked) state.combinator = Combinator.Any;
-          if ((<HTMLInputElement>id('combinator-all'))?.checked) state.combinator = Combinator.All;
+          if ((<HTMLInputElement>id('area-publisher'))?.checked) state.searchParams.areaToSearch = SearchArea.Publisher;
+          if ((<HTMLInputElement>id('area-whitehall'))?.checked) state.searchParams.areaToSearch = SearchArea.Whitehall;
+          if ((<HTMLInputElement>id('area-any'))?.checked) state.searchParams.areaToSearch = SearchArea.Any;
+          if ((<HTMLInputElement>id('combinator-any'))?.checked) state.searchParams.combinator = Combinator.Any;
+          if ((<HTMLInputElement>id('combinator-all'))?.checked) state.searchParams.combinator = Combinator.All;
           state.searchResults = null;
           searchButtonClicked();
           break;
@@ -55,23 +55,23 @@ const handleEvent: Neo4jCallback = async function(event) {
           break;
         case 'search-keyword':
           resetSearch();
-          state.searchType = SearchType.Keyword;
+          state.searchParams.searchType = SearchType.Keyword;
           break;
         case 'search-link':
           resetSearch();
-          state.searchType = SearchType.Link;
+          state.searchParams.searchType = SearchType.Link;
           break;
         case 'search-taxon':
           resetSearch();
-          state.searchType = SearchType.Taxon;
+          state.searchParams.searchType = SearchType.Taxon;
           break;
         case 'search-language':
           resetSearch();
-          state.searchType = SearchType.Language;
+          state.searchParams.searchType = SearchType.Language;
           break;
         case 'search-mixed':
           resetSearch();
-          state.searchType = SearchType.Mixed;
+          state.searchParams.searchType = SearchType.Mixed;
           break;
         default:
           fieldClicked = event.id ? event.id.match(/show-field-(.*)/) : null;
@@ -121,9 +121,9 @@ const searchButtonClicked = async function(): Promise<void> {
   const searchStatus = searchState();
   switch (searchStatus.code) {
     case 'ready-to-search':
-      if (state.selectedWords !== '' || state.selectedLocale !== '' || state.selectedTaxon !== '' || state.linkSearchUrl !== '') {
+      if (state.searchParams.selectedWords !== '' || state.searchParams.selectedLocale !== '' || state.searchParams.selectedTaxon !== '' || state.searchParams.linkSearchUrl !== '') {
         state.waiting = true;
-        queryGraph(state, handleEvent);
+        queryGraph(state.searchParams.selectedWords, state.searchParams.excludedWords, state.searchParams.combinator, state.searchParams.whereToSearch.title, state.searchParams.whereToSearch.text, state.searchParams.caseSensitive, state.searchParams.areaToSearch, state.searchParams.selectedLocale, state.searchParams.selectedTaxon, state.searchParams.linkSearchUrl, state.searchParams.nbResultsLimit, handleEvent);
       }
       break;
     case 'error':
@@ -148,17 +148,18 @@ const updateUrl = function() {
 
     // if the state differs from the default, then set parameter
 
-    if (state.searchType !== SearchType.Keyword) searchParams.set('search-type', state.searchType);
-    if (state.selectedWords !== '') searchParams.set('selected-words', state.selectedWords);
-    if (state.excludedWords !== '') searchParams.set('excluded-words', state.excludedWords);
-    if (state.selectedTaxon !== '') searchParams.set('selected-taxon', state.selectedTaxon);
-    if (state.selectedLocale !== '') searchParams.set('lang', languageCode(state.selectedLocale));
-    if (state.caseSensitive) searchParams.set('case-sensitive', state.caseSensitive.toString());
-    if (!state.whereToSearch.title) searchParams.set('search-in-title', 'false');
-    if (!state.whereToSearch.text) searchParams.set('search-in-text', 'false');
-    if (state.areaToSearch !== SearchArea.Any) searchParams.set('area', state.areaToSearch);
-    if (state.combinator !== Combinator.Any) searchParams.set('combinator', state.combinator);
-    if (state.linkSearchUrl !== '') searchParams.set('link-search-url', state.linkSearchUrl);
+    if (state.searchParams.searchType !== SearchType.Keyword) searchParams.set('search-type', state.searchParams.searchType);
+    if (state.searchParams.selectedWords !== '') searchParams.set('selected-words', state.searchParams.selectedWords);
+    if (state.searchParams.excludedWords !== '') searchParams.set('excluded-words', state.searchParams.excludedWords);
+    if (state.searchParams.selectedTaxon !== '') searchParams.set('selected-taxon', state.searchParams.selectedTaxon);
+    if (state.searchParams.selectedLocale !== '') searchParams.set('lang', languageCode(state.searchParams.selectedLocale));
+    if (state.searchParams.caseSensitive) searchParams.set('case-sensitive', state.searchParams.caseSensitive.toString());
+    if (!state.searchParams.whereToSearch.title) searchParams.set('search-in-title', 'false');
+    if (!state.searchParams.whereToSearch.text) searchParams.set('search-in-text', 'false');
+    if (state.searchParams.areaToSearch !== SearchArea.Any) searchParams.set('area', state.searchParams.areaToSearch);
+    if (state.searchParams.combinator !== Combinator.Any) searchParams.set('combinator', state.searchParams.combinator);
+    if (state.searchParams.linkSearchUrl !== '') searchParams.set('link-search-url', state.searchParams.linkSearchUrl);
+    if (state.searchParams.nbResultsLimit) searchParams.set('nresults', state.searchParams.nbResultsLimit.toString());
 
     let newRelativePathQuery = window.location.pathname;
     if (searchParams.toString().length > 0) {

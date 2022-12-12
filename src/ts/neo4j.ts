@@ -2,17 +2,16 @@
 // Cypher query methods
 //==================================================
 
-import { state } from './state';
 import { languageCode } from './lang';
 import { splitKeywords } from './utils';
 import { Neo4jResponse, Neo4jResultData, Neo4jCallback, Neo4jQuery, MetaResult, Neo4jResponseResult } from './neo4j-types';
 import { EventType } from './event-types';
-import { State } from './state-types';
 
 //=========== public methods ===========
 
 const initNeo4j = async function() {
   console.log('retrieving taxons and locales');
+  const result = {};
   const neo4jResponse: Response = await queryNeo4j([
     { statement: 'MATCH (t:Taxon) RETURN t.name' },
     { statement: 'MATCH (n:Page) WHERE n.locale <> "en" AND n.locale <> "cy" RETURN DISTINCT n.locale' }
@@ -28,25 +27,27 @@ const initNeo4j = async function() {
     throw 'Received invalid data from GovGraph';
   }
   if (json.results[0].data.length === 0 || json.results[1].data.length === 0) {
-    state.taxons = [];
-    state.locales = [];
     console.log('Retrieved no taxons or no locales');
+    return { taxons: [], locales: [] };
     throw 'Received no data from GovGraph. It might still be loading.';
   } else {
-    state.taxons = json.results[0].data.map((d: Neo4jResultData) => d.row[0]).sort();
-    state.locales = json.results[1].data.map((d: Neo4jResultData) => d.row[0]).sort();
-    state.locales = ['', 'en', 'cy'].concat(state.locales);
-    console.log(`successfully fetched ${state.taxons.length} taxons and ${state.locales.length} locales`);
+    console.log(`successfully fetched taxons and locales`);
+    return {
+      taxons: json.results[0].data.map((d: Neo4jResultData) => d.row[0]).sort(),
+      locales: ['', 'en', 'cy'].concat(json.results[1].data.map((d: Neo4jResultData) => d.row[0]).sort())
+    }
   }
 };
 
 
-const queryGraph: (state: State, callback: Neo4jCallback) => Promise<void> = async function(state, callback) {
+const queryGraph: (selectedWords, excludedWords, eitherOr, searchInTitle, searchInText, caseSensitive, areaToSearch, selectedLocale, selectedTaxon, linkSearchUrl, nbResultsLimit, callback: Neo4jCallback) => Promise<void> = async function(selectedWords, excludedWords, eitherOr, searchInTitle, searchInText, caseSensitive, areaToSearch, selectedLocale, selectedTaxon, linkSearchUrl, nbResultsLimit, callback) {
 
-  const mainCypherQuery: Neo4jQuery = { statement: searchQuery(state) };
-  const searchKeywords: string = state.selectedWords.replace(/"/g, '');
+  const mainQuery: Neo4jQuery = {
+    statement: mainCypherQuery(selectedWords, excludedWords, eitherOr, searchInTitle, searchInText, caseSensitive, areaToSearch, selectedLocale, selectedTaxon, linkSearchUrl, nbResultsLimit)
+  };
+  const searchKeywords: string = selectedWords.replace(/"/g, '');
 
-  const wholeQuery: Neo4jQuery[] = [mainCypherQuery];
+  const wholeQuery: Neo4jQuery[] = [mainQuery];
 
   if (searchKeywords.length >= 5 && searchKeywords.includes(' ')) {
     const metaSearchQuery: Neo4jQuery = {
@@ -310,56 +311,57 @@ const buildMetaboxInfo = async function(info: any) {
 };
 
 
-const searchQuery = function(state: State): string {
+
+const mainCypherQuery = function(selectedWords, excludedWords, eitherOr, searchInTitle, searchInText, caseSensitive, areaToSearch, selectedLocale, selectedTaxon, linkSearchUrl, nbResultsLimit): string {
   const fieldsToSearch: string[] = [];
-  const keywords = splitKeywords(state.selectedWords);
-  const excludedKeywords = splitKeywords(state.excludedWords);
-  const combinator = state.combinator === 'any' ? 'OR' : 'AND';
-  if (state.whereToSearch.title) fieldsToSearch.push('title');
-  if (state.whereToSearch.text) fieldsToSearch.push('text', 'description');
+  const keywords = splitKeywords(selectedWords);
+  const excludedKeywords = splitKeywords(excludedWords);
+  const combinator = eitherOr === 'any' ? 'OR' : 'AND';
+  if (searchInTitle) fieldsToSearch.push('title');
+  if (searchInText) fieldsToSearch.push('text', 'description');
   let inclusionClause = '';
   if (keywords.length > 0) {
     inclusionClause = 'WITH *\nWHERE ' +
       keywords
-        .map(word => multiContainsClause(fieldsToSearch, word, state.caseSensitive))
+        .map(word => multiContainsClause(fieldsToSearch, word, caseSensitive))
         .join(`\n ${combinator} `);
   }
 
   const exclusionClause = excludedKeywords.length ?
-    ('WITH * WHERE NOT ' + excludedKeywords.map(word => multiContainsClause(fieldsToSearch, word, state.caseSensitive)).join(`\n OR`)) : '';
+    ('WITH * WHERE NOT ' + excludedKeywords.map(word => multiContainsClause(fieldsToSearch, word, caseSensitive)).join(`\n OR`)) : '';
 
   let areaClause = '';
-  if (state.areaToSearch === 'publisher') {
+  if (areaToSearch === 'publisher') {
     areaClause = 'WITH * WHERE n.publishingApp = "publisher"';
-  } else if (state.areaToSearch === 'whitehall') {
+  } else if (areaToSearch === 'whitehall') {
     areaClause = 'WITH * WHERE n.publishingApp = "whitehall"';
   }
 
   let localeClause = '';
-  if (state.selectedLocale !== '') {
-    localeClause = `WITH * WHERE n.locale = "${languageCode(state.selectedLocale)}"\n`
+  if (selectedLocale !== '') {
+    localeClause = `WITH * WHERE n.locale = "${languageCode(selectedLocale)}"\n`
   }
 
-  const taxonClause = state.selectedTaxon ? `
+  const taxonClause = selectedTaxon ? `
     WITH n
-    MATCH(n: Page) - [: IS_TAGGED_TO] -> (taxon: Taxon) - [: HAS_PARENT * 0..] -> (:Taxon { name: "${state.selectedTaxon}" })` :
+    MATCH(n: Page) - [: IS_TAGGED_TO] -> (taxon: Taxon) - [: HAS_PARENT * 0..] -> (:Taxon { name: "${selectedTaxon}" })` :
     `OPTIONAL MATCH(n: Page) - [: IS_TAGGED_TO] -> (taxon:Taxon)`;
 
   let linkClause = '';
 
-  if (state.linkSearchUrl.length > 0) {
+  if (linkSearchUrl.length > 0) {
     // We need to determine if the link is internal or external
     const internalLinkRexExp = /^((https:\/\/)?((www\.)?gov\.uk))?\//;
-    if (internalLinkRexExp.test(state.linkSearchUrl)) {
+    if (internalLinkRexExp.test(linkSearchUrl)) {
       linkClause = `
         WITH n, taxon
       MATCH(n: Page) - [: HYPERLINKS_TO] -> (n2:Page)
-        WHERE n2.url = "https://www.gov.uk${state.linkSearchUrl.replace(internalLinkRexExp, '/')}"`
+        WHERE n2.url = "https://www.gov.uk${linkSearchUrl.replace(internalLinkRexExp, '/')}"`
     } else {
       linkClause = `
         WITH n, taxon
       MATCH(n: Page) - [: HYPERLINKS_TO] -> (e:ExternalPage)
-        WHERE e.url CONTAINS "${state.linkSearchUrl}"`
+        WHERE e.url CONTAINS "${linkSearchUrl}"`
     }
   }
 
@@ -374,7 +376,7 @@ const searchQuery = function(state: State): string {
       ${linkClause}
       OPTIONAL MATCH(n: Page) - [r: HAS_PRIMARY_PUBLISHING_ORGANISATION] -> (o:Organisation)
       OPTIONAL MATCH(n: Page) - [: HAS_ORGANISATIONS] -> (o2:Organisation)
-      ${returnClause()} `;
+      ${returnClause(nbResultsLimit)} `;
 };
 
 
@@ -414,7 +416,7 @@ const multiContainsClause = function(fields: string[], word: string, caseSensiti
 }
 
 
-const returnClause = function() {
+const returnClause = function(nbResultsLimit: number) {
   return `
       RETURN
       n.url as url,
@@ -432,7 +434,7 @@ const returnClause = function() {
                               COLLECT(distinct o.name) AS primary_organisation,
                                 COLLECT(distinct o2.name) AS all_organisations
     ORDER BY n.pagerank DESC
-    LIMIT ${state.nbResultsLimit} `;
+    LIMIT ${nbResultsLimit} `;
 };
 
 
@@ -447,4 +449,4 @@ const formattedSearchResults = (neo4jResults: Neo4jResponseResult): any[] => {
   return results;
 };
 
-export { searchQuery, queryGraph, initNeo4j };
+export { queryGraph, initNeo4j };
