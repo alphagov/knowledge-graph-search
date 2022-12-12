@@ -123,7 +123,7 @@ const searchButtonClicked = async function(): Promise<void> {
     case 'ready-to-search':
       if (state.searchParams.selectedWords !== '' || state.searchParams.selectedLocale !== '' || state.searchParams.selectedTaxon !== '' || state.searchParams.linkSearchUrl !== '') {
         state.waiting = true;
-        queryGraph(state.searchParams.selectedWords, state.searchParams.excludedWords, state.searchParams.combinator, state.searchParams.whereToSearch.title, state.searchParams.whereToSearch.text, state.searchParams.caseSensitive, state.searchParams.areaToSearch, state.searchParams.selectedLocale, state.searchParams.selectedTaxon, state.searchParams.linkSearchUrl, state.searchParams.nbResultsLimit, handleEvent);
+        queryGraph(state.searchParams, handleEvent);
       }
       break;
     case 'error':
@@ -159,8 +159,6 @@ const updateUrl = function() {
     if (state.searchParams.areaToSearch !== SearchArea.Any) searchParams.set('area', state.searchParams.areaToSearch);
     if (state.searchParams.combinator !== Combinator.Any) searchParams.set('combinator', state.searchParams.combinator);
     if (state.searchParams.linkSearchUrl !== '') searchParams.set('link-search-url', state.searchParams.linkSearchUrl);
-    if (state.searchParams.nbResultsLimit) searchParams.set('nresults', state.searchParams.nbResultsLimit.toString());
-
     let newRelativePathQuery = window.location.pathname;
     if (searchParams.toString().length > 0) {
       newRelativePathQuery += '?' + searchParams.toString();

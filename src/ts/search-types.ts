@@ -32,6 +32,5 @@ export interface SearchParams {
   }, // what parts of the pages to search in
   combinator: Combinator, // all keywords or any keywords
   areaToSearch: SearchArea, // whitehall, publisher, both
-  caseSensitive: boolean, // case sensitive keyword search?
-  nbResultsLimit: number // max number of results to return
+  caseSensitive: boolean // case sensitive keyword search?
 }

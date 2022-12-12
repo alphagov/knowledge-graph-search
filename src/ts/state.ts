@@ -22,7 +22,6 @@ const initialSearchParams: SearchParams = {
   },
   combinator: Combinator.Any,
   areaToSearch: SearchArea.Any,
-  nbResultsLimit: 50000, // limit queries to this number of results
   caseSensitive: false // whether the keyword search is case sensitive
 };
 
@@ -61,7 +60,6 @@ const setQueryParamsFromQS = function(): void {
   state.searchParams.selectedLocale = lang ? languageName(lang) : initialSearchParams.selectedLocale;
   state.searchParams.caseSensitive = maybeReplace('caseSensitive', 'case-sensitive');
   state.searchParams.areaToSearch = maybeReplace('areaToSearch', 'area');
-  state.searchParams.nbResultsLimit = maybeReplace('nbResultsLimit', 'nresults');
   state.searchParams.combinator = maybeReplace('combinator', 'combinator');
 
   state.searchParams.whereToSearch.title = searchParams.get('search-in-title') === 'false' ?
@@ -110,7 +108,6 @@ const resetSearch = function(): void {
   state.searchParams.whereToSearch.text = true;
   state.searchParams.caseSensitive = false;
   state.searchParams.linkSearchUrl = '';
-  state.searchParams.nbResultsLimit = 50000;
   state.skip = 0; // reset to first page
   state.searchParams.areaToSearch = SearchArea.Any;
   state.searchResults = null;

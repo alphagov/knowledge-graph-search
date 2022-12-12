@@ -6,6 +6,7 @@ import { languageCode } from './lang';
 import { splitKeywords } from './utils';
 import { Neo4jResponse, Neo4jResultData, Neo4jCallback, Neo4jQuery, MetaResult, Neo4jResponseResult } from './neo4j-types';
 import { EventType } from './event-types';
+import { SearchParams } from './search-types';
 
 //=========== public methods ===========
 
@@ -40,12 +41,12 @@ const initNeo4j = async function() {
 };
 
 
-const queryGraph: (selectedWords, excludedWords, eitherOr, searchInTitle, searchInText, caseSensitive, areaToSearch, selectedLocale, selectedTaxon, linkSearchUrl, nbResultsLimit, callback: Neo4jCallback) => Promise<void> = async function(selectedWords, excludedWords, eitherOr, searchInTitle, searchInText, caseSensitive, areaToSearch, selectedLocale, selectedTaxon, linkSearchUrl, nbResultsLimit, callback) {
+const queryGraph: (searchParams: SearchParams, callback: Neo4jCallback) => Promise<void> = async function(searchParams, callback) {
 
   const mainQuery: Neo4jQuery = {
-    statement: mainCypherQuery(selectedWords, excludedWords, eitherOr, searchInTitle, searchInText, caseSensitive, areaToSearch, selectedLocale, selectedTaxon, linkSearchUrl, nbResultsLimit)
+    statement: mainCypherQuery(searchParams)
   };
-  const searchKeywords: string = selectedWords.replace(/"/g, '');
+  const searchKeywords: string = searchParams.selectedWords.replace(/"/g, '');
 
   const wholeQuery: Neo4jQuery[] = [mainQuery];
 
@@ -312,56 +313,56 @@ const buildMetaboxInfo = async function(info: any) {
 
 
 
-const mainCypherQuery = function(selectedWords, excludedWords, eitherOr, searchInTitle, searchInText, caseSensitive, areaToSearch, selectedLocale, selectedTaxon, linkSearchUrl, nbResultsLimit): string {
+const mainCypherQuery = function(searchParams): string {
   const fieldsToSearch: string[] = [];
-  const keywords = splitKeywords(selectedWords);
-  const excludedKeywords = splitKeywords(excludedWords);
-  const combinator = eitherOr === 'any' ? 'OR' : 'AND';
-  if (searchInTitle) fieldsToSearch.push('title');
-  if (searchInText) fieldsToSearch.push('text', 'description');
+  const keywords = splitKeywords(searchParams.selectedWords);
+  const excludedKeywords = splitKeywords(searchParams.excludedWords);
+  const combinator = searchParams.eitherOr === 'any' ? 'OR' : 'AND';
+  if (searchParams.searchInTitle) fieldsToSearch.push('title');
+  if (searchParams.searchInText) fieldsToSearch.push('text', 'description');
   let inclusionClause = '';
   if (keywords.length > 0) {
     inclusionClause = 'WITH *\nWHERE ' +
       keywords
-        .map(word => multiContainsClause(fieldsToSearch, word, caseSensitive))
+        .map(word => multiContainsClause(fieldsToSearch, word, searchParams.caseSensitive))
         .join(`\n ${combinator} `);
   }
 
   const exclusionClause = excludedKeywords.length ?
-    ('WITH * WHERE NOT ' + excludedKeywords.map(word => multiContainsClause(fieldsToSearch, word, caseSensitive)).join(`\n OR`)) : '';
+    ('WITH * WHERE NOT ' + excludedKeywords.map(word => multiContainsClause(fieldsToSearch, word, searchParams.caseSensitive)).join(`\n OR`)) : '';
 
   let areaClause = '';
-  if (areaToSearch === 'publisher') {
+  if (searchParams.areaToSearch === 'publisher') {
     areaClause = 'WITH * WHERE n.publishingApp = "publisher"';
-  } else if (areaToSearch === 'whitehall') {
+  } else if (searchParams.areaToSearch === 'whitehall') {
     areaClause = 'WITH * WHERE n.publishingApp = "whitehall"';
   }
 
   let localeClause = '';
-  if (selectedLocale !== '') {
-    localeClause = `WITH * WHERE n.locale = "${languageCode(selectedLocale)}"\n`
+  if (searchParams.selectedLocale !== '') {
+    localeClause = `WITH * WHERE n.locale = "${languageCode(searchParams.selectedLocale)}"\n`
   }
 
-  const taxonClause = selectedTaxon ? `
+  const taxonClause = searchParams.selectedTaxon ? `
     WITH n
-    MATCH(n: Page) - [: IS_TAGGED_TO] -> (taxon: Taxon) - [: HAS_PARENT * 0..] -> (:Taxon { name: "${selectedTaxon}" })` :
+    MATCH(n: Page) - [: IS_TAGGED_TO] -> (taxon: Taxon) - [: HAS_PARENT * 0..] -> (:Taxon { name: "${searchParams.selectedTaxon}" })` :
     `OPTIONAL MATCH(n: Page) - [: IS_TAGGED_TO] -> (taxon:Taxon)`;
 
   let linkClause = '';
 
-  if (linkSearchUrl.length > 0) {
+  if (searchParams.linkSearchUrl.length > 0) {
     // We need to determine if the link is internal or external
     const internalLinkRexExp = /^((https:\/\/)?((www\.)?gov\.uk))?\//;
-    if (internalLinkRexExp.test(linkSearchUrl)) {
+    if (internalLinkRexExp.test(searchParams.linkSearchUrl)) {
       linkClause = `
         WITH n, taxon
       MATCH(n: Page) - [: HYPERLINKS_TO] -> (n2:Page)
-        WHERE n2.url = "https://www.gov.uk${linkSearchUrl.replace(internalLinkRexExp, '/')}"`
+        WHERE n2.url = "https://www.gov.uk${searchParams.linkSearchUrl.replace(internalLinkRexExp, '/')}"`
     } else {
       linkClause = `
         WITH n, taxon
       MATCH(n: Page) - [: HYPERLINKS_TO] -> (e:ExternalPage)
-        WHERE e.url CONTAINS "${linkSearchUrl}"`
+        WHERE e.url CONTAINS "${searchParams.linkSearchUrl}"`
     }
   }
 
@@ -376,7 +377,7 @@ const mainCypherQuery = function(selectedWords, excludedWords, eitherOr, searchI
       ${linkClause}
       OPTIONAL MATCH(n: Page) - [r: HAS_PRIMARY_PUBLISHING_ORGANISATION] -> (o:Organisation)
       OPTIONAL MATCH(n: Page) - [: HAS_ORGANISATIONS] -> (o2:Organisation)
-      ${returnClause(nbResultsLimit)} `;
+      ${returnClause()} `;
 };
 
 
@@ -416,7 +417,7 @@ const multiContainsClause = function(fields: string[], word: string, caseSensiti
 }
 
 
-const returnClause = function(nbResultsLimit: number) {
+const returnClause = function() {
   return `
       RETURN
       n.url as url,
@@ -434,7 +435,7 @@ const returnClause = function(nbResultsLimit: number) {
                               COLLECT(distinct o.name) AS primary_organisation,
                                 COLLECT(distinct o2.name) AS all_organisations
     ORDER BY n.pagerank DESC
-    LIMIT ${nbResultsLimit} `;
+    LIMIT 50000`;
 };
 
 
