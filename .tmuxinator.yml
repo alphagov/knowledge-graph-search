@@ -54,4 +54,4 @@ windows:
         - emacs -nw .
         - cd src/scss && ls main.scss | entr -dr sass main.scss > ../../public/main.css
         - npx webpack -w
-        - NEO4J_URL=https://govgraph.dev:7473/db/neo4j/tx npm start npm start
+        - NEO4J_URL=https://govgraph.dev:7473/db/neo4j/tx npm run dev
