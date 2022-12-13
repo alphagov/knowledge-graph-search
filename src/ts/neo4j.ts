@@ -12,17 +12,15 @@ import { SearchParams } from './search-types';
 
 const initNeo4j = async function() {
   console.log('retrieving taxons and locales');
-  const result = {};
-  const neo4jResponse: Response = await queryNeo4j([
-    { statement: 'MATCH (t:Taxon) RETURN t.name' },
-    { statement: 'MATCH (n:Page) WHERE n.locale <> "en" AND n.locale <> "cy" RETURN DISTINCT n.locale' }
-  ], 10);
+  const neo4jResponse: Response = await fetch('/get-init-data');
   if (!neo4jResponse.ok) {
     throw 'Failed to connect to GovGraph';
   }
   let json: Neo4jResponse;
   try {
     json = await neo4jResponse.json();
+    console.log('neo4Response', json);
+
   } catch (error) {
     console.log('Got an invalid json answer from Neo4j', JSON.stringify(error));
     throw 'Received invalid data from GovGraph';
@@ -291,13 +289,13 @@ const buildMetaboxInfo = async function(info: any) {
       json = await taxonData.json();
       result.description = json.results[0].data[0].row[0];
       result.homepage = json.results[0].data[0].row[1];
-      result.ancestorTaxons = json.results[1].data.map(ancestor => {
+      result.ancestorTaxons = json.results[1].data.map((ancestor: any) => {
         return {
           url: ancestor.row[0],
           name: ancestor.row[1]
         }
       });
-      result.childTaxons = json.results[2].data.map(ancestor => {
+      result.childTaxons = json.results[2].data.map((ancestor: any) => {
         return {
           url: ancestor.row[0],
           name: ancestor.row[1]
@@ -312,14 +310,13 @@ const buildMetaboxInfo = async function(info: any) {
 };
 
 
-
-const mainCypherQuery = function(searchParams): string {
+const mainCypherQuery = function(searchParams: any): string {
   const fieldsToSearch: string[] = [];
   const keywords = splitKeywords(searchParams.selectedWords);
   const excludedKeywords = splitKeywords(searchParams.excludedWords);
   const combinator = searchParams.eitherOr === 'any' ? 'OR' : 'AND';
-  if (searchParams.searchInTitle) fieldsToSearch.push('title');
-  if (searchParams.searchInText) fieldsToSearch.push('text', 'description');
+  if (searchParams.whereToSearch.title) fieldsToSearch.push('title');
+  if (searchParams.whereToSearch.text) fieldsToSearch.push('text', 'description');
   let inclusionClause = '';
   if (keywords.length > 0) {
     inclusionClause = 'WITH *\nWHERE ' +
@@ -401,6 +398,22 @@ const queryNeo4j: (queries: Neo4jQuery[], timeoutSeconds?: number) => Promise<Re
 };
 
 
+const query = function(query: SearchParams, timeoutSeconds: number = 60) {
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(), timeoutSeconds * 1000)
+
+  console.log('sending query to server:', query);
+  return fetch('/neo4j', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    // TODO: qsps from query
+    signal: controller.signal
+  });
+};
+
+
 const containsClause = function(field: string, word: string, caseSensitive: boolean) {
   return caseSensitive ?
     `(n.${field} CONTAINS "${word}")`
@@ -450,4 +463,4 @@ const formattedSearchResults = (neo4jResults: Neo4jResponseResult): any[] => {
   return results;
 };
 
-export { queryGraph, initNeo4j };
+export { queryGraph, initNeo4j, mainCypherQuery };
