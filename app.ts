@@ -1,11 +1,17 @@
+// Import the express in typescript file
 import express from 'express';
-import { postToNeo4j } from './db-proxy.mjs';
+import { postToNeo4j } from './db-proxy';
+//import { SearchParams } from './search-types.js';
 
-const app = express();
-const port = process.env.PORT || 3000;
+// Initialize the express engine
+const app: express.Application = express();
+
+// Take a port 3000 for running server.
+const port: number = 3000;
 
 app.use(express.static('public'));
 app.use(express.json());
+
 
 
 app.post('/neo4j', async (req, res) => {
@@ -22,6 +28,13 @@ app.post('/neo4j', async (req, res) => {
 });
 
 
+// // Handling '/' Request
+// app.get('/', (_req, _res) => {
+//   _res.send("TypeScript With Express");
+// });
+
+// Server setup
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+  console.log(`TypeScript with Express
+		http://localhost:${port}/`);
+});
