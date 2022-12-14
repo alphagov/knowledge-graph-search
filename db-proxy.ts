@@ -42,7 +42,7 @@ const sendCypherSearchQuery = async function(searchParams: SearchParams) {
     statement: mainCypherQuery(searchParams)
   };
 
-  return sendCypherQuery([mainQuery]);
+  return sendCypherQuery([mainQuery], 60000);
 }
 
 const sendCypherInitQuery = async function() {
@@ -51,11 +51,11 @@ const sendCypherInitQuery = async function() {
     { statement: 'MATCH (n:Page) WHERE n.locale <> "en" AND n.locale <> "cy" RETURN DISTINCT n.locale' }
   ];
   console.log('sendCypherInitQuery');
-  return await sendCypherQuery(query);
+  return await sendCypherQuery(query, 5000);
 }
 
 
-const sendCypherQuery = async function(cypherQuery: Neo4jQuery[]) {
+const sendCypherQuery = async function(cypherQuery: Neo4jQuery[], timeout: number) {
   const headers: any = { 'Content-Type': 'application/json' }
   if (neo4jParams.username || neo4jParams.password) {
     headers.Authorization =
@@ -66,7 +66,7 @@ const sendCypherQuery = async function(cypherQuery: Neo4jQuery[]) {
   const { data } = await axios.post(
     neo4jParams.url,
     { statements: cypherQuery },
-    headers
+    { timeout, headers }
   );
   console.log('axios!');
   console.log(data);

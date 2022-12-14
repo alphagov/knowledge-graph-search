@@ -20,6 +20,7 @@ app.get('/get-init-data', async (req, res) => {
     res.send(await sendCypherInitQuery());
   } catch (e) {
     console.log('/get-init-data fail:', JSON.stringify(e));
+    res.status(500).send(`/get-init-data fail: ${JSON.stringify(e, null, 2)}`);
   }
 });
 
@@ -56,11 +57,10 @@ app.get('/neo4j', async (req: any, res) => {
     const data = await sendCypherSearchQuery(params);
     res.send(data);
   } catch (e) {
-    console.log('neo4j proxy fail:', JSON.stringify(e));
-    res.status(500).send(`neo4j proxy fail: ${e}`);
+    res.status(500).send(`neo4j proxy fail: ${JSON.stringify(e, null, 2)}`);
   }
 });
-*/
+
 
 
 // Server setup
