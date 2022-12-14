@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { SearchArea, Combinator, SearchType, SearchParams } from './search-types';
+import { SearchArea, Combinator, SearchType, SearchParams } from './src/ts/search-types';
 import { mainCypherQuery } from './src/ts/neo4j';
 import { Neo4jQuery } from './src/ts/neo4j-types';
 

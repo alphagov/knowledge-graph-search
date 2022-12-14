@@ -1,7 +1,7 @@
 // Import the express in typescript file
 import express from 'express';
 import { sendOldSkoolCypherQuery, sendCypherSearchQuery, sendCypherInitQuery } from './db-proxy';
-import { SearchArea, Combinator, SearchType, SearchParams } from './search-types';
+import { SearchArea, Combinator, SearchType, SearchParams } from './src/ts/search-types';
 
 // Initialize the express engine
 const app: express.Application = express();
