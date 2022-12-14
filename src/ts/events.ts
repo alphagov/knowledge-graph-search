@@ -1,7 +1,7 @@
 import { state, searchState, resetSearch } from './state';
 import { id, getFormInputValue } from './utils';
 import { view } from './view/view';
-import { languageCode } from './lang';
+import { makeQueryString } from './search-utils';
 import { queryGraph } from './neo4j';
 import { EventType } from './event-types';
 import { Neo4jCallback } from './neo4j-types';
@@ -143,29 +143,14 @@ const searchButtonClicked = async function(): Promise<void> {
 
 
 const updateUrl = function() {
-  if ('URLSearchParams' in window) {
-    var searchParams = new URLSearchParams();
+  const urlQueryString = makeQueryString(state.searchParams);
 
-    // if the state differs from the default, then set parameter
-
-    if (state.searchParams.searchType !== SearchType.Keyword) searchParams.set('search-type', state.searchParams.searchType);
-    if (state.searchParams.selectedWords !== '') searchParams.set('selected-words', state.searchParams.selectedWords);
-    if (state.searchParams.excludedWords !== '') searchParams.set('excluded-words', state.searchParams.excludedWords);
-    if (state.searchParams.selectedTaxon !== '') searchParams.set('selected-taxon', state.searchParams.selectedTaxon);
-    if (state.searchParams.selectedLocale !== '') searchParams.set('lang', languageCode(state.searchParams.selectedLocale));
-    if (state.searchParams.caseSensitive) searchParams.set('case-sensitive', state.searchParams.caseSensitive.toString());
-    if (!state.searchParams.whereToSearch.title) searchParams.set('search-in-title', 'false');
-    if (!state.searchParams.whereToSearch.text) searchParams.set('search-in-text', 'false');
-    if (state.searchParams.areaToSearch !== SearchArea.Any) searchParams.set('area', state.searchParams.areaToSearch);
-    if (state.searchParams.combinator !== Combinator.Any) searchParams.set('combinator', state.searchParams.combinator);
-    if (state.searchParams.linkSearchUrl !== '') searchParams.set('link-search-url', state.searchParams.linkSearchUrl);
-    let newRelativePathQuery = window.location.pathname;
-    if (searchParams.toString().length > 0) {
-      newRelativePathQuery += '?' + searchParams.toString();
-    }
-    history.pushState(null, '', newRelativePathQuery);
+  let newRelativePathQuery = window.location.pathname;
+  if (urlQueryString.length > 0) {
+    newRelativePathQuery += '?' + urlQueryString;
   }
-}
+  history.pushState(null, '', newRelativePathQuery);
+};
 
 
 export {

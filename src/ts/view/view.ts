@@ -1,4 +1,5 @@
-import { id, splitKeywords } from '../utils';
+import { id } from '../utils';
+import { splitKeywords } from '../search-utils';
 import { state, searchState } from '../state';
 import { handleEvent } from '../events';
 import { languageName } from '../lang';

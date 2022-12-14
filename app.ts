@@ -26,7 +26,6 @@ app.get('/get-init-data', async (req, res) => {
 
 app.post('/neo4j', async (req, res) => {
   try {
-    console.log(1);
     res.send(await sendOldSkoolCypherQuery(req.body));
   } catch (e) {
     console.log('neo4j proxy fail:', JSON.stringify(e));
@@ -34,8 +33,8 @@ app.post('/neo4j', async (req, res) => {
   }
 });
 
-/*
-app.get('/neo4j', async (req: any, res) => {
+app.get('/search', async (req: any, res) => {
+  console.log('API call to /search');
   // retrieve qsp params
   const params: SearchParams = {
     searchType: req.params['search-type'] || SearchType.Keyword,
@@ -55,9 +54,11 @@ app.get('/neo4j', async (req: any, res) => {
 
   try {
     const data = await sendCypherSearchQuery(params);
+    console.log('/search returns', data);
     res.send(data);
   } catch (e) {
-    res.status(500).send(`neo4j proxy fail: ${JSON.stringify(e, null, 2)}`);
+    console.log('/search fail');
+    res.status(500).send(`/search fail: ${JSON.stringify(e, null, 2)}`);
   }
 });
 

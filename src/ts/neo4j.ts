@@ -3,7 +3,7 @@
 //==================================================
 
 import { languageCode } from './lang';
-import { splitKeywords } from './utils';
+import { splitKeywords, makeQueryString } from './search-utils';
 import { Neo4jResponse, Neo4jResultData, Neo4jCallback, Neo4jQuery, MetaResult, Neo4jResponseResult } from './neo4j-types';
 import { EventType } from './event-types';
 import { SearchParams } from './search-types';
@@ -40,6 +40,15 @@ const initNeo4j = async function() {
 
 
 const queryGraph: (searchParams: SearchParams, callback: Neo4jCallback) => Promise<void> = async function(searchParams, callback) {
+
+  // ==== temporary location: try out the new API endpoint ==
+
+  const url = `/search?${makeQueryString(searchParams)}`;
+  console.log('about to hit', url);
+  // eventually queryNeo4j below will be replaced by this fetch
+  fetch(url);
+
+  // ====================================================
 
   const mainQuery: Neo4jQuery = {
     statement: mainCypherQuery(searchParams)
@@ -393,22 +402,6 @@ const queryNeo4j: (queries: Neo4jQuery[], timeoutSeconds?: number) => Promise<Re
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(body),
-    signal: controller.signal
-  });
-};
-
-
-const query = function(query: SearchParams, timeoutSeconds: number = 60) {
-  const controller = new AbortController();
-  setTimeout(() => controller.abort(), timeoutSeconds * 1000)
-
-  console.log('sending query to server:', query);
-  return fetch('/neo4j', {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    // TODO: qsps from query
     signal: controller.signal
   });
 };
