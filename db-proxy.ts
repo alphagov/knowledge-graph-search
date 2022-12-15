@@ -44,7 +44,12 @@ const sendCypherInitQuery = async function() {
     { statement: 'MATCH (t:Taxon) RETURN t.name' },
     { statement: 'MATCH (n:Page) WHERE n.locale <> "en" AND n.locale <> "cy" RETURN DISTINCT n.locale' }
   ];
-  return sendCypherQuery(query, 5000);
+  // TODO: decode cypher results here and return a API-friendly response
+  const response = await sendCypherQuery(query, 5000);
+  return {
+    taxons: response.results[0].data.map((d: Neo4jResultData) => d.row[0]).sort(),
+    locales: ['', 'en', 'cy'].concat(response.results[1].data.map((d: Neo4jResultData) => d.row[0]).sort())
+  };
 }
 
 const getTaxonInfo = async function(name: string) {

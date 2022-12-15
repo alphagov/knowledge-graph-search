@@ -12,30 +12,11 @@ import { SearchParams } from './search-types';
 
 const initNeo4j = async function() {
   console.log('retrieving taxons and locales');
-  const neo4jResponse: Response = await fetch('/get-init-data');
-  if (!neo4jResponse.ok) {
-    throw 'Failed to connect to GovGraph';
-  }
-  let json: Neo4jResponse;
-  try {
-    json = await neo4jResponse.json();
-    console.log('neo4Response', json);
-
-  } catch (error) {
-    console.log('Got an invalid json answer from Neo4j', JSON.stringify(error));
-    throw 'Received invalid data from GovGraph';
-  }
-  if (json.results[0].data.length === 0 || json.results[1].data.length === 0) {
-    console.log('Retrieved no taxons or no locales');
-    return { taxons: [], locales: [] };
+  const apiResponse = await fetchWithTimeout('/get-init-data');
+  if (apiResponse.taxons.length === 0 || apiResponse.locales.length === 3) {
     throw 'Received no data from GovGraph. It might still be loading.';
-  } else {
-    console.log(`successfully fetched taxons and locales`);
-    return {
-      taxons: json.results[0].data.map((d: Neo4jResultData) => d.row[0]).sort(),
-      locales: ['', 'en', 'cy'].concat(json.results[1].data.map((d: Neo4jResultData) => d.row[0]).sort())
-    }
   }
+  return apiResponse;
 };
 
 
