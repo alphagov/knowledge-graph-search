@@ -1,14 +1,12 @@
 import axios from 'axios';
 import { SearchArea, Combinator, SearchType, SearchParams } from './src/ts/search-types';
 import { mainCypherQuery } from './src/ts/neo4j';
-import { Neo4jQuery } from './src/ts/neo4j-types';
+import { MetaResult, Neo4jQuery, Neo4jResponse, ResultRole } from './src/ts/neo4j-types';
 import { makeQueryString, splitKeywords } from './src/ts/search-utils';
 
 
 const neo4jParams = {
-  url: process.env.NEO4J_URL || "http://127.0.0.1:7474/db/neo4j/tx",
-  password: process.env.NEO4J_PASSWORD || null,
-  username: process.env.NEO4J_USERNAME || null
+  url: process.env.NEO4J_URL || "http://127.0.0.1:7474/db/neo4j/tx"
 };
 
 
@@ -148,7 +146,24 @@ const getPersonInfo = async function(name: string) {
         { name }
     }
   ];
-  return await sendCypherQuery(query, 5000);
+  const personInfo: Neo4jResponse = await sendCypherQuery(query, 5000);
+  const result: MetaResult = {
+    type: 'Person',
+    name,
+    homepage: personInfo.results[0].data[0].row[4].url,
+    description: personInfo.results[0].data[0].row[4].description,
+    roles: personInfo.results[0].data.map((result: any) => {
+      const res: ResultRole = {
+        title: result.row[2].name,
+        orgName: result.row[3]?.name,
+        orgUrl: result.row[3]?.homepage,
+        startDate: new Date(result.row[1].startDate),
+        endDate: result.row[1].endDate ? new Date(result.row[1].endDate) : null
+      };
+      return res;
+    })
+  };
+  return result;
 };
 
 

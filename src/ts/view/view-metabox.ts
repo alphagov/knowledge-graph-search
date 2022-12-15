@@ -42,8 +42,8 @@ const viewPersonRoles = function(roles: any[]) {
   const title: string = roles.length === 1 ? 'Role' : 'Roles';
   const roleFormatter: (role: any) => string = role => `
     ${viewMetaLink(role.title)} ${role.orgName ? ' at ' + viewMetaLink(role.orgName) : ''}
-    (from ${role.startDate ? role.startDate.getFullYear() : ''}
-    to ${role.endDate ? role.endDate.getFullYear() : 'present'})`;
+    (${role.startDate ? new Date(role.startDate).getFullYear() : ''}
+    to ${role.endDate ? new Date(role.endDate).getFullYear() : 'present'})`;
   const rolesInDateOrder = roles.sort((r1, r2) => r2.startDate - r1.startDate);
   return viewDetails(title, rolesInDateOrder, roleFormatter);
 };
@@ -53,9 +53,9 @@ const viewRolePersons = (persons: any[]) => {
   const formatPerson = (person: any) => {
     return `
     ${viewMetaLink(person.name)}
-    (from ${person.startDate ? person.startDate.getFullYear() : ''}
+    (${person.startDate ? new Date(person.startDate).getFullYear() : ''}
     to
-    ${person.endDate ? person.endDate.getFullYear() : 'now'})
+    ${person.endDate ? new Date(person.endDate).getFullYear() : 'now'})
   `};
   const currents = persons.filter((person: any) => person.endDate === null);
   const previous = persons.filter((person: any) => person.endDate !== null);
@@ -64,10 +64,10 @@ const viewRolePersons = (persons: any[]) => {
     (currents.length === 1 ?
       `<p class="govuk-body">Current holder:</p>
        <p class="govuk-body-l"><a href="${currents[0].homepage}">${currents[0].name}</a></p>
-       <p class="govuk-body">(since ${currents[0].startDate.getFullYear()})</p>
+       <p class="govuk-body">(since ${new Date(currents[0].startDate).getFullYear()})</p>
         ` :
       `<ul class="govuk-list govuk-list--bullet" >
-    ${currents.sort((a, b) => b.startDate.getTime() - a.startDate.getTime()).map(person => `<li>${formatPerson(person)}</li>`).join('')}
+    ${currents.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()).map(person => `<li>${formatPerson(person)}</li>`).join('')}
   </ul>
     `);
 
@@ -75,19 +75,19 @@ const viewRolePersons = (persons: any[]) => {
     '<p class="govuk-body">No previous holders</p>' :
     (previous.length === 1 ? `
     <p class="govuk-body" > Previous holder: ${formatPerson(previous[0])} </p>` : `
-      <details class="govuk-details" >
-        <summary class="govuk-details__summary" >
-          <span class="govuk-details__summary-text" >
-            Previous holders
-              </span>
-              </summary>
-              <div class="govuk-details__text" >
-                <ul class="govuk-list govuk-list--bullet" >
-                  ${previous.sort((a, b) => b.startDate.getTime() - a.startDate.getTime()).map(person => `<li>${formatPerson(person)}</li>`).join('')}
-  </ul>
-    </div>
+    <details class="govuk-details" >
+      <summary class="govuk-details__summary" >
+        <span class="govuk-details__summary-text" >
+          Previous holders
+        </span>
+      </summary>
+      <div class="govuk-details__text" >
+        <ul class="govuk-list govuk-list--bullet" >
+          ${previous.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()).map(person => `<li>${formatPerson(person)}</li>`).join('')}
+        </ul>
+      </div>
     </details>
-      `);
+  `);
 
   return `${currentsHtml} ${previousHtml} `;
 };

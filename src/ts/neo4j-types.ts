@@ -48,6 +48,26 @@ export interface ResultTaxon {
   url: string
 }
 
+export interface ResultRole {
+  title: string,
+  orgName: string,
+  orgUrl: string,
+  startDate: Date,
+  endDate: Date | null
+}
+
+export interface ResultPersonRoleName {
+  personName: string,
+  roleName: string
+}
+
+export interface ResultPersonName {
+  name: string,
+  homepage: string,
+  startDate: Date,
+  endDate: Date | null
+}
+
 export interface MetaResult {
   type: string,
   name: string,
@@ -57,10 +77,10 @@ export interface MetaResult {
   description?: string,
   parentName?: string,
   childOrgNames?: string[],
-  personRoleNames?: string[],
-  roles?: string[],
+  personRoleNames?: ResultPersonRoleName[],
+  roles?: ResultRole[],
   orgNames?: string[],
-  personNames?: string[],
+  personNames?: ResultPersonName[],
   ancestorTaxons?: ResultTaxon[]
   childTaxons?: ResultTaxon[]
 }

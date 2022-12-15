@@ -43,7 +43,6 @@ const queryGraph: (searchParams: SearchParams, callback: Neo4jCallback) => Promi
   callback({ type: EventType.Neo4jRunning });
   const url = `/search?${makeQueryString(searchParams)}`;
   fetchWithTimeout(url, 300)
-    .then(response => response.json())
     .then(async json => {
       const mainResults: any[] = formattedSearchResults(json.results[0]);
       let metaResults: any[] = json.results[1]?.data.length > 0 ?
@@ -89,31 +88,13 @@ const buildMetaboxInfo = async function(info: any) {
     case 'BankHoliday': {
       const usp = new URLSearchParams();
       usp.set('name', info.node.name);
-      const response: Response = await fetchWithTimeout(`/bank-holiday?${usp}`);
-      const bankHolidayInfo = await response.json();
-      result.dates = bankHolidayInfo.results[0].data.map((record: any) => record.row[0]);
-      result.regions = bankHolidayInfo.results[1].data.map((record: any) => record.row[0].name);
+      const response: Neo4jResponse = await fetchWithTimeout(`/bank-holiday?${usp}`);
+      result.dates = response.results[0].data.map((record: any) => record.row[0]);
+      result.regions = response.results[1].data.map((record: any) => record.row[0].name);
       break;
     }
     case 'Person': {
-      // We found a person, so we need to run a further query
-      // to get the person's roles and organisations
-      const usp = new URLSearchParams();
-      usp.set('name', info.node.name);
-      const response: Response = await fetchWithTimeout(`/person?${usp}`);
-      const personInfo = await response.json();
-      result.homepage = personInfo.results[0].data[0].row[4].url;
-      result.description = personInfo.results[0].data[0].row[4].description;
-      result.roles = personInfo.results[0].data.map((result: any) => {
-        return {
-          title: result.row[2].name,
-          orgName: result.row[3]?.name,
-          orgUrl: result.row[3]?.homepage,
-          startDate: new Date(result.row[1].startDate),
-          endDate: result.row[1].endDate ? new Date(result.row[1].endDate) : null
-        };
-      });
-      break;
+      return await fetchWithTimeout(`/person?${encodeURIComponent(info.node.name)}`);
     }
     case 'Role': {
       // We found a Role, so we need to run a further query to
@@ -121,11 +102,10 @@ const buildMetaboxInfo = async function(info: any) {
       // Find the organisation for this role
       const usp = new URLSearchParams();
       usp.set('name', info.node.name);
-      const response: Response = await fetchWithTimeout(`/role?${usp}`);
-      const roleInfo = await response.json();
-      const role = roleInfo.results[0].data[0];
-      const persons = roleInfo.results[1];
-      const orgs = roleInfo.results[2];
+      const response: Neo4jResponse = await fetchWithTimeout(`/role?${usp}`);
+      const role = response.results[0].data[0];
+      const persons = response.results[1];
+      const orgs = response.results[2];
       result.name = role.row[0].name;
       result.description = role.row[0].description;
       result.personNames = persons.data.map((person: any) => {
@@ -144,12 +124,11 @@ const buildMetaboxInfo = async function(info: any) {
       // to get the sub organisations
       const usp = new URLSearchParams();
       usp.set('name', info.node.name);
-      const response: Response = await fetchWithTimeout(`/organisation?${usp}`);
-      const organisationInfo = await response.json();
-      const orgDetails = organisationInfo.results[0].data[0].row;
-      const personRoleDetails = organisationInfo.results[1].data;
-      const childDetails = organisationInfo.results[2].data;
-      const parentDetails = organisationInfo.results[3].data;
+      const response: Neo4jResponse = await fetchWithTimeout(`/organisation?${usp}`);
+      const orgDetails = response.results[0].data[0].row;
+      const personRoleDetails = response.results[1].data;
+      const childDetails = response.results[2].data;
+      const parentDetails = response.results[3].data;
       result.homepage = orgDetails[1];
       result.description = orgDetails[0];
       result.parentName = parentDetails.length === 1 ?
@@ -172,17 +151,16 @@ const buildMetaboxInfo = async function(info: any) {
       // We found a taxon so we need to find its homepage
       const usp = new URLSearchParams();
       usp.set('name', info.node.name);
-      const response: Response = await fetchWithTimeout(`/taxon?${usp}`);
-      const taxonInfo = await response.json();
-      result.description = taxonInfo.results[0].data[0].row[0];
-      result.homepage = taxonInfo.results[0].data[0].row[1];
-      result.ancestorTaxons = taxonInfo.results[1].data.map((ancestor: any) => {
+      const response = await fetchWithTimeout(`/taxon?${usp}`);
+      result.description = response.results[0].data[0].row[0];
+      result.homepage = response.results[0].data[0].row[1];
+      result.ancestorTaxons = response.results[1].data.map((ancestor: any) => {
         return {
           url: ancestor.row[0],
           name: ancestor.row[1]
         }
       });
-      result.childTaxons = taxonInfo.results[2].data.map((ancestor: any) => {
+      result.childTaxons = response.results[2].data.map((ancestor: any) => {
         return {
           url: ancestor.row[0],
           name: ancestor.row[1]
@@ -268,16 +246,17 @@ const mainCypherQuery = function(searchParams: any): string {
 
 //========== Private methods ==========
 
-const fetchWithTimeout = function(url: string, timeoutSeconds: number = 60) {
+const fetchWithTimeout = async function(url: string, timeoutSeconds: number = 60) {
   const controller = new AbortController();
   setTimeout(() => controller.abort(), timeoutSeconds * 1000)
-  return fetch(url, {
+  const fetchOutput = await fetch(url, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json'
     },
     signal: controller.signal
   });
+  return await fetchOutput.json();
 };
 
 
