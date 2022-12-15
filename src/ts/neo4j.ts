@@ -4,7 +4,7 @@
 
 import { languageCode } from './lang';
 import { splitKeywords, makeQueryString } from './search-utils';
-import { Neo4jResponse, Neo4jResultData, Neo4jCallback, MetaResult, Neo4jResponseResult } from './neo4j-types';
+import { Neo4jCallback, MetaResult } from './neo4j-types';
 import { EventType } from './event-types';
 import { SearchParams } from './search-types';
 
@@ -23,39 +23,36 @@ const initNeo4j = async function() {
 const queryGraph: (searchParams: SearchParams, callback: Neo4jCallback) => Promise<void> = async function(searchParams, callback) {
   callback({ type: EventType.Neo4jRunning });
   const url = `/search?${makeQueryString(searchParams)}`;
-  fetchWithTimeout(url, 300)
-    .then(async json => {
-      const mainResults: any[] = formattedSearchResults(json.results[0]);
-      let metaResults: any[] = json.results[1]?.data.length > 0 ?
-        formattedSearchResults(json.results[1]) :
-        [];
+  let apiResults;
+  try {
+    apiResults = await fetchWithTimeout(url, 300);
+  } catch (error: any) {
+    console.log('error running main+meta queries', error);
+    callback({ type: EventType.Neo4jCallbackFail, error })
+  }
 
-      // If there's an exact match, just keep it
-      const searchKeywords: string = searchParams.selectedWords.replace(/"/g, '');
-      const exactMetaResults = metaResults.filter((result: any) => {
-        return result.node.name.toLowerCase() === searchKeywords.toLowerCase()
-      });
+  let { mainResults, metaResults } = apiResults;
 
-      if (exactMetaResults.length === 1) {
-        metaResults = exactMetaResults;
-      }
+  // If there's an exact match within the meta results, just keep that one
+  const searchKeywords: string = searchParams.selectedWords.replace(/"/g, '');
+  const exactMetaResults = metaResults.filter((result: any) => {
+    return result.node.name.toLowerCase() === searchKeywords.toLowerCase()
+  });
+  if (exactMetaResults.length === 1) {
+    metaResults = exactMetaResults;
+  }
 
-      if (metaResults.length === 1) {
-        // one meta result: show the knowledge panel (may require more neo4j queries)
-        const fullMetaResults = await buildMetaboxInfo(metaResults[0]);
-        callback({ type: EventType.Neo4jCallbackOk, results: { main: mainResults, meta: [fullMetaResults] } });
-      } else if (metaResults.length >= 1) {
-        // multiple meta results: we'll show a disambiguation page
-        callback({ type: EventType.Neo4jCallbackOk, results: { main: mainResults, meta: metaResults } });
-      } else {
-        // no meta results
-        callback({ type: EventType.Neo4jCallbackOk, results: { main: mainResults, meta: null } });
-      }
-    })
-    .catch(error => {
-      console.log('error running main+meta queries', error);
-      callback({ type: EventType.Neo4jCallbackFail, error })
-    });
+  if (metaResults.length === 1) {
+    // one meta result: show the knowledge panel (may require more neo4j queries)
+    const fullMetaResults = await buildMetaboxInfo(metaResults[0]);
+    callback({ type: EventType.Neo4jCallbackOk, results: { main: mainResults, meta: [fullMetaResults] } });
+  } else if (metaResults.length >= 1) {
+    // multiple meta results: we'll show a disambiguation page
+    callback({ type: EventType.Neo4jCallbackOk, results: { main: mainResults, meta: metaResults } });
+  } else {
+    // no meta results
+    callback({ type: EventType.Neo4jCallbackOk, results: { main: mainResults, meta: null } });
+  }
 };
 
 //=========== private ===========
@@ -216,15 +213,5 @@ const returnClause = function() {
 };
 
 
-const formattedSearchResults = (neo4jResults: Neo4jResponseResult): any[] => {
-  const keys = neo4jResults.columns;
-  const results: any[] = [];
-  neo4jResults.data.forEach(val => {
-    const result: Record<string, number> = {};
-    keys.forEach((key: string, i: number) => result[key] = val.row[i]);
-    results.push(result);
-  });
-  return results;
-};
 
 export { queryGraph, initNeo4j, mainCypherQuery };

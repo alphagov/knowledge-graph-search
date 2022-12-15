@@ -1,8 +1,7 @@
 import axios from 'axios';
-import { SearchArea, Combinator, SearchType, SearchParams } from './src/ts/search-types';
+import { SearchParams } from './src/ts/search-types';
 import { mainCypherQuery } from './src/ts/neo4j';
-import { MetaResult, Neo4jQuery, Neo4jResponse, ResultRole, Neo4jResultData } from './src/ts/neo4j-types';
-import { makeQueryString, splitKeywords } from './src/ts/search-utils';
+import { MetaResult, Neo4jQuery, Neo4jResponse, ResultRole, Neo4jResultData, Neo4jResponseResult } from './src/ts/neo4j-types';
 
 
 const neo4jParams = {
@@ -13,10 +12,8 @@ const neo4jParams = {
 // Send a Cypher query to the Neo4j server
 const sendCypherSearchQuery = async function(searchParams: SearchParams) {
   console.log('sendCypherSearchQuery');
-  // build the neo4j query from the search params extracted from the body
-  console.log('MAINNEO4JQUERY', searchParams);
-  const mainNeo4jQuery: string = mainCypherQuery(searchParams);
 
+  // build the neo4j query from the search params extracted from the body
   const mainQuery: Neo4jQuery = {
     statement: mainCypherQuery(searchParams)
   };
@@ -36,7 +33,12 @@ const sendCypherSearchQuery = async function(searchParams: SearchParams) {
     };
     wholeQuery.push(metaQuery);
   }
-  return sendCypherQuery(wholeQuery, 60000);
+  const dbResponse = await sendCypherQuery(wholeQuery, 60000);
+  const mainResults: any[] = formattedSearchResults(dbResponse.results[0]);
+  const metaResults: any[] = dbResponse.results[1]?.data.length > 0 ?
+    formattedSearchResults(dbResponse.results[1]) :
+    [];
+  return { mainResults, metaResults };
 }
 
 const sendCypherInitQuery = async function() {
@@ -265,6 +267,18 @@ const sendCypherQuery = async function(cypherQuery: Neo4jQuery[], timeout: numbe
     { timeout, headers: { 'Content-Type': 'application/json' } }
   );
   return data;
+};
+
+
+const formattedSearchResults = (neo4jResults: Neo4jResponseResult): any[] => {
+  const keys = neo4jResults.columns;
+  const results: any[] = [];
+  neo4jResults.data.forEach(val => {
+    const result: Record<string, number> = {};
+    keys.forEach((key: string, i: number) => result[key] = val.row[i]);
+    results.push(result);
+  });
+  return results;
 };
 
 
