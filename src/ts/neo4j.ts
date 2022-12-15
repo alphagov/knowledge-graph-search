@@ -40,11 +40,7 @@ const initNeo4j = async function() {
 
 
 const queryGraph: (searchParams: SearchParams, callback: Neo4jCallback) => Promise<void> = async function(searchParams, callback) {
-
-  console.log('QUERYGRAPH', searchParams);
-
   callback({ type: EventType.Neo4jRunning });
-
   const url = `/search?${makeQueryString(searchParams)}`;
   fetchWithTimeout(url, 300)
     .then(response => response.json())
@@ -64,20 +60,14 @@ const queryGraph: (searchParams: SearchParams, callback: Neo4jCallback) => Promi
         metaResults = exactMetaResults;
       }
 
-      console.log('EXACTMETARETULRS', exactMetaResults);
-
       if (metaResults.length === 1) {
-        console.log('OK');
         // one meta result: show the knowledge panel (may require more neo4j queries)
         const fullMetaResults = await buildMetaboxInfo(metaResults[0]);
-        console.log('OK2');
         callback({ type: EventType.Neo4jCallbackOk, results: { main: mainResults, meta: [fullMetaResults] } });
       } else if (metaResults.length >= 1) {
-        console.log('OK3');
         // multiple meta results: we'll show a disambiguation page
         callback({ type: EventType.Neo4jCallbackOk, results: { main: mainResults, meta: metaResults } });
       } else {
-        console.log('OK4');
         // no meta results
         callback({ type: EventType.Neo4jCallbackOk, results: { main: mainResults, meta: null } });
       }
@@ -93,57 +83,28 @@ const queryGraph: (searchParams: SearchParams, callback: Neo4jCallback) => Promi
 const buildMetaboxInfo = async function(info: any) {
   console.log(`Found a ${info.nodeType[0]}. Running extra queries`);
   const result: MetaResult = { type: info.nodeType[0], name: info.node.name };
-  let json: any;
-  let orgData: any, orgDetails: any, personRoleDetails: any, childDetails: any, parentDetails: any;
-  let holidayData: any, personData: any, roleData: any, taxonData: any;
-  console.log('OK5')
   switch (info.nodeType[0]) {
     // We found a bank holiday, so we need to run 2 further queries
     // one to get the dates, the other to get the regions
-    case 'BankHoliday':
-      holidayData = await queryNeo4j([
-        {
-          statement: `
-            MATCH (b:BankHoliday)-[:IS_ON]->(d)
-            WHERE b.name = $name
-            RETURN d`,
-          parameters:
-            { name: info.node.name }
-        }, {
-          statement: `
-            MATCH (b:BankHoliday)-[:IS_OBSERVED_IN]->(r)
-            WHERE b.name = $name
-            RETURN r`,
-          parameters:
-            { name: info.node.name }
-        }
-      ]);
-
-      json = await holidayData.json();
-      result.dates = json.results[0].data.map((record: any) => record.row[0]);
-      result.regions = json.results[1].data.map((record: any) => record.row[0].name);
+    case 'BankHoliday': {
+      const usp = new URLSearchParams();
+      usp.set('name', info.node.name);
+      const response: Response = await fetchWithTimeout(`/bank-holiday?${usp}`);
+      const bankHolidayInfo = await response.json();
+      result.dates = bankHolidayInfo.results[0].data.map((record: any) => record.row[0]);
+      result.regions = bankHolidayInfo.results[1].data.map((record: any) => record.row[0].name);
       break;
-
-    case 'Person':
+    }
+    case 'Person': {
       // We found a person, so we need to run a further query
       // to get the person's roles and organisations
-      personData = await queryNeo4j([
-        {
-          statement: `
-            MATCH (p:Person { name: $name })-[l]->(r:Role)
-            MATCH (p)-[:HAS_HOMEPAGE]->(ph:Page)
-            OPTIONAL MATCH (r)-[:BELONGS_TO]->(o:Organisation)
-            OPTIONAL MATCH (r)-[:HAS_HOMEPAGE]->(rh:Page)
-            RETURN p,l,r,o,ph,rh`,
-          parameters:
-            { name: info.node.name }
-        }
-      ]);
-
-      json = await personData.json();
-      result.homepage = json.results[0].data[0].row[4].url;
-      result.description = json.results[0].data[0].row[4].description;
-      result.roles = json.results[0].data.map((result: any) => {
+      const usp = new URLSearchParams();
+      usp.set('name', info.node.name);
+      const response: Response = await fetchWithTimeout(`/person?${usp}`);
+      const personInfo = await response.json();
+      result.homepage = personInfo.results[0].data[0].row[4].url;
+      result.description = personInfo.results[0].data[0].row[4].description;
+      result.roles = personInfo.results[0].data.map((result: any) => {
         return {
           title: result.row[2].name,
           orgName: result.row[3]?.name,
@@ -153,31 +114,18 @@ const buildMetaboxInfo = async function(info: any) {
         };
       });
       break;
-    case 'Role':
+    }
+    case 'Role': {
       // We found a Role, so we need to run a further query to
       // Find the person holding that role (as well as previous people)
       // Find the organisation for this role
-      roleData = await queryNeo4j([
-        {
-          statement: `MATCH (r:Role { name: $name }) RETURN r`,
-          parameters: { name: info.node.name }
-        },
-        {
-          statement: `
-            MATCH (p:Person)-[h:HAS_ROLE]->(Role { name: $name })
-            MATCH (p:Person)-[:HAS_HOMEPAGE]->(hp:Page)
-            RETURN p,h,hp.url`,
-          parameters: { name: info.node.name }
-        },
-        {
-          statement: `MATCH (Role { name: $name })-[:BELONGS_TO]->(o:Organisation) RETURN o`,
-          parameters: { name: info.node.name }
-        }
-      ]);
-      json = await roleData.json();
-      const role = json.results[0].data[0];
-      const persons = json.results[1];
-      const orgs = json.results[2];
+      const usp = new URLSearchParams();
+      usp.set('name', info.node.name);
+      const response: Response = await fetchWithTimeout(`/role?${usp}`);
+      const roleInfo = await response.json();
+      const role = roleInfo.results[0].data[0];
+      const persons = roleInfo.results[1];
+      const orgs = roleInfo.results[2];
       result.name = role.row[0].name;
       result.description = role.row[0].description;
       result.personNames = persons.data.map((person: any) => {
@@ -190,48 +138,18 @@ const buildMetaboxInfo = async function(info: any) {
       });
       result.orgNames = orgs.data.map((result: any) => result.row[0].name);
       break;
-    case 'Organisation':
+    }
+    case 'Organisation': {
       // We found an organisation, so we need to run a further query
       // to get the sub organisations
-      orgData = await queryNeo4j([
-        {
-          statement: `
-            MATCH (org:Organisation)-[:HAS_HOMEPAGE]->(homepage:Page)
-            WHERE org.name = $name
-            RETURN homepage.description, homepage.url`,
-          parameters:
-            { name: info.node.name }
-        }, {
-          statement: `
-            MATCH (person:Person)-[hr:HAS_ROLE]->(role:Role)-[:BELONGS_TO]->(org:Organisation)
-            WHERE org.name = $name
-            AND hr.endDate IS NULL
-            RETURN person, role`,
-          parameters:
-            { name: info.node.name }
-        }, {
-          statement: `
-            MATCH (org:Organisation)-[:HAS_CHILD_ORGANISATION]->(childOrg:Organisation)
-            WHERE org.name = $name
-            AND childOrg.status <> "closed"
-            RETURN childOrg.name`,
-          parameters:
-            { name: info.node.name }
-        }, {
-          statement: `
-            MATCH (org:Organisation)-[:HAS_PARENT_ORGANISATION]->(parentOrg:Organisation)
-            WHERE org.name = $name
-            RETURN parentOrg.name`,
-          parameters:
-            { name: info.node.name }
-        }
-      ]);
-
-      json = await orgData.json();
-      orgDetails = json.results[0].data[0].row;
-      personRoleDetails = json.results[1].data;
-      childDetails = json.results[2].data;
-      parentDetails = json.results[3].data;
+      const usp = new URLSearchParams();
+      usp.set('name', info.node.name);
+      const response: Response = await fetchWithTimeout(`/organisation?${usp}`);
+      const organisationInfo = await response.json();
+      const orgDetails = organisationInfo.results[0].data[0].row;
+      const personRoleDetails = organisationInfo.results[1].data;
+      const childDetails = organisationInfo.results[2].data;
+      const parentDetails = organisationInfo.results[3].data;
       result.homepage = orgDetails[1];
       result.description = orgDetails[0];
       result.parentName = parentDetails.length === 1 ?
@@ -244,11 +162,13 @@ const buildMetaboxInfo = async function(info: any) {
         }
       });
       break;
-    case 'Transaction':
+    }
+    case 'Transaction': {
       result.homepage = info.homepage.url;
       result.description = info.node.description;
       break;
-    case 'Taxon':
+    }
+    case 'Taxon': {
       // We found a taxon so we need to find its homepage
       const usp = new URLSearchParams();
       usp.set('name', info.node.name);
@@ -269,6 +189,7 @@ const buildMetaboxInfo = async function(info: any) {
         }
       });
       break;
+    }
     default:
       console.log('unknown meta node type', info.nodeType[0]);
   }
@@ -280,7 +201,6 @@ const buildMetaboxInfo = async function(info: any) {
 const mainCypherQuery = function(searchParams: any): string {
   const fieldsToSearch: string[] = [];
   const keywords = splitKeywords(searchParams.selectedWords);
-  console.log('KEYWORDS', keywords);
   const excludedKeywords = splitKeywords(searchParams.excludedWords);
   const combinator = searchParams.eitherOr === 'any' ? 'OR' : 'AND';
   if (searchParams.whereToSearch.title) fieldsToSearch.push('title');
@@ -349,7 +269,6 @@ const mainCypherQuery = function(searchParams: any): string {
 //========== Private methods ==========
 
 const fetchWithTimeout = function(url: string, timeoutSeconds: number = 60) {
-  console.log('fetchWithTimeout', url, timeoutSeconds);
   const controller = new AbortController();
   setTimeout(() => controller.abort(), timeoutSeconds * 1000)
   return fetch(url, {
@@ -357,24 +276,6 @@ const fetchWithTimeout = function(url: string, timeoutSeconds: number = 60) {
     headers: {
       'Content-Type': 'application/json'
     },
-    signal: controller.signal
-  });
-};
-
-
-const queryNeo4j: (queries: Neo4jQuery[], timeoutSeconds?: number) => Promise<Response> = async function(queries, timeoutSeconds = 60) {
-  console.log('queryNeo4j', queries);
-  const body = { statements: queries };
-  const controller = new AbortController();
-  setTimeout(() => controller.abort(), timeoutSeconds * 1000)
-
-  console.log('sending query to neo4j:', body);
-  return fetch('/neo4j', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body),
     signal: controller.signal
   });
 };
@@ -398,23 +299,24 @@ const multiContainsClause = function(fields: string[], word: string, caseSensiti
 
 const returnClause = function() {
   return `
-      RETURN
-      n.url as url,
-        n.title AS title,
-          n.documentType AS documentType,
-            n.contentID AS contentID,
-              n.locale AS locale,
-                n.publishingApp AS publishing_app,
-                  n.firstPublishedAt AS first_published_at,
-                    n.publicUpdatedAt AS public_updated_at,
-                      n.withdrawnAt AS withdrawn_at,
-                        n.withdrawnExplanation AS withdrawn_explanation,
-                          n.pagerank AS pagerank,
-                            COLLECT(distinct taxon.name) AS taxons,
-                              COLLECT(distinct o.name) AS primary_organisation,
-                                COLLECT(distinct o2.name) AS all_organisations
+    RETURN
+    n.url as url,
+    n.title AS title,
+    n.documentType AS documentType,
+    n.contentID AS contentID,
+    n.locale AS locale,
+    n.publishingApp AS publishing_app,
+    n.firstPublishedAt AS first_published_at,
+    n.publicUpdatedAt AS public_updated_at,
+    n.withdrawnAt AS withdrawn_at,
+    n.withdrawnExplanation AS withdrawn_explanation,
+    n.pagerank AS pagerank,
+    COLLECT(distinct taxon.name) AS taxons,
+    COLLECT(distinct o.name) AS primary_organisation,
+    COLLECT(distinct o2.name) AS all_organisations
     ORDER BY n.pagerank DESC
-    LIMIT 50000`;
+    LIMIT 50000
+  `;
 };
 
 

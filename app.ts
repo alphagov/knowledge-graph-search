@@ -1,6 +1,6 @@
 // Import the express in typescript file
 import express from 'express';
-import { getTaxonInfo, sendOldSkoolCypherQuery, sendCypherSearchQuery, sendCypherInitQuery } from './db-proxy';
+import { getRoleInfo, getOrganisationInfo, getTaxonInfo, sendCypherSearchQuery, sendCypherInitQuery, getBankHolidayInfo, getPersonInfo } from './db-proxy';
 import { SearchArea, Combinator, SearchType, SearchParams } from './src/ts/search-types';
 
 // Initialize the express engine
@@ -23,17 +23,6 @@ app.get('/get-init-data', async (req, res) => {
     res.status(500).send(`/get-init-data fail: ${JSON.stringify(e, null, 2)}`);
   }
 });
-
-// ===== SHOULD BE REMOVED ONCE ALL ENDPOINTS ARE DONE =====
-app.post('/neo4j', async (req, res) => {
-  try {
-    res.send(await sendOldSkoolCypherQuery(req.body));
-  } catch (e) {
-    console.log('neo4j proxy fail:', JSON.stringify(e));
-    res.status(500).send(`neo4j proxy fail: ${e}`);
-  }
-});
-// ========================================================
 
 app.get('/search', async (req: any, res) => {
   console.log('API call to /search', req.query);
@@ -68,11 +57,53 @@ app.get('/taxon', async (req: any, res) => {
   console.log('API call to /taxon', req.query);
   try {
     const data = await getTaxonInfo(req.query['name']);
-    console.log('/taxon returns', data);
     res.send(data);
   } catch (e) {
-    console.log('/taxon fail');
     res.status(500).send(`/taxon fail: ${JSON.stringify(e, null, 2)}`);
+  }
+});
+
+
+app.get('/organisation', async (req: any, res) => {
+  console.log('API call to /organisation', req.query);
+  try {
+    const data = await getOrganisationInfo(req.query['name']);
+    res.send(data);
+  } catch (e) {
+    res.status(500).send(`/organisation fail: ${JSON.stringify(e, null, 2)}`);
+  }
+});
+
+
+app.get('/role', async (req: any, res) => {
+  console.log('API call to /role', req.query);
+  try {
+    const data = await getRoleInfo(req.query['name']);
+    res.send(data);
+  } catch (e) {
+    res.status(500).send(`/role fail: ${JSON.stringify(e, null, 2)}`);
+  }
+});
+
+
+app.get('/bank-holiday', async (req: any, res) => {
+  console.log('API call to /bank-holiday', req.query);
+  try {
+    const data = await getBankHolidayInfo(req.query['name']);
+    res.send(data);
+  } catch (e) {
+    res.status(500).send(`/bank-holiday: ${JSON.stringify(e, null, 2)}`);
+  }
+});
+
+
+app.get('/person', async (req: any, res) => {
+  console.log('API call to /person', req.query);
+  try {
+    const data = await getPersonInfo(req.query['name']);
+    res.send(data);
+  } catch (e) {
+    res.status(500).send(`/person: ${JSON.stringify(e, null, 2)}`);
   }
 });
 

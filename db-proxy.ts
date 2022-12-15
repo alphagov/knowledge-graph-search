@@ -12,18 +12,6 @@ const neo4jParams = {
 };
 
 
-const sendOldSkoolCypherQuery = async function(body: Neo4jQuery) {
-  const headers: any = { 'Content-Type': 'application/json' }
-  const { data } = await axios({
-    method: 'post',
-    url: neo4jParams.url,
-    data: body,
-    headers
-  });
-  return data;
-};
-
-
 // Send a Cypher query to the Neo4j server
 const sendCypherSearchQuery = async function(searchParams: SearchParams) {
   console.log('sendCypherSearchQuery');
@@ -89,6 +77,101 @@ const getTaxonInfo = async function(name: string) {
 };
 
 
+const getOrganisationInfo = async function(name: string) {
+  const query: Neo4jQuery[] = [
+    {
+      statement: `
+        MATCH (org:Organisation)-[:HAS_HOMEPAGE]->(homepage:Page)
+        WHERE org.name = $name
+        RETURN homepage.description, homepage.url`,
+      parameters:
+        { name: name }
+    }, {
+      statement: `
+        MATCH (person:Person)-[hr:HAS_ROLE]->(role:Role)-[:BELONGS_TO]->(org:Organisation)
+        WHERE org.name = $name
+        AND hr.endDate IS NULL
+        RETURN person, role`,
+      parameters:
+        { name: name }
+    }, {
+      statement: `
+        MATCH (org:Organisation)-[:HAS_CHILD_ORGANISATION]->(childOrg:Organisation)
+        WHERE org.name = $name
+        AND childOrg.status <> "closed"
+        RETURN childOrg.name`,
+      parameters: { name }
+    }, {
+      statement: `
+        MATCH (org:Organisation)-[:HAS_PARENT_ORGANISATION]->(parentOrg:Organisation)
+        WHERE org.name = $name
+        RETURN parentOrg.name`,
+      parameters: { name }
+    }
+  ];
+  return await sendCypherQuery(query, 5000);
+};
+
+
+const getRoleInfo = async function(name: string) {
+  const query: Neo4jQuery[] = [
+    {
+      statement: `MATCH (r:Role { name: $name }) RETURN r`,
+      parameters: { name }
+    },
+    {
+      statement: `
+        MATCH (p:Person)-[h:HAS_ROLE]->(Role { name: $name })
+        MATCH (p:Person)-[:HAS_HOMEPAGE]->(hp:Page)
+        RETURN p,h,hp.url`,
+      parameters: { name }
+    },
+    {
+      statement: `MATCH (Role { name: $name })-[:BELONGS_TO]->(o:Organisation) RETURN o`,
+      parameters: { name }
+    }
+  ];
+  return await sendCypherQuery(query, 5000);
+};
+
+
+const getPersonInfo = async function(name: string) {
+  const query: Neo4jQuery[] = [
+    {
+      statement: `
+        MATCH (p:Person { name: $name })-[l]->(r:Role)
+        MATCH (p)-[:HAS_HOMEPAGE]->(ph:Page)
+        OPTIONAL MATCH (r)-[:BELONGS_TO]->(o:Organisation)
+        OPTIONAL MATCH (r)-[:HAS_HOMEPAGE]->(rh:Page)
+        RETURN p,l,r,o,ph,rh`,
+      parameters:
+        { name }
+    }
+  ];
+  return await sendCypherQuery(query, 5000);
+};
+
+
+const getBankHolidayInfo = async function(name: string) {
+  const query: Neo4jQuery[] = [
+    {
+      statement: `
+        MATCH (b:BankHoliday)-[:IS_ON]->(d)
+        WHERE b.name = $name
+        RETURN d`,
+      parameters: { name }
+    }, {
+      statement: `
+        MATCH (b:BankHoliday)-[:IS_OBSERVED_IN]->(r)
+        WHERE b.name = $name
+        RETURN r`,
+      parameters: { name }
+    }
+  ];
+  return await sendCypherQuery(query, 5000);
+};
+
+
 const sendCypherQuery = async function(cypherQuery: Neo4jQuery[], timeout: number) {
   console.log('sending', JSON.stringify(cypherQuery, null, 2));
   const { data } = await axios.post(
@@ -99,4 +182,5 @@ const sendCypherQuery = async function(cypherQuery: Neo4jQuery[], timeout: numbe
   return data;
 };
 
-export { sendCypherSearchQuery, sendCypherInitQuery, sendOldSkoolCypherQuery, getTaxonInfo };
+
+export { sendCypherSearchQuery, sendCypherInitQuery, getTaxonInfo, getOrganisationInfo, getRoleInfo, getPersonInfo, getBankHolidayInfo };
