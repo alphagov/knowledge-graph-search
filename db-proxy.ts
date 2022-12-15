@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { SearchArea, Combinator, SearchType, SearchParams } from './src/ts/search-types';
 import { mainCypherQuery } from './src/ts/neo4j';
-import { MetaResult, Neo4jQuery, Neo4jResponse, ResultRole } from './src/ts/neo4j-types';
+import { MetaResult, Neo4jQuery, Neo4jResponse, ResultRole, Neo4jResultData } from './src/ts/neo4j-types';
 import { makeQueryString, splitKeywords } from './src/ts/search-utils';
 
 
@@ -71,7 +71,26 @@ const getTaxonInfo = async function(name: string) {
         { name: name }
     }
   ];
-  return await sendCypherQuery(query, 5000);
+  const taxonInfo: Neo4jResponse = await sendCypherQuery(query, 5000);
+  const result: MetaResult = {
+    type: 'Taxon',
+    name,
+    description: taxonInfo.results[0].data[0].row[0],
+    homepage: taxonInfo.results[0].data[0].row[1],
+    ancestorTaxons: taxonInfo.results[1].data.map((ancestor: any) => {
+      return {
+        url: ancestor.row[0],
+        name: ancestor.row[1]
+      }
+    }),
+    childTaxons: taxonInfo.results[2].data.map((ancestor: any) => {
+      return {
+        url: ancestor.row[0],
+        name: ancestor.row[1]
+      }
+    })
+  };
+  return result;
 };
 
 
@@ -107,7 +126,26 @@ const getOrganisationInfo = async function(name: string) {
       parameters: { name }
     }
   ];
-  return await sendCypherQuery(query, 5000);
+  const orgInfo: Neo4jResponse = await sendCypherQuery(query, 5000);
+  const orgDetails = orgInfo.results[0].data[0].row;
+  const personRoleDetails = orgInfo.results[1].data;
+  const childDetails = orgInfo.results[2].data;
+  const parentDetails = orgInfo.results[3].data;
+  const result: MetaResult = {
+    type: 'Organisation',
+    name,
+    homepage: orgDetails[1],
+    description: orgDetails[0],
+    parentName: parentDetails.length === 1 ? parentDetails[0].row[0] : null,
+    childOrgNames: childDetails.map((child: Neo4jResultData) => child.row[0]),
+    personRoleNames: personRoleDetails.map((record: any) => {
+      return {
+        personName: record.row[0].name,
+        roleName: record.row[1].name
+      }
+    })
+  };
+  return result;
 };
 
 
@@ -129,7 +167,25 @@ const getRoleInfo = async function(name: string) {
       parameters: { name }
     }
   ];
-  return await sendCypherQuery(query, 5000);
+  const roleInfo: Neo4jResponse = await sendCypherQuery(query, 5000);
+  const role = roleInfo.results[0].data[0];
+  const persons = roleInfo.results[1];
+  const orgs = roleInfo.results[2];
+  const result: MetaResult = {
+    type: 'Role',
+    name: role.row[0].name,
+    description: role.row[0].description,
+    personNames: persons.data.map((person: any) => {
+      return {
+        name: person.row[0].name,
+        homepage: person.row[2],
+        startDate: new Date(person.row[1].startDate),
+        endDate: person.row[1].endDate ? new Date(person.row[1].endDate) : null
+      }
+    }),
+    orgNames: orgs.data.map((result: any) => result.row[0].name)
+  };
+  return result;
 };
 
 
@@ -168,6 +224,7 @@ const getPersonInfo = async function(name: string) {
 
 
 const getBankHolidayInfo = async function(name: string) {
+  console.log('NAME', name)
   const query: Neo4jQuery[] = [
     {
       statement: `
@@ -183,7 +240,15 @@ const getBankHolidayInfo = async function(name: string) {
       parameters: { name }
     }
   ];
-  return await sendCypherQuery(query, 5000);
+  const bankHolidayInfo: Neo4jResponse = await sendCypherQuery(query, 5000);
+  console.log('BANKHOLIDAYINFO', bankHolidayInfo);
+  const result: MetaResult = {
+    type: 'BankHoliday',
+    name,
+    dates: bankHolidayInfo.results[0].data.map((record: any) => record.row[0]),
+    regions: bankHolidayInfo.results[1].data.map((record: any) => record.row[0].name)
+  }
+  return result;
 };
 
 

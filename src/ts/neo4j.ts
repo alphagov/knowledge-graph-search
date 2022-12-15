@@ -4,7 +4,7 @@
 
 import { languageCode } from './lang';
 import { splitKeywords, makeQueryString } from './search-utils';
-import { Neo4jResponse, Neo4jResultData, Neo4jCallback, Neo4jQuery, MetaResult, Neo4jResponseResult } from './neo4j-types';
+import { Neo4jResponse, Neo4jResultData, Neo4jCallback, MetaResult, Neo4jResponseResult } from './neo4j-types';
 import { EventType } from './event-types';
 import { SearchParams } from './search-types';
 
@@ -83,90 +83,26 @@ const buildMetaboxInfo = async function(info: any) {
   console.log(`Found a ${info.nodeType[0]}. Running extra queries`);
   const result: MetaResult = { type: info.nodeType[0], name: info.node.name };
   switch (info.nodeType[0]) {
-    // We found a bank holiday, so we need to run 2 further queries
-    // one to get the dates, the other to get the regions
     case 'BankHoliday': {
-      const usp = new URLSearchParams();
-      usp.set('name', info.node.name);
-      const response: Neo4jResponse = await fetchWithTimeout(`/bank-holiday?${usp}`);
-      result.dates = response.results[0].data.map((record: any) => record.row[0]);
-      result.regions = response.results[1].data.map((record: any) => record.row[0].name);
-      break;
+      return await fetchWithTimeout(`/bank-holiday?name=${encodeURIComponent(info.node.name)}`);
     }
     case 'Person': {
-      return await fetchWithTimeout(`/person?${encodeURIComponent(info.node.name)}`);
+      return await fetchWithTimeout(`/person?name=${encodeURIComponent(info.node.name)}`);
     }
     case 'Role': {
-      // We found a Role, so we need to run a further query to
-      // Find the person holding that role (as well as previous people)
-      // Find the organisation for this role
-      const usp = new URLSearchParams();
-      usp.set('name', info.node.name);
-      const response: Neo4jResponse = await fetchWithTimeout(`/role?${usp}`);
-      const role = response.results[0].data[0];
-      const persons = response.results[1];
-      const orgs = response.results[2];
-      result.name = role.row[0].name;
-      result.description = role.row[0].description;
-      result.personNames = persons.data.map((person: any) => {
-        return {
-          name: person.row[0].name,
-          homepage: person.row[2],
-          startDate: new Date(person.row[1].startDate),
-          endDate: person.row[1].endDate ? new Date(person.row[1].endDate) : null
-        }
-      });
-      result.orgNames = orgs.data.map((result: any) => result.row[0].name);
-      break;
+      return await fetchWithTimeout(`/role?name=${encodeURIComponent(info.node.name)}`);
     }
     case 'Organisation': {
-      // We found an organisation, so we need to run a further query
-      // to get the sub organisations
-      const usp = new URLSearchParams();
-      usp.set('name', info.node.name);
-      const response: Neo4jResponse = await fetchWithTimeout(`/organisation?${usp}`);
-      const orgDetails = response.results[0].data[0].row;
-      const personRoleDetails = response.results[1].data;
-      const childDetails = response.results[2].data;
-      const parentDetails = response.results[3].data;
-      result.homepage = orgDetails[1];
-      result.description = orgDetails[0];
-      result.parentName = parentDetails.length === 1 ?
-        parentDetails[0].row[0] : null;
-      result.childOrgNames = childDetails.map((child: Neo4jResultData) => child.row[0]);
-      result.personRoleNames = personRoleDetails.map((record: any) => {
-        return {
-          personName: record.row[0].name,
-          roleName: record.row[1].name
-        }
-      });
-      break;
+      return await fetchWithTimeout(`/organisation?name=${encodeURIComponent(info.node.name)}`);
     }
     case 'Transaction': {
-      result.homepage = info.homepage.url;
-      result.description = info.node.description;
-      break;
+      return {
+        homepage: info.homepage.url,
+        description: info.node.description
+      }
     }
     case 'Taxon': {
-      // We found a taxon so we need to find its homepage
-      const usp = new URLSearchParams();
-      usp.set('name', info.node.name);
-      const response = await fetchWithTimeout(`/taxon?${usp}`);
-      result.description = response.results[0].data[0].row[0];
-      result.homepage = response.results[0].data[0].row[1];
-      result.ancestorTaxons = response.results[1].data.map((ancestor: any) => {
-        return {
-          url: ancestor.row[0],
-          name: ancestor.row[1]
-        }
-      });
-      result.childTaxons = response.results[2].data.map((ancestor: any) => {
-        return {
-          url: ancestor.row[0],
-          name: ancestor.row[1]
-        }
-      });
-      break;
+      return await fetchWithTimeout(`/taxon?name=${encodeURIComponent(info.node.name)}`);
     }
     default:
       console.log('unknown meta node type', info.nodeType[0]);
