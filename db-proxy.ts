@@ -14,10 +14,6 @@ const neo4jParams = {
 
 const sendOldSkoolCypherQuery = async function(body: Neo4jQuery) {
   const headers: any = { 'Content-Type': 'application/json' }
-  if (neo4jParams.username || neo4jParams.password) {
-    headers.Authorization =
-      'Basic ' + Buffer.from(neo4jParams.username + ":" + neo4jParams.password, 'binary').toString('base64');
-  }
   const { data } = await axios({
     method: 'post',
     url: neo4jParams.url,
@@ -30,10 +26,9 @@ const sendOldSkoolCypherQuery = async function(body: Neo4jQuery) {
 
 // Send a Cypher query to the Neo4j server
 const sendCypherSearchQuery = async function(searchParams: SearchParams) {
-
-  // curl -d '{"statements": [{"statement": "MATCH (t:Taxon) RETURN t.name"}]}' -H "Authorization: Basic XXXXXXXXXXXX==" -H "Content-Type: application/json"  https://knowledge-graph.integration.govuk.digital:7473/db/neo4j/tx | jq .
-
+  console.log('sendCypherSearchQuery');
   // build the neo4j query from the search params extracted from the body
+  console.log('MAINNEO4JQUERY', searchParams);
   const mainNeo4jQuery: string = mainCypherQuery(searchParams);
 
   const mainQuery: Neo4jQuery = {
@@ -42,9 +37,8 @@ const sendCypherSearchQuery = async function(searchParams: SearchParams) {
 
   const wholeQuery = [mainQuery];
 
-  const keywords = splitKeywords(searchParams.selectedWords);
-
-  if (keywords.length >= 5 && keywords.includes(' ')) {
+  const searchKeywords: string = searchParams.selectedWords.replace(/"/g, '');
+  if (searchKeywords.length >= 5 && searchKeywords.includes(' ')) {
     const metaQuery: Neo4jQuery = {
       statement: `
         MATCH (node)
@@ -52,11 +46,10 @@ const sendCypherSearchQuery = async function(searchParams: SearchParams) {
         AND toLower(node.name) CONTAINS toLower($keywords)
         OPTIONAL MATCH (node)-[:HAS_HOMEPAGE|HAS_START_PAGE]->(homepage:Page)
         RETURN node, homepage, labels(node) as nodeType`,
-      parameters: { keywords }
+      parameters: { keywords: searchKeywords }
     };
     wholeQuery.push(metaQuery);
   }
-
   return sendCypherQuery(wholeQuery, 60000);
 }
 
@@ -65,23 +58,45 @@ const sendCypherInitQuery = async function() {
     { statement: 'MATCH (t:Taxon) RETURN t.name' },
     { statement: 'MATCH (n:Page) WHERE n.locale <> "en" AND n.locale <> "cy" RETURN DISTINCT n.locale' }
   ];
-  return await sendCypherQuery(query, 5000);
+  return sendCypherQuery(query, 5000);
 }
+
+const getTaxonInfo = async function(name: string) {
+  const query: Neo4jQuery[] = [
+    { // Get details about this taxon
+      statement: `
+        MATCH (p:Page)<-[:HAS_HOMEPAGE]-(t:Taxon { name: $name })
+        RETURN p.description, p.url`,
+      parameters:
+        { name: name }
+    },
+    { // Get list of ancestor taxons
+      statement: `
+        MATCH (h:Page)<-[:HAS_HOMEPAGE]-(:Taxon)<-[:HAS_PARENT*]-(:Taxon { name: $name })
+        RETURN h.url, h.title`,
+      parameters:
+        { name: name }
+    },
+    { // Get list of child taxons
+      statement: `
+        MATCH (h:Page)<-[:HAS_HOMEPAGE]-(:Taxon)-[:HAS_PARENT]->(:Taxon { name: $name })
+        RETURN h.url, h.title`,
+      parameters:
+        { name: name }
+    }
+  ];
+  return await sendCypherQuery(query, 5000);
+};
 
 
 const sendCypherQuery = async function(cypherQuery: Neo4jQuery[], timeout: number) {
-  const headers: any = { 'Content-Type': 'application/json' }
-  if (neo4jParams.username || neo4jParams.password) {
-    headers.Authorization =
-      'Basic ' + Buffer.from(neo4jParams.username + ":" + neo4jParams.password, 'binary').toString('base64');
-  }
-  // Send the cypher query
+  console.log('sending', JSON.stringify(cypherQuery, null, 2));
   const { data } = await axios.post(
     neo4jParams.url,
     { statements: cypherQuery },
-    { timeout, headers }
+    { timeout, headers: { 'Content-Type': 'application/json' } }
   );
   return data;
 };
 
-export { sendCypherSearchQuery, sendCypherInitQuery, sendOldSkoolCypherQuery };
+export { sendCypherSearchQuery, sendCypherInitQuery, sendOldSkoolCypherQuery, getTaxonInfo };

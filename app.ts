@@ -1,6 +1,6 @@
 // Import the express in typescript file
 import express from 'express';
-import { sendOldSkoolCypherQuery, sendCypherSearchQuery, sendCypherInitQuery } from './db-proxy';
+import { getTaxonInfo, sendOldSkoolCypherQuery, sendCypherSearchQuery, sendCypherInitQuery } from './db-proxy';
 import { SearchArea, Combinator, SearchType, SearchParams } from './src/ts/search-types';
 
 // Initialize the express engine
@@ -24,6 +24,7 @@ app.get('/get-init-data', async (req, res) => {
   }
 });
 
+// ===== SHOULD BE REMOVED ONCE ALL ENDPOINTS ARE DONE =====
 app.post('/neo4j', async (req, res) => {
   try {
     res.send(await sendOldSkoolCypherQuery(req.body));
@@ -32,26 +33,26 @@ app.post('/neo4j', async (req, res) => {
     res.status(500).send(`neo4j proxy fail: ${e}`);
   }
 });
+// ========================================================
 
 app.get('/search', async (req: any, res) => {
-  console.log('API call to /search');
+  console.log('API call to /search', req.query);
   // retrieve qsp params
   const params: SearchParams = {
-    searchType: req.params['search-type'] || SearchType.Keyword,
-    selectedWords: req.params['selected-words'] || '',
-    excludedWords: req.params['excluded-words'] || '',
-    selectedTaxon: req.params['selected-taxon'] || '',
-    selectedLocale: req.params['lang'] || '',
-    caseSensitive: req.params['case-sensitive'] || false,
-    combinator: req.params['combinator'] || Combinator.Any,
+    searchType: req.query['search-type'] || SearchType.Keyword,
+    selectedWords: req.query['selected-words'] || '',
+    excludedWords: req.query['excluded-words'] || '',
+    selectedTaxon: req.query['selected-taxon'] || '',
+    selectedLocale: req.query['lang'] || '',
+    caseSensitive: req.query['case-sensitive'] || false,
+    combinator: req.query['combinator'] || Combinator.Any,
     whereToSearch: {
-      title: req.params['search-in-title'] || true,
-      text: req.params['search-in-text'] || true
+      title: !(req.query['search-in-title'] === 'false'),
+      text: !(req.query['search-in-text'] === 'false')
     },
-    areaToSearch: req.params['area'] || SearchArea.Any,
-    linkSearchUrl: req.params['link-search-url'] || ''
+    areaToSearch: req.query['area'] || SearchArea.Any,
+    linkSearchUrl: req.query['link-search-url'] || ''
   };
-
   try {
     const data = await sendCypherSearchQuery(params);
     console.log('/search returns', data);
@@ -61,6 +62,20 @@ app.get('/search', async (req: any, res) => {
     res.status(500).send(`/search fail: ${JSON.stringify(e, null, 2)}`);
   }
 });
+
+
+app.get('/taxon', async (req: any, res) => {
+  console.log('API call to /taxon', req.query);
+  try {
+    const data = await getTaxonInfo(req.query['name']);
+    console.log('/taxon returns', data);
+    res.send(data);
+  } catch (e) {
+    console.log('/taxon fail');
+    res.status(500).send(`/taxon fail: ${JSON.stringify(e, null, 2)}`);
+  }
+});
+
 
 
 

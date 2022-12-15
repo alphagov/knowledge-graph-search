@@ -41,39 +41,12 @@ const initNeo4j = async function() {
 
 const queryGraph: (searchParams: SearchParams, callback: Neo4jCallback) => Promise<void> = async function(searchParams, callback) {
 
-  // ==== temporary location: try out the new API endpoint ==
-
-  const url = `/search?${makeQueryString(searchParams)}`;
-  console.log('about to hit', url);
-  // eventually queryNeo4j below will be replaced by this fetch
-  fetch(url);
-
-  // ====================================================
-
-  const mainQuery: Neo4jQuery = {
-    statement: mainCypherQuery(searchParams)
-  };
-  const searchKeywords: string = searchParams.selectedWords.replace(/"/g, '');
-
-  const wholeQuery: Neo4jQuery[] = [mainQuery];
-
-  if (searchKeywords.length >= 5 && searchKeywords.includes(' ')) {
-    const metaSearchQuery: Neo4jQuery = {
-      statement: `
-        MATCH (node)
-        WHERE (node:BankHoliday OR node:Person OR node:Organisation OR node:Role OR node:Transaction OR node:Taxon)
-        AND toLower(node.name) CONTAINS toLower($keywords)
-        OPTIONAL MATCH (node)-[:HAS_HOMEPAGE|HAS_START_PAGE]->(homepage:Page)
-        RETURN node, homepage, labels(node) as nodeType`,
-      parameters: {
-        keywords: searchKeywords
-      }
-    };
-    wholeQuery.push(metaSearchQuery);
-  }
+  console.log('QUERYGRAPH', searchParams);
 
   callback({ type: EventType.Neo4jRunning });
-  queryNeo4j(wholeQuery)
+
+  const url = `/search?${makeQueryString(searchParams)}`;
+  fetchWithTimeout(url, 300)
     .then(response => response.json())
     .then(async json => {
       const mainResults: any[] = formattedSearchResults(json.results[0]);
@@ -82,6 +55,7 @@ const queryGraph: (searchParams: SearchParams, callback: Neo4jCallback) => Promi
         [];
 
       // If there's an exact match, just keep it
+      const searchKeywords: string = searchParams.selectedWords.replace(/"/g, '');
       const exactMetaResults = metaResults.filter((result: any) => {
         return result.node.name.toLowerCase() === searchKeywords.toLowerCase()
       });
@@ -90,14 +64,20 @@ const queryGraph: (searchParams: SearchParams, callback: Neo4jCallback) => Promi
         metaResults = exactMetaResults;
       }
 
+      console.log('EXACTMETARETULRS', exactMetaResults);
+
       if (metaResults.length === 1) {
+        console.log('OK');
         // one meta result: show the knowledge panel (may require more neo4j queries)
         const fullMetaResults = await buildMetaboxInfo(metaResults[0]);
+        console.log('OK2');
         callback({ type: EventType.Neo4jCallbackOk, results: { main: mainResults, meta: [fullMetaResults] } });
       } else if (metaResults.length >= 1) {
+        console.log('OK3');
         // multiple meta results: we'll show a disambiguation page
         callback({ type: EventType.Neo4jCallbackOk, results: { main: mainResults, meta: metaResults } });
       } else {
+        console.log('OK4');
         // no meta results
         callback({ type: EventType.Neo4jCallbackOk, results: { main: mainResults, meta: null } });
       }
@@ -116,7 +96,7 @@ const buildMetaboxInfo = async function(info: any) {
   let json: any;
   let orgData: any, orgDetails: any, personRoleDetails: any, childDetails: any, parentDetails: any;
   let holidayData: any, personData: any, roleData: any, taxonData: any;
-
+  console.log('OK5')
   switch (info.nodeType[0]) {
     // We found a bank holiday, so we need to run 2 further queries
     // one to get the dates, the other to get the regions
@@ -270,41 +250,19 @@ const buildMetaboxInfo = async function(info: any) {
       break;
     case 'Taxon':
       // We found a taxon so we need to find its homepage
-      console.log('TAXON');
-      taxonData = await queryNeo4j([
-        { // Get details about this taxon
-          statement: `
-            MATCH (p:Page)<-[:HAS_HOMEPAGE]-(t:Taxon { name: $name })
-            RETURN p.description, p.url`,
-          parameters:
-            { name: info.node.name }
-        },
-        { // Get list of ancestor taxons
-          statement: `
-            MATCH (h:Page)<-[:HAS_HOMEPAGE]-(:Taxon)<-[:HAS_PARENT*]-(:Taxon { name: $name })
-            RETURN h.url, h.title`,
-          parameters:
-            { name: info.node.name }
-        },
-        { // Get list of child taxons
-          statement: `
-            MATCH (h:Page)<-[:HAS_HOMEPAGE]-(:Taxon)-[:HAS_PARENT]->(:Taxon { name: $name })
-            RETURN h.url, h.title`,
-          parameters:
-            { name: info.node.name }
-        }
-
-      ]);
-      json = await taxonData.json();
-      result.description = json.results[0].data[0].row[0];
-      result.homepage = json.results[0].data[0].row[1];
-      result.ancestorTaxons = json.results[1].data.map((ancestor: any) => {
+      const usp = new URLSearchParams();
+      usp.set('name', info.node.name);
+      const response: Response = await fetchWithTimeout(`/taxon?${usp}`);
+      const taxonInfo = await response.json();
+      result.description = taxonInfo.results[0].data[0].row[0];
+      result.homepage = taxonInfo.results[0].data[0].row[1];
+      result.ancestorTaxons = taxonInfo.results[1].data.map((ancestor: any) => {
         return {
           url: ancestor.row[0],
           name: ancestor.row[1]
         }
       });
-      result.childTaxons = json.results[2].data.map((ancestor: any) => {
+      result.childTaxons = taxonInfo.results[2].data.map((ancestor: any) => {
         return {
           url: ancestor.row[0],
           name: ancestor.row[1]
@@ -322,6 +280,7 @@ const buildMetaboxInfo = async function(info: any) {
 const mainCypherQuery = function(searchParams: any): string {
   const fieldsToSearch: string[] = [];
   const keywords = splitKeywords(searchParams.selectedWords);
+  console.log('KEYWORDS', keywords);
   const excludedKeywords = splitKeywords(searchParams.excludedWords);
   const combinator = searchParams.eitherOr === 'any' ? 'OR' : 'AND';
   if (searchParams.whereToSearch.title) fieldsToSearch.push('title');
@@ -388,6 +347,20 @@ const mainCypherQuery = function(searchParams: any): string {
 
 
 //========== Private methods ==========
+
+const fetchWithTimeout = function(url: string, timeoutSeconds: number = 60) {
+  console.log('fetchWithTimeout', url, timeoutSeconds);
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(), timeoutSeconds * 1000)
+  return fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    signal: controller.signal
+  });
+};
+
 
 const queryNeo4j: (queries: Neo4jQuery[], timeoutSeconds?: number) => Promise<Response> = async function(queries, timeoutSeconds = 60) {
   console.log('queryNeo4j', queries);
