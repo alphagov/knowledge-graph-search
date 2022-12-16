@@ -1,7 +1,10 @@
 // Import the express in typescript file
 import express from 'express';
-import { getRoleInfo, getOrganisationInfo, getTaxonInfo, sendCypherSearchQuery, sendCypherInitQuery, getBankHolidayInfo, getPersonInfo } from './db-proxy';
-import { SearchArea, Combinator, SearchType, SearchParams } from './src/ts/search-types';
+import { getRoleInfo, getOrganisationInfo, getTaxonInfo, sendSearchQuery, sendInitQuery, getBankHolidayInfo, getPersonInfo } from './neo4j';
+// eventually replace with:
+// import { getRoleInfo, getOrganisationInfo, getTaxonInfo, sendSearchQuery, sendInitQuery, getBankHolidayInfo, getPersonInfo } from './bigquery';
+
+import { SearchArea, Combinator, SearchType, SearchParams } from './src/ts/search-api-types';
 
 // Initialize the express engine
 const app: express.Application = express();
@@ -17,12 +20,13 @@ app.use(express.json());
 app.get('/get-init-data', async (req, res) => {
   console.log('/get-init-data');
   try {
-    res.send(await sendCypherInitQuery());
+    res.send(await sendInitQuery());
   } catch (e) {
     console.log('/get-init-data fail:', JSON.stringify(e));
     res.status(500).send(`/get-init-data fail: ${JSON.stringify(e, null, 2)}`);
   }
 });
+
 
 app.get('/search', async (req: any, res) => {
   console.log('API call to /search', req.query);
@@ -43,7 +47,7 @@ app.get('/search', async (req: any, res) => {
     linkSearchUrl: req.query['link-search-url'] || ''
   };
   try {
-    const data = await sendCypherSearchQuery(params);
+    const data = await sendSearchQuery(params);
     console.log('/search returns', data);
     res.send(data);
   } catch (e) {
@@ -106,8 +110,6 @@ app.get('/person', async (req: any, res) => {
     res.status(500).send(`/person: ${JSON.stringify(e, null, 2)}`);
   }
 });
-
-
 
 
 // Server setup

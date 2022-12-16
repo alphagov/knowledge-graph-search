@@ -42,4 +42,20 @@ const sanitiseOutput = function(text: string): string {
 };
 
 
-export { id, sanitiseInput, sanitiseOutput, getFormInputValue };
+const splitKeywords = function(keywords: string): string[] {
+  const wordsToIgnore = ['of', 'for', 'the'];
+  const regexp = /[^\s,"]+|"([^"]*)"/gi;
+  const output = [];
+  let match: (RegExpExecArray | null);
+  do {
+    match = regexp.exec(keywords);
+    if (match) {
+      output.push(match[1] ? match[1] : match[0]);
+    }
+  } while (match);
+  return output.filter(d => d.length > 0 && !wordsToIgnore.includes(d));
+};
+
+
+
+export { id, sanitiseInput, sanitiseOutput, getFormInputValue, splitKeywords };

@@ -1,7 +1,8 @@
 import axios from 'axios';
-import { SearchParams } from './src/ts/search-types';
-import { mainCypherQuery } from './src/ts/neo4j';
-import { MetaResult, Neo4jQuery, Neo4jResponse, ResultRole, Neo4jResultData, Neo4jResponseResult } from './src/ts/neo4j-types';
+import { SearchParams, MetaResult, ResultRole } from './src/ts/search-api-types';
+import { splitKeywords } from './src/ts/utils';
+import { languageCode } from './src/ts/lang';
+import { Neo4jQuery, Neo4jResponseResult, Neo4jResponse, Neo4jResultData } from './neo4j-types';
 
 
 const neo4jParams = {
@@ -10,12 +11,12 @@ const neo4jParams = {
 
 
 // Send a Cypher query to the Neo4j server
-const sendCypherSearchQuery = async function(searchParams: SearchParams) {
-  console.log('sendCypherSearchQuery');
+const sendSearchQuery = async function(searchParams: SearchParams) {
+  console.log('sendSearchQuery');
 
   // build the neo4j query from the search params extracted from the body
   const mainQuery: Neo4jQuery = {
-    statement: mainCypherQuery(searchParams)
+    statement: buildSearchQuery(searchParams)
   };
 
   const wholeQuery = [mainQuery];
@@ -41,13 +42,12 @@ const sendCypherSearchQuery = async function(searchParams: SearchParams) {
   return { mainResults, metaResults };
 }
 
-const sendCypherInitQuery = async function() {
+const sendInitQuery = async function() {
   const query: Neo4jQuery[] = [
     { statement: 'MATCH (t:Taxon) RETURN t.name' },
     { statement: 'MATCH (n:Page) WHERE n.locale <> "en" AND n.locale <> "cy" RETURN DISTINCT n.locale' }
   ];
-  // TODO: decode cypher results here and return a API-friendly response
-  const response = await sendCypherQuery(query, 5000);
+  const response = await sendCypherQuery(query, 10000);
   return {
     taxons: response.results[0].data.map((d: Neo4jResultData) => d.row[0]).sort(),
     locales: ['', 'en', 'cy'].concat(response.results[1].data.map((d: Neo4jResultData) => d.row[0]).sort())
@@ -282,4 +282,115 @@ const formattedSearchResults = (neo4jResults: Neo4jResponseResult): any[] => {
 };
 
 
-export { sendCypherSearchQuery, sendCypherInitQuery, getTaxonInfo, getOrganisationInfo, getRoleInfo, getPersonInfo, getBankHolidayInfo };
+const buildSearchQuery = function(searchParams: any): string {
+  const fieldsToSearch: string[] = [];
+  const keywords = splitKeywords(searchParams.selectedWords);
+  const excludedKeywords = splitKeywords(searchParams.excludedWords);
+  const combinator = searchParams.eitherOr === 'any' ? 'OR' : 'AND';
+  if (searchParams.whereToSearch.title) fieldsToSearch.push('title');
+  if (searchParams.whereToSearch.text) fieldsToSearch.push('text', 'description');
+  let inclusionClause = '';
+  if (keywords.length > 0) {
+    inclusionClause = 'WITH *\nWHERE ' +
+      keywords
+        .map(word => multiContainsClause(fieldsToSearch, word, searchParams.caseSensitive))
+        .join(`\n ${combinator} `);
+  }
+
+  const exclusionClause = excludedKeywords.length ?
+    ('WITH * WHERE NOT ' + excludedKeywords.map(word => multiContainsClause(fieldsToSearch, word, searchParams.caseSensitive)).join(`\n OR`)) : '';
+
+  let areaClause = '';
+  if (searchParams.areaToSearch === 'publisher') {
+    areaClause = 'WITH * WHERE n.publishingApp = "publisher"';
+  } else if (searchParams.areaToSearch === 'whitehall') {
+    areaClause = 'WITH * WHERE n.publishingApp = "whitehall"';
+  }
+
+  let localeClause = '';
+  if (searchParams.selectedLocale !== '') {
+    localeClause = `WITH * WHERE n.locale = "${languageCode(searchParams.selectedLocale)}"\n`
+  }
+
+  const taxonClause = searchParams.selectedTaxon ? `
+    WITH n
+    MATCH(n: Page) - [: IS_TAGGED_TO] -> (taxon: Taxon) - [: HAS_PARENT * 0..] -> (:Taxon { name: "${searchParams.selectedTaxon}" })` :
+    `OPTIONAL MATCH(n: Page) - [: IS_TAGGED_TO] -> (taxon:Taxon)`;
+
+  let linkClause = '';
+
+  if (searchParams.linkSearchUrl.length > 0) {
+    // We need to determine if the link is internal or external
+    const internalLinkRexExp = /^((https:\/\/)?((www\.)?gov\.uk))?\//;
+    if (internalLinkRexExp.test(searchParams.linkSearchUrl)) {
+      linkClause = `
+        WITH n, taxon
+        MATCH(n: Page) - [: HYPERLINKS_TO] -> (n2:Page)
+        WHERE n2.url = "https://www.gov.uk${searchParams.linkSearchUrl.replace(internalLinkRexExp, '/')}"`
+    } else {
+      linkClause = `
+        WITH n, taxon
+        MATCH(n: Page) - [: HYPERLINKS_TO] -> (e:ExternalPage)
+        WHERE e.url CONTAINS "${searchParams.linkSearchUrl}"`
+    }
+  }
+
+  return `
+    MATCH(n: Page)
+    WHERE n.documentType IS null OR NOT n.documentType IN['gone', 'redirect', 'placeholder', 'placeholder_person']
+    ${inclusionClause}
+    ${exclusionClause}
+    ${localeClause}
+    ${areaClause}
+    ${taxonClause}
+    ${linkClause}
+    OPTIONAL MATCH(n: Page) - [r: HAS_PRIMARY_PUBLISHING_ORGANISATION] -> (o:Organisation)
+    OPTIONAL MATCH(n: Page) - [: HAS_ORGANISATIONS] -> (o2:Organisation)
+    ${returnClause()}
+  `;
+};
+
+
+//========== Private methods ==========
+
+
+const containsClause = function(field: string, word: string, caseSensitive: boolean) {
+  return caseSensitive ?
+    `(n.${field} CONTAINS "${word}")`
+    :
+    `(toLower(n.${field}) CONTAINS toLower("${word}"))`
+    ;
+}
+
+
+const multiContainsClause = function(fields: string[], word: string, caseSensitive: boolean) {
+  return '(' + fields
+    .map(field => containsClause(field, word, caseSensitive))
+    .join(' OR ') + ')'
+}
+
+
+const returnClause = function() {
+  return `
+    RETURN
+    n.url as url,
+    n.title AS title,
+    n.documentType AS documentType,
+    n.contentID AS contentID,
+    n.locale AS locale,
+    n.publishingApp AS publishing_app,
+    n.firstPublishedAt AS first_published_at,
+    n.publicUpdatedAt AS public_updated_at,
+    n.withdrawnAt AS withdrawn_at,
+    n.withdrawnExplanation AS withdrawn_explanation,
+    n.pagerank AS pagerank,
+    COLLECT(distinct taxon.name) AS taxons,
+    COLLECT(distinct o.name) AS primary_organisation,
+    COLLECT(distinct o2.name) AS all_organisations
+    ORDER BY n.pagerank DESC
+    LIMIT 50000
+  `;
+};
+
+
+export { sendSearchQuery, sendInitQuery, getTaxonInfo, getOrganisationInfo, getRoleInfo, getPersonInfo, getBankHolidayInfo };

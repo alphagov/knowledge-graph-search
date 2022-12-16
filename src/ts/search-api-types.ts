@@ -34,3 +34,50 @@ export interface SearchParams {
   areaToSearch: SearchArea, // whitehall, publisher, both
   caseSensitive: boolean // case sensitive keyword search?
 }
+
+
+export interface ResultDate {
+  dateString: string
+}
+
+export interface ResultTaxon {
+  name: string,
+  url: string
+}
+
+export interface ResultRole {
+  title: string,
+  orgName: string,
+  orgUrl: string,
+  startDate: Date,
+  endDate: Date | null
+}
+
+export interface ResultPersonRoleName {
+  personName: string,
+  roleName: string
+}
+
+export interface ResultPersonName {
+  name: string,
+  homepage: string,
+  startDate: Date,
+  endDate: Date | null
+}
+
+export interface MetaResult {
+  type: string,
+  name: string,
+  dates?: ResultDate[],
+  regions?: string[],
+  homepage?: string,
+  description?: string,
+  parentName?: string,
+  childOrgNames?: string[],
+  personRoleNames?: ResultPersonRoleName[],
+  roles?: ResultRole[],
+  orgNames?: string[],
+  personNames?: ResultPersonName[],
+  ancestorTaxons?: ResultTaxon[]
+  childTaxons?: ResultTaxon[]
+}

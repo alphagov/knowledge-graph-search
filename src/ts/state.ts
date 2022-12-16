@@ -1,5 +1,5 @@
 import { languageName } from './lang';
-import { SearchType, SearchParams, Combinator, SearchArea } from './search-types';
+import { SearchType, SearchParams, Combinator, SearchArea } from './search-api-types';
 import { State } from './state-types';
 
 

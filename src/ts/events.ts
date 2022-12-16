@@ -1,16 +1,14 @@
 import { state, searchState, resetSearch } from './state';
 import { id, getFormInputValue } from './utils';
 import { view } from './view/view';
-import { makeQueryString } from './search-utils';
-import { queryGraph } from './neo4j';
-import { EventType } from './event-types';
-import { Neo4jCallback } from './neo4j-types';
-import { SearchType, SearchArea, Combinator } from './search-types';
+import { makeQueryString, queryGraph } from './search-api';
+import { EventType, SearchApiCallback } from './event-types';
+import { SearchType, SearchArea, Combinator } from './search-api-types';
 
 
 declare const window: any;
 
-const handleEvent: Neo4jCallback = async function(event) {
+const handleEvent: SearchApiCallback = async function(event) {
   let fieldClicked: RegExpMatchArray | null;
   console.log('handleEvent:', event.type, event.id || '')
   switch (event.type) {
@@ -85,20 +83,20 @@ const handleEvent: Neo4jCallback = async function(event) {
       break;
 
     // non-dom events
-    case EventType.Neo4jRunning:
+    case EventType.SearchRunning:
       state.waiting = true;
       break;
-    case EventType.Neo4jCallbackOk:
+    case EventType.SearchApiCallbackOk:
       state.searchResults = event.results?.main.sort((a: any, b: any) => b.pagerank - a.pagerank);
       state.metaSearchResults = event.results?.meta;
       state.waiting = false;
       state.systemErrorText = null;
       break;
-    case EventType.Neo4jCallbackFail:
+    case EventType.SearchApiCallbackFail:
       state.searchResults = null;
       state.waiting = false;
       state.systemErrorText = 'There was a problem querying the GovGraph.';
-      console.log('neo4j-callback-fail:', event.error);
+      console.log('search-api-callback-fail:', event.error);
       break;
     default:
       console.log('unknown event type:', event);
