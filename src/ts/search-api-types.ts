@@ -19,7 +19,7 @@ export enum SearchArea {
   Publisher = 'publisher'
 }
 
-export interface SearchParams {
+export type SearchParams = {
   searchType: SearchType,
   selectedWords: string, // list of words to search
   excludedWords: string, // list of words to exclude
@@ -35,49 +35,86 @@ export interface SearchParams {
   caseSensitive: boolean // case sensitive keyword search?
 }
 
+export type MetaResult = Person | Organisation | BankHoliday | Role | Taxon
 
-export interface ResultDate {
-  dateString: string
-}
-
-export interface ResultTaxon {
-  name: string,
-  url: string
-}
-
-export interface ResultRole {
-  title: string,
-  orgName: string,
-  orgUrl: string,
-  startDate: Date,
-  endDate: Date | null
-}
-
-export interface ResultPersonRoleName {
-  personName: string,
-  roleName: string
-}
-
-export interface ResultPersonName {
-  name: string,
-  homepage: string,
-  startDate: Date,
-  endDate: Date | null
-}
-
-export interface MetaResult {
+export type Person = {
   type: string,
   name: string,
-  dates?: ResultDate[],
-  regions?: string[],
-  homepage?: string,
-  description?: string,
-  parentName?: string,
-  childOrgNames?: string[],
-  personRoleNames?: ResultPersonRoleName[],
-  roles?: ResultRole[],
-  orgNames?: string[],
-  personNames?: ResultPersonName[],
-  ancestorTaxons?: ResultTaxon[]
-  childTaxons?: ResultTaxon[]
+  homepage: string,
+  description: string,
+  roles: {
+    title: string,
+    orgName: string,
+    orgUrl: string,
+    startDate: Date,
+    endDate: Date | null
+  }[]
+}
+
+export type Organisation = {
+  type: string,
+  name: string,
+  homepage: string,
+  description: string,
+  parentName: string,
+  childOrgNames: string[],
+  personRoleNames: {
+    personName: string,
+    roleName: string
+  }[]
+}
+
+export type Taxon = {
+  type: string,
+  name: string,
+  homepage: string,
+  description: string,
+  ancestorTaxons: {
+    url: string,
+    name: string
+  }[],
+  childTaxons: {
+    url: string,
+    name: string
+  }[]
+}
+
+export type Transaction = {
+  type: string,
+  name: string,
+  description: string,
+  homepage: string
+}
+
+export type BankHoliday = {
+  type: string,
+  name: string,
+  dates: string[],
+  regions: string[]
+}
+
+export type Role = {
+  type: string,
+  name: string,
+  description: string,
+  personNames: {
+    name: string,
+    homepage: string,
+    startDate: Date,
+    endDate: Date | null
+  }[],
+  orgNames: string[]
+}
+
+// a neo4 search can return a variable number of records of any type
+export type MainResult = any;
+
+export type SearchResults = {
+  mainResults: MainResult[],
+  metaResults: MetaResult[]
+}
+
+export type InitResults = {
+  taxons: string[],
+  locales: string[]
 }

@@ -74,7 +74,6 @@ const queryGraph: (searchParams: SearchParams, callback: SearchApiCallback) => P
 
 const buildMetaboxInfo = async function(info: any) {
   console.log(`Found a ${info.nodeType[0]}. Running extra queries`);
-  const result: MetaResult = { type: info.nodeType[0], name: info.node.name };
   switch (info.nodeType[0]) {
     case 'BankHoliday': {
       return await fetchWithTimeout(`/bank-holiday?name=${encodeURIComponent(info.node.name)}`);
@@ -100,8 +99,6 @@ const buildMetaboxInfo = async function(info: any) {
     default:
       console.log('unknown meta node type', info.nodeType[0]);
   }
-  console.log('result', result);
-  return result;
 };
 
 

@@ -1,6 +1,6 @@
 import { state } from '../state';
 import { viewMetaLink } from './view-components';
-import { MetaResult, ResultTaxon } from '../search-api-types';
+import { MetaResult, Taxon, Organisation, Transaction, BankHoliday, Person, Role } from '../search-api-types';
 
 
 const viewDetails = (title: string, list: any[], itemFormatFn: (item: any) => string) => {
@@ -108,7 +108,7 @@ const viewBankHolidayDetails = function(holiday: any) {
 };
 
 
-const viewBankHoliday = (record: MetaResult): string =>
+const viewBankHoliday = (record: BankHoliday): string =>
   `<div class="meta-results-panel" >
     <h2 class="govuk-heading-m" >
       ${record.name}
@@ -161,7 +161,7 @@ const viewRole = function(record: any) {
 };
 
 
-const viewOrg = (record: MetaResult): string =>
+const viewOrg = (record: Organisation): string =>
   `<div class="meta-results-panel">
      <h2 class="govuk-heading-m">
        <a class="govuk-link" href="${record.homepage}">${record.name}</a>
@@ -177,7 +177,7 @@ const viewOrg = (record: MetaResult): string =>
    </div>`;
 
 
-const viewTransaction = (record: MetaResult): string =>
+const viewTransaction = (record: Transaction): string =>
   `<div class="meta-results-panel">
      <h2 class="govuk-heading-m">
        <a class="govuk-link" href="${record.homepage}">${record.name}</a>
@@ -187,7 +187,7 @@ const viewTransaction = (record: MetaResult): string =>
    </div>`;
 
 
-const viewTaxon = (record: MetaResult): string =>
+const viewTaxon = (record: Taxon): string =>
   `<div class="meta-results-panel">
      <div class="govuk-breadcrumbs">
        <ol class="govuk-breadcrumbs__list">
@@ -207,7 +207,7 @@ const viewTaxon = (record: MetaResult): string =>
    </div>`;
 
 
-const viewTaxonChildren = (records: ResultTaxon[]): string =>
+const viewTaxonChildren = (records: any[]): string =>
   viewDetails(
     'Subtaxons',
     records,

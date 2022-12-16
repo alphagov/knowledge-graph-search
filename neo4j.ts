@@ -1,8 +1,9 @@
 import axios from 'axios';
-import { SearchParams, MetaResult, ResultRole } from './src/ts/search-api-types';
+import { MainResult, MetaResult, Person, Organisation, Role, Taxon, BankHoliday } from './src/ts/search-api-types';
 import { splitKeywords } from './src/ts/utils';
 import { languageCode } from './src/ts/lang';
 import { Neo4jQuery, Neo4jResponseResult, Neo4jResponse, Neo4jResultData } from './neo4j-types';
+import { GetBankHolidayInfoSignature, GetOrganisationInfoSignature, GetPersonInfoSignature, GetRoleInfoSignature, GetTaxonInfoSignature, SendInitQuerySignature, SendSearchQuerySignature } from './db-api-types';
 
 
 const neo4jParams = {
@@ -11,8 +12,7 @@ const neo4jParams = {
 
 
 // Send a Cypher query to the Neo4j server
-const sendSearchQuery = async function(searchParams: SearchParams) {
-  console.log('sendSearchQuery');
+const sendSearchQuery: SendSearchQuerySignature = async function(searchParams) {
 
   // build the neo4j query from the search params extracted from the body
   const mainQuery: Neo4jQuery = {
@@ -35,14 +35,14 @@ const sendSearchQuery = async function(searchParams: SearchParams) {
     wholeQuery.push(metaQuery);
   }
   const dbResponse = await sendCypherQuery(wholeQuery, 60000);
-  const mainResults: any[] = formattedSearchResults(dbResponse.results[0]);
-  const metaResults: any[] = dbResponse.results[1]?.data.length > 0 ?
-    formattedSearchResults(dbResponse.results[1]) :
+  const mainResults: MainResult[] = formattedMainResults(dbResponse.results[0]);
+  const metaResults: MetaResult[] = dbResponse.results[1]?.data.length > 0 ?
+    formattedMetaResults(dbResponse.results[1]) :
     [];
   return { mainResults, metaResults };
 }
 
-const sendInitQuery = async function() {
+const sendInitQuery: SendInitQuerySignature = async function() {
   const query: Neo4jQuery[] = [
     { statement: 'MATCH (t:Taxon) RETURN t.name' },
     { statement: 'MATCH (n:Page) WHERE n.locale <> "en" AND n.locale <> "cy" RETURN DISTINCT n.locale' }
@@ -54,7 +54,7 @@ const sendInitQuery = async function() {
   };
 }
 
-const getTaxonInfo = async function(name: string) {
+const getTaxonInfo: GetTaxonInfoSignature = async function(name) {
   const query: Neo4jQuery[] = [
     { // Get details about this taxon
       statement: `
@@ -79,7 +79,7 @@ const getTaxonInfo = async function(name: string) {
     }
   ];
   const taxonInfo: Neo4jResponse = await sendCypherQuery(query, 5000);
-  const result: MetaResult = {
+  const result: Taxon = {
     type: 'Taxon',
     name,
     description: taxonInfo.results[0].data[0].row[0],
@@ -101,7 +101,7 @@ const getTaxonInfo = async function(name: string) {
 };
 
 
-const getOrganisationInfo = async function(name: string) {
+const getOrganisationInfo: GetOrganisationInfoSignature = async function(name) {
   const query: Neo4jQuery[] = [
     {
       statement: `
@@ -138,7 +138,7 @@ const getOrganisationInfo = async function(name: string) {
   const personRoleDetails = orgInfo.results[1].data;
   const childDetails = orgInfo.results[2].data;
   const parentDetails = orgInfo.results[3].data;
-  const result: MetaResult = {
+  const result: Organisation = {
     type: 'Organisation',
     name,
     homepage: orgDetails[1],
@@ -156,7 +156,7 @@ const getOrganisationInfo = async function(name: string) {
 };
 
 
-const getRoleInfo = async function(name: string) {
+const getRoleInfo: GetRoleInfoSignature = async function(name) {
   const query: Neo4jQuery[] = [
     {
       statement: `MATCH (r:Role { name: $name }) RETURN r`,
@@ -178,7 +178,7 @@ const getRoleInfo = async function(name: string) {
   const role = roleInfo.results[0].data[0];
   const persons = roleInfo.results[1];
   const orgs = roleInfo.results[2];
-  const result: MetaResult = {
+  const result: Role = {
     type: 'Role',
     name: role.row[0].name,
     description: role.row[0].description,
@@ -196,7 +196,7 @@ const getRoleInfo = async function(name: string) {
 };
 
 
-const getPersonInfo = async function(name: string) {
+const getPersonInfo: GetPersonInfoSignature = async function(name) {
   const query: Neo4jQuery[] = [
     {
       statement: `
@@ -210,28 +210,26 @@ const getPersonInfo = async function(name: string) {
     }
   ];
   const personInfo: Neo4jResponse = await sendCypherQuery(query, 5000);
-  const result: MetaResult = {
+  const result: Person = {
     type: 'Person',
     name,
     homepage: personInfo.results[0].data[0].row[4].url,
     description: personInfo.results[0].data[0].row[4].description,
     roles: personInfo.results[0].data.map((result: any) => {
-      const res: ResultRole = {
+      return {
         title: result.row[2].name,
         orgName: result.row[3]?.name,
         orgUrl: result.row[3]?.homepage,
         startDate: new Date(result.row[1].startDate),
         endDate: result.row[1].endDate ? new Date(result.row[1].endDate) : null
-      };
-      return res;
+      }
     })
   };
   return result;
 };
 
 
-const getBankHolidayInfo = async function(name: string) {
-  console.log('NAME', name)
+const getBankHolidayInfo: GetBankHolidayInfoSignature = async function(name) {
   const query: Neo4jQuery[] = [
     {
       statement: `
@@ -248,8 +246,7 @@ const getBankHolidayInfo = async function(name: string) {
     }
   ];
   const bankHolidayInfo: Neo4jResponse = await sendCypherQuery(query, 5000);
-  console.log('BANKHOLIDAYINFO', bankHolidayInfo);
-  const result: MetaResult = {
+  const result: BankHoliday = {
     type: 'BankHoliday',
     name,
     dates: bankHolidayInfo.results[0].data.map((record: any) => record.row[0]),
@@ -270,7 +267,18 @@ const sendCypherQuery = async function(cypherQuery: Neo4jQuery[], timeout: numbe
 };
 
 
-const formattedSearchResults = (neo4jResults: Neo4jResponseResult): any[] => {
+const formattedMainResults = (neo4jResults: Neo4jResponseResult): MainResult[] => {
+  const keys = neo4jResults.columns;
+  const results: MainResult[] = [];
+  neo4jResults.data.forEach(val => {
+    const result: Record<string, number> = {};
+    keys.forEach((key: string, i: number) => result[key] = val.row[i]);
+    results.push(result);
+  });
+  return results;
+};
+
+const formattedMetaResults = (neo4jResults: Neo4jResponseResult): MetaResult[] => {
   const keys = neo4jResults.columns;
   const results: any[] = [];
   neo4jResults.data.forEach(val => {
