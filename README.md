@@ -51,3 +51,9 @@ The browser-side application uses the [Elm Architecture](https://elmprogramming.
 - `view` renders the state, including the search results.
 - The page waits for the next event
 etc.
+
+## Running tests
+
+# end-to-end tests
+
+We use [Cypress](https://docs.cypress.io), which is installed automatically on installing the `dev` npm packages. If Chrome is installed on your system it should be as simple as running `npx cypress run`.
