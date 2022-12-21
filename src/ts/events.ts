@@ -141,25 +141,71 @@ const searchButtonClicked = async function(): Promise<void> {
 };
 
 
-
 const updateUrl = function() {
   if ('URLSearchParams' in window) {
     var searchParams = new URLSearchParams();
-
-    // if the state differs from the default, then set parameter
-
-    if (state.searchType !== SearchType.Keyword) searchParams.set('search-type', state.searchType);
-    if (state.selectedWords !== '') searchParams.set('selected-words', state.selectedWords);
-    if (state.excludedWords !== '') searchParams.set('excluded-words', state.excludedWords);
-    if (state.selectedTaxon !== '') searchParams.set('selected-taxon', state.selectedTaxon);
-    if (state.selectedLocale !== '') searchParams.set('lang', languageCode(state.selectedLocale));
-    if (state.caseSensitive) searchParams.set('case-sensitive', state.caseSensitive.toString());
-    if (!state.whereToSearch.title) searchParams.set('search-in-title', 'false');
-    if (!state.whereToSearch.text) searchParams.set('search-in-text', 'false');
-    if (state.areaToSearch !== SearchArea.Any) searchParams.set('area', state.areaToSearch);
-    if (state.combinator !== Combinator.Any) searchParams.set('combinator', state.combinator);
-    if (state.linkSearchUrl !== '') searchParams.set('link-search-url', state.linkSearchUrl);
-
+    switch (state.searchType) {
+      case SearchType.Keyword:
+        if (state.selectedWords !== '')
+          searchParams.set('selected-words', state.selectedWords);
+        if (state.excludedWords !== '')
+          searchParams.set('excluded-words', state.excludedWords);
+        if (state.caseSensitive)
+          searchParams.set('case-sensitive', state.caseSensitive.toString());
+        if (!state.whereToSearch.title)
+          searchParams.set('search-in-title', 'false');
+        if (!state.whereToSearch.text)
+          searchParams.set('search-in-text', 'false');
+        if (state.areaToSearch !== SearchArea.Any)
+          searchParams.set('area', state.areaToSearch);
+        if (state.combinator !== Combinator.Any)
+          searchParams.set('combinator', state.combinator);
+        break;
+      case SearchType.Link:
+        searchParams.set('search-type', state.searchType);
+        if (state.linkSearchUrl !== '')
+          searchParams.set('link-search-url', state.linkSearchUrl);
+        if (state.areaToSearch !== SearchArea.Any)
+          searchParams.set('area', state.areaToSearch);
+        break;
+      case SearchType.Taxon:
+        searchParams.set('search-type', state.searchType);
+        if (state.selectedTaxon !== '')
+          searchParams.set('selected-taxon', state.selectedTaxon);
+        if (state.areaToSearch !== SearchArea.Any)
+          searchParams.set('area', state.areaToSearch);
+        break;
+      case SearchType.Language:
+        searchParams.set('search-type', state.searchType);
+        if (state.selectedLocale !== '')
+          searchParams.set('lang', languageCode(state.selectedLocale));
+        if (state.areaToSearch !== SearchArea.Any)
+          searchParams.set('area', state.areaToSearch);
+        break;
+      default:
+        searchParams.set('search-type', state.searchType);
+        if (state.selectedWords !== '')
+          searchParams.set('selected-words', state.selectedWords);
+        if (state.excludedWords !== '')
+          searchParams.set('excluded-words', state.excludedWords);
+        if (state.selectedTaxon !== '')
+          searchParams.set('selected-taxon', state.selectedTaxon);
+        if (state.selectedLocale !== '')
+          searchParams.set('lang', languageCode(state.selectedLocale));
+        if (state.caseSensitive)
+          searchParams.set('case-sensitive', state.caseSensitive.toString());
+        if (!state.whereToSearch.title)
+          searchParams.set('search-in-title', 'false');
+        if (!state.whereToSearch.text)
+          searchParams.set('search-in-text', 'false');
+        if (state.areaToSearch !== SearchArea.Any)
+          searchParams.set('area', state.areaToSearch);
+        if (state.combinator !== Combinator.Any)
+          searchParams.set('combinator', state.combinator);
+        if (state.linkSearchUrl !== '')
+          searchParams.set('link-search-url', state.linkSearchUrl);
+        break;
+    }
     let newRelativePathQuery = window.location.pathname;
     if (searchParams.toString().length > 0) {
       newRelativePathQuery += '?' + searchParams.toString();
