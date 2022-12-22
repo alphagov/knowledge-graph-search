@@ -206,11 +206,15 @@ const updateUrl = function() {
           searchParams.set('link-search-url', state.linkSearchUrl);
         break;
     }
-    let newRelativePathQuery = window.location.pathname;
-    if (searchParams.toString().length > 0) {
-      newRelativePathQuery += '?' + searchParams.toString();
+    const newQueryString = searchParams.toString();
+    const oldQueryString = location.search.slice(1);
+    if (newQueryString !== oldQueryString) {
+      let newRelativePathQuery = window.location.pathname;
+      if (newQueryString.length > 0) {
+        newRelativePathQuery += '?' + searchParams.toString();
+      }
+      history.pushState(null, '', newRelativePathQuery);
     }
-    history.pushState(null, '', newRelativePathQuery);
   }
 }
 

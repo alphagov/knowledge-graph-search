@@ -1,7 +1,7 @@
 import { view } from './view/view';
 import { state, setQueryParamsFromQS, resetSearch } from './state';
-import { searchButtonClicked } from './events';
-import { initNeo4j } from './neo4j';
+import { searchButtonClicked, handleEvent } from './events';
+import { initNeo4j, queryGraph } from './neo4j';
 
 
 //==================================================
@@ -23,8 +23,15 @@ const init = async function() {
   }
 
   window.addEventListener('popstate', () => {
+    console.log('pop!');
     setQueryParamsFromQS();
+    state.searchResults = null;
     view();
+    // Find if we need to run a search
+    if (state.selectedWords !== '' || state.selectedLocale !== '' || state.selectedTaxon !== '' || state.linkSearchUrl !== '') {
+      state.waiting = true;
+      queryGraph(state, handleEvent);
+    }
   });
 };
 

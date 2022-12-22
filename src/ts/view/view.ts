@@ -55,6 +55,7 @@ const view = () => {
     () => handleEvent({ type: EventType.Dom, id: 'toggleDisamBox' })
   );
 
+
   // focus on the results heading if present
   id('results-heading')?.focus();
 
