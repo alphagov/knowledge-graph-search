@@ -420,7 +420,7 @@ const returnClause = function() {
       n.url as url,
         n.title AS title,
           n.documentType AS documentType,
-            n.contentID AS contentID,
+            n.contentId AS contentId,
               n.locale AS locale,
                 n.publishingApp AS publishing_app,
                   n.firstPublishedAt AS first_published_at,
