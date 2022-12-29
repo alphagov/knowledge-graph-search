@@ -337,7 +337,7 @@ const viewResults = function() {
     const file = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(file); // TODO: use window.URL.revokeObjectURL(url);  after
     html.push(`
-      <p class= "govuk-body"><a class="govuk-link" href="${url}" download="export.csv">Download all ${state.searchResults.length} records in CSV</a></p>`);
+      <p class="govuk-body"><a class="govuk-link" href="${url}" download="export.csv">Download all ${state.searchResults.length} records in CSV</a></p>`);
     return html.join('');
   } else {
     return '';
@@ -348,7 +348,7 @@ const viewResults = function() {
 const viewNoResults = () => {
   return `
     <h1 tabindex="0" id="results-heading" class="govuk-heading-l">No results</h1>
-    <div class="govuk-body">for ${viewQueryDescription()}</div>
+    <div class="govuk-body">for ${viewQueryDescription()} </div>
   `;
 };
 
