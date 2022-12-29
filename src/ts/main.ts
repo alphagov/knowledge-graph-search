@@ -1,7 +1,7 @@
 import { view } from './view/view';
 import { state, setQueryParamsFromQS, resetSearch } from './state';
 import { searchButtonClicked, handleEvent } from './events';
-import { fetchWithTimeout } from './search-api';
+import { fetchWithTimeout, queryGraph } from './search-api';
 
 
 //==================================================
@@ -35,14 +35,13 @@ const init = async function() {
   }
 
   window.addEventListener('popstate', () => {
-    console.log('pop!');
     setQueryParamsFromQS();
     state.searchResults = null;
     view();
     // Find if we need to run a search
-    if (state.selectedWords !== '' || state.selectedLocale !== '' || state.selectedTaxon !== '' || state.linkSearchUrl !== '') {
+    if (state.searchParams.selectedWords !== '' || state.searchParams.selectedLocale !== '' || state.searchParams.selectedTaxon !== '' || state.searchParams.linkSearchUrl !== '') {
       state.waiting = true;
-      queryGraph(state, handleEvent);
+      queryGraph(state.searchParams, handleEvent);
     }
   });
 };

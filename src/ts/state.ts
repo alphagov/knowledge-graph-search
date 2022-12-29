@@ -27,7 +27,7 @@ const initialSearchParams: SearchParams = {
 
 
 const state: State = {
-  searchParams: initialSearchParams,
+  searchParams: JSON.parse(JSON.stringify(initialSearchParams)), // deep copy
   taxons: [], // list of names of all the taxons
   locales: [], // all the languages found in the content store
   systemErrorText: null,
@@ -47,7 +47,6 @@ const state: State = {
 
 const setQueryParamsFromQS = function(): void {
   const searchParams: URLSearchParams = new URLSearchParams(window.location.search);
-
   const maybeReplace = (stateField: keyof SearchParams, qspName: string): any =>
     searchParams.get(qspName) !== null ? searchParams.get(qspName) : initialSearchParams[stateField];
 
@@ -56,6 +55,7 @@ const setQueryParamsFromQS = function(): void {
   state.searchParams.excludedWords = maybeReplace('excludedWords', 'excluded-words');
   state.searchParams.linkSearchUrl = maybeReplace('linkSearchUrl', 'link-search-url');
   state.searchParams.selectedTaxon = maybeReplace('selectedTaxon', 'selected-taxon');
+
   const lang: (string | null) = searchParams.get('lang');
   state.searchParams.selectedLocale = lang ? languageName(lang) : initialSearchParams.selectedLocale;
   state.searchParams.caseSensitive = maybeReplace('caseSensitive', 'case-sensitive');

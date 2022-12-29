@@ -294,7 +294,7 @@ const buildSearchQuery = function(searchParams: any): string {
   const fieldsToSearch: string[] = [];
   const keywords = splitKeywords(searchParams.selectedWords);
   const excludedKeywords = splitKeywords(searchParams.excludedWords);
-  const combinator = searchParams.eitherOr === 'any' ? 'OR' : 'AND';
+  const combinator = searchParams.combinator === 'any' ? 'OR' : 'AND';
   if (searchParams.whereToSearch.title) fieldsToSearch.push('title');
   if (searchParams.whereToSearch.text) fieldsToSearch.push('text', 'description');
   let inclusionClause = '';
@@ -384,7 +384,7 @@ const returnClause = function() {
     n.url as url,
     n.title AS title,
     n.documentType AS documentType,
-    n.contentID AS contentID,
+    n.contentId AS contentId,
     n.locale AS locale,
     n.publishingApp AS publishing_app,
     n.firstPublishedAt AS first_published_at,

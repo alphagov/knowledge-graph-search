@@ -142,8 +142,8 @@ describe('Keyword searching', () => {
     cy.visit('');
     cy.get('input#keyword').type('sunak disraeli');
     cy.get('.govuk-details__summary').click();
-    cy.get('#search-text').uncheck();
     cy.get('#combinator-any').check();
+    cy.get('#search-text').uncheck();
     cy.get('button#search').click();
     cy.contains('button', 'Searching');
     cy.get('#results-heading', { timeout: 60000 }).contains(/^\d+ results$/);

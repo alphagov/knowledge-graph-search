@@ -48,7 +48,6 @@ app.get('/search', async (req: any, res) => {
   };
   try {
     const data = await sendSearchQuery(params);
-    console.log('/search returns', data);
     res.send(data);
   } catch (e) {
     console.log('/search fail');

@@ -1,9 +1,10 @@
 import { state, searchState, resetSearch } from './state';
 import { id, getFormInputValue } from './utils';
 import { view } from './view/view';
-import { makeQueryString, queryGraph } from './search-api';
+import { queryGraph } from './search-api';
 import { EventType, SearchApiCallback } from './event-types';
 import { SearchType, SearchArea, Combinator } from './search-api-types';
+import { languageCode } from './lang'
 
 
 declare const window: any;
@@ -140,66 +141,66 @@ const searchButtonClicked = async function(): Promise<void> {
 const updateUrl = function() {
   if ('URLSearchParams' in window) {
     var searchParams = new URLSearchParams();
-    switch (state.searchType) {
+    switch (state.searchParams.searchType) {
       case SearchType.Keyword:
-        if (state.selectedWords !== '')
-          searchParams.set('selected-words', state.selectedWords);
-        if (state.excludedWords !== '')
-          searchParams.set('excluded-words', state.excludedWords);
-        if (state.caseSensitive)
-          searchParams.set('case-sensitive', state.caseSensitive.toString());
-        if (!state.whereToSearch.title)
+        if (state.searchParams.selectedWords !== '')
+          searchParams.set('selected-words', state.searchParams.selectedWords);
+        if (state.searchParams.excludedWords !== '')
+          searchParams.set('excluded-words', state.searchParams.excludedWords);
+        if (state.searchParams.caseSensitive)
+          searchParams.set('case-sensitive', state.searchParams.caseSensitive.toString());
+        if (!state.searchParams.whereToSearch.title)
           searchParams.set('search-in-title', 'false');
-        if (!state.whereToSearch.text)
+        if (!state.searchParams.whereToSearch.text)
           searchParams.set('search-in-text', 'false');
-        if (state.areaToSearch !== SearchArea.Any)
-          searchParams.set('area', state.areaToSearch);
-        if (state.combinator !== Combinator.Any)
-          searchParams.set('combinator', state.combinator);
+        if (state.searchParams.areaToSearch !== SearchArea.Any)
+          searchParams.set('area', state.searchParams.areaToSearch);
+        if (state.searchParams.combinator !== Combinator.Any)
+          searchParams.set('combinator', state.searchParams.combinator);
         break;
       case SearchType.Link:
-        searchParams.set('search-type', state.searchType);
-        if (state.linkSearchUrl !== '')
-          searchParams.set('link-search-url', state.linkSearchUrl);
-        if (state.areaToSearch !== SearchArea.Any)
-          searchParams.set('area', state.areaToSearch);
+        searchParams.set('search-type', state.searchParams.searchType);
+        if (state.searchParams.linkSearchUrl !== '')
+          searchParams.set('link-search-url', state.searchParams.linkSearchUrl);
+        if (state.searchParams.areaToSearch !== SearchArea.Any)
+          searchParams.set('area', state.searchParams.areaToSearch);
         break;
       case SearchType.Taxon:
-        searchParams.set('search-type', state.searchType);
-        if (state.selectedTaxon !== '')
-          searchParams.set('selected-taxon', state.selectedTaxon);
-        if (state.areaToSearch !== SearchArea.Any)
-          searchParams.set('area', state.areaToSearch);
+        searchParams.set('search-type', state.searchParams.searchType);
+        if (state.searchParams.selectedTaxon !== '')
+          searchParams.set('selected-taxon', state.searchParams.selectedTaxon);
+        if (state.searchParams.areaToSearch !== SearchArea.Any)
+          searchParams.set('area', state.searchParams.areaToSearch);
         break;
       case SearchType.Language:
-        searchParams.set('search-type', state.searchType);
-        if (state.selectedLocale !== '')
-          searchParams.set('lang', languageCode(state.selectedLocale));
-        if (state.areaToSearch !== SearchArea.Any)
-          searchParams.set('area', state.areaToSearch);
+        searchParams.set('search-type', state.searchParams.searchType);
+        if (state.searchParams.selectedLocale !== '')
+          searchParams.set('lang', languageCode(state.searchParams.selectedLocale));
+        if (state.searchParams.areaToSearch !== SearchArea.Any)
+          searchParams.set('area', state.searchParams.areaToSearch);
         break;
       default:
-        searchParams.set('search-type', state.searchType);
-        if (state.selectedWords !== '')
-          searchParams.set('selected-words', state.selectedWords);
-        if (state.excludedWords !== '')
-          searchParams.set('excluded-words', state.excludedWords);
-        if (state.selectedTaxon !== '')
-          searchParams.set('selected-taxon', state.selectedTaxon);
-        if (state.selectedLocale !== '')
-          searchParams.set('lang', languageCode(state.selectedLocale));
-        if (state.caseSensitive)
-          searchParams.set('case-sensitive', state.caseSensitive.toString());
-        if (!state.whereToSearch.title)
+        searchParams.set('search-type', state.searchParams.searchType);
+        if (state.searchParams.selectedWords !== '')
+          searchParams.set('selected-words', state.searchParams.selectedWords);
+        if (state.searchParams.excludedWords !== '')
+          searchParams.set('excluded-words', state.searchParams.excludedWords);
+        if (state.searchParams.selectedTaxon !== '')
+          searchParams.set('selected-taxon', state.searchParams.selectedTaxon);
+        if (state.searchParams.selectedLocale !== '')
+          searchParams.set('lang', languageCode(state.searchParams.selectedLocale));
+        if (state.searchParams.caseSensitive)
+          searchParams.set('case-sensitive', state.searchParams.caseSensitive.toString());
+        if (!state.searchParams.whereToSearch.title)
           searchParams.set('search-in-title', 'false');
-        if (!state.whereToSearch.text)
+        if (!state.searchParams.whereToSearch.text)
           searchParams.set('search-in-text', 'false');
-        if (state.areaToSearch !== SearchArea.Any)
-          searchParams.set('area', state.areaToSearch);
-        if (state.combinator !== Combinator.Any)
-          searchParams.set('combinator', state.combinator);
-        if (state.linkSearchUrl !== '')
-          searchParams.set('link-search-url', state.linkSearchUrl);
+        if (state.searchParams.areaToSearch !== SearchArea.Any)
+          searchParams.set('area', state.searchParams.areaToSearch);
+        if (state.searchParams.combinator !== Combinator.Any)
+          searchParams.set('combinator', state.searchParams.combinator);
+        if (state.searchParams.linkSearchUrl !== '')
+          searchParams.set('link-search-url', state.searchParams.linkSearchUrl);
         break;
     }
     const newQueryString = searchParams.toString();
@@ -212,7 +213,6 @@ const updateUrl = function() {
       history.pushState(null, '', newRelativePathQuery);
     }
   }
-  history.pushState(null, '', newRelativePathQuery);
 };
 
 
