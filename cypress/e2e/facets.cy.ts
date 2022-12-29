@@ -80,7 +80,4 @@ describe('Search results facets', () => {
     cy.get('input#show-field-all_organisations').check();
     cy.get('td:eq(13)').then($th => cy.expect($th.text()).to.not.equal('null'));
   });
-
-
-
 });

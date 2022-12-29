@@ -1,5 +1,5 @@
 describe('Browser buttons behaviour', () => {
-  it ('goes back to the previous page when clicking through search types', () => {
+  it('goes back to the previous page when clicking through search types', () => {
     cy.visit('');
     cy.contains('#error-summary-title').should('not.exist');
     cy.contains('button', 'Taxons').click();
@@ -17,14 +17,10 @@ describe('Browser buttons behaviour', () => {
   it('goes back when user clicks back after results', () => {
     cy.visit('');
     cy.contains('#error-summary-title').should('not.exist');
-
-    // do a sample search
     cy.contains('button', 'Taxons').click();
     cy.get('input#taxon').type('Air passenger duty');
     cy.get('button#search').click();
     cy.get('#results-heading', { timeout: 60000 }).contains(/^\d+ results$/);
-
-    // go back
     cy.go('back')
     cy.get('ul#show-fields').should('not.exist');
     cy.get('table#results-table').should('not.exist');
@@ -33,24 +29,18 @@ describe('Browser buttons behaviour', () => {
   it('refetches old results when back', () => {
     cy.visit('');
     cy.contains('#error-summary-title').should('not.exist');
-
-    // do a sample search
     cy.contains('button', 'Taxons').click();
     cy.get('input#taxon').type('Air passenger duty');
     cy.get('button#search').click();
     cy.get('#results-heading', { timeout: 60000 }).contains(/^\d+ results$/);
-
-    // change search type
     cy.contains('button', 'Languages').click();
     cy.get('table#results-table').should('not.exist');
-
-    // go back
     cy.go('back');
     cy.get('#results-heading', { timeout: 60000 }).contains(/^\d+ results$/);
     cy.get('#results-table');
   });
 
-  it ('ends on the start page if going back, forward, back, back', () => {
+  it('ends on the start page if going back, forward, back, back', () => {
     cy.visit('');
     cy.contains('#error-summary-title').should('not.exist');
     cy.contains('button', 'Taxons').click();
@@ -70,7 +60,7 @@ describe('Browser buttons behaviour', () => {
     });
   });
 
-  it ('shows the start page if the user presses reload on the start page', () => {
+  it('shows the start page if the user presses reload on the start page', () => {
     cy.visit('');
     cy.contains('#error-summary-title').should('not.exist');
     cy.get('#results-heading').should('not.exist');
@@ -81,17 +71,14 @@ describe('Browser buttons behaviour', () => {
     cy.location().should(loc => expect(loc.search).to.eq(''));
   });
 
-  it ('shows the same page if the user presses reload', () => {
+  it('shows the same page if the user presses reload', () => {
     cy.visit('');
     cy.contains('#error-summary-title').should('not.exist');
     cy.get('#results-heading').should('not.exist');
-
-    // do a sample search
     cy.contains('button', 'Taxons').click();
     cy.get('input#taxon').type('Air passenger duty');
     cy.get('button#search').click();
     cy.get('#results-heading', { timeout: 60000 }).contains(/^\d+ results$/);
-
     cy.reload();
     cy.location().should(loc => expect(loc.search).to.eq('?search-type=taxon&selected-taxon=Air+passenger+duty'));
     cy.get('#results-heading', { timeout: 60000 }).contains(/^\d+ results$/);

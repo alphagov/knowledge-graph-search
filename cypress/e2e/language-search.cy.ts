@@ -29,9 +29,6 @@ describe('Language search', () => {
       numUnfilteredResults = parseInt(heading.text().match(/^(\d+) results$/)[1]);
     });
     cy.get('#results-table');
-    cy.location().should(loc => {
-      expect(loc.search).to.eq('?search-type=language&lang=cy');
-    });
   });
 
   it('returns fewer results for a Publisher language search', () => {
@@ -48,9 +45,6 @@ describe('Language search', () => {
       expect(numPublisherResults).to.be.lessThan(numUnfilteredResults);
     });
     cy.get('#results-table');
-    cy.location().should(loc => {
-      expect(loc.search).to.eq('?search-type=language&lang=cy&area=publisher');
-    });
   });
 
   it('returns fewer results for a Whitehall language search', () => {
@@ -67,11 +61,5 @@ describe('Language search', () => {
       expect(numWhitehallResults).to.be.lessThan(numUnfilteredResults);
     });
     cy.get('#results-table');
-    cy.location().should(loc => {
-      expect(loc.search).to.eq('?search-type=language&lang=cy&area=whitehall');
-    });
   });
-
-
-
 });

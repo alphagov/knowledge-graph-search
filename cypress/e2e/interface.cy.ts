@@ -64,7 +64,6 @@ describe('Interface', () => {
     cy.contains('button', 'Search');
   });
 
-
   it('Shows the correct filters in languages search', () => {
     cy.visit('');
     cy.contains('button', 'Languages').click();

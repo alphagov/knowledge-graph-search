@@ -1,6 +1,5 @@
-let numUnfilteredResults;
-
 describe('Taxon search', () => {
+  let numUnfilteredResults: number;
   it('returns no results for an empty taxon search', () => {
     cy.visit('');
     cy.contains('button', 'Taxons').click();
@@ -29,9 +28,6 @@ describe('Taxon search', () => {
       numUnfilteredResults = parseInt(heading.text().match(/^(\d+) results$/)[1]);
     });
     cy.get('#results-table');
-    cy.location().should(loc => {
-      expect(loc.search).to.eq('?search-type=taxon&selected-taxon=Environment');
-    });
   });
 
   it('returns fewer results for a Publisher taxon search', () => {
@@ -48,9 +44,6 @@ describe('Taxon search', () => {
       expect(numPublisherResults).to.be.lessThan(numUnfilteredResults);
     });
     cy.get('#results-table');
-    cy.location().should(loc => {
-      expect(loc.search).to.eq('?search-type=taxon&selected-taxon=Environment&area=publisher');
-    });
   });
 
   it('returns fewer results for a Whitehall taxon search', () => {
@@ -67,9 +60,6 @@ describe('Taxon search', () => {
       expect(numWhitehallResults).to.be.lessThan(numUnfilteredResults);
     });
     cy.get('#results-table');
-    cy.location().should(loc => {
-      expect(loc.search).to.eq('?search-type=taxon&selected-taxon=Environment&area=whitehall');
-    });
   });
 
 

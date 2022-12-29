@@ -14,12 +14,9 @@ describe('Keyword searching', () => {
     cy.contains('button', 'Searching');
     cy.get('#results-heading', { timeout: 60000 }).contains('No results');
     cy.title().should('eq', 'GOV.UK pages that contain "wwekufsskjfdksufweuf" - GovGraph search')
-    cy.location().should(loc => {
-      expect(loc.search).to.eq('?selected-words=wwekufsskjfdksufweuf');
-    });
   });
 
-  it('returns results when searching for searching keywords that exist', () => {
+  it('returns results when searching for keywords that exist', () => {
     cy.visit('');
     cy.get('input#keyword').type('Churchill');
     cy.get('button#search').click();
@@ -32,9 +29,6 @@ describe('Keyword searching', () => {
     cy.contains('Showing results 1 to 10, in descending popularity');
     cy.get('#results-table');
     cy.title().should('eq', 'GOV.UK pages that contain "Churchill" - GovGraph search')
-    cy.location().should(loc => {
-      expect(loc.search).to.eq('?selected-words=Churchill');
-    });
   });
 
   it('returns results when searching in title only', () => {
@@ -51,9 +45,6 @@ describe('Keyword searching', () => {
     });
     cy.contains('in their title');
     cy.get('#results-table');
-    cy.location().should(loc => {
-      expect(loc.search).to.eq('?selected-words=Churchill&search-in-text=false');
-    });
   });
 
   it('returns results when searching in body only', () => {
@@ -70,9 +61,6 @@ describe('Keyword searching', () => {
     });
     cy.contains('in their body content');
     cy.get('#results-table');
-    cy.location().should(loc => {
-      expect(loc.search).to.eq('?selected-words=Churchill&search-in-title=false');
-    });
   });
 
   it('shows an error when unchecking both body and title', () => {
@@ -83,9 +71,6 @@ describe('Keyword searching', () => {
     cy.get('#search-text').uncheck();
     cy.get('button#search').click();
     cy.title().should('eq', 'GovGraph search')
-    cy.location().should(loc => {
-      expect(loc.search).to.eq('?selected-words=Churchill&search-in-title=false&search-in-text=false');
-    });
     cy.get('div.govuk-error-summary');
     cy.contains('There is a problem');
     cy.contains('You need to select a keyword location');
@@ -103,9 +88,6 @@ describe('Keyword searching', () => {
     });
     cy.get('#results-table');
     cy.title().should('eq', 'GOV.UK pages that contain "education" - GovGraph search')
-    cy.location().should(loc => {
-      expect(loc.search).to.eq('?selected-words=education');
-    });
   });
 
   it('returns fewer results when searching in Publisher only', () => {
@@ -124,9 +106,6 @@ describe('Keyword searching', () => {
     cy.contains('in their title');
     cy.get('#results-table');
     cy.title().should('eq', 'GOV.UK pages that contain "education" in their title and are published using "publisher" - GovGraph search')
-    cy.location().should(loc => {
-      expect(loc.search).to.eq('?selected-words=education&search-in-text=false&area=publisher');
-    });
   });
 
   it('returns fewer results when searching in Whitehall only', () => {
@@ -145,9 +124,6 @@ describe('Keyword searching', () => {
     cy.contains('in their title');
     cy.get('#results-table');
     cy.title().should('eq', 'GOV.UK pages that contain "education" in their title and are published using "whitehall" - GovGraph search')
-    cy.location().should(loc => {
-      expect(loc.search).to.eq('?selected-words=education&search-in-text=false&area=whitehall');
-    });
   });
 
   it('returns no results when doing an empty case-sensitive search', () => {
