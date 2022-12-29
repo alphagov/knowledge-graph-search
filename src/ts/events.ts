@@ -44,11 +44,9 @@ const handleEvent: Neo4jCallback = async function(event) {
           break;
         case 'button-next-page':
           state.skip = state.skip + state.resultsPerPage;
-          updateUrl();
           break;
         case 'button-prev-page':
           state.skip = Math.max(state.skip - state.resultsPerPage, 0);
-          updateUrl();
           break;
         case 'toggleDisamBox':
           state.disamboxExpanded = !state.disamboxExpanded;
