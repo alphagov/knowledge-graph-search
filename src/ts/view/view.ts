@@ -316,28 +316,28 @@ const viewResults = function() {
 
     html.push(`<div class="govuk-body">for ${viewQueryDescription()}</div>`);
 
-    if (nbRecords >= state.resultsPerPage) {
+    if (nbRecords > state.resultsPerPage) {
+
       html.push(`
         <p class="govuk-body">Showing results ${state.skip + 1} to ${Math.min(nbRecords, state.skip + state.resultsPerPage)}, in descending popularity</p>
         <a class="govuk-skip-link" href="#results-table">Skip to results</a>
         <a class="govuk-skip-link" href="#search-form">Back to search filters</a>
-  `);
+     `);
     }
+
     html.push(viewSearchResultsTable());
 
-    if (nbRecords >= state.resultsPerPage) {
-      html.push(`
-        <p class="govuk-body">
-          <button type="button" class="govuk-button" id="button-prev-page">Previous</button>
-          <button type="button" class="govuk-button" id="button-next-page">Next</button>
-        </p>`);
-    }
+    html.push(`
+      <p class="govuk-body">
+        <button type="button" class="govuk-button" id="button-prev-page" ${state.skip < state.resultsPerPage ? "disabled" : ""}>Previous</button>
+        <button type="button" class="govuk-button" id="button-next-page" ${state.skip + state.resultsPerPage >= nbRecords ? "disabled" : ""}>Next</button>
+      </p>`);
 
     const csv = csvFromResults(state.searchResults);
     const file = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(file); // TODO: use window.URL.revokeObjectURL(url);  after
     html.push(`
-        <p class="govuk-body"><a class="govuk-link" href="${url}" download="export.csv">Download all ${state.searchResults.length} records in CSV</a></p>`);
+      <p class= "govuk-body"><a class="govuk-link" href="${url}" download="export.csv">Download all ${state.searchResults.length} records in CSV</a></p>`);
     return html.join('');
   } else {
     return '';
