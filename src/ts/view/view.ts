@@ -375,7 +375,7 @@ const viewSearchResults = () => {
 const formatNames = (array: []) => [...new Set(array)].map(x => `"${x}"`).join(', ');
 
 
-const formatDateTime = (date: string) => `${date.slice(0, 10)} at ${date.slice(12, 16)}`;
+const formatDateTime = (date: string) => `${date.slice(0, 10)} at ${date.slice(11, 16)} `;
 
 
 const fieldFormatters: Record<string, any> = {
