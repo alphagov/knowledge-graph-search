@@ -65,18 +65,18 @@ const view = () => {
 const viewSearchTypeSelector = () => `
     <p class="govuk-body search-selector">
       Search for:
-      <button class="${state.searchType === 'keyword' ? 'active' : ''}" id="search-keyword">Keywords</button>
-      <button class="${state.searchType === 'link' ? 'active' : ''}" id="search-link">Links</button>
-      <button class="${state.searchType === 'taxon' ? 'active' : ''}" id="search-taxon">Taxons</button>
-      <button class="${state.searchType === 'language' ? 'active' : ''}" id="search-language">Languages</button>
-      <button class="${state.searchType === 'mixed' ? 'active' : ''}" id="search-mixed">Mixed</button>
+      <button class="${state.searchParams.searchType === 'keyword' ? 'active' : ''}" id="search-keyword">Keywords</button>
+      <button class="${state.searchParams.searchType === 'link' ? 'active' : ''}" id="search-link">Links</button>
+      <button class="${state.searchParams.searchType === 'taxon' ? 'active' : ''}" id="search-taxon">Taxons</button>
+      <button class="${state.searchParams.searchType === 'language' ? 'active' : ''}" id="search-language">Languages</button>
+      <button class="${state.searchParams.searchType === 'mixed' ? 'active' : ''}" id="search-mixed">Mixed</button>
     </p>
   `;
 
 
 const viewMainLayout = () => {
   const result = [];
-  if (state.searchType === 'mixed') {
+  if (state.searchParams.searchType === 'mixed') {
     if (!state.searchResults) {
       result.push(`
         <div class="govuk-grid-row mixed-layout--no-results">
@@ -119,39 +119,39 @@ const makeBold = (text: string, includeMarkup: boolean) =>
 
 const viewContainDescription = (includeMarkup: boolean) => {
   let where: string;
-  if (state.whereToSearch.title && state.whereToSearch.text) {
+  if (state.searchParams.whereToSearch.title && state.searchParams.whereToSearch.text) {
     where = '';
-  } else if (state.whereToSearch.title) {
+  } else if (state.searchParams.whereToSearch.title) {
     where = 'in their title';
   } else {
     where = 'in their body content';
   }
-  let combineOp = state.combinator === 'all' ? 'and' : 'or';
-  let combinedWords = splitKeywords(state.selectedWords)
+  let combineOp = state.searchParams.combinator === 'all' ? 'and' : 'or';
+  let combinedWords = splitKeywords(state.searchParams.selectedWords)
     .filter(w => w.length > 2)
     .map(w => makeBold(w, includeMarkup))
     .join(` ${combineOp} `);
-  return state.selectedWords !== '' ? `${combinedWords} ${where}` : '';
+  return state.searchParams.selectedWords !== '' ? `${combinedWords} ${where}` : '';
 };
 
 
 const viewQueryDescription = (includeMarkup = true) => {
   const clauses = [];
-  if (state.selectedWords !== '') {
+  if (state.searchParams.selectedWords !== '') {
     let keywords = `contain ${viewContainDescription(includeMarkup)}`;
-    if (state.excludedWords !== '') {
-      keywords = `${keywords} (but don't contain ${makeBold(state.excludedWords, includeMarkup)})`;
+    if (state.searchParams.excludedWords !== '') {
+      keywords = `${keywords} (but don't contain ${makeBold(state.searchParams.excludedWords, includeMarkup)})`;
     }
     clauses.push(keywords);
   }
-  if (state.selectedTaxon !== '')
-    clauses.push(`belong to the ${makeBold(state.selectedTaxon, includeMarkup)} taxon (or its sub-taxons)`);
-  if (state.selectedLocale !== '')
-    clauses.push(`are in ${makeBold(languageName(state.selectedLocale), includeMarkup)}`);
-  if (state.linkSearchUrl !== '')
-    clauses.push(`link to ${makeBold(state.linkSearchUrl, includeMarkup)}`);
-  if (state.areaToSearch === 'whitehall' || state.areaToSearch === 'publisher')
-    clauses.push(`are published using ${makeBold(state.areaToSearch, includeMarkup)}`);
+  if (state.searchParams.selectedTaxon !== '')
+    clauses.push(`belong to the ${makeBold(state.searchParams.selectedTaxon, includeMarkup)} taxon (or its sub-taxons)`);
+  if (state.searchParams.selectedLocale !== '')
+    clauses.push(`are in ${makeBold(languageName(state.searchParams.selectedLocale), includeMarkup)}`);
+  if (state.searchParams.linkSearchUrl !== '')
+    clauses.push(`link to ${makeBold(state.searchParams.linkSearchUrl, includeMarkup)}`);
+  if (state.searchParams.areaToSearch === 'whitehall' || state.searchParams.areaToSearch === 'publisher')
+    clauses.push(`are published using ${makeBold(state.searchParams.areaToSearch, includeMarkup)}`);
 
   const joinedClauses = (clauses.length === 1) ?
     clauses[0] :
@@ -299,7 +299,7 @@ const viewResults = function() {
     const html = [];
     const nbRecords = state.searchResults.length;
 
-    if (nbRecords < state.nbResultsLimit) {
+    if (nbRecords < 50000) {
       html.push(`
         <h1 tabindex="0" id="results-heading" class="govuk-heading-l">${nbRecords} result${nbRecords !== 0 ? 's' : ''}</h1>`);
     } else {
@@ -308,7 +308,7 @@ const viewResults = function() {
           <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
           <strong class="govuk-warning-text__text">
             <span class="govuk-warning-text__assistive">Warning</span>
-            There are more than ${state.nbResultsLimit} results. Try to narrow down your search.
+            There are more than 50000 results. Try to narrow down your search.
           </strong>
         </div>
       `);

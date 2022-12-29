@@ -1,12 +1,12 @@
 import { sanitiseOutput } from '../utils';
 import { state, searchState } from '../state';
 import { languageName } from '../lang';
-import { SearchType } from '../state-types';
+import { SearchType } from '../search-api-types';
 
 
 const viewSearchPanel = () => {
   const result = [];
-  switch (state.searchType) {
+  switch (state.searchParams.searchType) {
     case SearchType.Mixed:
     case SearchType.Results:
       result.push(`
@@ -116,7 +116,7 @@ const viewSearchPanel = () => {
     `);
       break;
     default:
-      console.log('viewSearchPanel: unknown value', state.searchType);
+      console.log('viewSearchPanel: unknown value', state.searchParams.searchType);
   }
   return result.join('');
 };
@@ -148,7 +148,7 @@ const viewScopeSelector = (): string => {
           <input
               class="govuk-checkboxes__input"
               type="checkbox" id="search-title"
-              ${state.whereToSearch.title ? 'checked' : ''}/>
+              ${state.searchParams.whereToSearch.title ? 'checked' : ''}/>
           <label for="search-title" class="govuk-label govuk-checkboxes__label">title</label>
         </div>
         <div class="govuk-checkboxes__item">
@@ -156,7 +156,7 @@ const viewScopeSelector = (): string => {
               class="govuk-checkboxes__input"
               type="checkbox"
               id="search-text"
-            ${state.whereToSearch.text ? 'checked' : ''}/>
+            ${state.searchParams.whereToSearch.text ? 'checked' : ''}/>
           <label for="search-text" class="govuk-label govuk-checkboxes__label">
             body content and description
           </label>
@@ -185,7 +185,7 @@ const viewTaxonSelector = () => `
         ${state.waiting && 'disabled="disabled"'}
         style="display: inline-block"
         list="taxonList"
-        value="${state.selectedTaxon}"
+        value="${state.searchParams.selectedTaxon}"
         class="govuk-input"
         id="taxon"
         autocomplete="off" />
@@ -206,12 +206,12 @@ const viewLocaleSelector = () => {
       </div>
       <datalist id="localeList">
   `];
-  html.push(...state.locales.map(code => `<option data-value="${code}" ${state.selectedLocale == code ? 'selected' : ''}>${languageName(code)}</option>`))
+  html.push(...state.locales.map(code => `<option data-value="${code}" ${state.searchParams.selectedLocale == code ? 'selected' : ''}>${languageName(code)}</option>`))
   html.push(`
       </datalist>
       <input type="text"
          ${state.waiting && 'disabled="disabled"'}
-         value="${state.selectedLocale}"
+         value="${state.searchParams.selectedLocale}"
          class="govuk-input"
          list="localeList"
          id="locale" name="locale"
@@ -246,7 +246,7 @@ const viewLinkSearch = () => `
         class="govuk-input"
         id="link-search"
         ${state.waiting && 'disabled="disabled"'}
-        value="${state.linkSearchUrl}"
+        value="${state.searchParams.linkSearchUrl}"
      />
   </div>
 `;
@@ -261,7 +261,7 @@ const viewCaseSensitiveSelector = () => `
             ${state.waiting && 'disabled="disabled"'}
             type="checkbox"
             id="case-sensitive"
-            ${state.caseSensitive ? 'checked' : ''}
+            ${state.searchParams.caseSensitive ? 'checked' : ''}
         />
         <label for="case-sensitive" class="govuk-label govuk-checkboxes__label">case-sensitive search</label>
       </div>
@@ -285,7 +285,7 @@ const viewKeywordsCombinator = () =>
           <input class="govuk-radios__input"
                  type="radio" id="combinator-any"
                  name="combinator"
-            ${state.combinator === 'any' ? 'checked' : ''}/>
+            ${state.searchParams.combinator === 'any' ? 'checked' : ''}/>
           <label for="combinator-any" class="govuk-label govuk-radios__label">
             any keyword
           </label>
@@ -294,7 +294,7 @@ const viewKeywordsCombinator = () =>
           <input class="govuk-radios__input"
                  type="radio" id="combinator-all"
                  name="combinator"
-            ${state.combinator === 'all' ? 'checked' : ''}/>
+            ${state.searchParams.combinator === 'all' ? 'checked' : ''}/>
           <label for="combinator-all" class="govuk-label govuk-radios__label">
             all keywords
           </label>
@@ -319,7 +319,7 @@ const viewPublishingAppSelector = () =>
           <input class="govuk-radios__input"
                  type="radio" id="area-publisher"
                  name="area"
-            ${state.areaToSearch === 'publisher' ? 'checked' : ''}/>
+            ${state.searchParams.areaToSearch === 'publisher' ? 'checked' : ''}/>
           <label for="area-publisher" class="govuk-label govuk-radios__label">
             Publisher
           </label>
@@ -328,14 +328,14 @@ const viewPublishingAppSelector = () =>
           <input class="govuk-radios__input"
                  type="radio" id="area-whitehall"
                  name="area"
-            ${state.areaToSearch === 'whitehall' ? 'checked' : ''}/>
+            ${state.searchParams.areaToSearch === 'whitehall' ? 'checked' : ''}/>
           <label for="area-whitehall" class="govuk-label govuk-radios__label">Whitehall</label>
         </div>
         <div class="govuk-radios__item">
           <input class="govuk-radios__input"
                  type="radio" id="area-any"
                  name="area"
-            ${state.areaToSearch === 'any' ? 'checked' : ''}/>
+            ${state.searchParams.areaToSearch === 'any' ? 'checked' : ''}/>
           <label for="area-any" class="govuk-label govuk-radios__label">All publishing applications</label>
         </div>
       </div>
@@ -354,7 +354,7 @@ const viewKeywordsInput = () => `
       ${state.waiting && 'disabled="disabled"'}
       class="govuk-input"
       id="keyword"
-      value='${sanitiseOutput(state.selectedWords)}'
+      value='${sanitiseOutput(state.searchParams.selectedWords)}'
     />
   </div>
 `;
@@ -371,7 +371,7 @@ const viewExclusionsInput = () => `
     <input class="govuk-input"
         ${state.waiting && 'disabled="disabled"'}
         id="excluded-keyword"
-        value='${sanitiseOutput(state.excludedWords).replace('"', '&quot;')}'/>
+        value='${sanitiseOutput(state.searchParams.excludedWords).replace('"', '&quot;')}'/>
   </div>
 `;
 

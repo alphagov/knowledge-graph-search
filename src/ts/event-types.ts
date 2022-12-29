@@ -1,6 +1,12 @@
-export enum EventType {
-  Dom, Neo4jRunning, Neo4jCallbackOk, Neo4jCallbackFail
+export interface SearchApiCallback {
+  (event: AppEvent): Promise<void>
 }
+
+
+export enum EventType {
+  Dom, SearchRunning, SearchApiCallbackOk, SearchApiCallbackFail
+}
+
 
 export interface AppEvent {
   type: EventType,

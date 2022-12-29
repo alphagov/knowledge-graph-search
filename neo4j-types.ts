@@ -38,29 +38,3 @@ export interface QueryGraphFn {
 export interface Neo4jCallback {
   (event: AppEvent): Promise<void>
 }
-
-export interface ResultDate {
-  dateString: string
-}
-
-export interface ResultTaxon {
-  name: string,
-  url: string
-}
-
-export interface MetaResult {
-  type: string,
-  name: string,
-  dates?: ResultDate[],
-  regions?: string[],
-  homepage?: string,
-  description?: string,
-  parentName?: string,
-  childOrgNames?: string[],
-  personRoleNames?: string[],
-  roles?: string[],
-  orgNames?: string[],
-  personNames?: string[],
-  ancestorTaxons?: ResultTaxon[]
-  childTaxons?: ResultTaxon[]
-}

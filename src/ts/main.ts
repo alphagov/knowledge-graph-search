@@ -1,17 +1,29 @@
 import { view } from './view/view';
 import { state, setQueryParamsFromQS, resetSearch } from './state';
 import { searchButtonClicked, handleEvent } from './events';
-import { initNeo4j, queryGraph } from './neo4j';
+import { fetchWithTimeout } from './search-api';
 
 
 //==================================================
 // INIT
 //==================================================
 
+const initDatabase = async function() {
+  console.log('retrieving taxons and locales');
+  const apiResponse = await fetchWithTimeout('/get-init-data');
+  if (apiResponse.taxons.length === 0 || apiResponse.locales.length === 3) {
+    throw 'Received no data from GovGraph. It might still be loading.';
+  }
+  return apiResponse;
+};
+
+
 const init = async function() {
   state.systemErrorText = null;
   try {
-    await initNeo4j();
+    const dbInitResults = await initDatabase();
+    state.taxons = dbInitResults.taxons;
+    state.locales = dbInitResults.locales;
   } catch (error) {
     if (error instanceof DOMException && error.name === "AbortError") {
       state.systemErrorText = 'It looks like GovGraph is not responding.';

@@ -1,5 +1,6 @@
 import { languageName } from './lang';
-import { SearchType, SearchParams, Combinator, SearchArea, State } from './state-types';
+import { SearchType, SearchParams, Combinator, SearchArea } from './search-api-types';
+import { State } from './state-types';
 
 
 // user inputs that are used to build the query.
@@ -21,18 +22,16 @@ const initialSearchParams: SearchParams = {
   },
   combinator: Combinator.Any,
   areaToSearch: SearchArea.Any,
-
   caseSensitive: false // whether the keyword search is case sensitive
 };
 
 
 const state: State = {
-  ...initialSearchParams,
+  searchParams: initialSearchParams,
   taxons: [], // list of names of all the taxons
   locales: [], // all the languages found in the content store
   systemErrorText: null,
   userErrors: [], // error codes due to user not entering valid search criteria
-  nbResultsLimit: 50000, // limit queries to this number of results
   searchResults: null,
   metaSearchResults: null,
   skip: 0, // where to start the pagination (number of results)
@@ -52,20 +51,20 @@ const setQueryParamsFromQS = function(): void {
   const maybeReplace = (stateField: keyof SearchParams, qspName: string): any =>
     searchParams.get(qspName) !== null ? searchParams.get(qspName) : initialSearchParams[stateField];
 
-  state.searchType = maybeReplace('searchType', 'search-type');
-  state.selectedWords = maybeReplace('selectedWords', 'selected-words');
-  state.excludedWords = maybeReplace('excludedWords', 'excluded-words');
-  state.linkSearchUrl = maybeReplace('linkSearchUrl', 'link-search-url');
-  state.selectedTaxon = maybeReplace('selectedTaxon', 'selected-taxon');
+  state.searchParams.searchType = maybeReplace('searchType', 'search-type');
+  state.searchParams.selectedWords = maybeReplace('selectedWords', 'selected-words');
+  state.searchParams.excludedWords = maybeReplace('excludedWords', 'excluded-words');
+  state.searchParams.linkSearchUrl = maybeReplace('linkSearchUrl', 'link-search-url');
+  state.searchParams.selectedTaxon = maybeReplace('selectedTaxon', 'selected-taxon');
   const lang: (string | null) = searchParams.get('lang');
-  state.selectedLocale = lang ? languageName(lang) : initialSearchParams.selectedLocale;
-  state.caseSensitive = maybeReplace('caseSensitive', 'case-sensitive');
-  state.areaToSearch = maybeReplace('areaToSearch', 'area');
-  state.combinator = maybeReplace('combinator', 'combinator');
+  state.searchParams.selectedLocale = lang ? languageName(lang) : initialSearchParams.selectedLocale;
+  state.searchParams.caseSensitive = maybeReplace('caseSensitive', 'case-sensitive');
+  state.searchParams.areaToSearch = maybeReplace('areaToSearch', 'area');
+  state.searchParams.combinator = maybeReplace('combinator', 'combinator');
 
-  state.whereToSearch.title = searchParams.get('search-in-title') === 'false' ?
+  state.searchParams.whereToSearch.title = searchParams.get('search-in-title') === 'false' ?
     false : initialSearchParams.whereToSearch.title;
-  state.whereToSearch.text = searchParams.get('search-in-text') === 'false' ?
+  state.searchParams.whereToSearch.text = searchParams.get('search-in-text') === 'false' ?
     false : initialSearchParams.whereToSearch.text;
 };
 
@@ -84,12 +83,12 @@ const searchState = function(): { code: string, errors: string[] } {
 
   if (state.waiting) return { code: 'waiting', errors };
 
-  if (state.selectedWords === '' && state.excludedWords === '' && state.selectedTaxon === '' && state.selectedLocale === '' && state.linkSearchUrl === '' && state.whereToSearch.title === false && state.whereToSearch.text === false) {
+  if (state.searchParams.selectedWords === '' && state.searchParams.excludedWords === '' && state.searchParams.selectedTaxon === '' && state.searchParams.selectedLocale === '' && state.searchParams.linkSearchUrl === '' && state.searchParams.whereToSearch.title === false && state.searchParams.whereToSearch.text === false) {
     return { code: 'initial', errors };
   }
 
-  if (state.selectedWords !== '') {
-    if (!state.whereToSearch.title && !state.whereToSearch.text) {
+  if (state.searchParams.selectedWords !== '') {
+    if (!state.searchParams.whereToSearch.title && !state.searchParams.whereToSearch.text) {
       errors.push('missingWhereToSearch');
     }
   }
@@ -101,19 +100,19 @@ const searchState = function(): { code: string, errors: string[] } {
 
 
 const resetSearch = function(): void {
-  state.selectedWords = '';
-  state.excludedWords = '';
-  state.selectedTaxon = '';
-  state.selectedLocale = '';
-  state.whereToSearch.title = true;
-  state.whereToSearch.text = true;
-  state.caseSensitive = false;
-  state.linkSearchUrl = '';
+  state.searchParams.selectedWords = '';
+  state.searchParams.excludedWords = '';
+  state.searchParams.selectedTaxon = '';
+  state.searchParams.selectedLocale = '';
+  state.searchParams.whereToSearch.title = true;
+  state.searchParams.whereToSearch.text = true;
+  state.searchParams.caseSensitive = false;
+  state.searchParams.linkSearchUrl = '';
   state.skip = 0; // reset to first page
-  state.areaToSearch = SearchArea.Any;
+  state.searchParams.areaToSearch = SearchArea.Any;
   state.searchResults = null;
   state.waiting = false;
-  state.combinator = Combinator.All;
+  state.searchParams.combinator = Combinator.All;
 };
 
 

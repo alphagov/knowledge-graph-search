@@ -57,4 +57,5 @@ const splitKeywords = function(keywords: string): string[] {
 };
 
 
-export { id, sanitiseInput, sanitiseOutput, splitKeywords, getFormInputValue };
+
+export { id, sanitiseInput, sanitiseOutput, getFormInputValue, splitKeywords };

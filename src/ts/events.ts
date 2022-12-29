@@ -1,16 +1,14 @@
 import { state, searchState, resetSearch } from './state';
 import { id, getFormInputValue } from './utils';
 import { view } from './view/view';
-import { languageCode } from './lang';
-import { queryGraph } from './neo4j';
-import { EventType } from './event-types';
-import { Neo4jCallback } from './neo4j-types';
-import { SearchType, SearchArea, Combinator } from './state-types';
+import { makeQueryString, queryGraph } from './search-api';
+import { EventType, SearchApiCallback } from './event-types';
+import { SearchType, SearchArea, Combinator } from './search-api-types';
 
 
 declare const window: any;
 
-const handleEvent: Neo4jCallback = async function(event) {
+const handleEvent: SearchApiCallback = async function(event) {
   let fieldClicked: RegExpMatchArray | null;
   console.log('handleEvent:', event.type, event.id || '')
   switch (event.type) {
@@ -25,20 +23,20 @@ const handleEvent: Neo4jCallback = async function(event) {
           });
 
           // Update the state
-          state.selectedWords = getFormInputValue('keyword');
-          state.excludedWords = getFormInputValue('excluded-keyword');
-          state.selectedTaxon = getFormInputValue('taxon');
-          state.selectedLocale = getFormInputValue('locale');
-          state.whereToSearch.title = (<HTMLInputElement>id('search-title'))?.checked;
-          state.whereToSearch.text = (<HTMLInputElement>id('search-text'))?.checked;
-          state.caseSensitive = (<HTMLInputElement>id('case-sensitive'))?.checked;
-          state.linkSearchUrl = getFormInputValue('link-search');
+          state.searchParams.selectedWords = getFormInputValue('keyword');
+          state.searchParams.excludedWords = getFormInputValue('excluded-keyword');
+          state.searchParams.selectedTaxon = getFormInputValue('taxon');
+          state.searchParams.selectedLocale = getFormInputValue('locale');
+          state.searchParams.whereToSearch.title = (<HTMLInputElement>id('search-title'))?.checked;
+          state.searchParams.whereToSearch.text = (<HTMLInputElement>id('search-text'))?.checked;
+          state.searchParams.caseSensitive = (<HTMLInputElement>id('case-sensitive'))?.checked;
+          state.searchParams.linkSearchUrl = getFormInputValue('link-search');
           state.skip = 0; // reset to first page
-          if ((<HTMLInputElement>id('area-publisher'))?.checked) state.areaToSearch = SearchArea.Publisher;
-          if ((<HTMLInputElement>id('area-whitehall'))?.checked) state.areaToSearch = SearchArea.Whitehall;
-          if ((<HTMLInputElement>id('area-any'))?.checked) state.areaToSearch = SearchArea.Any;
-          if ((<HTMLInputElement>id('combinator-any'))?.checked) state.combinator = Combinator.Any;
-          if ((<HTMLInputElement>id('combinator-all'))?.checked) state.combinator = Combinator.All;
+          if ((<HTMLInputElement>id('area-publisher'))?.checked) state.searchParams.areaToSearch = SearchArea.Publisher;
+          if ((<HTMLInputElement>id('area-whitehall'))?.checked) state.searchParams.areaToSearch = SearchArea.Whitehall;
+          if ((<HTMLInputElement>id('area-any'))?.checked) state.searchParams.areaToSearch = SearchArea.Any;
+          if ((<HTMLInputElement>id('combinator-any'))?.checked) state.searchParams.combinator = Combinator.Any;
+          if ((<HTMLInputElement>id('combinator-all'))?.checked) state.searchParams.combinator = Combinator.All;
           state.searchResults = null;
           searchButtonClicked();
           break;
@@ -53,23 +51,23 @@ const handleEvent: Neo4jCallback = async function(event) {
           break;
         case 'search-keyword':
           resetSearch();
-          state.searchType = SearchType.Keyword;
+          state.searchParams.searchType = SearchType.Keyword;
           break;
         case 'search-link':
           resetSearch();
-          state.searchType = SearchType.Link;
+          state.searchParams.searchType = SearchType.Link;
           break;
         case 'search-taxon':
           resetSearch();
-          state.searchType = SearchType.Taxon;
+          state.searchParams.searchType = SearchType.Taxon;
           break;
         case 'search-language':
           resetSearch();
-          state.searchType = SearchType.Language;
+          state.searchParams.searchType = SearchType.Language;
           break;
         case 'search-mixed':
           resetSearch();
-          state.searchType = SearchType.Mixed;
+          state.searchParams.searchType = SearchType.Mixed;
           break;
         default:
           fieldClicked = event.id ? event.id.match(/show-field-(.*)/) : null;
@@ -83,20 +81,20 @@ const handleEvent: Neo4jCallback = async function(event) {
       break;
 
     // non-dom events
-    case EventType.Neo4jRunning:
+    case EventType.SearchRunning:
       state.waiting = true;
       break;
-    case EventType.Neo4jCallbackOk:
+    case EventType.SearchApiCallbackOk:
       state.searchResults = event.results?.main.sort((a: any, b: any) => b.pagerank - a.pagerank);
       state.metaSearchResults = event.results?.meta;
       state.waiting = false;
       state.systemErrorText = null;
       break;
-    case EventType.Neo4jCallbackFail:
+    case EventType.SearchApiCallbackFail:
       state.searchResults = null;
       state.waiting = false;
       state.systemErrorText = 'There was a problem querying the GovGraph.';
-      console.log('neo4j-callback-fail:', event.error);
+      console.log('search-api-callback-fail:', event.error);
       break;
     default:
       console.log('unknown event type:', event);
@@ -119,9 +117,9 @@ const searchButtonClicked = async function(): Promise<void> {
   const searchStatus = searchState();
   switch (searchStatus.code) {
     case 'ready-to-search':
-      if (state.selectedWords !== '' || state.selectedLocale !== '' || state.selectedTaxon !== '' || state.linkSearchUrl !== '') {
+      if (state.searchParams.selectedWords !== '' || state.searchParams.selectedLocale !== '' || state.searchParams.selectedTaxon !== '' || state.searchParams.linkSearchUrl !== '') {
         state.waiting = true;
-        queryGraph(state, handleEvent);
+        queryGraph(state.searchParams, handleEvent);
       }
       break;
     case 'error':
@@ -214,7 +212,8 @@ const updateUrl = function() {
       history.pushState(null, '', newRelativePathQuery);
     }
   }
-}
+  history.pushState(null, '', newRelativePathQuery);
+};
 
 
 export {
