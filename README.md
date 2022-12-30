@@ -13,7 +13,7 @@ variables: `NEO4JSERVER`, `NEO4JUSER` and `NEO4JPWD`.
 - install the govuk design system with `npm install` (needs NodeJS installed)
 - run the server with `npm run`
   (or `NEO4JSERVER=localhost NEO4JUSER=user NEO4JPWS=abc123 npm run`)
-- Point your browser to `https://localhost:3000` (the port can be changed using the `PORT` environment variable)
+- Point your browser to `https://localhost:8080` (the port can be changed using the `PORT` environment variable)
 
 # Developing
 

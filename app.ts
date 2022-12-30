@@ -9,8 +9,7 @@ import { SearchArea, Combinator, SearchType, SearchParams } from './src/ts/searc
 // Initialize the express engine
 const app: express.Application = express();
 
-// Take a port 3000 for running server.
-const port: number = 3000;
+const port: number = process.env.port ? parseInt(process.env.port) : 8080;
 
 app.use(express.static('public'));
 app.use(express.json());
