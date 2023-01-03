@@ -112,7 +112,7 @@ const resetSearch = function(): void {
   state.searchParams.areaToSearch = SearchArea.Any;
   state.searchResults = null;
   state.waiting = false;
-  state.searchParams.combinator = Combinator.All;
+  state.searchParams.combinator = Combinator.Any;
 };
 
 

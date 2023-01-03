@@ -249,6 +249,15 @@ describe('URL Setting', () => {
       expect(loc.search).to.eq('?search-type=language&lang=cy&area=whitehall');
     });
   });
+
+  it('Resets to no Query String when going back to Keyword search (regression)', () => {
+    cy.visit('');
+    cy.contains('button', 'Links').click();
+    cy.contains('button', 'Keywords').click();
+    cy.location().should(loc => {
+      expect(loc.search).to.eq('');
+    });
+  });
 });
 
 
