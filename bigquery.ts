@@ -4,11 +4,9 @@ import { splitKeywords } from './src/ts/utils';
 import { languageCode } from './src/ts/lang';
 import { GetBankHolidayInfoSignature, GetOrganisationInfoSignature, GetPersonInfoSignature, GetRoleInfoSignature, GetTaxonInfoSignature, SendInitQuerySignature, SendSearchQuerySignature } from './db-api-types';
 const { BigQuery } = require('@google-cloud/bigquery');
-const fs = require('fs');
 
 const bigquery = new BigQuery({
-  keyFilename: 'bigquery-credentials.json',
-  projectId: 'govuk-knowledge-graph',
+  projectId: 'govuk-knowledge-graph'
 });
 
 const bigQuery = async function(userQuery: string) {
