@@ -28,7 +28,7 @@ const bigQuery = async function(userQuery: string) {
 
 const sendInitQuery: SendInitQuerySignature = async function() {
   const bqLocales = await bigQuery('SELECT DISTINCT locale FROM `govuk-knowledge-graph.content.locale` ORDER BY locale');
-  const bqTaxons = await bigQuery('SELECT DISTINCT taxon_title FROM `govuk-knowledge-graph.content.taxon_search` ORDER BY taxon_title');
+  const bqTaxons = await bigQuery('SELECT DISTINCT taxon_title FROM `govuk-knowledge-graph.content.taxon` ORDER BY taxon_title');
 
   const locales = ['', 'en', 'cy'].concat(
     bqLocales
