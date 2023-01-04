@@ -257,7 +257,7 @@ const getBankHolidayInfo: GetBankHolidayInfoSignature = async function(name) {
 
 
 const sendCypherQuery = async function(cypherQuery: Neo4jQuery[], timeout: number) {
-  console.log('sending', JSON.stringify(cypherQuery, null, 2));
+  console.log('sending', JSON.stringify(cypherQuery, null, 2), 'with timeout', timeout);
   const { data } = await axios.post(
     neo4jParams.url,
     { statements: cypherQuery },

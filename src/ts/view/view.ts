@@ -166,12 +166,20 @@ const viewErrorBanner = () => {
   if (state.systemErrorText || state.userErrors.length > 0) {
     html.push(`
         <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">`);
-
     if (state.systemErrorText) {
+      let errorText;
+      switch (state.systemErrorText) {
+        case 'TIMEOUT':
+        errorText = "The databse took too long to respond. This is usually due to too many query results. Please try a more precise query.";
+        break;
+        default:
+        errorText = "A problem has occurred with the database.";
+      }
       html.push(`
           <h1 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h1>
-          <p class="govuk-body">Please try again later or <a class="govuk-link" href="mailto:data-products-research@digital.cabinet-office.gov.uk">contact the Data Products team</a> if the problem persists.</p>
-        `);
+          <p class="govuk-body">${errorText}</p>
+          <p>Please <a class=\"govuk-link\" href=\"mailto:data-products-research@digital.cabinet-office.gov.uk\">contact the Data Products team</a> if the problem persists.</p>
+      `);
     } else {
       if (state.userErrors.length > 0) {
         html.push(`

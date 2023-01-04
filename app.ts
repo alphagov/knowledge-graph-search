@@ -20,9 +20,9 @@ app.get('/get-init-data', async (req, res) => {
   console.log('/get-init-data');
   try {
     res.send(await sendInitQuery());
-  } catch (e) {
+  } catch (e: any) {
     console.log('/get-init-data fail:', JSON.stringify(e));
-    res.status(500).send(`/get-init-data fail: ${JSON.stringify(e, null, 2)}`);
+    res.status(500).send(e);
   }
 });
 
@@ -48,9 +48,9 @@ app.get('/search', async (req: any, res) => {
   try {
     const data = await sendSearchQuery(params);
     res.send(data);
-  } catch (e) {
-    console.log('/search fail');
-    res.status(500).send(`/search fail: ${JSON.stringify(e, null, 2)}`);
+  } catch (e: any) {
+    console.log('/search fail:', JSON.stringify(e));
+    res.status(500).send(e);
   }
 });
 
@@ -60,8 +60,8 @@ app.get('/taxon', async (req: any, res) => {
   try {
     const data = await getTaxonInfo(req.query['name']);
     res.send(data);
-  } catch (e) {
-    res.status(500).send(`/taxon fail: ${JSON.stringify(e, null, 2)}`);
+  } catch (e: any) {
+    res.status(500).send(e);
   }
 });
 
@@ -71,8 +71,8 @@ app.get('/organisation', async (req: any, res) => {
   try {
     const data = await getOrganisationInfo(req.query['name']);
     res.send(data);
-  } catch (e) {
-    res.status(500).send(`/organisation fail: ${JSON.stringify(e, null, 2)}`);
+  } catch (e: any) {
+    res.status(500).send(e);
   }
 });
 
@@ -82,8 +82,8 @@ app.get('/role', async (req: any, res) => {
   try {
     const data = await getRoleInfo(req.query['name']);
     res.send(data);
-  } catch (e) {
-    res.status(500).send(`/role fail: ${JSON.stringify(e, null, 2)}`);
+  } catch (e: any) {
+    res.status(500).send(e);
   }
 });
 
@@ -93,8 +93,8 @@ app.get('/bank-holiday', async (req: any, res) => {
   try {
     const data = await getBankHolidayInfo(req.query['name']);
     res.send(data);
-  } catch (e) {
-    res.status(500).send(`/bank-holiday: ${JSON.stringify(e, null, 2)}`);
+  } catch (e: any) {
+    res.status(500).send(e);
   }
 });
 
@@ -104,8 +104,8 @@ app.get('/person', async (req: any, res) => {
   try {
     const data = await getPersonInfo(req.query['name']);
     res.send(data);
-  } catch (e) {
-    res.status(500).send(`/person: ${JSON.stringify(e, null, 2)}`);
+  } catch (e: any) {
+    res.status(500).send(e);
   }
 });
 

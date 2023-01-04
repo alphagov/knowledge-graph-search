@@ -23,14 +23,23 @@ const makeQueryString = function(sp: SearchParams): string {
 const fetchWithTimeout = async function(url: string, timeoutSeconds: number = 60) {
   const controller = new AbortController();
   setTimeout(() => controller.abort(), timeoutSeconds * 1000)
-  const fetchOutput = await fetch(url, {
+  const fetchResult = await fetch(url, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json'
     },
     signal: controller.signal
   });
-  return await fetchOutput.json();
+  const responseBody = await fetchResult.json();
+  if (!fetchResult.ok) {
+    if (/^timeout of \d+ms exceeded/.test(responseBody.message)) {
+      throw 'TIMEOUT';
+    } else {
+      throw 'UNKNOWN';
+    }
+  } else {
+    return responseBody;
+  }
 };
 
 
@@ -44,6 +53,7 @@ const queryGraph: (searchParams: SearchParams, callback: SearchApiCallback) => P
   } catch (error: any) {
     console.log('error running main+meta queries', error);
     callback({ type: EventType.SearchApiCallbackFail, error })
+    return;
   }
 
   let { mainResults, metaResults } = apiResults;

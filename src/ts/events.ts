@@ -94,7 +94,7 @@ const handleEvent: SearchApiCallback = async function(event) {
     case EventType.SearchApiCallbackFail:
       state.searchResults = null;
       state.waiting = false;
-      state.systemErrorText = 'There was a problem querying the GovGraph.';
+      state.systemErrorText = event.error;
       console.log('search-api-callback-fail:', event.error);
       break;
     default:
