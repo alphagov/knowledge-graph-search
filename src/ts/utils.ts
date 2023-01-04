@@ -43,7 +43,7 @@ const sanitiseOutput = function(text: string): string {
 
 
 const splitKeywords = function(keywords: string): string[] {
-  const wordsToIgnore = ['of', 'for', 'the'];
+  const wordsToIgnore = ['of', 'for', 'the', 'or', 'and'];
   const regexp = /[^\s,"]+|"([^"]*)"/gi;
   const output = [];
   let match: (RegExpExecArray | null);
