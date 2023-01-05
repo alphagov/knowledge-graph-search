@@ -131,6 +131,18 @@ const getOrganisationInfo: GetOrganisationInfoSignature = async function(name) {
         WHERE org.name = $name
         RETURN parentOrg.name`,
       parameters: { name }
+    }, {
+      statement: `
+        MATCH (supersedingOrg)-[:HAS_SUPERSEDED]->(org:Organisation)
+        WHERE org.name = $name
+        RETURN supersedingOrg.name`,
+      parameters: { name }
+    }, {
+      statement: `
+        MATCH (org:Organisation)-[:HAS_SUPERSEDED]->(supersededOrg:Organisation)
+        WHERE org.name = $name
+        RETURN supersededOrg.name`,
+      parameters: { name }
     }
   ];
   const orgInfo: Neo4jResponse = await sendCypherQuery(query, 5000);
@@ -138,6 +150,8 @@ const getOrganisationInfo: GetOrganisationInfoSignature = async function(name) {
   const personRoleDetails = orgInfo.results[1].data;
   const childDetails = orgInfo.results[2].data;
   const parentDetails = orgInfo.results[3].data;
+  const supersedingDetails = orgInfo.results[4].data;
+  const supersededDetails = orgInfo.results[5].data;
   const result: Organisation = {
     type: 'Organisation',
     name,
@@ -150,7 +164,9 @@ const getOrganisationInfo: GetOrganisationInfoSignature = async function(name) {
         personName: record.row[0].name,
         roleName: record.row[1].name
       }
-    })
+    }),
+    supersededBy: supersedingDetails.map((d: Neo4jResultData) => d.row[0]),
+    supersedes: supersededDetails.map((d: Neo4jResultData) => d.row[0])
   };
   return result;
 };

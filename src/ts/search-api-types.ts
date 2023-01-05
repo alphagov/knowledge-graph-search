@@ -61,7 +61,9 @@ export type Organisation = {
   personRoleNames: {
     personName: string,
     roleName: string
-  }[]
+  }[],
+  supersededBy: string[],
+  supersedes: string[]
 }
 
 export type Taxon = {

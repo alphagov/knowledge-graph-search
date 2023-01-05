@@ -161,20 +161,48 @@ const viewRole = function(record: any) {
 };
 
 
-const viewOrg = (record: Organisation): string =>
-  `<div class="meta-results-panel">
-     <h2 class="govuk-heading-m">
-       <a class="govuk-link" href="${record.homepage}">${record.name}</a>
-     </h2>
-     <p class="govuk-body">
-       Government organisation${record.parentName ? `, part of ${viewMetaLink(record.parentName)}` : ''}
-     </p>
-     ${record.description ? `<p class="govuk-body">${record.description}</p>` : ''}
-     ${record.childOrgNames && record.childOrgNames.length > 0 ?
-    viewOrgChildren(record.childOrgNames) : ''}
-     ${record.personRoleNames && record.personRoleNames.length > 0 ?
-    viewOrgPersonRoles(record.personRoleNames) : ''}
-   </div>`;
+const viewOrg = (record: Organisation): string => `
+  <div class="meta-results-panel">
+    <h2 class="govuk-heading-m">
+      <a class="govuk-link" href="${record.homepage}">${record.name}</a>
+    </h2>
+    <p class="govuk-body">
+      Government organisation${record.parentName ? `, part of ${viewMetaLink(record.parentName)}` : ''}
+    </p>
+    ${record.supersededBy.length > 0 ? `
+      <p class="govuk-body govuk-!-font-weight-bold">
+        ${viewMetaLinkList(record.supersededBy, 'Superseded by:')}
+      </p>
+    ` : ''}
+    ${record.description ? `<p class="govuk-body">${record.description}</p>` : ''}
+    ${record.childOrgNames && record.childOrgNames.length > 0 ?
+      viewOrgChildren(record.childOrgNames) : ''}
+    ${record.personRoleNames && record.personRoleNames.length > 0 ?
+      viewOrgPersonRoles(record.personRoleNames) : ''}
+    ${record.supersedes.length > 0 ? `
+    <p class="govuk-body">${viewMetaLinkList(record.supersedes, 'Supersedes: ')}</p>
+    ` : ''}
+  </div>
+`;
+
+
+const viewMetaLinkList = (names: string[], title?: string, noneTitle?: string): string => {
+  if (names.length === 0 && noneTitle) {
+    return noneTitle;
+  } else if (names.length === 1) {
+    return `
+      ${title?.length > 0 ? title : ''}
+      ${viewMetaLink(names[0])}
+    `;
+  } else {
+    return `
+      ${title?.length > 0 ? title : ''}
+      <ul class="govuk-list govuk-list--bullet">
+        ${names.map(name => `<li>${viewMetaLink(name)}</li>`).join('')}
+      </ul>
+    `;
+  }
+};
 
 
 const viewTransaction = (record: Transaction): string =>
