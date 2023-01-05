@@ -37,7 +37,7 @@ app.get('/search', async (req: any, res) => {
     selectedTaxon: req.query['selected-taxon'] || '',
     selectedLocale: req.query['lang'] || '',
     caseSensitive: req.query['case-sensitive'] || false,
-    combinator: req.query['combinator'] || Combinator.Any,
+    combinator: req.query['combinator'] || Combinator.All,
     whereToSearch: {
       title: !(req.query['search-in-title'] === 'false'),
       text: !(req.query['search-in-text'] === 'false')

@@ -20,7 +20,7 @@ const initialSearchParams: SearchParams = {
     title: true, // whether search should include page titles
     text: true  // whether search should include page content
   },
-  combinator: Combinator.Any,
+  combinator: Combinator.All,
   areaToSearch: SearchArea.Any,
   caseSensitive: false // whether the keyword search is case sensitive
 };
@@ -112,7 +112,7 @@ const resetSearch = function(): void {
   state.searchParams.areaToSearch = SearchArea.Any;
   state.searchResults = null;
   state.waiting = false;
-  state.searchParams.combinator = Combinator.Any;
+  state.searchParams.combinator = Combinator.All;
 };
 
 

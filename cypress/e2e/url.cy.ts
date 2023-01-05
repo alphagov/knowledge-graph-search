@@ -148,7 +148,7 @@ describe('URL Setting', () => {
     cy.get('#combinator-any').check();
     cy.get('button#search').click();
     cy.location().should(loc => {
-      expect(loc.search).to.eq('?selected-words=sunak+disraeli');
+      expect(loc.search).to.eq('?selected-words=sunak+disraeli&combinator=any');
     });
   });
 
@@ -159,7 +159,7 @@ describe('URL Setting', () => {
     cy.get('#combinator-all').check();
     cy.get('button#search').click();
     cy.location().should(loc => {
-      expect(loc.search).to.eq('?selected-words=sunak+disraeli&combinator=all');
+      expect(loc.search).to.eq('?selected-words=sunak+disraeli');
     });
   });
 
@@ -287,7 +287,7 @@ describe('URL Reading', () => {
     cy.get('#keyword')
       .invoke('val')
       .then(value => expect(value).to.be.eq('wwekufsskjfdksufweuf'));
-    cy.get('#combinator-any').should('be.checked');
+    cy.get('#combinator-all').should('be.checked');
     cy.get('#excluded-keyword')
       .invoke('val')
       .then(value => expect(value).to.be.eq(''));
@@ -303,7 +303,7 @@ describe('URL Reading', () => {
     cy.get('#keyword')
       .invoke('val')
       .then(value => expect(value).to.be.eq('Churchill'));
-    cy.get('#combinator-any').should('be.checked');
+    cy.get('#combinator-all').should('be.checked');
     cy.get('#excluded-keyword')
       .invoke('val')
       .then(value => expect(value).to.be.eq(''));
@@ -319,7 +319,7 @@ describe('URL Reading', () => {
     cy.get('#keyword')
       .invoke('val')
       .then(value => expect(value).to.be.eq('Churchill'));
-    cy.get('#combinator-any').should('be.checked');
+    cy.get('#combinator-all').should('be.checked');
     cy.get('#excluded-keyword')
       .invoke('val')
       .then(value => expect(value).to.be.eq(''));
@@ -335,7 +335,7 @@ describe('URL Reading', () => {
     cy.get('#keyword')
       .invoke('val')
       .then(value => expect(value).to.be.eq('Churchill'));
-    cy.get('#combinator-any').should('be.checked');
+    cy.get('#combinator-all').should('be.checked');
     cy.get('#excluded-keyword')
       .invoke('val')
       .then(value => expect(value).to.be.eq(''));
@@ -351,7 +351,7 @@ describe('URL Reading', () => {
     cy.get('#keyword')
       .invoke('val')
       .then(value => expect(value).to.be.eq('education'));
-    cy.get('#combinator-any').should('be.checked');
+    cy.get('#combinator-all').should('be.checked');
     cy.get('#excluded-keyword')
       .invoke('val')
       .then(value => expect(value).to.be.eq(''));
@@ -367,7 +367,7 @@ describe('URL Reading', () => {
     cy.get('#keyword')
       .invoke('val')
       .then(value => expect(value).to.be.eq('education'));
-    cy.get('#combinator-any').should('be.checked');
+    cy.get('#combinator-all').should('be.checked');
     cy.get('#excluded-keyword')
       .invoke('val')
       .then(value => expect(value).to.be.eq(''));
@@ -383,7 +383,7 @@ describe('URL Reading', () => {
     cy.get('#keyword')
       .invoke('val')
       .then(value => expect(value).to.be.eq('edUcatIon'));
-    cy.get('#combinator-any').should('be.checked');
+    cy.get('#combinator-all').should('be.checked');
     cy.get('#excluded-keyword')
       .invoke('val')
       .then(value => expect(value).to.be.eq(''));
@@ -394,7 +394,7 @@ describe('URL Reading', () => {
   });
 
   it('Sets the correct inputs for an "any keywords" search', () => {
-    cy.visit('?selected-words=sunak+disraeli');
+    cy.visit('?selected-words=sunak+disraeli&combinator=any');
     cy.get('#search-keyword.active');
     cy.get('#keyword')
       .invoke('val')

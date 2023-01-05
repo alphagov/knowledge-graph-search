@@ -14,7 +14,7 @@ const makeQueryString = function(sp: SearchParams): string {
   if (!sp.whereToSearch.title) usp.set('search-in-title', 'false');
   if (!sp.whereToSearch.text) usp.set('search-in-text', 'false');
   if (sp.areaToSearch !== SearchArea.Any) usp.set('area', sp.areaToSearch);
-  if (sp.combinator !== Combinator.Any) usp.set('combinator', sp.combinator);
+  if (sp.combinator !== Combinator.All) usp.set('combinator', sp.combinator);
   if (sp.linkSearchUrl !== '') usp.set('link-search-url', sp.linkSearchUrl);
   return usp.toString();
 };

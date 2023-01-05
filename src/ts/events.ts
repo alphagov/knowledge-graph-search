@@ -155,7 +155,7 @@ const updateUrl = function() {
           searchParams.set('search-in-text', 'false');
         if (state.searchParams.areaToSearch !== SearchArea.Any)
           searchParams.set('area', state.searchParams.areaToSearch);
-        if (state.searchParams.combinator !== Combinator.Any)
+        if (state.searchParams.combinator !== Combinator.All)
           searchParams.set('combinator', state.searchParams.combinator);
         break;
       case SearchType.Link:
@@ -197,7 +197,7 @@ const updateUrl = function() {
           searchParams.set('search-in-text', 'false');
         if (state.searchParams.areaToSearch !== SearchArea.Any)
           searchParams.set('area', state.searchParams.areaToSearch);
-        if (state.searchParams.combinator !== Combinator.Any)
+        if (state.searchParams.combinator !== Combinator.All)
           searchParams.set('combinator', state.searchParams.combinator);
         if (state.searchParams.linkSearchUrl !== '')
           searchParams.set('link-search-url', state.searchParams.linkSearchUrl);
