@@ -42,6 +42,21 @@ const sendInitQuery: SendInitQuerySignature = async function() {
 
   // maybe we need to handle exceptions here rather than leave it to the
   // caller.
+  // Expected bqResults:
+  //
+  // [
+  //  [
+  //    { locale: 'ar' }, { locale: 'az' },     { locale: 'be' },
+  //    { locale: 'bg' }, { locale: 'bn' },     { locale: 'cs' },
+  //    ...
+  //  ],
+  //  [
+  //    { taxon_title: 'https://www.gov.uk/brexit/business-guidance' },
+  //    { taxon_title: 'https://www.gov.uk/brexit/guidance-individuals' },
+  //    { taxon_title: 'https://www.gov.uk/business-and-industry/alcohol-sales' },
+  //    ...
+  //  ]
+  // ]
 
   const locales = ['', 'en', 'cy'].concat(
     bqResults[0]
@@ -56,7 +71,7 @@ const sendInitQuery: SendInitQuerySignature = async function() {
 
 /*
 const getTaxonInfo: GetTaxonInfoSignature = async function(name) {
-  const taxonInfo = await bigQuery(`
+  const taxonInfoPromise = bigQuery(`
     -- This is more annoying than it needs to be, because the
     -- taxon_levels table uses the homepage_url, not the taxon
     -- url that we defined, and we couldn't work out how to
@@ -74,7 +89,7 @@ const getTaxonInfo: GetTaxonInfoSignature = async function(name) {
     ;
  `);
 
-  const ancestorsInfo = await bigQuery(`
+  const ancestorsInfoPromise = bigQuery(`
     SELECT
       taxon_ancestors.ancestor_url,
       taxon_ancestors.ancestor_title,
@@ -87,7 +102,7 @@ const getTaxonInfo: GetTaxonInfoSignature = async function(name) {
     ;
   `);
 
-  const childrenInfo = await bigQuery(`
+  const childrenInfoPromise = bigQuery(`
     SELECT
       child.title,
       child_homepage.homepage_url,
@@ -102,6 +117,45 @@ const getTaxonInfo: GetTaxonInfoSignature = async function(name) {
     AND child_level.level = parent_level.level + 1
     ;
   `);
+
+  const bqResults = await Promise.all([
+    taxonInfoPromise,
+    ancestorsInfoPromise,
+    childrenInfoPromise
+  ]);
+
+// expected output
+// [
+//   [ // results of taxonInfo
+//     {
+//       taxon.title: ...,
+//       has_homepage.homepage_url: ...,
+//       taxon_levels.level: ...
+//     },
+//     { ... }
+//   ],
+//   [ // results of ancestorsInfo
+//     {
+//       taxon_ancestors.ancestor_url: ...
+//       taxon_ancestors.ancestor_title: ...
+//       taxon_levels.level: ...
+//     },
+//     { ... }
+//   ],
+//   [ // results of childrenInfo
+//     {
+//       child.title: ...,
+//       child_homepage.homepage_url: ...,
+//       child_level.level: ...
+//     },
+//     { ... }
+//   ]
+// ]
+
+
+
+
+
 
   const result: Taxon = {
 
