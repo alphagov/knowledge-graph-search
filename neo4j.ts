@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { MainResult, MetaResult, Person, Organisation, Role, Taxon, BankHoliday } from './src/ts/search-api-types';
+import { MainResult, MetaResultType, MetaResult, Person, Organisation, Role, Taxon, BankHoliday } from './src/ts/search-api-types';
 import { splitKeywords } from './src/ts/utils';
 import { languageCode } from './src/ts/lang';
 import { Neo4jQuery, Neo4jResponseResult, Neo4jResponse, Neo4jResultData } from './neo4j-types';
@@ -80,7 +80,7 @@ const getTaxonInfo: GetTaxonInfoSignature = async function(name) {
   ];
   const taxonInfo: Neo4jResponse = await sendCypherQuery(query, 5000);
   const result: Taxon = {
-    type: 'Taxon',
+    type: MetaResultType.Taxon,
     name,
     description: taxonInfo.results[0].data[0].row[0],
     homepage: taxonInfo.results[0].data[0].row[1],
@@ -157,7 +157,7 @@ const getOrganisationInfo: GetOrganisationInfoSignature = async function(name) {
   const supersedingDetails = orgInfo.results[4].data;
   const supersededDetails = orgInfo.results[5].data;
   const result: Organisation = {
-    type: 'Organisation',
+    type: MetaResultType.Organisation,
     name,
     homepage: orgDetails[1],
     description: orgDetails[0],
@@ -199,7 +199,7 @@ const getRoleInfo: GetRoleInfoSignature = async function(name) {
   const persons = roleInfo.results[1];
   const orgs = roleInfo.results[2];
   const result: Role = {
-    type: 'Role',
+    type: MetaResultType.Role,
     name: role.row[0].name,
     description: role.row[0].description,
     personNames: persons.data.map((person: any) => {
@@ -231,7 +231,7 @@ const getPersonInfo: GetPersonInfoSignature = async function(name) {
   ];
   const personInfo: Neo4jResponse = await sendCypherQuery(query, 5000);
   const result: Person = {
-    type: 'Person',
+    type: MetaResultType.Person,
     name,
     homepage: personInfo.results[0].data[0].row[4].url,
     description: personInfo.results[0].data[0].row[4].description,
@@ -267,7 +267,7 @@ const getBankHolidayInfo: GetBankHolidayInfoSignature = async function(name) {
   ];
   const bankHolidayInfo: Neo4jResponse = await sendCypherQuery(query, 5000);
   const result: BankHoliday = {
-    type: 'BankHoliday',
+    type: MetaResultType.BankHoliday,
     name,
     dates: bankHolidayInfo.results[0].data.map((record: any) => record.row[0]),
     regions: bankHolidayInfo.results[1].data.map((record: any) => record.row[0].name)

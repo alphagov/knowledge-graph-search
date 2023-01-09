@@ -35,10 +35,21 @@ export type SearchParams = {
   caseSensitive: boolean // case sensitive keyword search?
 }
 
+export enum MetaResultType {
+  Person,
+  Organisation,
+  BankHoliday,
+  Role,
+  Taxon,
+  Transaction
+}
+
 export type MetaResult = Person | Organisation | BankHoliday | Role | Taxon
 
 export type Person = {
-  type: string,
+  // type below is needed when you need to know the type of an object at runtime
+  // (the type above is only available to TypeScript to statically check)
+  type: MetaResultType,
   name: string,
   homepage: string,
   description: string,
@@ -52,7 +63,7 @@ export type Person = {
 }
 
 export type Organisation = {
-  type: string,
+  type: MetaResultType,
   name: string,
   homepage: string,
   description: string,
@@ -67,7 +78,7 @@ export type Organisation = {
 }
 
 export type Taxon = {
-  type: string,
+  type: MetaResultType,
   name: string,
   homepage: string,
   description: string,
@@ -85,21 +96,21 @@ export type Taxon = {
 }
 
 export type Transaction = {
-  type: string,
+  type: MetaResultType,
   name: string,
   description: string,
   homepage: string
 }
 
 export type BankHoliday = {
-  type: string,
+  type: MetaResultType,
   name: string,
   dates: string[],
   regions: string[]
 }
 
 export type Role = {
-  type: string,
+  type: MetaResultType,
   name: string,
   description: string,
   personNames: {

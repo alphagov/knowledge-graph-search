@@ -1,6 +1,6 @@
 import { state } from '../state';
 import { viewMetaLink } from './view-components';
-import { MetaResult, Taxon, Organisation, Transaction, BankHoliday, Person, Role } from '../search-api-types';
+import { MetaResultType, Taxon, Organisation, Transaction, BankHoliday, Person, Role } from '../search-api-types';
 
 
 const viewDetails = (title: string, list: any[], itemFormatFn: (item: any) => string) => {
@@ -277,12 +277,12 @@ const viewMetaResults = function() {
   const record = state.metaSearchResults[0];
   console.log(`meta: found a ${record.type}`)
   switch (record.type) {
-    case "BankHoliday": return viewBankHoliday(record);
-    case "Organisation": return viewOrg(record);
-    case "Person": return viewPerson(record);
-    case "Role": return viewRole(record);
-    case "Transaction": return viewTransaction(record);
-    case "Taxon": return viewTaxon(record);
+    case MetaResultType.BankHoliday: return viewBankHoliday(record);
+    case MetaResultType.Organisation: return viewOrg(record);
+    case MetaResultType.Person: return viewPerson(record);
+    case MetaResultType.Role: return viewRole(record);
+    case MetaResultType.Transaction: return viewTransaction(record);
+    case MetaResultType.Taxon: return viewTaxon(record);
     default: console.log(`unknown record type: ${record.type}`); return ``;
   }
   //}
