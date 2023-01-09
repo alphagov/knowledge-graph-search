@@ -33,9 +33,9 @@ const sendInitQuery: SendInitQuerySignature = async function() {
     ORDER BY locale
   `);
   const bqTaxonsPromise = bigQuery(`
-    SELECT DISTINCT taxon
-    FROM \`govuk-knowledge-graph.content.taxon_ancestors\`
-    ORDER BY taxon
+    SELECT DISTINCT taxon_title
+    FROM \`govuk-knowledge-graph.content.taxon_search\`
+    ORDER BY taxon_title
   `);
 
   const bqResults = await Promise.all([bqLocalesPromise, bqTaxonsPromise]);
