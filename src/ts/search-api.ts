@@ -1,4 +1,4 @@
-import { SearchParams, SearchType, SearchArea, Combinator, MetaResult } from './search-api-types';
+import { SearchParams, SearchType, SearchArea, Combinator, MetaResult, MetaResultType } from './search-api-types';
 import { languageCode } from './lang';
 import { EventType, SearchApiCallback } from './event-types';
 
@@ -99,8 +99,10 @@ const buildMetaboxInfo = async function(info: any) {
     }
     case 'Transaction': {
       return {
+        type: MetaResultType.Transaction,
         homepage: info.homepage.url,
-        description: info.node.description
+        description: info.node.description,
+        name: info.node.name
       }
     }
     case 'Taxon': {
