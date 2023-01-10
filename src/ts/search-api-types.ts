@@ -71,13 +71,16 @@ export type Taxon = {
   name: string,
   homepage: string,
   description: string,
+  level: number,
   ancestorTaxons: {
     url: string,
-    name: string
+    name: string,
+    level: number,
   }[],
   childTaxons: {
     url: string,
-    name: string
+    name: string,
+    level: number
   }[]
 }
 

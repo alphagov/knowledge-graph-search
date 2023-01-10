@@ -219,7 +219,7 @@ const viewTaxon = (record: Taxon): string => {
   return `<div class="meta-results-panel">
      <div class="govuk-breadcrumbs">
        <ol class="govuk-breadcrumbs__list">
-         ${sortedBy(record.ancestorTaxons, 'level').reverse().map(taxon => `
+         ${sortedBy(record.ancestorTaxons, 'level').map(taxon => `
          <li class="govuk-breadcrumbs__list-item">
            ${viewMetaLink(taxon.name, 'govuk-breadcrumbs__link')}
          </li>

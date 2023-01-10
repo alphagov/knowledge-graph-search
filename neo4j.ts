@@ -59,21 +59,21 @@ const getTaxonInfo: GetTaxonInfoSignature = async function(name) {
     { // Get details about this taxon
       statement: `
         MATCH (p:Page)<-[:HAS_HOMEPAGE]-(t:Taxon { name: $name })
-        RETURN p.description, p.url`,
+        RETURN p.description, p.url, t.level`,
       parameters:
         { name: name }
     },
     { // Get list of ancestor taxons
       statement: `
-        MATCH (h:Page)<-[:HAS_HOMEPAGE]-(:Taxon)<-[:HAS_PARENT*]-(t:Taxon { name: $name })
-        RETURN h.url, h.title, t.level`,
+        MATCH (homepage:Page)<-[:HAS_HOMEPAGE]-(ancestor:Taxon)<-[:HAS_PARENT*]-(:Taxon { name: $name })
+        RETURN homepage.url, ancestor.name, ancestor.level`,
       parameters:
         { name: name }
     },
     { // Get list of child taxons
       statement: `
-        MATCH (h:Page)<-[:HAS_HOMEPAGE]-(:Taxon)-[:HAS_PARENT]->(t:Taxon { name: $name })
-        RETURN h.url, h.title, t.level`,
+        MATCH (homepage:Page)<-[:HAS_HOMEPAGE]-(child:Taxon)-[:HAS_PARENT]->(:Taxon { name: $name })
+        RETURN homepage.url, child.name, child.level`,
       parameters:
         { name: name }
     }
@@ -84,6 +84,7 @@ const getTaxonInfo: GetTaxonInfoSignature = async function(name) {
     name,
     description: taxonInfo.results[0].data[0].row[0],
     homepage: taxonInfo.results[0].data[0].row[1],
+    level: taxonInfo.results[0].data[0].row[2],
     ancestorTaxons: taxonInfo.results[1].data.map((ancestor: any) => {
       return {
         url: ancestor.row[0],
@@ -91,14 +92,15 @@ const getTaxonInfo: GetTaxonInfoSignature = async function(name) {
         level: ancestor.row[2],
       }
     }),
-    childTaxons: taxonInfo.results[2].data.map((ancestor: any) => {
+    childTaxons: taxonInfo.results[2].data.map((child: any) => {
       return {
-        url: ancestor.row[0],
-        name: ancestor.row[1],
-        level: ancestor.row[2]
+        url: child.row[0],
+        name: child.row[1],
+        level: child.row[2]
       }
     })
   };
+  console.log('skdjnf', result);
   return result;
 };
 
