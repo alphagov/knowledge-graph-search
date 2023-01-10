@@ -22,10 +22,10 @@ const viewDetails = (title: string, list: any[], itemFormatFn: (item: any) => st
 };
 
 
-const viewOrgPersonRoles = (personRoles: any[]) =>
+const viewOrgPersonRoles = (personRoles: Record<string, any>[]) =>
   viewDetails(
     `${personRoles.length} ${personRoles.length === 1 ? 'person' : 'people'}`,
-    personRoles,
+    sortedBy(personRoles, 'personName'),
     personRole => `${viewMetaLink(personRole.personName)} (${viewMetaLink(personRole.roleName)})`
   );
 
@@ -33,7 +33,7 @@ const viewOrgPersonRoles = (personRoles: any[]) =>
 const viewOrgChildren = (childOrgNames: string[]) =>
   viewDetails(
     `${childOrgNames.length} sub-organisations`,
-    childOrgNames,
+    childOrgNames.sort(),
     viewMetaLink
   );
 
@@ -44,7 +44,7 @@ const viewPersonRoles = function(roles: any[]) {
     ${viewMetaLink(role.title)} ${role.orgName ? ' at ' + viewMetaLink(role.orgName) : ''}
     (${role.startDate ? new Date(role.startDate).getFullYear() : ''}
     to ${role.endDate ? new Date(role.endDate).getFullYear() : 'present'})`;
-  const rolesInDateOrder = roles.sort((r1, r2) => r2.startDate - r1.startDate);
+  const rolesInDateOrder = sortedBy(roles, 'startDate').reverse();
   return viewDetails(title, rolesInDateOrder, roleFormatter);
 };
 
@@ -96,12 +96,12 @@ const viewRolePersons = (persons: any[]) => {
 const viewBankHolidayDetails = function(holiday: any) {
   const datesDetails: string = viewDetails(
     'dates',
-    holiday.dates,
+    sortedBy(holiday.dates, 'dateString').reverse(),
     date => date.dateString
   );
   const regionDetails: string = viewDetails(
     'Observed in',
-    holiday.regions,
+    holiday.regions.sort(),
     region => region
   );
   return `${datesDetails}${regionDetails} `;
@@ -131,7 +131,7 @@ const viewPerson = (record: any) =>
 const viewRoleOrgs = (orgs: any[]) =>
   viewDetails(
     `belongs to ${orgs.length} ${orgs.length === 1 ? 'organisation' : 'organisations'}`,
-    orgs,
+    orgs.sort(),
     viewMetaLink
   );
 
@@ -215,11 +215,11 @@ const viewTransaction = (record: Transaction): string =>
    </div>`;
 
 
-const viewTaxon = (record: Taxon): string =>
-  `<div class="meta-results-panel">
+const viewTaxon = (record: Taxon): string => {
+  return `<div class="meta-results-panel">
      <div class="govuk-breadcrumbs">
        <ol class="govuk-breadcrumbs__list">
-         ${record.ancestorTaxons.map(taxon => `
+         ${sortedBy(record.ancestorTaxons, 'level').reverse().map(taxon => `
          <li class="govuk-breadcrumbs__list-item">
            ${viewMetaLink(taxon.name, 'govuk-breadcrumbs__link')}
          </li>
@@ -233,15 +233,21 @@ const viewTaxon = (record: Taxon): string =>
      ${record.description ? `<p class="govuk-body">${record.description}</p>` : ''}
      ${record.childTaxons?.length ? viewTaxonChildren(record.childTaxons) : ''}
    </div>`;
+}
 
-
-const viewTaxonChildren = (records: any[]): string =>
-  viewDetails(
+const viewTaxonChildren = (records: any[]): string => {
+  return viewDetails(
     'Subtaxons',
-    records,
+    sortedBy(records, 'name'),
     taxon => viewMetaLink(taxon.name)
   );
+}
 
+// Sorts a list of object using a specific field to sort by
+const sortedBy = function(arrayOfObjects: Record<string, any>[], field: string): Record<string, any>[] {
+  const deepCopy = JSON.parse(JSON.stringify(arrayOfObjects));
+  return deepCopy.sort((a, b) => a[field] < b[field] ? -1 : 1);
+}
 
 //=================== public ====================
 

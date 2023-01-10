@@ -65,15 +65,15 @@ const getTaxonInfo: GetTaxonInfoSignature = async function(name) {
     },
     { // Get list of ancestor taxons
       statement: `
-        MATCH (h:Page)<-[:HAS_HOMEPAGE]-(:Taxon)<-[:HAS_PARENT*]-(:Taxon { name: $name })
-        RETURN h.url, h.title`,
+        MATCH (h:Page)<-[:HAS_HOMEPAGE]-(:Taxon)<-[:HAS_PARENT*]-(t:Taxon { name: $name })
+        RETURN h.url, h.title, t.level`,
       parameters:
         { name: name }
     },
     { // Get list of child taxons
       statement: `
-        MATCH (h:Page)<-[:HAS_HOMEPAGE]-(:Taxon)-[:HAS_PARENT]->(:Taxon { name: $name })
-        RETURN h.url, h.title`,
+        MATCH (h:Page)<-[:HAS_HOMEPAGE]-(:Taxon)-[:HAS_PARENT]->(t:Taxon { name: $name })
+        RETURN h.url, h.title, t.level`,
       parameters:
         { name: name }
     }
@@ -87,13 +87,15 @@ const getTaxonInfo: GetTaxonInfoSignature = async function(name) {
     ancestorTaxons: taxonInfo.results[1].data.map((ancestor: any) => {
       return {
         url: ancestor.row[0],
-        name: ancestor.row[1]
+        name: ancestor.row[1],
+        level: ancestor.row[2],
       }
     }),
     childTaxons: taxonInfo.results[2].data.map((ancestor: any) => {
       return {
         url: ancestor.row[0],
-        name: ancestor.row[1]
+        name: ancestor.row[1],
+        level: ancestor.row[2]
       }
     })
   };
