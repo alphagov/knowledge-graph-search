@@ -35,11 +35,11 @@ const sendSearchQuery: SendSearchQuerySignature = async function(searchParams) {
     wholeQuery.push(metaQuery);
   }
   const dbResponse = await sendCypherQuery(wholeQuery, 60000);
-  const mainResults: MainResult[] = formattedMainResults(dbResponse.results[0]);
-  const metaResults: MetaResult[] = dbResponse.results[1]?.data.length > 0 ?
+  const main: MainResult[] = formattedMainResults(dbResponse.results[0]);
+  const meta: MetaResult[] = dbResponse.results[1]?.data.length > 0 ?
     formattedMetaResults(dbResponse.results[1]) :
     [];
-  return { mainResults, metaResults };
+  return { main, meta };
 }
 
 const sendInitQuery: SendInitQuerySignature = async function() {

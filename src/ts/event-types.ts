@@ -1,3 +1,5 @@
+import { SearchResults } from './search-api-types';
+
 export interface SearchApiCallback {
   (event: AppEvent): Promise<void>
 }
@@ -11,9 +13,6 @@ export enum EventType {
 export interface AppEvent {
   type: EventType,
   id?: string,
-  results?: {
-    main: any,
-    meta: any
-  },
+  results?: SearchResults,
   error?: string
 }

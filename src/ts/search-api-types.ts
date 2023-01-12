@@ -126,8 +126,8 @@ export type Role = {
 export type MainResult = any;
 
 export type SearchResults = {
-  mainResults: MainResult[],
-  metaResults: MetaResult[]
+  main: MainResult[],
+  meta: MetaResult[]
 }
 
 export type InitResults = {
