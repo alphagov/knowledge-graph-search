@@ -52,7 +52,7 @@ const sendInitQuery: SendInitQuerySignature = async function() {
   };
 };
 
-
+/*
 const getTaxonInfo: GetTaxonInfoSignature = async function(name) {
   const [ bqTaxon, bqAncestors, bqChildren] = await Promise.all([
     bigQuery(`
@@ -275,3 +275,6 @@ const sendSearchQuery: SendSearchQuerySignature = async function(searchParams) {
 
 
 export { sendSearchQuery, sendInitQuery, getTaxonInfo, getOrganisationInfo, getRoleInfo, getPersonInfo, getBankHolidayInfo };
+*/
+
+export { sendInitQuery };
