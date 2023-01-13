@@ -297,8 +297,10 @@ const csvFromResults = function(searchResults: any) {
 
 
 const viewWaiting = () => `
-  <div class="govuk-body">Searching for ${viewQueryDescription()}</div>
-  <p class="govuk-body-s">Some queries may take up to a minute</p>
+  <div aria-live="polite" role="region">
+    <div class="govuk-body">Searching for ${viewQueryDescription()}</div>
+    <p class="govuk-body-s">Some queries may take up to a minute</p>
+  </div>
 `;
 
 
