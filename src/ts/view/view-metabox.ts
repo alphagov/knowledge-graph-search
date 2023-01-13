@@ -1,6 +1,6 @@
 import { state } from '../state';
 import { viewMetaLink } from './view-components';
-import { MetaResultType, Taxon, Organisation, Transaction, BankHoliday, Person, Role } from '../search-api-types';
+import { MetaResultType, Taxon, Organisation, Transaction, BankHoliday } from '../search-api-types';
 
 
 const viewDetails = (title: string, list: any[], itemFormatFn: (item: any) => string) => {
@@ -70,7 +70,7 @@ const viewRolePersons = (persons: any[]) => {
     break;
     default: currentsHtml = `
       <p class="govuk-body">Current holders:</p>
-      <ul class="govuk-list govuk-list--bullet" >
+      <ul class="govuk-list govuk-list--bullet">
         ${currents.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()).map(person => `<li>${formatPerson(person)}</li>`).join('')}
       </ul>
     `;
@@ -83,12 +83,12 @@ const viewRolePersons = (persons: any[]) => {
       <p class="govuk-body">Previous holder: ${formatPerson(previous[0])}</p>
     `; break;
     case 2: return `
-      <details class="govuk-details" >
-        <summary class="govuk-details__summary" >
-          <span class="govuk-details__summary-text" >Previous holders</span>
+      <details class="govuk-details">
+        <summary class="govuk-details__summary">
+          <span class="govuk-details__summary-text">Previous holders</span>
         </summary>
-        <div class="govuk-details__text" >
-          <ul class="govuk-list govuk-list--bullet" >
+        <div class="govuk-details__text">
+          <ul class="govuk-list govuk-list--bullet">
             ${previous.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()).map(person => `<li>${formatPerson(person)}</li>`).join('')}
           </ul>
         </div>
@@ -111,28 +111,29 @@ const viewBankHolidayDetails = function(holiday: any) {
     holiday.regions.sort(),
     region => region
   );
-  return `${datesDetails}${regionDetails} `;
+  return `${datesDetails}${regionDetails}`;
 };
 
 
-const viewBankHoliday = (record: BankHoliday): string =>
-  `<div class="meta-results-panel" >
-    <h2 class="govuk-heading-m" >
+const viewBankHoliday = (record: BankHoliday): string => `
+  <div class="meta-results-panel">
+    <h2 class="govuk-heading-m">
       ${record.name}
-  </h2>
-    <p class="govuk-body" > Bank holiday </p>
-     ${viewBankHolidayDetails(record)}
+    </h2>
+    <p class="govuk-body">Bank holiday</p>
+    ${viewBankHolidayDetails(record)}
   </div>
-    `;
+`;
 
-const viewPerson = (record: any) =>
-  `<div class="meta-results-panel" >
-    <h2 class="govuk-heading-m" >
-      <a class="govuk-link" href="${record.homepage}" > ${record.name} </a>
-        </h2>
-        <p class="govuk-body" > ${record.description} </p>
-     ${record.roles && record.roles.length > 0 ? viewPersonRoles(record.roles) : ''}
-  </div>`;
+const viewPerson = (record: any) => `
+  <div class="meta-results-panel">
+    <h2 class="govuk-heading-m">
+      <a class="govuk-link" href="${record.homepage}">${record.name}</a>
+    </h2>
+    <p class="govuk-body">${record.description}</p>
+    ${record.roles && record.roles.length > 0 ? viewPersonRoles(record.roles) : ''}
+  </div>
+`;
 
 
 const viewRoleOrgs = (orgs: any[]) =>
@@ -153,9 +154,9 @@ const viewRolePersons = (persons: any[]) =>
 */
 
 const viewRole = function(record: any) {
-  const nameHtml = record.homePage ?
-    `<a class="govuk-link" href="${record.homepage}">${record.name}</a>` :
-    record.name;
+  const nameHtml = record.homePage ? `
+    <a class="govuk-link" href="${record.homepage}">${record.name}</a>
+  ` : record.name;
 
   return `
     <div class="meta-results-panel">
@@ -212,35 +213,39 @@ const viewMetaLinkList = (names: string[], title?: string, noneTitle?: string): 
 };
 
 
-const viewTransaction = (record: Transaction): string =>
-  `<div class="meta-results-panel">
-     <h2 class="govuk-heading-m">
-       <a class="govuk-link" href="${record.homepage}">${record.name}</a>
-     </h2>
-     <p class="govuk-body">Online government service</p>
-     ${record.description ? `<p class="govuk-body">${record.description}</p>` : ''}
-   </div>`;
+const viewTransaction = (record: Transaction): string => `
+  <div class="meta-results-panel">
+    <h2 class="govuk-heading-m">
+      <a class="govuk-link" href="${record.homepage}">${record.name}</a>
+    </h2>
+    <p class="govuk-body">Online government service</p>
+    ${record.description ? `<p class="govuk-body">${record.description}</p>` : ''}
+  </div>
+`;
 
 
 const viewTaxon = (record: Taxon): string => {
-  return `<div class="meta-results-panel">
-     <div class="govuk-breadcrumbs">
-       <ol class="govuk-breadcrumbs__list">
-         ${sortedBy(record.ancestorTaxons, 'level').map(taxon => `
-         <li class="govuk-breadcrumbs__list-item">
-           ${viewMetaLink(taxon.name, 'govuk-breadcrumbs__link')}
-         </li>
-         `)}
-       </ol>
-     </div>
-     <h2 class="govuk-heading-m">
-       <a class="govuk-link" href="${record.homepage}">${record.name}</a>
-     </h2>
-     <p class="govuk-body">GOV.UK Taxon</p>
-     ${record.description ? `<p class="govuk-body">${record.description}</p>` : ''}
-     ${record.childTaxons?.length ? viewTaxonChildren(record.childTaxons) : ''}
-   </div>`;
+  return `
+    <div class="meta-results-panel">
+      <div class="govuk-breadcrumbs">
+        <ol class="govuk-breadcrumbs__list">
+          ${sortedBy(record.ancestorTaxons, 'level').map(taxon => `
+          <li class="govuk-breadcrumbs__list-item">
+            ${viewMetaLink(taxon.name, 'govuk-breadcrumbs__link')}
+          </li>
+          `)}
+        </ol>
+      </div>
+      <h2 class="govuk-heading-m">
+        <a class="govuk-link" href="${record.homepage}">${record.name}</a>
+      </h2>
+      <p class="govuk-body">GOV.UK Taxon</p>
+      ${record.description ? `<p class="govuk-body">${record.description}</p>` : ''}
+      ${record.childTaxons?.length ? viewTaxonChildren(record.childTaxons) : ''}
+    </div>
+  `;
 }
+
 
 const viewTaxonChildren = (records: any[]): string => {
   return viewDetails(
@@ -256,14 +261,15 @@ const sortedBy = function(arrayOfObjects: Record<string, any>[], field: string):
   return deepCopy.sort((a, b) => a[field] < b[field] ? -1 : 1);
 }
 
-//=================== public ====================
-
-
+/*
 const viewMetaResultsExpandToggle = () =>
-  state.metaSearchResults && state.metaSearchResults.length > 5 ?
-    `< button id = "meta-results-expand" > ${state.disamboxExpanded ? 'show less' : 'show more'} < /button>` :
-    '';
+  state.metaSearchResults && state.metaSearchResults.length > 5
+    ? `<button id = "meta-results-expand">${state.disamboxExpanded ? 'show less' : 'show more'}</button>`
+    : '';
+*/
 
+
+//=================== public ====================
 
 const viewMetaResults = function() {
   if (!state.metaSearchResults) return;
