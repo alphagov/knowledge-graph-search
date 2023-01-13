@@ -59,37 +59,44 @@ const viewRolePersons = (persons: any[]) => {
   `};
   const currents = persons.filter((person: any) => person.endDate === null);
   const previous = persons.filter((person: any) => person.endDate !== null);
-  const currentsHtml = currents.length === 0 ?
-    '<p class="govuk-body-l">No current holder</p>' :
-    (currents.length === 1 ?
-      `<p class="govuk-body">Current holder:</p>
-       <p class="govuk-body-l"><a href="${currents[0].homepage}">${currents[0].name}</a></p>
-       <p class="govuk-body">(since ${new Date(currents[0].startDate).getFullYear()})</p>
-        ` :
-      `<ul class="govuk-list govuk-list--bullet" >
-    ${currents.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()).map(person => `<li>${formatPerson(person)}</li>`).join('')}
-  </ul>
-    `);
+  let currentsHtml: string;
+  switch(currents.length) {
+    case 0: currentsHtml = ''; break;
+    case 1: currentsHtml = `
+      <p class="govuk-body">Current holder:</p>
+      <p class="govuk-body-l"><a href="${currents[0].homepage}">${currents[0].name}</a></p>
+      <p class="govuk-body">(since ${new Date(currents[0].startDate).getFullYear()})</p>
+    `;
+    break;
+    default: currentsHtml = `
+      <p class="govuk-body">Current holders:</p>
+      <ul class="govuk-list govuk-list--bullet" >
+        ${currents.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()).map(person => `<li>${formatPerson(person)}</li>`).join('')}
+      </ul>
+    `;
+  }
 
-  const previousHtml = previous.length === 0 ?
-    '<p class="govuk-body">No previous holders</p>' :
-    (previous.length === 1 ? `
-    <p class="govuk-body" > Previous holder: ${formatPerson(previous[0])} </p>` : `
-    <details class="govuk-details" >
-      <summary class="govuk-details__summary" >
-        <span class="govuk-details__summary-text" >
-          Previous holders
-        </span>
-      </summary>
-      <div class="govuk-details__text" >
-        <ul class="govuk-list govuk-list--bullet" >
-          ${previous.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()).map(person => `<li>${formatPerson(person)}</li>`).join('')}
-        </ul>
-      </div>
-    </details>
-  `);
+  let previousHtml: string;
+  switch (previous.length) {
+    case 0: previousHtml = ''; break;
+    case 1: return `
+      <p class="govuk-body">Previous holder: ${formatPerson(previous[0])}</p>
+    `; break;
+    case 2: return `
+      <details class="govuk-details" >
+        <summary class="govuk-details__summary" >
+          <span class="govuk-details__summary-text" >Previous holders</span>
+        </summary>
+        <div class="govuk-details__text" >
+          <ul class="govuk-list govuk-list--bullet" >
+            ${previous.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()).map(person => `<li>${formatPerson(person)}</li>`).join('')}
+          </ul>
+        </div>
+      </details>
+    `;
+  }
 
-  return `${currentsHtml} ${previousHtml} `;
+  return `${currentsHtml} ${previousHtml}`;
 };
 
 
