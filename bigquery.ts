@@ -54,75 +54,57 @@ const sendInitQuery: SendInitQuerySignature = async function() {
 
 /*
 const getTaxonInfo: GetTaxonInfoSignature = async function(name) {
-  const [ bqTaxon, bqAncestors, bqChildren] = await Promise.all([
+  const [ bqTaxon, bqAncestors, bqChildren ] = await Promise.all([
     bigQuery(`
-      -- This is more annoying than it needs to be, because the
-      -- taxon_levels table uses the homepage_url, not the taxon
-      -- url that we defined, and we couldn't work out how to
-      -- fix it in MongoDB.
-
-      -- Searched-for taxon
       SELECT
-        taxon.title,
-        has_homepage.homepage_url,
-        taxon_levels.level
+        title,
+        level,
+        taxon_levels.homepage_url AS homepage,
+        description.description
       FROM graph.taxon
-      INNER JOIN graph.has_homepage ON has_homepage.url = taxon.url
-      INNER JOIN content.taxon_levels ON (taxon_levels.url = has_homepage.homepage_url)
-      WHERE taxon.title = 'Land Registration Data'
+      INNER JOIN content.taxon_levels ON taxon_levels.url = taxon.url
+      INNER JOIN content.description ON description.url = taxon_levels.homepage_url
+      WHERE taxon.title = '${name}'
       ;
     `),
     bigQuery(`
       SELECT
-        taxon_ancestors.ancestor_url,
-        taxon_ancestors.ancestor_title,
-        taxon_levels.level
+        taxon_ancestors.ancestor_title AS name,
+        taxon_levels.level AS level,
+        taxon_levels.homepage_url AS url
       FROM graph.taxon_ancestors
-      INNER JOIN graph.has_homepage ON has_homepage.url = taxon_ancestors.ancestor_url
-      INNER JOIN content.taxon_levels ON (taxon_levels.url = has_homepage.homepage_url)
-      WHERE title = 'Land Registration Data'
-      ORDER BY level
+      INNER JOIN content.taxon_levels ON taxon_levels.url = taxon_ancestors.ancestor_url
+      WHERE title = '${name}'
       ;
    `),
     bigQuery(`
       SELECT
-        child.title,
-        child_homepage.homepage_url,
-        child_level.level
-      FROM graph.taxon
-      INNER JOIN graph.has_homepage AS parent_homepage USING (url)
-      INNER JOIN graph.taxon_ancestors AS child ON (child.ancestor_title = taxon.title)
-      INNER JOIN graph.has_homepage AS child_homepage ON child_homepage.url = child.url
-      INNER JOIN content.taxon_levels AS parent_level ON (parent_level.url = parent_homepage.homepage_url)
-      INNER JOIN content.taxon_levels AS child_level ON (child_level.url = child_homepage.homepage_url)
-      WHERE taxon.title = 'Land registration'
-      AND child_level.level = parent_level.level + 1
+        child.title AS name,
+        taxon_levels.homepage AS url,
+        taxon_levels.level AS level
+      FROM graph.taxon AS parent
+      INNER JOIN graph.has_parent ON has_parent.parent_url = parent.url
+      INNER JOIN graph.taxon AS child ON child.url = has_parent.url
+      INNER JOIN content.taxon_levels ON taxon_levels.url = child.url
+      WHERE parent.title = '${name}'
       ;
     `)
   ]);
 
   return {
     type: MetaResultType.Taxon,
-    name: string,
-    homepage: string,
-    description: string,
-    level:
-    ancestorTaxons: {
-      url: string,
-      name: string,
-      level:
-    }[],
-    childTaxons: {
-      url: string,
-      name: string,
-      level:
-    }[]
-  }
+    name: bqTaxon.title,
+    homepage: bqTaxon.homepage,
+    description: bqTaxon.description,
+    level: new Number(bqTaxon.level),
+    ancestorTaxons: bqAncestors,
+    childTaxons: bqChildren
+  };
 };
 
 
 const getOrganisationInfo: GetOrganisationInfoSignature = async function(name) {
-  const [ bqOrganisation, bqParent, bqChildren, bqPersonRole ] = await Promise.all([
+  const [ bqOrganisation, bqParent, bqChildren, bqPersonRole, bqSuccessor, bqPredecessor ] = await Promise.all([
     bigQuery(`
       SELECT url, title, description, homepage_url
       FROM graph.organisation
@@ -130,7 +112,7 @@ const getOrganisationInfo: GetOrganisationInfoSignature = async function(name) {
       ;
    `),
     bigQuery(`
-      SELECT parent.title
+      SELECT parent.title AS parent
       FROM graph.organisation
       INNER JOIN graph.has_parent USING (url)
       INNER JOIN graph.organisation AS parent ON has_parent.parent_url = parent.url
@@ -157,7 +139,7 @@ const getOrganisationInfo: GetOrganisationInfoSignature = async function(name) {
       ;
     `),
     bigQuery(`
-      SELECT successor.title
+      SELECT successor.title AS title
       FROM graph.organisation
       INNER JOIN graph.has_successor USING (url)
       INNER JOIN graph.organisation AS successor ON has_successor.successor_url = successor.url
@@ -165,27 +147,23 @@ const getOrganisationInfo: GetOrganisationInfoSignature = async function(name) {
       ;
     `),
     bigQuery(`
-      SELECT child.title
-      FROM graph.organisation AS parent
-      INNER JOIN graph.has_parent ON has_parent.parent_url = parent.url
-      INNER JOIN graph.organisation AS child ON child.url = has_parent.url
-      WHERE parent.title = ${name}
-      ;
-    `),
-]);
+      SELECT organisation.title
+      FROM graph.organisation
+      INNER JOIN graph.has_successor USING (url)
+      INNER JOIN graph.organisation AS successor ON has_successor.successor_url = successor.url
+      WHERE successor.title = ${name}
+  `)];
 
   return {
     type: MetaResultType.Organisation,
     name: bqOrganisation.title,
     description: bqOrganisation.description,
     homepage: bqOrganisation.homepage_url,
-    parentName: bqParent['parent.title'],
-    childOrgNames: bqChildren.map(child => child['child.title']),
+    parentName: bqParent.title,
+    childOrgNames: bqChildren.map(child => child.title),
     personRoleNames: bqPersonRole,
-
-
-//   supersededBy: string[],
-//   supersedes: string[]
+    supersededBy: bqSuccessor.map(successor => successor.title),
+    supersedes: bqPredecessor.map(predecessor => predecessor.title)
   };
 };
 
