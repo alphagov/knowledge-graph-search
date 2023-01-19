@@ -119,7 +119,7 @@ const getOrganisationInfo: GetOrganisationInfoSignature = async function(name) {
       FROM graph.organisation
       INNER JOIN graph.has_parent USING (url)
       INNER JOIN graph.organisation AS parent ON has_parent.parent_url = parent.url
-      WHERE organisation.title = ${name}
+      WHERE organisation.title = '${name}'
       ;
     `),
     bigQuery(`
@@ -127,7 +127,7 @@ const getOrganisationInfo: GetOrganisationInfoSignature = async function(name) {
       FROM graph.organisation AS parent
       INNER JOIN graph.has_parent ON has_parent.parent_url = parent.url
       INNER JOIN graph.organisation AS child ON child.url = has_parent.url
-      WHERE parent.title = ${name}
+      WHERE parent.title = '${name}'
       ;
     `),
     bigQuery(`
@@ -137,7 +137,7 @@ const getOrganisationInfo: GetOrganisationInfoSignature = async function(name) {
       INNER JOIN graph.role ON belongs_to.role_url = role.url
       INNER JOIN graph.has_role ON role.url = has_role.role_url
       INNER JOIN graph.person ON has_role.person_url = person.url
-      WHERE org.title = ${name}
+      WHERE org.title = '${name}'
       AND has_role.ended_on IS NULL
       ;
     `),
@@ -146,7 +146,7 @@ const getOrganisationInfo: GetOrganisationInfoSignature = async function(name) {
       FROM graph.organisation
       INNER JOIN graph.has_successor USING (url)
       INNER JOIN graph.organisation AS successor ON has_successor.successor_url = successor.url
-      WHERE organisation.title = ${name}
+      WHERE organisation.title = '${name}'
       ;
     `),
     bigQuery(`
