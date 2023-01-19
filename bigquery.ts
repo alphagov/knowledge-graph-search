@@ -256,11 +256,9 @@ const sendSearchQuery: SendSearchQuerySignature = async function(searchParams) {
   }
 
 };
-
-
-
-
-export { sendSearchQuery, sendInitQuery, getTaxonInfo, getOrganisationInfo, getRoleInfo, getPersonInfo, getBankHolidayInfo };
 */
 
-export { sendInitQuery };
+
+
+export { sendInitQuery, getTaxonInfo, getOrganisationInfo, getBankHolidayInfo };
+//export { sendSearchQuery, sendInitQuery, getTaxonInfo, getOrganisationInfo, getRoleInfo, getPersonInfo, getBankHolidayInfo };
