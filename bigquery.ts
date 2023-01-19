@@ -108,10 +108,15 @@ const getTaxonInfo: GetTaxonInfoSignature = async function(name) {
 
 const getOrganisationInfo: GetOrganisationInfoSignature = async function(name) {
   const [ bqOrganisation, bqParent, bqChildren, bqPersonRole, bqSuccessor, bqPredecessor ] = await Promise.all([
-    bigQuery(`
-      SELECT url, title, description, homepage_url
-      FROM graph.organisation
-      WHERE title = ${name}
+    bigQuery(`   # TODO Fix query
+      SELECT
+        org.title AS title,
+        has_org.url AS homepage_url,
+        page.description AS description
+      FROM graph.organisation AS org
+      INNER JOIN graph.has_organisation AS has_org ON has_org.organisation_url = org.url
+      INNER JOIN graph.page AS page ON has_org.url = page.url
+      WHERE org.title = 'Department for Education'
       ;
    `),
     bigQuery(`
