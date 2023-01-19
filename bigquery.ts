@@ -30,17 +30,20 @@ const bigQuery = async function(userQuery: string) {
 //====== public ======
 
 const sendInitQuery: SendInitQuerySignature = async function() {
-  const [ bqLocales, bqTaxons ] = await Promise.all([
+  let bqLocales, bqTaxons;
+  try {
+  [ bqLocales, bqTaxons ] = await Promise.all([
     bigQuery(`
       SELECT DISTINCT locale
       FROM \`govuk-knowledge-graph.content.locale\`
-      ORDER BY locale
     `),
     bigQuery(`
-      SELECT DISTINCT taxon_title
-      FROM \`govuk-knowledge-graph.content.taxon_search\`
-      ORDER BY taxon_title
+      SELECT title
+      FROM \`govuk-knowledge-graph.graph.taxon\`
     `)]);
+  } catch(e) {
+    console.log('sendInitQueryError', e);
+  }
 
   return {
     locales: ['', 'en', 'cy'].concat(
@@ -48,7 +51,7 @@ const sendInitQuery: SendInitQuerySignature = async function() {
         .map((row: any) => row.locale)
         .filter((locale: string) => locale !== 'en' && locale !== 'cy')
       ),
-    taxons: bqTaxons.map((taxon: any) => taxon.taxon_title)
+    taxons: bqTaxons.map((taxon: any) => taxon.title)
   };
 };
 
