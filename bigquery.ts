@@ -99,7 +99,7 @@ const getTaxonInfo: GetTaxonInfoSignature = async function(name) {
     name: bqTaxon.title,
     homepage: bqTaxon.homepage,
     description: bqTaxon.description,
-    level: new Number(bqTaxon.level),
+    level: parseInt(bqTaxon.level),
     ancestorTaxons: bqAncestors,
     childTaxons: bqChildren
   };
