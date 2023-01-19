@@ -159,37 +159,44 @@ const getOrganisationInfo: GetOrganisationInfoSignature = async function(name) {
       FROM graph.organisation
       INNER JOIN graph.has_successor USING (url)
       INNER JOIN graph.organisation AS successor ON has_successor.successor_url = successor.url
-      WHERE successor.title = ${name}
-  `)];
+      WHERE successor.title = '${name}'
+    `)
+  ]);
 
   return {
     type: MetaResultType.Organisation,
-    name: bqOrganisation.title,
+    name: bqOrganisation[0].title,
     description: bqOrganisation.description,
     homepage: bqOrganisation.homepage_url,
     parentName: bqParent.title,
-    childOrgNames: bqChildren.map(child => child.title),
+    childOrgNames: bqChildren.map((child: any) => child.title),
     personRoleNames: bqPersonRole,
-    supersededBy: bqSuccessor.map(successor => successor.title),
-    supersedes: bqPredecessor.map(predecessor => predecessor.title)
+    supersededBy: bqSuccessor.map((successor: any) => successor.title),
+    supersedes: bqPredecessor.map((predecessor: any) => predecessor.title)
   };
 };
 
 
 const getBankHolidayInfo: GetBankHolidayInfoSignature = async function(name) {
   const bqBankHoliday = await bigQuery(`
-    ...
+    SELECT
+      title AS name,
+      ARRAY_AGG(DISTINCT division) AS divisions,
+      ARRAY_AGG(DISTINCT date) AS dates
+    FROM \`govuk-knowledge-graph.content.bank_holiday\`
+    WHERE title = '${name}'
+    GROUP BY title
   `);
 
   return {
     type: MetaResultType.BankHoliday,
-//   name: string,
-//   dates: string[],
-//   regions: string[]
+    name: bqBankHoliday.name,
+    dates: bqBankHoliday.dates.map((date: any) => date.value),
+    regions: bqBankHoliday.divisions
   };
 };
 
-
+/*
 const getRoleInfo: GetRoleInfoSignature = async function(name) {
   const [ bqRole, bqPersons ] = await Promise.all([
     bigQuery(`
