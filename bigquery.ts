@@ -110,13 +110,12 @@ const getOrganisationInfo: GetOrganisationInfoSignature = async function(name) {
   const [ bqOrganisation, bqParent, bqChildren, bqPersonRole, bqSuccessor, bqPredecessor ] = await Promise.all([
     bigQuery(`   # TODO Fix query
       SELECT
-        org.title AS title,
-        has_org.url AS homepage_url,
-        page.description AS description
+        page.url AS homepage,
+        page.description AS description,
       FROM graph.organisation AS org
-      INNER JOIN graph.has_organisation AS has_org ON has_org.organisation_url = org.url
-      INNER JOIN graph.page AS page ON has_org.url = page.url
-      WHERE org.title = 'Department for Education'
+      INNER JOIN graph.has_homepage AS hh on hh.url = org.url
+      INNER JOIN graph.page on hh.homepage_url = page.url
+      WHERE org.title = '${name}'
       ;
    `),
     bigQuery(`
@@ -165,9 +164,9 @@ const getOrganisationInfo: GetOrganisationInfoSignature = async function(name) {
 
   return {
     type: MetaResultType.Organisation,
-    name: bqOrganisation[0].title,
-    description: bqOrganisation.description,
-    homepage: bqOrganisation.homepage_url,
+    name,
+    description: bqOrganisation[0].description,
+    homepage: bqOrganisation[0].homepage,
     parentName: bqParent.title,
     childOrgNames: bqChildren.map((child: any) => child.title),
     personRoleNames: bqPersonRole,
