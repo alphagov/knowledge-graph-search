@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { MainResult, MetaResult, Person, Organisation, Role, Taxon, BankHoliday, MetaResultType } from './src/ts/search-api-types';
+import { MainResult, MetaResult, Person, Organisation, Role, Taxon, BankHoliday, MetaResultType, SearchParams } from './src/ts/search-api-types';
 import { splitKeywords } from './src/ts/utils';
 import { languageCode } from './src/ts/lang';
 import { GetBankHolidayInfoSignature, GetOrganisationInfoSignature, GetPersonInfoSignature, GetRoleInfoSignature, GetTaxonInfoSignature, SendInitQuerySignature, SendSearchQuerySignature } from './db-api-types';
@@ -11,18 +11,19 @@ const bigquery = new BigQuery({
   projectId: 'govuk-knowledge-graph'
 });
 
-const bigQuery = async function(userQuery: string) {
+const bigQuery = async function(userQuery: string, keywords?: string[]) {
+  const params: Record<string, string> = {};
+  if (keywords) {
+    keywords.forEach((keyword: string, index: number) => params[`keyword${index}`] = keyword);
+  }
+
   const options = {
     query: userQuery,
-    // Location must match that of the dataset(s) referenced in the query.
     location: 'europe-west2',
+    params
   };
-  // Run the query as a job
-  const [job] = await bigquery.createQueryJob(options);
-  console.log(`Job ${job.id} started.`);
 
-  // Wait for the query to finish
-  const [rows] = await job.getQueryResults();
+  const [rows] = await bigquery.query(options);
 
   return rows;
 };
@@ -108,7 +109,7 @@ const getTaxonInfo: GetTaxonInfoSignature = async function(name) {
 
 const getOrganisationInfo: GetOrganisationInfoSignature = async function(name) {
   const [ bqOrganisation, bqParent, bqChildren, bqPersonRole, bqSuccessor, bqPredecessor ] = await Promise.all([
-    bigQuery(`   # TODO Fix query
+    bigQuery(`
       SELECT
         page.url AS homepage,
         page.description AS description,
@@ -244,27 +245,55 @@ const getPersonInfo: GetPersonInfoSignature = async function(name) {
     }[]
   }
 };
-
-
-const sendSearchQuery: SendSearchQuerySignature = async function(searchParams) {
-  const [ bqMainResults, bqMetaResults ] = await Promise.all([
-    bigQuery(`
-      ... // keyword search
-    `),
-    bigQuery(`
-      ... // meta query
-    `)
-  ]);
-
-  return {
-    mainResults: MainResult[],
-    metaResults: MetaResult[]
-  }
-
-};
 */
 
 
 
-export { sendInitQuery, getTaxonInfo, getOrganisationInfo, getBankHolidayInfo };
-//export { sendSearchQuery, sendInitQuery, getTaxonInfo, getOrganisationInfo, getRoleInfo, getPersonInfo, getBankHolidayInfo };
+const sendSearchQuery: SendSearchQuerySignature = async function(searchParams) {
+  const keywords = splitKeywords(searchParams.selectedWords);
+  const query = buildSqlQuery(searchParams, keywords);
+  console.log('query', query);
+  const [ bqMainResults /*, bqMetaResults */ ] = await Promise.all([
+    bigQuery(query, keywords),
+//    bigQuery(`
+//      ... // meta query
+//    `)
+  ]);
+
+  return {
+    mainResults: bqMainResults,
+    metaResults: [] //MetaResult[]
+  }
+};
+
+
+const buildSqlQuery = function(searchParams: SearchParams, keywords: string[]): string {
+  const includeClause = [...Array(keywords.length).keys()]
+    .map(index => `CONTAINS_SUBSTR(page.title, @keyword${index})`)
+    .join(' AND ');
+
+  return `
+    SELECT
+      url,
+      title,
+      document_type AS documentType,
+      content_id AS contentId,
+      locale,
+      publishing_app,
+      first_published_at,
+      public_updated_at,
+      withdrawn_at,
+      withdrawn_explanation,
+      pagerank
+    FROM graph.page
+    WHERE TRUE
+    AND (page.document_type IS NULL
+    OR NOT page.document_type IN ('gone', 'redirect', 'placeholder', 'placeholder_person'))
+    AND (${includeClause})
+    LIMIT 10
+  `;
+};
+
+
+export { sendInitQuery, getTaxonInfo, getOrganisationInfo, getBankHolidayInfo, sendSearchQuery };
+//export { sendSearchQuery, getTaxonInfo, getOrganisationInfo, getRoleInfo, getPersonInfo, getBankHolidayInfo };
