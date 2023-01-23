@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { MainResult, MetaResult, Person, Organisation, Role, Taxon, BankHoliday, MetaResultType, SearchParams } from './src/ts/search-api-types';
+import { MainResult, MetaResult, Person, Organisation, Role, Taxon, BankHoliday, MetaResultType, SearchParams, Combinator } from './src/ts/search-api-types';
 import { splitKeywords } from './src/ts/utils';
 import { languageCode } from './src/ts/lang';
 import { GetBankHolidayInfoSignature, GetOrganisationInfoSignature, GetPersonInfoSignature, GetRoleInfoSignature, GetTaxonInfoSignature, SendInitQuerySignature, SendSearchQuerySignature } from './db-api-types';
@@ -268,9 +268,21 @@ const sendSearchQuery: SendSearchQuerySignature = async function(searchParams) {
 
 
 const buildSqlQuery = function(searchParams: SearchParams, keywords: string[]): string {
+
+  const contentToSearch = [];
+  if (searchParams.whereToSearch.title) {
+    contentToSearch.push('page.title');
+  }
+  if (searchParams.whereToSearch.text) {
+    contentToSearch.push('page.text', 'page.description');
+  }
+  const contentToSearchString = contentToSearch.join(' || " " || ');
+
   const includeClause = [...Array(keywords.length).keys()]
-    .map(index => `CONTAINS_SUBSTR(page.title, @keyword${index})`)
-    .join(' AND ');
+    .map(index => searchParams.caseSensitive
+      ? `STRPOS(${contentToSearchString}, @keyword${index}) <> 0`
+      : `CONTAINS_SUBSTR(${contentToSearchString}, @keyword${index})`)
+    .join(searchParams.combinator === Combinator.Any ? ' OR ' : ' AND ');
 
   return `
     SELECT
@@ -286,11 +298,12 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[]): 
       withdrawn_explanation,
       pagerank
     FROM graph.page
+
     WHERE TRUE
     AND (page.document_type IS NULL
     OR NOT page.document_type IN ('gone', 'redirect', 'placeholder', 'placeholder_person'))
     AND (${includeClause})
-    LIMIT 10
+    LIMIT 50000
   `;
 };
 
