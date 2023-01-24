@@ -61,7 +61,11 @@ app.get('/taxon', async (req: any, res) => {
     const data = await getTaxonInfo(req.query['name']);
     res.send(data);
   } catch (e: any) {
-    res.status(500).send(e);
+    if (e.status === 404) {
+      res.status(e.status).send(e.message);
+    } else {
+      res.status(500).send(e.message);
+    }
   }
 });
 
@@ -72,7 +76,11 @@ app.get('/organisation', async (req: any, res) => {
     const data = await getOrganisationInfo(req.query['name']);
     res.send(data);
   } catch (e: any) {
-    res.status(500).send(e);
+    if (e.status === 404) {
+      res.status(e.status).send(e.message);
+    } else {
+      res.status(500).send(e.message);
+    }
   }
 });
 
@@ -83,7 +91,11 @@ app.get('/role', async (req: any, res) => {
     const data = await getRoleInfo(req.query['name']);
     res.send(data);
   } catch (e: any) {
-    res.status(500).send(e);
+    if (e.status === 404) {
+      res.status(e.status).send(e.message);
+    } else {
+      res.status(500).send(e.message);
+    }
   }
 });
 
@@ -94,7 +106,11 @@ app.get('/bank-holiday', async (req: any, res) => {
     const data = await getBankHolidayInfo(req.query['name']);
     res.send(data);
   } catch (e: any) {
-    res.status(500).send(e);
+    if (e.status === 404) {
+      res.status(e.status).send(e.message);
+    } else {
+      res.status(500).send(e.message);
+    }
   }
 });
 
@@ -105,7 +121,11 @@ app.get('/person', async (req: any, res) => {
     const data = await getPersonInfo(req.query['name']);
     res.send(data);
   } catch (e: any) {
-    res.status(500).send(e);
+    if (e.status === 404) {
+      res.status(e.status).send(e.message);
+    } else {
+      res.status(500).send(e.message);
+    }
   }
 });
 
