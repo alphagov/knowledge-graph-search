@@ -79,6 +79,12 @@ const getTaxonInfo: GetTaxonInfoSignature = async function(name) {
     }
   ];
   const taxonInfo: Neo4jResponse = await sendCypherQuery(query, 5000);
+  if (taxonInfo.results[0].data.length === 0) {
+    throw {
+      status: 404,
+      message: `No taxon with name "${name}"`
+    };
+  }
   const result: Taxon = {
     type: MetaResultType.Taxon,
     name,
@@ -150,6 +156,12 @@ const getOrganisationInfo: GetOrganisationInfoSignature = async function(name) {
     }
   ];
   const orgInfo: Neo4jResponse = await sendCypherQuery(query, 5000);
+  if (orgInfo.results[0].data.length === 0) {
+    throw {
+      status: 404,
+      message: `No organisation with name "${name}"`
+    };
+  }
   const orgDetails = orgInfo.results[0].data[0].row;
   const personRoleDetails = orgInfo.results[1].data;
   const childDetails = orgInfo.results[2].data;
@@ -195,6 +207,12 @@ const getRoleInfo: GetRoleInfoSignature = async function(name) {
     }
   ];
   const roleInfo: Neo4jResponse = await sendCypherQuery(query, 5000);
+  if (roleInfo.results[0].data.length === 0) {
+    throw {
+      status: 404,
+      message: `No organisation with name "${name}"`
+    };
+  }
   const role = roleInfo.results[0].data[0];
   const persons = roleInfo.results[1];
   const orgs = roleInfo.results[2];
@@ -230,6 +248,12 @@ const getPersonInfo: GetPersonInfoSignature = async function(name) {
     }
   ];
   const personInfo: Neo4jResponse = await sendCypherQuery(query, 5000);
+  if (personInfo.results[0].data.length === 0) {
+    throw {
+      status: 404,
+      message: `No person with name "${name}"`
+    };
+  }
   const result: Person = {
     type: MetaResultType.Person,
     name,
@@ -266,6 +290,12 @@ const getBankHolidayInfo: GetBankHolidayInfoSignature = async function(name) {
     }
   ];
   const bankHolidayInfo: Neo4jResponse = await sendCypherQuery(query, 5000);
+  if (bankHolidayInfo.results[0].data.length === 0) {
+    throw {
+      status: 404,
+      message: `No bank holiday with name "${name}"`
+    };
+  }
   const result: BankHoliday = {
     type: MetaResultType.BankHoliday,
     name,
