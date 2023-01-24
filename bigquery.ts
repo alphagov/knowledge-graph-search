@@ -11,10 +11,13 @@ const bigquery = new BigQuery({
   projectId: 'govuk-knowledge-graph'
 });
 
-const bigQuery = async function(userQuery: string, keywords?: string[]) {
+const bigQuery = async function(userQuery: string, keywords?: string[], excludedKeywords?: string[]) {
   const params: Record<string, string> = {};
   if (keywords) {
     keywords.forEach((keyword: string, index: number) => params[`keyword${index}`] = keyword);
+  }
+  if (excludedKeywords) {
+    excludedKeywords.forEach((keyword: string, index: number) => params[`excluded_keyword${index}`] = keyword);
   }
 
   const options = {
@@ -251,10 +254,11 @@ const getPersonInfo: GetPersonInfoSignature = async function(name) {
 
 const sendSearchQuery: SendSearchQuerySignature = async function(searchParams) {
   const keywords = splitKeywords(searchParams.selectedWords);
-  const query = buildSqlQuery(searchParams, keywords);
+  const excludedKeywords = splitKeywords(searchParams.excludedWords);
+  const query = buildSqlQuery(searchParams, keywords, excludedKeywords);
   console.log('query', query);
   const [ bqMainResults /*, bqMetaResults */ ] = await Promise.all([
-    bigQuery(query, keywords),
+    bigQuery(query, keywords, excludedKeywords),
 //    bigQuery(`
 //      ... // meta query
 //    `)
@@ -267,7 +271,7 @@ const sendSearchQuery: SendSearchQuerySignature = async function(searchParams) {
 };
 
 
-const buildSqlQuery = function(searchParams: SearchParams, keywords: string[]): string {
+const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], excludedKeywords: string[]): string {
 
   const contentToSearch = [];
   if (searchParams.whereToSearch.title) {
@@ -278,11 +282,35 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[]): 
   }
   const contentToSearchString = contentToSearch.join(' || " " || ');
 
-  const includeClause = [...Array(keywords.length).keys()]
-    .map(index => searchParams.caseSensitive
-      ? `STRPOS(${contentToSearchString}, @keyword${index}) <> 0`
-      : `CONTAINS_SUBSTR(${contentToSearchString}, @keyword${index})`)
-    .join(searchParams.combinator === Combinator.Any ? ' OR ' : ' AND ');
+  const includeClause = keywords.length === 0
+    ? ''
+    : 'AND (' + ([...Array(keywords.length).keys()]
+      .map(index => searchParams.caseSensitive
+        ? `STRPOS(${contentToSearchString}, @keyword${index}) <> 0`
+        : `CONTAINS_SUBSTR(${contentToSearchString}, @keyword${index})`)
+      .join(searchParams.combinator === Combinator.Any ? ' OR ' : ' AND ')) + ')';
+
+  const excludeClause = excludedKeywords.length === 0
+    ? ''
+    : 'AND NOT (' + ([...Array(excludedKeywords.length).keys()]
+      .map(index => searchParams.caseSensitive
+        ? `STRPOS(${contentToSearchString}, @excluded_keyword${index}) <> 0`
+        : `CONTAINS_SUBSTR(${contentToSearchString}, @excluded_keyword${index})`)
+      .join(' OR ')) + ')';
+;
+
+  let areaClause = '';
+  if (searchParams.areaToSearch === 'publisher') {
+    areaClause = 'AND publishing_app = "publisher"';
+  } else if (searchParams.areaToSearch === 'whitehall') {
+    areaClause = 'AND publishing_app = "whitehall"';
+  }
+
+  let localeClause = '';
+  if (searchParams.selectedLocale !== '') {
+    localeClause = `AND locale = "${languageCode(searchParams.selectedLocale)}"`
+  }
+
 
   return `
     SELECT
@@ -296,13 +324,18 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[]): 
       public_updated_at,
       withdrawn_at,
       withdrawn_explanation,
-      pagerank
+      pagerank,
+      taxon_titles AS taxons
     FROM graph.page
 
     WHERE TRUE
     AND (page.document_type IS NULL
     OR NOT page.document_type IN ('gone', 'redirect', 'placeholder', 'placeholder_person'))
-    AND (${includeClause})
+    ${includeClause}
+    ${excludeClause}
+    ${areaClause}
+    ${localeClause}
+
     LIMIT 50000
   `;
 };
