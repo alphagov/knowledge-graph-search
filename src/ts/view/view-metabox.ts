@@ -82,7 +82,7 @@ const viewRolePersons = (persons: any[]) => {
     case 1: return `
       <p class="govuk-body">Previous holder: ${formatPerson(previous[0])}</p>
     `; break;
-    case 2: return `
+    default: return `
       <details class="govuk-details">
         <summary class="govuk-details__summary">
           <span class="govuk-details__summary-text">Previous holders</span>
