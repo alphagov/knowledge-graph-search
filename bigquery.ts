@@ -65,7 +65,7 @@ const getTaxonInfo: GetTaxonInfoSignature = async function(name) {
     bigQuery(`
       SELECT
         title,
-        level,
+        taxon.level AS level,
         taxon_levels.homepage_url AS homepage,
         description.description
       FROM graph.taxon
@@ -325,7 +325,7 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
       withdrawn_at,
       withdrawn_explanation,
       pagerank,
-      taxon_titles AS taxons
+      ancestor_titles AS taxons
     FROM graph.page
 
     WHERE TRUE
