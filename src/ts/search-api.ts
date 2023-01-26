@@ -57,10 +57,13 @@ const queryGraph: (searchParams: SearchParams, callback: SearchApiCallback) => P
   }
   let { main, meta } = apiResults;
 
+  console.log(123, metaResults)
+
+
   // If there's an exact match within the meta results, just keep that one
   const searchKeywords: string = searchParams.selectedWords.replace(/"/g, '');
-  const exactMetaResults = meta.filter((result: any) => {
-    return result.node.name.toLowerCase() === searchKeywords.toLowerCase()
+  const exactMetaResults = metaResults.filter((result: any) => {
+    return result.title.toLowerCase() === searchKeywords.toLowerCase()
   });
   if (exactMetaResults.length === 1) {
     meta = exactMetaResults;

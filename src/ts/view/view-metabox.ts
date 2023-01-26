@@ -287,15 +287,17 @@ const viewMetaResults = function() {
   //      </div>
   //    `;
   //  } else {
+
   const record = state.metaSearchResults[0];
   console.log(`meta: found a ${record.type}`)
+  console.log(record);
   switch (record.type) {
-    case MetaResultType.BankHoliday: return viewBankHoliday(record);
-    case MetaResultType.Organisation: return viewOrg(record);
-    case MetaResultType.Person: return viewPerson(record);
-    case MetaResultType.Role: return viewRole(record);
-    case MetaResultType.Transaction: return viewTransaction(record);
-    case MetaResultType.Taxon: return viewTaxon(record);
+    case 'BANK_HOLIDAY': return viewBankHoliday(record);
+    case 'ORGANISATION': return viewOrg(record);
+    case 'PERSON': return viewPerson(record);
+    case 'ROLE': return viewRole(record);
+    case 'TRANSACTION': return viewTransaction(record);
+    case 'TAXON': return viewTaxon(record);
     default: console.log(`unknown record type: ${record.type}`); return ``;
   }
   //}

@@ -36,15 +36,16 @@ const bigQuery = async function(userQuery: string, keywords?: string[], excluded
 const sendInitQuery: SendInitQuerySignature = async function() {
   let bqLocales, bqTaxons;
   try {
-  [ bqLocales, bqTaxons ] = await Promise.all([
-    bigQuery(`
-      SELECT DISTINCT locale
-      FROM \`govuk-knowledge-graph.content.locale\`
-    `),
-    bigQuery(`
-      SELECT title
-      FROM \`govuk-knowledge-graph.graph.taxon\`
-    `)]);
+    [ bqLocales, bqTaxons ] = await Promise.all([
+      bigQuery(`
+        SELECT DISTINCT locale
+        FROM \`govuk-knowledge-graph.content.locale\`
+        `),
+      bigQuery(`
+        SELECT title
+        FROM \`govuk-knowledge-graph.graph.taxon\`
+        `)
+    ]);
   } catch(e) {
     console.log('sendInitQueryError', e);
   }
@@ -257,16 +258,33 @@ const sendSearchQuery: SendSearchQuerySignature = async function(searchParams) {
   const excludedKeywords = splitKeywords(searchParams.excludedWords);
   const query = buildSqlQuery(searchParams, keywords, excludedKeywords);
   console.log('query', query);
-  const [ bqMainResults /*, bqMetaResults */ ] = await Promise.all([
+  const [ bqMainResults, bqMetaResults ] = await Promise.all([
     bigQuery(query, keywords, excludedKeywords),
-//    bigQuery(`
-//      ... // meta query
-//    `)
+    bigQuery(`
+      WITH things AS (
+        SELECT 'PERSON' AS type, url, title
+        FROM graph.person
+        UNION ALL
+        SELECT 'ORGANISATION' AS type, url, title
+        FROM graph.organisation
+        UNION ALL
+        SELECT 'ROLE' AS type, url, title
+        FROM graph.role
+        UNION ALL
+        SELECT 'BANK_HOLIDAY' AS type, url, title
+        FROM content.bank_holiday
+        UNION ALL
+        SELECT 'TAXON' AS type, url, title
+        FROM graph.taxon
+      )
+      SELECT type, url, title from things
+      WHERE CONTAINS_SUBSTR(title, "${searchParams.selectedWords}")
+    `)
   ]);
 
   return {
     mainResults: bqMainResults,
-    metaResults: [] //MetaResult[]
+    metaResults: bqMetaResults
   }
 };
 
