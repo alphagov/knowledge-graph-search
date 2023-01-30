@@ -1,4 +1,4 @@
-import { id, splitKeywords } from '../utils';
+import { id, queryDescription } from '../utils';
 import { state, searchState } from '../state';
 import { handleEvent } from '../events';
 import { languageName } from '../lang';
@@ -108,56 +108,6 @@ const viewMainLayout = () => {
     `);
   }
   return result.join('');
-};
-
-
-const makeBold = (text: string, includeMarkup: boolean) =>
-  includeMarkup ?
-    `<span class="govuk-!-font-weight-bold">${text}</span>` :
-    `"${text}"`;
-
-
-const viewContainDescription = (includeMarkup: boolean) => {
-  let where: string;
-  if (state.searchParams.whereToSearch.title && state.searchParams.whereToSearch.text) {
-    where = '';
-  } else if (state.searchParams.whereToSearch.title) {
-    where = 'in their title';
-  } else {
-    where = 'in their body content';
-  }
-  let combineOp = state.searchParams.combinator === 'all' ? 'and' : 'or';
-  let combinedWords = splitKeywords(state.searchParams.selectedWords)
-    .filter(w => w.length > 2)
-    .map(w => makeBold(w, includeMarkup))
-    .join(` ${combineOp} `);
-  return state.searchParams.selectedWords !== '' ? `${combinedWords} ${where}` : '';
-};
-
-
-const viewQueryDescription = (includeMarkup = true) => {
-  const clauses = [];
-  if (state.searchParams.selectedWords !== '') {
-    let keywords = `contain ${viewContainDescription(includeMarkup)}`;
-    if (state.searchParams.excludedWords !== '') {
-      keywords = `${keywords} (but don't contain ${makeBold(state.searchParams.excludedWords, includeMarkup)})`;
-    }
-    clauses.push(keywords);
-  }
-  if (state.searchParams.selectedTaxon !== '')
-    clauses.push(`belong to the ${makeBold(state.searchParams.selectedTaxon, includeMarkup)} taxon (or its sub-taxons)`);
-  if (state.searchParams.selectedLocale !== '')
-    clauses.push(`are in ${makeBold(languageName(state.searchParams.selectedLocale), includeMarkup)}`);
-  if (state.searchParams.linkSearchUrl !== '')
-    clauses.push(`link to ${makeBold(state.searchParams.linkSearchUrl, includeMarkup)}`);
-  if (state.searchParams.areaToSearch === 'whitehall' || state.searchParams.areaToSearch === 'publisher')
-    clauses.push(`are published using ${makeBold(state.searchParams.areaToSearch, includeMarkup)}`);
-
-  const joinedClauses = (clauses.length === 1) ?
-    clauses[0] :
-    `${clauses.slice(0, clauses.length - 1).join(', ')} and ${clauses[clauses.length - 1]}`;
-
-  return `pages that ${joinedClauses}`;
 };
 
 
@@ -298,7 +248,7 @@ const csvFromResults = function(searchResults: any) {
 
 const viewWaiting = () => `
   <div aria-live="polite" role="region">
-    <div class="govuk-body">Searching for ${viewQueryDescription()}</div>
+    <div class="govuk-body">Searching for ${queryDescription(state.searchParams)}</div>
     <p class="govuk-body-s">Some queries may take up to a minute</p>
   </div>
 `;
@@ -324,7 +274,7 @@ const viewResults = function() {
       `);
     }
 
-    html.push(`<div class="govuk-body">for ${viewQueryDescription()}</div>`);
+    html.push(`<div class="govuk-body">for ${queryDescription(state.searchParams)}</div>`);
 
     if (nbRecords > state.resultsPerPage) {
 
@@ -358,7 +308,7 @@ const viewResults = function() {
 const viewNoResults = () => {
   return `
     <h1 tabindex="0" id="results-heading" class="govuk-heading-l">No results</h1>
-    <div class="govuk-body">for ${viewQueryDescription()} </div>
+    <div class="govuk-body">for ${queryDescription(state.searchParams)} </div>
   `;
 };
 
@@ -366,13 +316,13 @@ const viewNoResults = () => {
 const viewSearchResults = () => {
   switch (searchState().code) {
     case 'waiting':
-      document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraph search`;
+      document.title = `GOV.UK ${queryDescription(state.searchParams, false)} - GovGraph search`;
       return viewWaiting();
     case 'results':
-      document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraph search`;
+      document.title = `GOV.UK ${queryDescription(state.searchParams, false)} - GovGraph search`;
       return `${viewMetaResults() || ''} ${viewResults()}`; // FIXME - avoid || ''
     case 'no-results':
-      document.title = `GOV.UK ${viewQueryDescription(false)} - GovGraph search`;
+      document.title = `GOV.UK ${queryDescription(state.searchParams, false)} - GovGraph search`;
       return `${viewMetaResults() || ''} ${viewNoResults()}`; // FIXME - avoid || ''
     default:
       document.title = 'GovGraph search';
