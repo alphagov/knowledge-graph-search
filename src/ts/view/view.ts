@@ -9,6 +9,7 @@ import { EventType } from '../event-types';
 
 declare const window: any;
 
+
 const view = () => {
   console.log('view')
   document.title = 'GovGraph search';
@@ -320,9 +321,11 @@ const viewSearchResults = () => {
       return viewWaiting();
     case 'results':
       document.title = `GOV.UK ${queryDescription(state.searchParams, false)} - GovGraph search`;
+      if (window.ga) window.ga('send', 'search', { search: document.title, resultsFound: true });
       return `${viewMetaResults() || ''} ${viewResults()}`; // FIXME - avoid || ''
     case 'no-results':
       document.title = `GOV.UK ${queryDescription(state.searchParams, false)} - GovGraph search`;
+      if (window.ga) window.ga('send', 'search', { search: document.title, resultsFound: false });
       return `${viewMetaResults() || ''} ${viewNoResults()}`; // FIXME - avoid || ''
     default:
       document.title = 'GovGraph search';
