@@ -118,7 +118,7 @@ const viewErrorBanner = () => {
     html.push(`
         <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">`);
     if (state.systemErrorText) {
-      let errorText;
+      let errorText: string = '';
       switch (state.systemErrorText) {
         case 'TIMEOUT':
         errorText = "The databse took too long to respond. This is usually due to too many query results. Please try a more precise query.";

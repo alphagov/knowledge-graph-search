@@ -81,7 +81,7 @@ const viewRolePersons = (persons: any[]) => {
     case 0: previousHtml = ''; break;
     case 1: return `
       <p class="govuk-body">Previous holder: ${formatPerson(previous[0])}</p>
-    `; break;
+    `;
     default: return `
       <details class="govuk-details">
         <summary class="govuk-details__summary">
@@ -258,7 +258,7 @@ const viewTaxonChildren = (records: any[]): string => {
 // Sorts a list of object using a specific field to sort by
 const sortedBy = function(arrayOfObjects: Record<string, any>[], field: string): Record<string, any>[] {
   const deepCopy = JSON.parse(JSON.stringify(arrayOfObjects));
-  return deepCopy.sort((a, b) => a[field] < b[field] ? -1 : 1);
+  return deepCopy.sort((a: any, b: any) => a[field] < b[field] ? -1 : 1);
 }
 
 /*
