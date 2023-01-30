@@ -1,4 +1,4 @@
-import { SearchParams, SearchType, SearchArea, Combinator, MetaResult, MetaResultType, SearchResults } from './search-api-types';
+import { SearchParams, SearchType, SearchArea, Combinator, MetaResultType, SearchResults } from './search-api-types';
 import { languageCode } from './lang';
 import { EventType, SearchApiCallback } from './event-types';
 
