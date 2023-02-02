@@ -93,10 +93,10 @@ const queryGraph: (searchParams: SearchParams, callback: SearchApiCallback) => P
 //=========== private ===========
 
 const buildMetaboxInfo = async function(info: any) {
-  console.log(`Found a ${info.nodeType[0]}. Running extra queries`);
-  switch (info.nodeType[0]) {
+  console.log(`Found a ${info.type}. Running extra queries`);
+  switch (info.type) {
     case 'BankHoliday': {
-      return await fetchWithTimeout(`/bank-holiday?name=${encodeURIComponent(info.node.name)}`);
+      return await fetchWithTimeout(`/bank-holiday?name=${encodeURIComponent(info.title)}`);
     }
     case 'Person': {
       return await fetchWithTimeout(`/person?name=${encodeURIComponent(info.node.name)}`);
@@ -119,7 +119,7 @@ const buildMetaboxInfo = async function(info: any) {
       return await fetchWithTimeout(`/taxon?name=${encodeURIComponent(info.node.name)}`);
     }
     default:
-      console.log('unknown meta node type', info.nodeType[0]);
+      console.log('unknown meta node type', info.type);
   }
 };
 

@@ -194,9 +194,9 @@ const getBankHolidayInfo: GetBankHolidayInfoSignature = async function(name) {
 
   return {
     type: MetaResultType.BankHoliday,
-    name: bqBankHoliday.name,
-    dates: bqBankHoliday.dates.map((date: any) => date.value),
-    regions: bqBankHoliday.divisions
+    name: bqBankHoliday[0].name,
+    dates: bqBankHoliday[0].dates.map((date: any) => date.value),
+    regions: bqBankHoliday[0].divisions
   };
 };
 
@@ -262,19 +262,19 @@ const sendSearchQuery: SendSearchQuerySignature = async function(searchParams) {
     bigQuery(query, keywords, excludedKeywords),
     bigQuery(`
       WITH things AS (
-        SELECT 'PERSON' AS type, url, title
+        SELECT 'Person' AS type, url, title
         FROM graph.person
         UNION ALL
-        SELECT 'ORGANISATION' AS type, url, title
+        SELECT 'Organisation' AS type, url, title
         FROM graph.organisation
         UNION ALL
-        SELECT 'ROLE' AS type, url, title
+        SELECT 'Role' AS type, url, title
         FROM graph.role
         UNION ALL
-        SELECT 'BANK_HOLIDAY' AS type, url, title
-        FROM content.bank_holiday
+        SELECT 'BankHoliday' AS type, url, title
+        FROM graph.bank_holiday_title
         UNION ALL
-        SELECT 'TAXON' AS type, url, title
+        SELECT 'Taxon' AS type, url, title
         FROM graph.taxon
       )
       SELECT type, url, title from things

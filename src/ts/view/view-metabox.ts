@@ -103,8 +103,8 @@ const viewRolePersons = (persons: any[]) => {
 const viewBankHolidayDetails = function(holiday: any) {
   const datesDetails: string = viewDetails(
     'dates',
-    sortedBy(holiday.dates, 'dateString').reverse(),
-    date => date.dateString
+    holiday.dates.sort().reverse(),
+    date => date
   );
   const regionDetails: string = viewDetails(
     'Observed in',
@@ -292,12 +292,12 @@ const viewMetaResults = function() {
   console.log(`meta: found a ${record.type}`)
   console.log(record);
   switch (record.type) {
-    case 'BANK_HOLIDAY': return viewBankHoliday(record);
-    case 'ORGANISATION': return viewOrg(record);
-    case 'PERSON': return viewPerson(record);
-    case 'ROLE': return viewRole(record);
-    case 'TRANSACTION': return viewTransaction(record);
-    case 'TAXON': return viewTaxon(record);
+    case 'BankHoliday': return viewBankHoliday(record);
+    case 'Organisation': return viewOrg(record);
+    case 'Person': return viewPerson(record);
+    case 'Role': return viewRole(record);
+    case 'Transaction': return viewTransaction(record);
+    case 'Taxon': return viewTaxon(record);
     default: console.log(`unknown record type: ${record.type}`); return ``;
   }
   //}

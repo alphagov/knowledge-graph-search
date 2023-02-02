@@ -1,7 +1,7 @@
 // Import the express in typescript file
 import express from 'express';
-import { getRoleInfo, getBankHolidayInfo, getPersonInfo } from './neo4j';
-import { sendSearchQuery, sendInitQuery, getOrganisationInfo, getTaxonInfo } from './bigquery';
+import { getRoleInfo, getPersonInfo } from './neo4j';
+import { sendSearchQuery, sendInitQuery, getOrganisationInfo, getTaxonInfo, getBankHolidayInfo } from './bigquery';
 // eventually replace with:
 // import { getRoleInfo, getOrganisationInfo, getTaxonInfo, sendSearchQuery, sendInitQuery, getBankHolidayInfo, getPersonInfo } from './bigquery';
 

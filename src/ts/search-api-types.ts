@@ -36,12 +36,12 @@ export type SearchParams = {
 }
 
 export enum MetaResultType {
-  Person,
-  Organisation,
-  BankHoliday,
-  Role,
-  Taxon,
-  Transaction
+  Person = "Person",
+  Organisation = "Organisation",
+  BankHoliday = "BankHoliday",
+  Role = "Role",
+  Taxon = "Taxon",
+  Transaction = "Transaction"
 }
 
 export type MetaResult = Person | Organisation | BankHoliday | Role | Taxon
