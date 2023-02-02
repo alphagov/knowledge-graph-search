@@ -343,7 +343,7 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
       withdrawn_at,
       withdrawn_explanation,
       pagerank,
-      ancestor_titles AS taxons
+      taxon_ancestors AS taxons
     FROM graph.page
 
     WHERE TRUE
