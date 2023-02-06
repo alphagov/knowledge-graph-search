@@ -7,25 +7,36 @@ without having to use Cypher.
 # Running
 
 You need a running Neo4j server, whose details should be put in the following environment
-variables: `NEO4JSERVER`, `NEO4JUSER` and `NEO4JPWD`.
+variable: `NEO4JSERVER`.
 
 - clone this repository on a server
-- install the govuk design system with `npm install` (needs NodeJS installed)
-- run the server with `npm run`
-  (or `NEO4JSERVER=localhost NEO4JUSER=user NEO4JPWS=abc123 npm run`)
-- Point your browser to `https://localhost:8080` (the port can be changed using the `PORT` environment variable)
+- install the govuk design system the server with `npm install` (needs NodeJS installed)
+- install webpack on the server with `npm install webpack`
+- run webpack with `npx webpack`
+- use another machine to compile the GOV.UK Design System with `sass
+  src/scss/main.scss > public main.css`, and put `public/main.css` on the
+  server. You can install sass with `npm install -g sass`
+- run the server with `npm start` (or
+  `NEO4JSERVER=https://govgraph.dev:7473/db/neo4j/tx npm start`)
 
 # Developing
 
 This is an ExpressJS app, but the only server logic (in `app.mjs`) is to serve static assets and proxy the Neo4j API endpoint.
 
+Use `npm run dev` instead of `npm start`, because `run dev` automatically
+reloads when the source code is changed.
+
+Point your browser to `http://localhost:8080` (the port can be changed using the
+`PORT` environment variable)
+
 ## Files
 
-- `app.mjs`: the main server file
+- `app.ts`: the main server file
 
 - `public/js/*`:  the main browser-side application code. See below.
 
-- `public/main.scss`: sass file, that compiles to `main.css` with `sass main.scss > main.css`
+- `src/scss/main.scss`: sass file, that compiles to `public/main.css` with `sass
+  src/scss/main.scss > public/main.css`
 
 - `package.json`: used to retrieve the Government Design System assets and ExpressJS
 
@@ -61,4 +72,3 @@ We use [Cypress](https://docs.cypress.io), which is installed automatically on i
 To run a single test file , use `--spec`. For instance:
 
     cypress run --spec cypress/e2e/url.cy.ts
-
