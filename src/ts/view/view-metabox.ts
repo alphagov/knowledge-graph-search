@@ -213,38 +213,42 @@ const viewMetaLinkList = (names: string[], title?: string, noneTitle?: string): 
 };
 
 
-const viewTransaction = (record: Transaction): string => `
-  <div class="meta-results-panel">
-    <h2 class="govuk-heading-m">
-      <a class="govuk-link" href="${record.homepage}">${record.name}</a>
-    </h2>
-    <p class="govuk-body">Online government service</p>
-    ${record.description ? `<p class="govuk-body">${record.description}</p>` : ''}
-  </div>
-`;
-
-
-const viewTaxon = (record: Taxon): string => {
-  return `
-    <div class="meta-results-panel">
-      <div class="govuk-breadcrumbs">
-        <ol class="govuk-breadcrumbs__list">
-          ${sortedBy(record.ancestorTaxons, 'level').map(taxon => `
-          <li class="govuk-breadcrumbs__list-item">
-            ${viewMetaLink(taxon.name, 'govuk-breadcrumbs__link')}
-          </li>
-          `)}
-        </ol>
-      </div>
-      <h2 class="govuk-heading-m">
-        <a class="govuk-link" href="${record.homepage}">${record.name}</a>
-      </h2>
-      <p class="govuk-body">GOV.UK Taxon</p>
-      ${record.description ? `<p class="govuk-body">${record.description}</p>` : ''}
-      ${record.childTaxons?.length ? viewTaxonChildren(record.childTaxons) : ''}
-    </div>
+const viewTransaction = (record: Transaction): string =>
+  `<div class="meta-results-panel">
+     <h2 class="govuk-heading-m">
+       <a class="govuk-link" href="${record.homepage}">${record.name}</a>
+     </h2>
+     <p class="govuk-body">Online government service</p>
+     ${record.description ? `<p class="govuk-body">${record.description}</p>` : ''}
+   </div>
   `;
-}
+
+
+const viewTaxon = (record: Taxon): string =>
+  `<div class="meta-results-panel">
+     ${viewTaxonAncestors(record.ancestorTaxons)}
+     <h2 class="govuk-heading-m">
+       <a class="govuk-link" href="${record.homepage}">${record.name}</a>
+     </h2>
+     <p class="govuk-body">GOV.UK Taxon</p>
+     ${record.description ? `<p class="govuk-body">${record.description}</p>` : ''}
+     ${record.childTaxons?.length ? viewTaxonChildren(record.childTaxons) : ''}
+   </div>
+  `;
+
+
+const viewTaxonAncestors = (ancestors: any[]): string =>
+  ancestors?.length > 0 ? `
+    <div class="govuk-breadcrumbs">
+      <ol class="govuk-breadcrumbs__list">
+        ${sortedBy(ancestors, 'level').map(taxon => `
+        <li class="govuk-breadcrumbs__list-item">
+          ${viewMetaLink(taxon.name, 'govuk-breadcrumbs__link')}
+        </li>
+        `)}
+      </ol>
+    </div>
+  ` : '';
 
 
 const viewTaxonChildren = (records: any[]): string => {
