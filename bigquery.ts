@@ -278,7 +278,7 @@ const sendSearchQuery: SendSearchQuerySignature = async function(searchParams) {
         FROM graph.taxon
       )
       SELECT type, url, title from things
-      WHERE CONTAINS_SUBSTR(title, "${searchParams.selectedWords}")
+      WHERE CONTAINS_SUBSTR(title, "${searchParams.selectedWords.replace(/"/g, '')}")
     `)
   ]);
 
