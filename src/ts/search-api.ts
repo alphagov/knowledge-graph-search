@@ -98,12 +98,12 @@ const buildMetaboxInfo = async function(info: any) {
     case 'BankHoliday': {
       return await fetchWithTimeout(`/bank-holiday?name=${encodeURIComponent(info.title)}`);
     }
-    case 'Person': {
-      return await fetchWithTimeout(`/person?name=${encodeURIComponent(info.node.name)}`);
-    }
-    case 'Role': {
-      return await fetchWithTimeout(`/role?name=${encodeURIComponent(info.node.name)}`);
-    }
+    // case 'Person': {
+    //   return await fetchWithTimeout(`/person?name=${encodeURIComponent(info.title)}`);
+    // }
+    // case 'Role': {
+    //   return await fetchWithTimeout(`/role?name=${encodeURIComponent(info.title)}`);
+    // }
     case 'Organisation': {
       return await fetchWithTimeout(`/organisation?name=${encodeURIComponent(info.node.name)}`);
     }

@@ -262,15 +262,15 @@ const sendSearchQuery: SendSearchQuerySignature = async function(searchParams) {
     bigQuery(query, keywords, excludedKeywords),
     bigQuery(`
       WITH things AS (
-        SELECT 'Person' AS type, url, title
-        FROM graph.person
-        UNION ALL
+--        SELECT 'Person' AS type, url, title
+--        FROM graph.person
+--        UNION ALL
         SELECT 'Organisation' AS type, url, title
         FROM graph.organisation
         UNION ALL
-        SELECT 'Role' AS type, url, title
-        FROM graph.role
-        UNION ALL
+--        SELECT 'Role' AS type, url, title
+--        FROM graph.role
+--        UNION ALL
         SELECT 'BankHoliday' AS type, url, title
         FROM graph.bank_holiday_title
         UNION ALL
@@ -359,5 +359,11 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
 };
 
 
-export { sendInitQuery, getTaxonInfo, getOrganisationInfo, getBankHolidayInfo, sendSearchQuery };
-//export { sendSearchQuery, getTaxonInfo, getOrganisationInfo, getRoleInfo, getPersonInfo, getBankHolidayInfo };
+export {
+  getBankHolidayInfo,
+  getOrganisationInfo,
+  getTaxonInfo,
+  sendInitQuery,
+  sendSearchQuery
+};
+//export { sendSearchQuery, getTaxonInfo, getOrganisationInfo, getPersonInfo, getBankHolidayInfo, getRoleInfo };
