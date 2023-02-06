@@ -105,18 +105,18 @@ const buildMetaboxInfo = async function(info: any) {
     //   return await fetchWithTimeout(`/role?name=${encodeURIComponent(info.title)}`);
     // }
     case 'Organisation': {
-      return await fetchWithTimeout(`/organisation?name=${encodeURIComponent(info.node.name)}`);
+      return await fetchWithTimeout(`/organisation?name=${encodeURIComponent(info.title)}`);
     }
     case 'Transaction': {
       return {
         type: MetaResultType.Transaction,
         homepage: info.homepage.url,
-        description: info.node.description,
-        name: info.node.name
+        description: info.description,
+        name: info.title
       }
     }
     case 'Taxon': {
-      return await fetchWithTimeout(`/taxon?name=${encodeURIComponent(info.node.name)}`);
+      return await fetchWithTimeout(`/taxon?name=${encodeURIComponent(info.title)}`);
     }
     default:
       console.log('unknown meta node type', info.type);
