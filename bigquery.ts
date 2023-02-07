@@ -7,26 +7,51 @@ const { BigQuery } = require('@google-cloud/bigquery');
 
 //====== private ======
 
+const internalLinkRegExp = /^((https:\/\/)?((www\.)?gov\.uk))?\//;
+
 const bigquery = new BigQuery({
   projectId: 'govuk-knowledge-graph'
 });
 
-const bigQuery = async function(userQuery: string, keywords?: string[], excludedKeywords?: string[]) {
+const bigQuery = async function(userQuery: string, options?: any) {
+
+
   const params: Record<string, string> = {};
-  if (keywords) {
-    keywords.forEach((keyword: string, index: number) => params[`keyword${index}`] = keyword);
-  }
-  if (excludedKeywords) {
-    excludedKeywords.forEach((keyword: string, index: number) => params[`excluded_keyword${index}`] = keyword);
+
+  if (options) {
+    if (options.keywords) {
+      options.keywords.forEach((keyword: string, index: number) =>
+        params[`keyword${index}`] = keyword
+      );
+    }
+    if (options.excludedKeywords) {
+      options.excludedKeywords.forEach((keyword: string, index: number) =>
+        params[`excluded_keyword${index}`] = keyword);
+    }
+    if (options.name) {
+      params.name = options.name;
+    }
+    if (options.locale) {
+      params.locale = options.locale;
+    }
+    if (options.taxon) {
+      params.taxon = options.taxon;
+    }
+    if (options.link) {
+      params.link = options.link;
+    }
+    if (options.selectedWordsWithoutQuotes !== undefined) {
+      params.selected_words_without_quotes = options.selectedWordsWithoutQuotes;
+    }
   }
 
-  const options = {
+  const bqOptions = {
     query: userQuery,
     location: 'europe-west2',
     params
   };
 
-  const [rows] = await bigquery.query(options);
+  const [rows] = await bigquery.query(bqOptions);
 
   return rows;
 };
@@ -34,7 +59,7 @@ const bigQuery = async function(userQuery: string, keywords?: string[], excluded
 //====== public ======
 
 const sendInitQuery: SendInitQuerySignature = async function() {
-  let bqLocales, bqTaxons;
+  let bqLocales: any, bqTaxons: any;
   try {
     [ bqLocales, bqTaxons ] = await Promise.all([
       bigQuery(`
@@ -71,10 +96,10 @@ const getTaxonInfo: GetTaxonInfoSignature = async function(name) {
         description.description
       FROM graph.taxon
       INNER JOIN content.taxon_levels ON taxon_levels.url = taxon.url
-      INNER JOIN content.description ON description.url = taxon_levels.homepage_url
-      WHERE taxon.title = '${name}'
+      LEFT JOIN content.description ON description.url = taxon_levels.homepage_url
+      WHERE taxon.title = @name
       ;
-    `),
+    `, { name }),
     bigQuery(`
       SELECT
         taxon_ancestors.ancestor_title AS name,
@@ -82,29 +107,29 @@ const getTaxonInfo: GetTaxonInfoSignature = async function(name) {
         taxon_levels.homepage_url AS url
       FROM graph.taxon_ancestors
       INNER JOIN content.taxon_levels ON taxon_levels.url = taxon_ancestors.ancestor_url
-      WHERE title = '${name}'
+      WHERE title = @name
       ;
-   `),
+   `, { name }),
     bigQuery(`
       SELECT
         child.title AS name,
-        taxon_levels.homepage AS url,
+        taxon_levels.homepage_url AS url,
         taxon_levels.level AS level
       FROM graph.taxon AS parent
       INNER JOIN graph.has_parent ON has_parent.parent_url = parent.url
       INNER JOIN graph.taxon AS child ON child.url = has_parent.url
       INNER JOIN content.taxon_levels ON taxon_levels.url = child.url
-      WHERE parent.title = '${name}'
+      WHERE parent.title = @name
       ;
-    `)
+    `, { name })
   ]);
 
   return {
     type: MetaResultType.Taxon,
-    name: bqTaxon.title,
-    homepage: bqTaxon.homepage,
-    description: bqTaxon.description,
-    level: parseInt(bqTaxon.level),
+    name: bqTaxon[0].title,
+    homepage: bqTaxon[0].homepage,
+    description: bqTaxon[0].description,
+    level: parseInt(bqTaxon[0].level),
     ancestorTaxons: bqAncestors,
     childTaxons: bqChildren
   };
@@ -120,25 +145,25 @@ const getOrganisationInfo: GetOrganisationInfoSignature = async function(name) {
       FROM graph.organisation AS org
       INNER JOIN graph.has_homepage AS hh on hh.url = org.url
       INNER JOIN graph.page on hh.homepage_url = page.url
-      WHERE org.title = '${name}'
+      WHERE org.title = @name
       ;
-   `),
+   `, { name }),
     bigQuery(`
       SELECT parent.title AS parent
       FROM graph.organisation
       INNER JOIN graph.has_parent USING (url)
       INNER JOIN graph.organisation AS parent ON has_parent.parent_url = parent.url
-      WHERE organisation.title = '${name}'
+      WHERE organisation.title = @name
       ;
-    `),
+    `, { name }),
     bigQuery(`
       SELECT child.title
       FROM graph.organisation AS parent
       INNER JOIN graph.has_parent ON has_parent.parent_url = parent.url
       INNER JOIN graph.organisation AS child ON child.url = has_parent.url
-      WHERE parent.title = '${name}'
+      WHERE parent.title = @name
       ;
-    `),
+    `, { name }),
     bigQuery(`
       SELECT person.title AS personName, role.title AS roleName
       FROM graph.organisation AS org
@@ -146,25 +171,25 @@ const getOrganisationInfo: GetOrganisationInfoSignature = async function(name) {
       INNER JOIN graph.role ON belongs_to.role_url = role.url
       INNER JOIN graph.has_role ON role.url = has_role.role_url
       INNER JOIN graph.person ON has_role.person_url = person.url
-      WHERE org.title = '${name}'
+      WHERE org.title = @name
       AND has_role.ended_on IS NULL
       ;
-    `),
+    `, { name }),
     bigQuery(`
       SELECT successor.title AS title
       FROM graph.organisation
       INNER JOIN graph.has_successor USING (url)
       INNER JOIN graph.organisation AS successor ON has_successor.successor_url = successor.url
-      WHERE organisation.title = '${name}'
+      WHERE organisation.title = @name
       ;
-    `),
+    `, { name }),
     bigQuery(`
       SELECT organisation.title
       FROM graph.organisation
       INNER JOIN graph.has_successor USING (url)
       INNER JOIN graph.organisation AS successor ON has_successor.successor_url = successor.url
-      WHERE successor.title = '${name}'
-    `)
+      WHERE successor.title = @name
+    `, { name })
   ]);
 
   return {
@@ -188,9 +213,9 @@ const getBankHolidayInfo: GetBankHolidayInfoSignature = async function(name) {
       ARRAY_AGG(DISTINCT division) AS divisions,
       ARRAY_AGG(DISTINCT date) AS dates
     FROM \`govuk-knowledge-graph.content.bank_holiday\`
-    WHERE title = '${name}'
+    WHERE title = @name
     GROUP BY title
-  `);
+  `, { name });
 
   return {
     type: MetaResultType.BankHoliday,
@@ -224,7 +249,6 @@ const getRoleInfo: GetRoleInfoSignature = async function(name) {
   };
 };
 
-
 const getPersonInfo: GetPersonInfoSignature = async function(name) {
   const [ bqPerson, bqRoles ] = await Promise.all([
     bigQuery(`
@@ -257,11 +281,20 @@ const sendSearchQuery: SendSearchQuerySignature = async function(searchParams) {
   const keywords = splitKeywords(searchParams.selectedWords);
   const excludedKeywords = splitKeywords(searchParams.excludedWords);
   const query = buildSqlQuery(searchParams, keywords, excludedKeywords);
-  console.log('query', query);
-  const [ bqMainResults, bqMetaResults ] = await Promise.all([
-    bigQuery(query, keywords, excludedKeywords),
-    bigQuery(`
-      WITH things AS (
+  const locale = languageCode(searchParams.selectedLocale);
+  const taxon = searchParams.selectedTaxon;
+  const selectedWordsWithoutQuotes = searchParams.selectedWords.replace(/"/g, '');
+  const link = searchParams.linkSearchUrl && internalLinkRegExp.test(searchParams.linkSearchUrl)
+    ? searchParams.linkSearchUrl.replace(internalLinkRegExp, 'https://www.gov.uk/')
+    : searchParams.linkSearchUrl;
+  const queries = [
+    bigQuery(query, { keywords, excludedKeywords, locale, taxon, link })
+  ];
+  console.log(111, query)
+  console.log(112, { keywords, excludedKeywords, locale, taxon, link })
+  if (selectedWordsWithoutQuotes) {
+    queries.push(bigQuery(
+`      WITH things AS (
 --        SELECT 'Person' AS type, url, title
 --        FROM graph.person
 --        UNION ALL
@@ -278,9 +311,15 @@ const sendSearchQuery: SendSearchQuerySignature = async function(searchParams) {
         FROM graph.taxon
       )
       SELECT type, url, title from things
-      WHERE CONTAINS_SUBSTR(title, "${searchParams.selectedWords.replace(/"/g, '')}")
-    `)
-  ]);
+      WHERE CONTAINS_SUBSTR(title, @selected_words_without_quotes)
+    `, { selectedWordsWithoutQuotes }))
+  }
+
+
+  const results = await Promise.all(queries);
+
+  const bqMainResults = results[0];
+  const bqMetaResults = results.length > 1 ? results[1] : [];
 
   return {
     mainResults: bqMainResults,
@@ -293,10 +332,10 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
 
   const contentToSearch = [];
   if (searchParams.whereToSearch.title) {
-    contentToSearch.push('page.title');
+    contentToSearch.push('IFNULL(page.title, "")');
   }
   if (searchParams.whereToSearch.text) {
-    contentToSearch.push('page.text', 'page.description');
+    contentToSearch.push('IFNULL(page.text, "")', 'IFNULL(page.description, "")');
   }
   const contentToSearchString = contentToSearch.join(' || " " || ');
 
@@ -326,9 +365,42 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
 
   let localeClause = '';
   if (searchParams.selectedLocale !== '') {
-    localeClause = `AND locale = "${languageCode(searchParams.selectedLocale)}"`
+    localeClause = `AND locale = @locale`
   }
 
+  let taxonClause = '';
+  if (searchParams.selectedTaxon !== '') {
+    taxonClause = `
+      AND EXISTS
+        (
+          SELECT 1 FROM UNNEST (taxon_ancestors) AS taxon
+          WHERE taxon = @taxon
+        )
+    `;
+  }
+
+  let linkClause = '';
+  if (searchParams.linkSearchUrl !== '') {
+    if (internalLinkRegExp.test(searchParams.linkSearchUrl)) {
+      // internal link search: look for exact match
+      linkClause = `
+        AND EXISTS
+          (
+            SELECT 1 FROM UNNEST (hyperlinks) AS link
+            WHERE link = @link
+          )
+      `;
+    } else {
+      // external link search: look for url as substring
+      linkClause = `
+        AND EXISTS
+          (
+            SELECT 1 FROM UNNEST (hyperlinks) AS link
+            WHERE CONTAINS_SUBSTR(link, @link)
+          )
+      `;
+    }
+  }
 
   return `
     SELECT
@@ -353,6 +425,8 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
     ${excludeClause}
     ${areaClause}
     ${localeClause}
+    ${taxonClause}
+    ${linkClause}
 
     LIMIT 50000
   `;

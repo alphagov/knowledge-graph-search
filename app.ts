@@ -60,6 +60,7 @@ app.get('/taxon', async (req: any, res) => {
   console.log('API call to /taxon', req.query);
   try {
     const data = await getTaxonInfo(req.query['name']);
+    console.log(239, data)
     res.send(data);
   } catch (e: any) {
     if (e.status === 404) {

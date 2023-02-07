@@ -94,6 +94,7 @@ const queryGraph: (searchParams: SearchParams, callback: SearchApiCallback) => P
 
 const buildMetaboxInfo = async function(info: any) {
   console.log(`Found a ${info.type}. Running extra queries`);
+  console.log(info);
   switch (info.type) {
     case 'BankHoliday': {
       return await fetchWithTimeout(`/bank-holiday?name=${encodeURIComponent(info.title)}`);
