@@ -292,26 +292,28 @@ const sendSearchQuery: SendSearchQuerySignature = async function(searchParams) {
   ];
   console.log(111, query)
   console.log(112, { keywords, excludedKeywords, locale, taxon, link })
-  if (selectedWordsWithoutQuotes) {
+  if (selectedWordsWithoutQuotes &&
+    selectedWordsWithoutQuotes.length > 5 &&
+    selectedWordsWithoutQuotes.includes(' ')) {
     queries.push(bigQuery(
 `      WITH things AS (
---        SELECT 'Person' AS type, url, title
+--        SELECT 'Person' AS type, url, title AS name
 --        FROM graph.person
 --        UNION ALL
-        SELECT 'Organisation' AS type, url, title
+        SELECT 'Organisation' AS type, url, title AS name
         FROM graph.organisation
         UNION ALL
---        SELECT 'Role' AS type, url, title
+--        SELECT 'Role' AS type, url, title AS name
 --        FROM graph.role
 --        UNION ALL
-        SELECT 'BankHoliday' AS type, url, title
+        SELECT 'BankHoliday' AS type, url, title AS name
         FROM graph.bank_holiday_title
         UNION ALL
-        SELECT 'Taxon' AS type, url, title
+        SELECT 'Taxon' AS type, url, title AS name
         FROM graph.taxon
       )
-      SELECT type, url, title from things
-      WHERE CONTAINS_SUBSTR(title, @selected_words_without_quotes)
+      SELECT type, url, name from things
+      WHERE CONTAINS_SUBSTR(name, @selected_words_without_quotes)
     `, { selectedWordsWithoutQuotes }))
   }
 
@@ -415,7 +417,9 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
       withdrawn_at,
       withdrawn_explanation,
       pagerank,
-      taxon_ancestors AS taxons
+      taxon_ancestors AS taxons,
+      primary_publishing_organisation AS primary_organisation,
+      organisations AS all_organisations
     FROM graph.page
 
     WHERE TRUE

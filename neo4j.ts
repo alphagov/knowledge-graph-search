@@ -336,6 +336,7 @@ const formattedMetaResults = (neo4jResults: Neo4jResponseResult): MetaResult[] =
     keys.forEach((key: string, i: number) => result[key] = val.row[i]);
     results.push(result);
   });
+  console.log(33, JSON.stringify(results, null, 2))
   return results;
 };
 

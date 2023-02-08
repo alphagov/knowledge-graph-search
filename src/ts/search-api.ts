@@ -57,33 +57,21 @@ const queryGraph: (searchParams: SearchParams, callback: SearchApiCallback) => P
   }
   let { main, meta } = apiResults;
 
-  console.log(123, metaResults)
-
-
   // If there's an exact match within the meta results, just keep that one
   const searchKeywords: string = searchParams.selectedWords.replace(/"/g, '');
   const exactMetaResults = metaResults.filter((result: any) => {
-    return result.title.toLowerCase() === searchKeywords.toLowerCase()
+    return result.name.toLowerCase() === searchKeywords.toLowerCase()
   });
   if (exactMetaResults.length === 1) {
     meta = exactMetaResults;
   }
   if (meta.length === 1) {
     // one meta result: show the knowledge panel (may require more API queries)
-    try {
-      const fullMetaResults = await buildMetaboxInfo(meta[0]);
-      callback({
-        type: EventType.SearchApiCallbackOk,
-        results: { main, meta: [fullMetaResults] }
-      });
-    } catch (error) {
-      console.log('failed to fetch extra meta results');
-      callback({ type: EventType.SearchApiCallbackOk, results: { main, meta: null } });
-      return;
-    }
-  } else if (meta.length >= 1) {
-    // multiple meta results: we'll show a disambiguation page
-    callback({ type: EventType.SearchApiCallbackOk, results: { main, meta } });
+    const fullMetaResults = await buildMetaboxInfo(metaResults[0]);
+    callback({ type: EventType.SearchApiCallbackOk, results: { main: mainResults, meta: [fullMetaResults] } });
+  // } else if (metaResults.length >= 1) {
+  //   // multiple meta results: we'll show a disambiguation page
+  //   callback({ type: EventType.SearchApiCallbackOk, results: { main: mainResults, meta: metaResults } });
   } else {
     // no meta results
     callback({ type: EventType.SearchApiCallbackOk, results: { main, meta: null } });
@@ -97,27 +85,27 @@ const buildMetaboxInfo = async function(info: any) {
   console.log(info);
   switch (info.type) {
     case 'BankHoliday': {
-      return await fetchWithTimeout(`/bank-holiday?name=${encodeURIComponent(info.title)}`);
+      return await fetchWithTimeout(`/bank-holiday?name=${encodeURIComponent(info.name)}`);
     }
     // case 'Person': {
-    //   return await fetchWithTimeout(`/person?name=${encodeURIComponent(info.title)}`);
+    //   return await fetchWithTimeout(`/person?name=${encodeURIComponent(info.name)}`);
     // }
     // case 'Role': {
-    //   return await fetchWithTimeout(`/role?name=${encodeURIComponent(info.title)}`);
+    //   return await fetchWithTimeout(`/role?name=${encodeURIComponent(info.name)}`);
     // }
     case 'Organisation': {
-      return await fetchWithTimeout(`/organisation?name=${encodeURIComponent(info.title)}`);
+      return await fetchWithTimeout(`/organisation?name=${encodeURIComponent(info.name)}`);
     }
     case 'Transaction': {
       return {
         type: MetaResultType.Transaction,
         homepage: info.homepage.url,
         description: info.description,
-        name: info.title
+        name: info.name
       }
     }
     case 'Taxon': {
-      return await fetchWithTimeout(`/taxon?name=${encodeURIComponent(info.title)}`);
+      return await fetchWithTimeout(`/taxon?name=${encodeURIComponent(info.name)}`);
     }
     default:
       console.log('unknown meta node type', info.type);
