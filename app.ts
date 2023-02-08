@@ -1,7 +1,7 @@
 // Import the express in typescript file
 import express from 'express';
 import { getRoleInfo, getPersonInfo } from './neo4j';
-import { sendSearchQuery, sendInitQuery, getOrganisationInfo, getTaxonInfo, getBankHolidayInfo } from './bigquery';
+import { sendSearchQuery, sendInitQuery, getOrganisationInfo, getTaxonInfo, getBankHolidayInfo, getTransactionInfo } from './bigquery';
 // eventually replace with:
 // import { getRoleInfo, getOrganisationInfo, getTaxonInfo, sendSearchQuery, sendInitQuery, getBankHolidayInfo, getPersonInfo } from './bigquery';
 
@@ -113,6 +113,16 @@ app.get('/bank-holiday', async (req: any, res) => {
     } else {
       res.status(500).send(e.message);
     }
+  }
+});
+
+app.get('/transaction', async (req: any, res) => {
+  console.log('API call to /transaction', req.query);
+  try {
+    const data = await getTransactionInfo(req.query['name']);
+    res.send(data);
+  } catch (e: any) {
+    res.status(500).send(e);
   }
 });
 

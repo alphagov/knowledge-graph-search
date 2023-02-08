@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { MainResult, MetaResult, Person, Organisation, Role, Taxon, BankHoliday, MetaResultType, SearchParams, Combinator } from './src/ts/search-api-types';
+import { MainResult, MetaResult, Person, Organisation, Role, Taxon, BankHoliday, Transaction, MetaResultType, SearchParams, Combinator } from './src/ts/search-api-types';
 import { splitKeywords } from './src/ts/utils';
 import { languageCode } from './src/ts/lang';
-import { GetBankHolidayInfoSignature, GetOrganisationInfoSignature, GetPersonInfoSignature, GetRoleInfoSignature, GetTaxonInfoSignature, SendInitQuerySignature, SendSearchQuerySignature } from './db-api-types';
+import { GetBankHolidayInfoSignature, GetTransactionInfoSignature, GetOrganisationInfoSignature, GetPersonInfoSignature, GetRoleInfoSignature, GetTaxonInfoSignature, SendInitQuerySignature, SendSearchQuerySignature } from './db-api-types';
 const { BigQuery } = require('@google-cloud/bigquery');
 
 //====== private ======
@@ -225,6 +225,26 @@ const getBankHolidayInfo: GetBankHolidayInfoSignature = async function(name) {
   };
 };
 
+const getTransactionInfo: GetTransactionInfoSignature = async function(name) {
+  const bqTransaction = await bigQuery(`
+    SELECT
+      url AS homepage,
+      title AS name,
+      description
+    FROM \`govuk-knowledge-graph.graph.page\`
+    WHERE title = @name
+  `, { name });
+
+  const result:Transaction = {
+    type: MetaResultType.Transaction,
+    homepage: bqTransaction[0].homepage,
+    name: bqTransaction[0].name,
+    description: bqTransaction[0].description
+  };
+  return result;
+};
+
+
 /*
 const getRoleInfo: GetRoleInfoSignature = async function(name) {
   const [ bqRole, bqPersons ] = await Promise.all([
@@ -311,6 +331,10 @@ const sendSearchQuery: SendSearchQuerySignature = async function(searchParams) {
         UNION ALL
         SELECT 'Taxon' AS type, url, title AS name
         FROM graph.taxon
+        UNION ALL
+        SELECT 'Transaction' AS type, url, title AS name
+        FROM graph.page
+        WHERE document_type = 'transaction'
       )
       SELECT type, url, name from things
       WHERE CONTAINS_SUBSTR(name, @selected_words_without_quotes)
@@ -439,6 +463,7 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
 
 export {
   getBankHolidayInfo,
+  getTransactionInfo,
   getOrganisationInfo,
   getTaxonInfo,
   sendInitQuery,

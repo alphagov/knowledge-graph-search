@@ -97,12 +97,7 @@ const buildMetaboxInfo = async function(info: any) {
       return await fetchWithTimeout(`/organisation?name=${encodeURIComponent(info.name)}`);
     }
     case 'Transaction': {
-      return {
-        type: MetaResultType.Transaction,
-        homepage: info.homepage.url,
-        description: info.description,
-        name: info.name
-      }
+      return await fetchWithTimeout(`/transaction?name=${encodeURIComponent(info.name)}`);
     }
     case 'Taxon': {
       return await fetchWithTimeout(`/taxon?name=${encodeURIComponent(info.name)}`);

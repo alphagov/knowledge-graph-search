@@ -44,7 +44,7 @@ export enum MetaResultType {
   Transaction = "Transaction"
 }
 
-export type MetaResult = Person | Organisation | BankHoliday | Role | Taxon
+export type MetaResult = Person | Organisation | BankHoliday | Transaction | Role | Taxon
 
 export type Person = {
   // type below is needed when you need to know the type of an object at runtime
