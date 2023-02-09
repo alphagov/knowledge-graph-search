@@ -57,9 +57,10 @@ const queryGraph: (searchParams: SearchParams, callback: SearchApiCallback) => P
   }
   let { main, meta } = apiResults;
 
+
   // If there's an exact match within the meta results, just keep that one
   const searchKeywords: string = searchParams.selectedWords.replace(/"/g, '');
-  const exactMetaResults = metaResults.filter((result: any) => {
+  const exactMetaResults = meta.filter((result: any) => {
     return result.name.toLowerCase() === searchKeywords.toLowerCase()
   });
   if (exactMetaResults.length === 1) {
@@ -67,11 +68,11 @@ const queryGraph: (searchParams: SearchParams, callback: SearchApiCallback) => P
   }
   if (meta.length === 1) {
     // one meta result: show the knowledge panel (may require more API queries)
-    const fullMetaResults = await buildMetaboxInfo(metaResults[0]);
-    callback({ type: EventType.SearchApiCallbackOk, results: { main: mainResults, meta: [fullMetaResults] } });
+    const fullMetaResults = await buildMetaboxInfo(meta[0]);
+    callback({ type: EventType.SearchApiCallbackOk, results: { main, meta: [fullMetaResults] } });
   // } else if (metaResults.length >= 1) {
   //   // multiple meta results: we'll show a disambiguation page
-  //   callback({ type: EventType.SearchApiCallbackOk, results: { main: mainResults, meta: metaResults } });
+  //   callback({ type: EventType.SearchApiCallbackOk, results: { main, meta: metaResults } });
   } else {
     // no meta results
     callback({ type: EventType.SearchApiCallbackOk, results: { main, meta: null } });

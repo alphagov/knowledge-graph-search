@@ -1,4 +1,4 @@
-import { Transaction, MetaResultType, SearchParams, Combinator } from './src/ts/search-api-types';
+import { Transaction, MetaResultType, SearchParams, Combinator, SearchResults } from './src/ts/search-api-types';
 import { splitKeywords } from './src/ts/utils';
 import { languageCode } from './src/ts/lang';
 import { GetBankHolidayInfoSignature, GetTransactionInfoSignature, GetOrganisationInfoSignature, GetTaxonInfoSignature, SendInitQuerySignature, SendSearchQuerySignature } from './db-api-types';
@@ -84,7 +84,6 @@ const sendInitQuery: SendInitQuerySignature = async function() {
   };
 };
 
-/*
 const getTaxonInfo: GetTaxonInfoSignature = async function(name) {
   const [ bqTaxon, bqAncestors, bqChildren ] = await Promise.all([
     bigQuery(`
@@ -346,10 +345,13 @@ const sendSearchQuery: SendSearchQuerySignature = async function(searchParams) {
   const bqMainResults = results[0];
   const bqMetaResults = results.length > 1 ? results[1] : [];
 
-  return {
-    mainResults: bqMainResults,
-    metaResults: bqMetaResults
+  const result:SearchResults = {
+    main: bqMainResults,
+    meta: bqMetaResults
   }
+
+  return result;
+
 };
 
 
