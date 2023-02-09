@@ -1,10 +1,6 @@
 // Import the express in typescript file
 import express from 'express';
-import { getRoleInfo, getPersonInfo } from './neo4j';
 import { sendSearchQuery, sendInitQuery, getOrganisationInfo, getTaxonInfo, getBankHolidayInfo, getTransactionInfo } from './bigquery';
-// eventually replace with:
-// import { getRoleInfo, getOrganisationInfo, getTaxonInfo, sendSearchQuery, sendInitQuery, getBankHolidayInfo, getPersonInfo } from './bigquery';
-
 import { SearchArea, Combinator, SearchType, SearchParams } from './src/ts/search-api-types';
 
 // Initialize the express engine
