@@ -44,7 +44,11 @@ Point your browser to `http://localhost:8080` (the port can be changed using the
 
 ## CSS
 
-`public/main.css` is generated from `public/main.scss` using sass.
+`public/main.css` is generated from `public/main.scss` using `npx sass`.
+
+## JS
+
+`public/main.ts` is generated from the TypeScript sources using `npx webpack`.
 
 ## Architecture
 
