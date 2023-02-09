@@ -83,19 +83,15 @@ app.get('/organisation', async (req: any, res) => {
 });
 
 
-app.get('/role', async (req: any, res) => {
-  console.log('API call to /role', req.query);
-  try {
-    const data = await getRoleInfo(req.query['name']);
-    res.send(data);
-  } catch (e: any) {
-    if (e.status === 404) {
-      res.status(e.status).send(e.message);
-    } else {
-      res.status(500).send(e.message);
-    }
-  }
-});
+// app.get('/role', async (req: any, res) => {
+//   console.log('API call to /role', req.query);
+//   try {
+//     const data = await getRoleInfo(req.query['name']);
+//     res.send(data);
+//   } catch (e: any) {
+//     res.status(500).send(e);
+//   }
+// });
 
 
 app.get('/bank-holiday', async (req: any, res) => {
@@ -123,19 +119,15 @@ app.get('/transaction', async (req: any, res) => {
 });
 
 
-app.get('/person', async (req: any, res) => {
-  console.log('API call to /person', req.query);
-  try {
-    const data = await getPersonInfo(req.query['name']);
-    res.send(data);
-  } catch (e: any) {
-    if (e.status === 404) {
-      res.status(e.status).send(e.message);
-    } else {
-      res.status(500).send(e.message);
-    }
-  }
-});
+// app.get('/person', async (req: any, res) => {
+//   console.log('API call to /person', req.query);
+//   try {
+//     const data = await getPersonInfo(req.query['name']);
+//     res.send(data);
+//   } catch (e: any) {
+//     res.status(500).send(e);
+//   }
+// });
 
 
 // Server setup
