@@ -1,21 +1,20 @@
-import axios from 'axios';
-import { MainResult, MetaResult, Person, Organisation, Role, Taxon, BankHoliday, Transaction, MetaResultType, SearchParams, Combinator } from './src/ts/search-api-types';
+import { Transaction, MetaResultType, SearchParams, Combinator } from './src/ts/search-api-types';
 import { splitKeywords } from './src/ts/utils';
 import { languageCode } from './src/ts/lang';
-import { GetBankHolidayInfoSignature, GetTransactionInfoSignature, GetOrganisationInfoSignature, GetPersonInfoSignature, GetRoleInfoSignature, GetTaxonInfoSignature, SendInitQuerySignature, SendSearchQuerySignature } from './db-api-types';
+import { GetBankHolidayInfoSignature, GetTransactionInfoSignature, GetOrganisationInfoSignature, GetTaxonInfoSignature, SendInitQuerySignature, SendSearchQuerySignature } from './db-api-types';
 const { BigQuery } = require('@google-cloud/bigquery');
 
 //====== private ======
 
 const internalLinkRegExp = /^((https:\/\/)?((www\.)?gov\.uk))?\//;
 
+
 const bigquery = new BigQuery({
   projectId: 'govuk-knowledge-graph'
 });
 
+
 const bigQuery = async function(userQuery: string, options?: any) {
-
-
   const params: Record<string, string> = {};
 
   if (options) {
