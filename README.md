@@ -8,8 +8,10 @@ without having to use Cypher.
 
 - clone this repository on a server
 - install the govuk design system with `npm install` (needs NodeJS installed)
-- run the server with `npm run`. The server will automatically connect to BigQuery
-  in the 'govuk-knowledge-graph' GCP project
+- set an environment variable called PROJECT_ID to the name of the GCP project
+  your server will be running on. This is so the server knows how to connect to
+  BigQuery to get the data.
+- run the server with `npm run`.
 - Point your browser to `https://localhost:8080` (the port can be changed using the `PORT` environment variable)
 
 # Developing

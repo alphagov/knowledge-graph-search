@@ -10,7 +10,7 @@ const internalLinkRegExp = /^((https:\/\/)?((www\.)?gov\.uk))?\//;
 
 
 const bigquery = new BigQuery({
-  projectId: 'govuk-knowledge-graph'
+  projectId: process.env.PROJECT_ID
 });
 
 
