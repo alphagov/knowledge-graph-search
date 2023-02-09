@@ -77,7 +77,6 @@ const handleEvent: SearchApiCallback = async function(event) {
           } else {
             console.log('unknown DOM event received:', event);
           }
-          console.log('unknown DOM event received:', event);
       }
       break;
 

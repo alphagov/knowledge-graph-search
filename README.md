@@ -6,32 +6,22 @@ without having to use Cypher.
 
 # Running
 
-You need a running Neo4j server, whose details should be put in the following environment
-variable: `NEO4JSERVER`.
-
 - clone this repository on a server
-- install the govuk design system the server with `npm install` (needs NodeJS installed)
-- install webpack on the server with `npm install webpack`
-- run webpack with `npx webpack`
-- use another machine to compile the GOV.UK Design System with `sass
-  src/scss/main.scss > public main.css`, and put `public/main.css` on the
-  server. You can install sass with `npm install -g sass`
-- run the server with `npm start` (or
-  `NEO4JSERVER=https://govgraph.dev:7473/db/neo4j/tx npm start`)
+- install the govuk design system with `npm install` (needs NodeJS installed)
+- set an environment variable called PROJECT_ID to the name of the GCP project
+  your server will be running on. This is so the server knows how to connect to
+  BigQuery to get the data.
+- run the server with `npm run`.
+- Point your browser to `https://localhost:8080` (the port can be changed using the `PORT` environment variable)
 
 # Developing
-
-This is an ExpressJS app, but the only server logic (in `app.mjs`) is to serve static assets and proxy the Neo4j API endpoint.
-
-Use `npm run dev` instead of `npm start`, because `run dev` automatically
-reloads when the source code is changed.
-
-Point your browser to `http://localhost:8080` (the port can be changed using the
-`PORT` environment variable)
 
 ## Files
 
 - `app.ts`: the main server file
+
+- `src/ts/*.ts`: the main browser-side files (some type definitions and
+  utilities are also used server-side)
 
 - `public/js/*`:  the main browser-side application code. See below.
 
@@ -54,10 +44,10 @@ The browser-side application uses the [Elm Architecture](https://elmprogramming.
 - The DOM event handler runs `handleEvent`, which:
   - retrieves the new search terms from the form
   - and updates `state.keywords` with the new values
-  - runs the search in neo4j
+  - runs the search in BigQuery via the Search API
   - runs `view`
 - The page shows the "searching screens" and waits for the next event
-- Neo4j finishes searching and calls `handleEvent`, which updates `state` with the search results
+- The search api call finishes and calls `handleEvent`, which updates `state` with the search results
 - `handleEvent` calls `view`
 - `view` renders the state, including the search results.
 - The page waits for the next event

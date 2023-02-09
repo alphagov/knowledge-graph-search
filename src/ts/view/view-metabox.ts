@@ -103,8 +103,8 @@ const viewRolePersons = (persons: any[]) => {
 const viewBankHolidayDetails = function(holiday: any) {
   const datesDetails: string = viewDetails(
     'dates',
-    sortedBy(holiday.dates, 'dateString').reverse(),
-    date => date.dateString
+    holiday.dates.sort().reverse(),
+    date => date
   );
   const regionDetails: string = viewDetails(
     'Observed in',
@@ -213,38 +213,42 @@ const viewMetaLinkList = (names: string[], title?: string, noneTitle?: string): 
 };
 
 
-const viewTransaction = (record: Transaction): string => `
-  <div class="meta-results-panel">
-    <h2 class="govuk-heading-m">
-      <a class="govuk-link" href="${record.homepage}">${record.name}</a>
-    </h2>
-    <p class="govuk-body">Online government service</p>
-    ${record.description ? `<p class="govuk-body">${record.description}</p>` : ''}
-  </div>
-`;
-
-
-const viewTaxon = (record: Taxon): string => {
-  return `
-    <div class="meta-results-panel">
-      <div class="govuk-breadcrumbs">
-        <ol class="govuk-breadcrumbs__list">
-          ${sortedBy(record.ancestorTaxons, 'level').map(taxon => `
-          <li class="govuk-breadcrumbs__list-item">
-            ${viewMetaLink(taxon.name, 'govuk-breadcrumbs__link')}
-          </li>
-          `)}
-        </ol>
-      </div>
-      <h2 class="govuk-heading-m">
-        <a class="govuk-link" href="${record.homepage}">${record.name}</a>
-      </h2>
-      <p class="govuk-body">GOV.UK Taxon</p>
-      ${record.description ? `<p class="govuk-body">${record.description}</p>` : ''}
-      ${record.childTaxons?.length ? viewTaxonChildren(record.childTaxons) : ''}
-    </div>
+const viewTransaction = (record: Transaction): string =>
+  `<div class="meta-results-panel">
+     <h2 class="govuk-heading-m">
+       <a class="govuk-link" href="${record.homepage}">${record.name}</a>
+     </h2>
+     <p class="govuk-body">Online government service</p>
+     ${record.description ? `<p class="govuk-body">${record.description}</p>` : ''}
+   </div>
   `;
-}
+
+
+const viewTaxon = (record: Taxon): string =>
+  `<div class="meta-results-panel">
+     ${viewTaxonAncestors(record.ancestorTaxons)}
+     <h2 class="govuk-heading-m">
+       <a class="govuk-link" href="${record.homepage}">${record.name}</a>
+     </h2>
+     <p class="govuk-body">GOV.UK Taxon</p>
+     ${record.description ? `<p class="govuk-body">${record.description}</p>` : ''}
+     ${record.childTaxons?.length ? viewTaxonChildren(record.childTaxons) : ''}
+   </div>
+  `;
+
+
+const viewTaxonAncestors = (ancestors: any[]): string =>
+  ancestors?.length > 0 ? `
+    <div class="govuk-breadcrumbs">
+      <ol class="govuk-breadcrumbs__list">
+        ${sortedBy(ancestors, 'level').map(taxon => `
+        <li class="govuk-breadcrumbs__list-item">
+          ${viewMetaLink(taxon.name, 'govuk-breadcrumbs__link')}
+        </li>
+        `)}
+      </ol>
+    </div>
+  ` : '';
 
 
 const viewTaxonChildren = (records: any[]): string => {
@@ -287,15 +291,17 @@ const viewMetaResults = function() {
   //      </div>
   //    `;
   //  } else {
+
   const record = state.metaSearchResults[0];
   console.log(`meta: found a ${record.type}`)
+  console.log(record);
   switch (record.type) {
-    case MetaResultType.BankHoliday: return viewBankHoliday(record);
-    case MetaResultType.Organisation: return viewOrg(record);
-    case MetaResultType.Person: return viewPerson(record);
-    case MetaResultType.Role: return viewRole(record);
-    case MetaResultType.Transaction: return viewTransaction(record);
-    case MetaResultType.Taxon: return viewTaxon(record);
+    case 'BankHoliday': return viewBankHoliday(record);
+    case 'Organisation': return viewOrg(record);
+    case 'Person': return viewPerson(record);
+    case 'Role': return viewRole(record);
+    case 'Transaction': return viewTransaction(record);
+    case 'Taxon': return viewTaxon(record);
     default: console.log(`unknown record type: ${record.type}`); return ``;
   }
   //}

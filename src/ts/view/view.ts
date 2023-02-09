@@ -338,7 +338,8 @@ const viewSearchResults = () => {
 const formatNames = (array: []) => [...new Set(array)].map(x => `"${x}"`).join(', ');
 
 
-const formatDateTime = (date: string) => `${date.slice(0, 10)} at ${date.slice(11, 16)}`;
+const formatDateTime = (date: any) =>
+  `${date.value.slice(0, 10)} at ${date.value.slice(11, 16)}`;
 
 
 const fieldFormatters: Record<string, any> = {
@@ -363,8 +364,11 @@ const fieldFormatters: Record<string, any> = {
     format: formatNames
   },
   'primary_organisation': {
-    name: 'Primary publishing organisations',
-    format: formatNames
+    name: 'Primary publishing organisation',
+    format: (x: string) => {
+      console.log(101, x)
+      return x
+    }
   },
   'all_organisations': {
     name: 'All publishing organisations',
@@ -372,7 +376,7 @@ const fieldFormatters: Record<string, any> = {
   },
   'pagerank': {
     name: 'Popularity',
-    format: (val: number) => val ? val.toFixed(2) : 'n/a'
+    format: (val: string) => val ? parseFloat(val).toFixed(2) : 'n/a'
   },
   'withdrawn_at': {
     name: 'Withdrawn at',

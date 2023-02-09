@@ -1,9 +1,6 @@
 // Import the express in typescript file
 import express from 'express';
-import { getRoleInfo, getOrganisationInfo, getTaxonInfo, sendSearchQuery, sendInitQuery, getBankHolidayInfo, getPersonInfo } from './neo4j';
-// eventually replace with:
-// import { getRoleInfo, getOrganisationInfo, getTaxonInfo, sendSearchQuery, sendInitQuery, getBankHolidayInfo, getPersonInfo } from './bigquery';
-
+import { sendSearchQuery, sendInitQuery, getOrganisationInfo, getTaxonInfo, getBankHolidayInfo, getTransactionInfo } from './bigquery';
 import { SearchArea, Combinator, SearchType, SearchParams } from './src/ts/search-api-types';
 
 // Initialize the express engine
@@ -59,6 +56,7 @@ app.get('/taxon', async (req: any, res) => {
   console.log('API call to /taxon', req.query);
   try {
     const data = await getTaxonInfo(req.query['name']);
+    console.log(239, data)
     res.send(data);
   } catch (e: any) {
     if (e.status === 404) {
@@ -85,19 +83,15 @@ app.get('/organisation', async (req: any, res) => {
 });
 
 
-app.get('/role', async (req: any, res) => {
-  console.log('API call to /role', req.query);
-  try {
-    const data = await getRoleInfo(req.query['name']);
-    res.send(data);
-  } catch (e: any) {
-    if (e.status === 404) {
-      res.status(e.status).send(e.message);
-    } else {
-      res.status(500).send(e.message);
-    }
-  }
-});
+// app.get('/role', async (req: any, res) => {
+//   console.log('API call to /role', req.query);
+//   try {
+//     const data = await getRoleInfo(req.query['name']);
+//     res.send(data);
+//   } catch (e: any) {
+//     res.status(500).send(e);
+//   }
+// });
 
 
 app.get('/bank-holiday', async (req: any, res) => {
@@ -114,20 +108,26 @@ app.get('/bank-holiday', async (req: any, res) => {
   }
 });
 
-
-app.get('/person', async (req: any, res) => {
-  console.log('API call to /person', req.query);
+app.get('/transaction', async (req: any, res) => {
+  console.log('API call to /transaction', req.query);
   try {
-    const data = await getPersonInfo(req.query['name']);
+    const data = await getTransactionInfo(req.query['name']);
     res.send(data);
   } catch (e: any) {
-    if (e.status === 404) {
-      res.status(e.status).send(e.message);
-    } else {
-      res.status(500).send(e.message);
-    }
+    res.status(500).send(e);
   }
 });
+
+
+// app.get('/person', async (req: any, res) => {
+//   console.log('API call to /person', req.query);
+//   try {
+//     const data = await getPersonInfo(req.query['name']);
+//     res.send(data);
+//   } catch (e: any) {
+//     res.status(500).send(e);
+//   }
+// });
 
 
 // Server setup
