@@ -63,11 +63,11 @@ const sendInitQuery: SendInitQuerySignature = async function() {
     [ bqLocales, bqTaxons ] = await Promise.all([
       bigQuery(`
         SELECT DISTINCT locale
-        FROM \`govuk-knowledge-graph.content.locale\`
+        FROM \`content.locale\`
         `),
       bigQuery(`
         SELECT title
-        FROM \`govuk-knowledge-graph.graph.taxon\`
+        FROM \`graph.taxon\`
         `)
     ]);
   } catch(e) {
@@ -210,7 +210,7 @@ const getBankHolidayInfo: GetBankHolidayInfoSignature = async function(name) {
       title AS name,
       ARRAY_AGG(DISTINCT division) AS divisions,
       ARRAY_AGG(DISTINCT date) AS dates
-    FROM \`govuk-knowledge-graph.content.bank_holiday\`
+    FROM \`content.bank_holiday\`
     WHERE title = @name
     GROUP BY title
   `, { name });
@@ -229,7 +229,7 @@ const getTransactionInfo: GetTransactionInfoSignature = async function(name) {
       url AS homepage,
       title AS name,
       description
-    FROM \`govuk-knowledge-graph.graph.page\`
+    FROM \`graph.page\`
     WHERE title = @name
   `, { name });
 
