@@ -1,4 +1,6 @@
 params.json
 node_modules
+public/main.js
+public/main.css
 cypress/videos
 cypress/screenshots

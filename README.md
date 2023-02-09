@@ -34,11 +34,7 @@ without having to use Cypher.
 
 ## CSS
 
-`public/main.css` is generated from `public/main.scss` using `npx sass`.
-
-## JS
-
-`public/main.ts` is generated from the TypeScript sources using `npx webpack`.
+`public/main.css` is generated from `public/main.scss` using sass.
 
 ## Architecture
 
