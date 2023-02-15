@@ -36,29 +36,33 @@ export type SearchParams = {
 }
 
 export enum MetaResultType {
-//  Person = "Person",
+  Person = "Person",
   Organisation = "Organisation",
   BankHoliday = "BankHoliday",
-//  Role = "Role",
+  Role = "Role",
   Taxon = "Taxon",
   Transaction = "Transaction"
 }
 
-export type MetaResult = /* Person | */ Organisation | BankHoliday | Transaction /* | Role */ | Taxon
+export type MetaResult = Person | Organisation | BankHoliday | Transaction | Role | Taxon
 
-// export type Person = {
-//   type: MetaResultType,
-//   name: string,
-//   homepage: string,
-//   description: string,
-//   roles: {
-//     title: string,
-//     orgName: string,
-//     orgUrl: string,
-//     startDate: Date,
-//     endDate: Date | null
-//   }[]
-// }
+export type Person = {
+  type: MetaResultType,
+  name: string,
+  homepage: string,
+  description: string,
+  roles: {
+    title: string,
+    orgs: {
+      orgName: string,
+      orgUrl: string
+    }[],
+    orgName: string,
+    orgUrl: string,
+    startDate: Date,
+    endDate: Date | null
+  }[]
+}
 
 export type Organisation = {
   type: MetaResultType,
@@ -107,18 +111,18 @@ export type BankHoliday = {
   regions: string[]
 }
 
-// export type Role = {
-//   type: MetaResultType,
-//   name: string,
-//   description: string,
-//   personNames: {
-//     name: string,
-//     homepage: string,
-//     startDate: Date,
-//     endDate: Date | null
-//   }[],
-//   orgNames: string[]
-// }
+export type Role = {
+  type: MetaResultType,
+  name: string,
+  description: string,
+  personNames: {
+    name: string,
+    homepage: string,
+    startDate: Date,
+    endDate: Date | null
+  }[],
+  orgNames: string[]
+}
 
 // a neo4 search can return a variable number of records of any type
 export type MainResult = any;

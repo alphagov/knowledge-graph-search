@@ -1,6 +1,6 @@
 // Import the express in typescript file
 import express from 'express';
-import { sendSearchQuery, sendInitQuery, getOrganisationInfo, getTaxonInfo, getBankHolidayInfo, getTransactionInfo } from './bigquery';
+import { sendSearchQuery, sendInitQuery, getOrganisationInfo, getPersonInfo, getRoleInfo, getTaxonInfo, getBankHolidayInfo, getTransactionInfo } from './bigquery';
 import { SearchArea, Combinator, SearchType, SearchParams } from './src/ts/search-api-types';
 
 // Initialize the express engine
@@ -83,15 +83,15 @@ app.get('/organisation', async (req: any, res) => {
 });
 
 
-// app.get('/role', async (req: any, res) => {
-//   console.log('API call to /role', req.query);
-//   try {
-//     const data = await getRoleInfo(req.query['name']);
-//     res.send(data);
-//   } catch (e: any) {
-//     res.status(500).send(e);
-//   }
-// });
+app.get('/role', async (req: any, res) => {
+  console.log('API call to /role', req.query);
+  try {
+    const data = await getRoleInfo(req.query['name']);
+    res.send(data);
+  } catch (e: any) {
+    res.status(500).send(e);
+  }
+});
 
 
 app.get('/bank-holiday', async (req: any, res) => {
@@ -119,15 +119,15 @@ app.get('/transaction', async (req: any, res) => {
 });
 
 
-// app.get('/person', async (req: any, res) => {
-//   console.log('API call to /person', req.query);
-//   try {
-//     const data = await getPersonInfo(req.query['name']);
-//     res.send(data);
-//   } catch (e: any) {
-//     res.status(500).send(e);
-//   }
-// });
+app.get('/person', async (req: any, res) => {
+  console.log('API call to /person', req.query);
+  try {
+    const data = await getPersonInfo(req.query['name']);
+    res.send(data);
+  } catch (e: any) {
+    res.status(500).send(e);
+  }
+});
 
 
 // Server setup

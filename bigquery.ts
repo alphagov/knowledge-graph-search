@@ -1,7 +1,7 @@
 import { Transaction, MetaResultType, SearchParams, Combinator, SearchResults } from './src/ts/search-api-types';
 import { splitKeywords } from './src/ts/utils';
 import { languageCode } from './src/ts/lang';
-import { GetBankHolidayInfoSignature, GetTransactionInfoSignature, GetOrganisationInfoSignature, GetTaxonInfoSignature, SendInitQuerySignature, SendSearchQuerySignature } from './db-api-types';
+import { GetBankHolidayInfoSignature, GetTransactionInfoSignature, GetOrganisationInfoSignature, GetPersonInfoSignature, GetRoleInfoSignature, GetTaxonInfoSignature, SendInitQuerySignature, SendSearchQuerySignature } from './db-api-types';
 const { BigQuery } = require('@google-cloud/bigquery');
 
 //====== private ======
@@ -147,58 +147,34 @@ const getTransactionInfo: GetTransactionInfoSignature = async function(name) {
   return result;
 };
 
-
-/*
 const getRoleInfo: GetRoleInfoSignature = async function(name) {
-  const [ bqRole, bqPersons ] = await Promise.all([
-    bigQuery(`
-      ...
-    `),
-    bigQuery(`
-      ...
-    `)]);
+  const bqRole = await bigQuery(
+    `SELECT * FROM search.role WHERE lower(name) = lower(@name);`, { name }
+  );
 
   return {
     type: MetaResultType.Role,
-    name: string,
-    description: string,
-    personNames: {
-      name: string,
-      homepage: string,
-      startDate: Date,
-      endDate: Date | null
-    }[],
-    orgNames: string[]
+    name: bqRole[0].name,
+    description: bqRole[0].description,
+    personNames: bqRole[0].personNames,
+    orgNames: bqRole[0].orgNames
   };
 };
 
 const getPersonInfo: GetPersonInfoSignature = async function(name) {
-  const [ bqPerson, bqRoles ] = await Promise.all([
-    bigQuery(`
-      ...
-    `),
-    bigQuery(`
-      ...
-    `)
-  ]);
+  const bqPerson = await bigQuery(
+      `SELECT * FROM search.person WHERE lower(name) = lower(@name);`, { name }
+    )
+  ;
 
   return {
     type: MetaResultType.Person,
-    name: string,
-    homepage: string,
-    description: string,
-    roles: {
-      title: string,
-      orgName: string,
-      orgUrl: string,
-      startDate: Date,
-      endDate: Date | null
-    }[]
+    name: bqPerson[0].name,
+    homepage: bqPerson[0].name,
+    description: bqPerson[0].name,
+    roles: bqPerson[0].roles
   }
 };
-*/
-
-
 
 const sendSearchQuery: SendSearchQuerySignature = async function(searchParams) {
   const keywords = splitKeywords(searchParams.selectedWords);
@@ -351,8 +327,9 @@ export {
   getBankHolidayInfo,
   getTransactionInfo,
   getOrganisationInfo,
+  getPersonInfo,
+  getRoleInfo,
   getTaxonInfo,
   sendInitQuery,
   sendSearchQuery
 };
-//export { sendSearchQuery, getTaxonInfo, getOrganisationInfo, getPersonInfo, getBankHolidayInfo, getRoleInfo };
