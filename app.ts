@@ -2,6 +2,7 @@
 import express from 'express';
 import { sendSearchQuery, sendInitQuery, getOrganisationInfo, getTaxonInfo, getBankHolidayInfo, getTransactionInfo } from './bigquery';
 import { SearchArea, Combinator, SearchType, SearchParams } from './src/ts/search-api-types';
+import { csvStringify } from './csv';
 
 // Initialize the express engine
 const app: express.Application = express();
@@ -51,12 +52,40 @@ app.get('/search', async (req: any, res) => {
   }
 });
 
+app.get('/csv', async (req: any, res) => {
+  console.log('API call to /csv', req.query);
+  // retrieve qsp params
+  const params: SearchParams = {
+    searchType: req.query['search-type'] || SearchType.Keyword,
+    selectedWords: req.query['selected-words'] || '',
+    excludedWords: req.query['excluded-words'] || '',
+    selectedTaxon: req.query['selected-taxon'] || '',
+    selectedLocale: req.query['lang'] || '',
+    caseSensitive: req.query['case-sensitive'] || false,
+    combinator: req.query['combinator'] || Combinator.All,
+    whereToSearch: {
+      title: !(req.query['search-in-title'] === 'false'),
+      text: !(req.query['search-in-text'] === 'false')
+    },
+    areaToSearch: req.query['area'] || SearchArea.Any,
+    linkSearchUrl: req.query['link-search-url'] || ''
+  };
+  try {
+    const data = await sendSearchQuery(params);
+    const csvData = csvStringify(data.main);
+    res.set('Content-Type', 'text/csv');
+    res.send(csvData);
+  } catch (e: any) {
+    console.log('/csv fail:', JSON.stringify(e));
+    res.status(500).send(e);
+  }
+});
+
 
 app.get('/taxon', async (req: any, res) => {
   console.log('API call to /taxon', req.query);
   try {
     const data = await getTaxonInfo(req.query['name']);
-    console.log(239, data)
     res.send(data);
   } catch (e: any) {
     if (e.status === 404) {

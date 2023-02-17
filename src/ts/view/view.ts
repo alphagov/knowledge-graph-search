@@ -217,36 +217,6 @@ const viewSearchResultsTable = () => {
 };
 
 
-const csvFromResults = function(searchResults: any) {
-  const csv = [];
-  if (searchResults && searchResults.length > 0) {
-    // column headings: take them from the first record
-    csv.push(Object.keys(searchResults[0]).map(fieldName).join())
-    // rows:
-    searchResults.forEach((record: Record<any, any>) => {
-      const line: string[] = [];
-      Object.values(record).forEach((field: any) => {
-        if (field) {
-          field = field.toString();
-          if (field.includes(',')) {
-            field = `"${field.replace('"', '""')}"`;
-          } else {
-            if (field.includes('"')) {
-              field = '"' + field.replace('"', '""') + '"';
-            }
-          }
-        } else {
-          field = '';
-        }
-        line.push(field);
-      });
-      csv.push(line.join());
-    });
-  }
-  return csv.join('\n');
-};
-
-
 const viewWaiting = () => `
   <div aria-live="polite" role="region">
     <div class="govuk-body">Searching for ${queryDescription(state.searchParams)}</div>
@@ -294,11 +264,8 @@ const viewResults = function() {
         <button type="button" class="govuk-button" id="button-next-page" ${state.skip + state.resultsPerPage >= nbRecords ? "disabled" : ""}>Next</button>
       </p>`);
 
-    const csv = csvFromResults(state.searchResults);
-    const file = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(file); // TODO: use window.URL.revokeObjectURL(url);  after
     html.push(`
-      <p class="govuk-body"><a class="govuk-link" href="${url}" download="export.csv">Download all ${state.searchResults.length} records in CSV</a></p>`);
+      <p class="govuk-body"><a class="govuk-link" href="/csv${window.location.search}" download="export.csv">Download all ${state.searchResults.length} records in CSV</a></p>`);
     return html.join('');
   } else {
     return '';
@@ -334,8 +301,7 @@ const viewSearchResults = () => {
 };
 
 
-// Remove duplicates - but should be fixed in cypher
-const formatNames = (array: []) => [...new Set(array)].map(x => `"${x}"`).join(', ');
+const formatNames = (array: []) => [...new Set(array)].map(x => `“${x}”`).join(', ');
 
 
 const formatDateTime = (date: any) =>
@@ -365,10 +331,7 @@ const fieldFormatters: Record<string, any> = {
   },
   'primary_organisation': {
     name: 'Primary publishing organisation',
-    format: (x: string) => {
-      console.log(101, x)
-      return x
-    }
+    format: (x: string) => x
   },
   'all_organisations': {
     name: 'All publishing organisations',
@@ -395,7 +358,7 @@ const fieldName = function(key: string) {
 };
 
 
-const fieldFormat = function(key: string, val: string | number) {
+const fieldFormat = function(key: string, val: string | number):string {
   const f = fieldFormatters[key];
   return (f && f.format) ? f.format(val) : val;
 };
