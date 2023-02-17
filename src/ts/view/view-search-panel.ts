@@ -19,6 +19,7 @@ const viewSearchPanel = () => {
           ${viewCaseSensitiveSelector()}
           ${viewScopeSelector()}
           ${viewLinkSearch()}
+          ${viewPublishingOrgSelector()}
           ${viewPublishingAppSelector()}
           ${viewTaxonSelector()}
           ${viewLocaleSelector()}
@@ -301,6 +302,33 @@ const viewKeywordsCombinator = () =>
         </div>
       </div>
     </fieldset>
+  </div>
+`;
+
+
+const viewPublishingOrgSelector = () => `
+  <div class="govuk-body">
+    <div class="taxon-facet">
+      <label class="govuk-label label--bold" for="publishing-organisation">
+        Search for publishing organisations
+      </label>
+      <div class="govuk-hint">
+        Type the first letters of an organisation or select from the dropdown
+      </div>
+      <datalist id="orgList">
+        ${state.organisations.map(organisation => `<option>${organisation}</option>`)}
+      </datalist>
+      <div>
+      <input
+        ${state.waiting && 'disabled="disabled"'}
+        style="display: inline-block"
+        list="orgList"
+        value="${state.searchParams.selectedOrganisation}"
+        class="govuk-input"
+        id="organisation"
+        autocomplete="off" />
+      </div>
+    </div>
   </div>
 `;
 

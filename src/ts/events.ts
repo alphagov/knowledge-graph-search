@@ -27,6 +27,7 @@ const handleEvent: SearchApiCallback = async function(event) {
           state.searchParams.selectedWords = getFormInputValue('keyword');
           state.searchParams.excludedWords = getFormInputValue('excluded-keyword');
           state.searchParams.selectedTaxon = getFormInputValue('taxon');
+          state.searchParams.selectedOrganisation = getFormInputValue('organisation');
           state.searchParams.selectedLocale = getFormInputValue('locale');
           state.searchParams.whereToSearch.title = (<HTMLInputElement>id('search-title'))?.checked;
           state.searchParams.whereToSearch.text = (<HTMLInputElement>id('search-text'))?.checked;
@@ -117,7 +118,7 @@ const searchButtonClicked = async function(): Promise<void> {
   const searchStatus = searchState();
   switch (searchStatus.code) {
     case 'ready-to-search':
-      if (state.searchParams.selectedWords !== '' || state.searchParams.selectedLocale !== '' || state.searchParams.selectedTaxon !== '' || state.searchParams.linkSearchUrl !== '') {
+      if (state.searchParams.selectedWords !== '' || state.searchParams.selectedLocale !== '' || state.searchParams.selectedTaxon !== '' || state.searchParams.selectedOrganisation !== '' || state.searchParams.linkSearchUrl !== '') {
         state.waiting = true;
         queryGraph(state.searchParams, handleEvent);
       }
@@ -186,6 +187,8 @@ const updateUrl = function() {
           searchParams.set('excluded-words', state.searchParams.excludedWords);
         if (state.searchParams.selectedTaxon !== '')
           searchParams.set('selected-taxon', state.searchParams.selectedTaxon);
+        if (state.searchParams.selectedOrganisation !== '')
+          searchParams.set('selected-organisation', state.searchParams.selectedOrganisation);
         if (state.searchParams.selectedLocale !== '')
           searchParams.set('lang', languageCode(state.searchParams.selectedLocale));
         if (state.searchParams.caseSensitive)

@@ -36,6 +36,9 @@ const bigQuery = async function(userQuery: string, options?: any) {
     if (options.taxon) {
       params.taxon = options.taxon;
     }
+    if (options.organisation) {
+      params.organisation = options.organisation;
+    }
     if (options.link) {
       params.link = options.link;
     }
@@ -58,9 +61,9 @@ const bigQuery = async function(userQuery: string, options?: any) {
 //====== public ======
 
 const sendInitQuery: SendInitQuerySignature = async function() {
-  let bqLocales: any, bqTaxons: any;
+  let bqLocales: any, bqTaxons: any, bqOrganisations: any;
   try {
-    [ bqLocales, bqTaxons ] = await Promise.all([
+    [ bqLocales, bqTaxons, bqOrganisations ] = await Promise.all([
       bigQuery(`
         SELECT DISTINCT locale
         FROM \`content.locale\`
@@ -68,6 +71,10 @@ const sendInitQuery: SendInitQuerySignature = async function() {
       bigQuery(`
         SELECT title
         FROM \`graph.taxon\`
+        `),
+      bigQuery(`
+        SELECT DISTINCT title
+        FROM \`graph.organisation\`
         `)
     ]);
   } catch(e) {
@@ -80,7 +87,8 @@ const sendInitQuery: SendInitQuerySignature = async function() {
         .map((row: any) => row.locale)
         .filter((locale: string) => locale !== 'en' && locale !== 'cy')
       ),
-    taxons: bqTaxons.map((taxon: any) => taxon.title)
+    taxons: bqTaxons.map((taxon: any) => taxon.title),
+    organisations: bqOrganisations.map((organisation: any) => organisation.title)
   };
 };
 
@@ -182,12 +190,13 @@ const sendSearchQuery: SendSearchQuerySignature = async function(searchParams) {
   const query = buildSqlQuery(searchParams, keywords, excludedKeywords);
   const locale = languageCode(searchParams.selectedLocale);
   const taxon = searchParams.selectedTaxon;
+  const organisation = searchParams.selectedOrganisation;
   const selectedWordsWithoutQuotes = searchParams.selectedWords.replace(/"/g, '');
   const link = searchParams.linkSearchUrl && internalLinkRegExp.test(searchParams.linkSearchUrl)
     ? searchParams.linkSearchUrl.replace(internalLinkRegExp, 'https://www.gov.uk/')
     : searchParams.linkSearchUrl;
   const queries = [
-    bigQuery(query, { keywords, excludedKeywords, locale, taxon, link })
+    bigQuery(query, { keywords, excludedKeywords, locale, taxon, organisation, link })
   ];
   if (selectedWordsWithoutQuotes &&
     selectedWordsWithoutQuotes.length > 5 &&
@@ -267,6 +276,17 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
     `;
   }
 
+  let organisationClause = '';
+  if (searchParams.selectedOrganisation !== '') {
+    organisationClause = `
+      AND EXISTS
+        (
+          SELECT 1 FROM UNNEST (organisations) AS link
+          WHERE link = @organisation
+        )
+    `;
+  }
+
   let linkClause = '';
   if (searchParams.linkSearchUrl !== '') {
     if (internalLinkRegExp.test(searchParams.linkSearchUrl)) {
@@ -314,6 +334,7 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
     ${areaClause}
     ${localeClause}
     ${taxonClause}
+    ${organisationClause}
     ${linkClause}
 
     LIMIT 50000

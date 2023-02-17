@@ -24,6 +24,7 @@ export type SearchParams = {
   selectedWords: string, // list of words to search
   excludedWords: string, // list of words to exclude
   selectedTaxon: string, // taxon to search in
+  selectedOrganisation: string, // organisation to search in
   selectedLocale: string, // the language to search for
   linkSearchUrl: string, // URL to find all pages linking to
   whereToSearch: {

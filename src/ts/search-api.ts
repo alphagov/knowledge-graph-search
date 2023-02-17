@@ -9,6 +9,7 @@ const makeQueryString = function(sp: SearchParams): string {
   if (sp.selectedWords !== '') usp.set('selected-words', sp.selectedWords);
   if (sp.excludedWords !== '') usp.set('excluded-words', sp.excludedWords);
   if (sp.selectedTaxon !== '') usp.set('selected-taxon', sp.selectedTaxon);
+  if (sp.selectedOrganisation !== '') usp.set('selected-organisation', sp.selectedOrganisation);
   if (sp.selectedLocale !== '') usp.set('lang', languageCode(sp.selectedLocale));
   if (sp.caseSensitive) usp.set('case-sensitive', sp.caseSensitive.toString());
   if (!sp.whereToSearch.title) usp.set('search-in-title', 'false');
