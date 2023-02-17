@@ -217,6 +217,14 @@ const viewSearchResultsTable = () => {
 };
 
 
+const formatForCsv = function(input: string):string {
+  let output:string = input.replace(/"/g, '""');
+  if (output.includes(',') || output.includes('\n')) {
+    output = `"${output}"`;
+  }
+  return output;
+};
+
 const csvFromResults = function(searchResults: any) {
   const csv = [];
   if (searchResults && searchResults.length > 0) {
@@ -225,16 +233,9 @@ const csvFromResults = function(searchResults: any) {
     // rows:
     searchResults.forEach((record: Record<any, any>) => {
       const line: string[] = [];
-      Object.values(record).forEach((field: any) => {
+      Object.entries(record).forEach(([key, field]) => {
         if (field) {
-          field = field.toString();
-          if (field.includes(',')) {
-            field = `"${field.replace('"', '""')}"`;
-          } else {
-            if (field.includes('"')) {
-              field = '"' + field.replace('"', '""') + '"';
-            }
-          }
+          field = formatForCsv(fieldFormat(key, field, true));
         } else {
           field = '';
         }
@@ -334,8 +335,10 @@ const viewSearchResults = () => {
 };
 
 
-// Remove duplicates - but should be fixed in cypher
-const formatNames = (array: []) => [...new Set(array)].map(x => `"${x}"`).join(', ');
+const formatNames = (array: string[]):string =>
+  array.length === 1
+    ? array[0]
+    : [...new Set(array)].map(x => `"${x}"`).join(', ');
 
 
 const formatDateTime = (date: any) =>
@@ -365,10 +368,7 @@ const fieldFormatters: Record<string, any> = {
   },
   'primary_organisation': {
     name: 'Primary publishing organisation',
-    format: (x: string) => {
-      console.log(101, x)
-      return x
-    }
+    format: (x: string) => x
   },
   'all_organisations': {
     name: 'All publishing organisations',
@@ -395,8 +395,15 @@ const fieldName = function(key: string) {
 };
 
 
-const fieldFormat = function(key: string, val: string | number) {
-  const f = fieldFormatters[key];
+const fieldFormat = function(key: string, val: string | number, forCsv?: boolean) {
+  let f;
+  if (forCsv && key === 'url') {
+    // if we're generating a CSV we need to change the way we output the url
+    // by not adding the HTML markup as done by the default formatter
+    f = { name: 'URL', format: (url: string) => url }
+  } else {
+    f = fieldFormatters[key];
+  }
   return (f && f.format) ? f.format(val) : val;
 };
 
