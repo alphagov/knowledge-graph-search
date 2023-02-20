@@ -189,8 +189,6 @@ const sendSearchQuery: SendSearchQuerySignature = async function(searchParams) {
   const queries = [
     bigQuery(query, { keywords, excludedKeywords, locale, taxon, link })
   ];
-  console.log(111, query)
-  console.log(112, { keywords, excludedKeywords, locale, taxon, link })
   if (selectedWordsWithoutQuotes &&
     selectedWordsWithoutQuotes.length > 5 &&
     selectedWordsWithoutQuotes.includes(' ')) {
