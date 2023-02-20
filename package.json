@@ -1,7 +1,7 @@
 {
   "name": "knowledge-graph-search",
   "version": "1.0.0",
-  "description": "Web app to make the Knowledge Graph simpler to search",
+  "description": "Search engine for GOV.UK content",
   "main": "app.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
