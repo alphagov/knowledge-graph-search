@@ -21,7 +21,6 @@ const view = () => {
         ${viewSearchTypeSelector()}
         ${viewMainLayout()}
         <p class="govuk-body-s">
-          Runs only between 9am and 7pm.
           Searches do not include history mode content, Publisher GitHub smart answers or service domains.
           Popularity scores depend on cookie consent.
         </p>
