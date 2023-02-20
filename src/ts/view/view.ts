@@ -21,7 +21,6 @@ const view = () => {
         ${viewSearchTypeSelector()}
         ${viewMainLayout()}
         <p class="govuk-body-s">
-          Runs only between 9am and 7pm.
           Searches do not include history mode content, Publisher GitHub smart answers or service domains.
           Popularity scores depend on cookie consent.
         </p>
@@ -227,6 +226,12 @@ const csvFromResults = function(searchResults: any) {
       const line: string[] = [];
       Object.values(record).forEach((field: any) => {
         if (field) {
+          // Hack in case it is a date from BigQuery.  We don't load the
+          // BigQuery library here in the front end, so we can't check the
+          // type or class of the field.
+          if (field.constructor.name == 'Object' && "value" in field) {
+            field = field.value;
+          }
           field = field.toString();
           if (field.includes(',')) {
             field = `"${field.replace('"', '""')}"`;

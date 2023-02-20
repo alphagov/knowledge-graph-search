@@ -1,7 +1,7 @@
 import { Transaction, MetaResultType, SearchParams, Combinator, SearchResults } from './src/ts/search-api-types';
 import { splitKeywords } from './src/ts/utils';
 import { languageCode } from './src/ts/lang';
-import { GetBankHolidayInfoSignature, GetTransactionInfoSignature, GetOrganisationInfoSignature, GetTaxonInfoSignature, SendInitQuerySignature, SendSearchQuerySignature } from './db-api-types';
+import { GetBankHolidayInfoSignature, GetTransactionInfoSignature, GetOrganisationInfoSignature, GetPersonInfoSignature, GetRoleInfoSignature, GetTaxonInfoSignature, SendInitQuerySignature, SendSearchQuerySignature } from './db-api-types';
 const { BigQuery } = require('@google-cloud/bigquery');
 
 //====== private ======
@@ -85,135 +85,45 @@ const sendInitQuery: SendInitQuerySignature = async function() {
 };
 
 const getTaxonInfo: GetTaxonInfoSignature = async function(name) {
-  const [ bqTaxon, bqAncestors, bqChildren ] = await Promise.all([
-    bigQuery(`
-      SELECT
-        title,
-        taxon.level AS level,
-        taxon_levels.homepage_url AS homepage,
-        description.description
-      FROM graph.taxon
-      INNER JOIN content.taxon_levels ON taxon_levels.url = taxon.url
-      LEFT JOIN content.description ON description.url = taxon_levels.homepage_url
-      WHERE taxon.title = @name
-      ;
-    `, { name }),
-    bigQuery(`
-      SELECT
-        taxon_ancestors.ancestor_title AS name,
-        taxon_levels.level AS level,
-        taxon_levels.homepage_url AS url
-      FROM graph.taxon_ancestors
-      INNER JOIN content.taxon_levels ON taxon_levels.url = taxon_ancestors.ancestor_url
-      WHERE title = @name
-      ;
-   `, { name }),
-    bigQuery(`
-      SELECT
-        child.title AS name,
-        taxon_levels.homepage_url AS url,
-        taxon_levels.level AS level
-      FROM graph.taxon AS parent
-      INNER JOIN graph.has_parent ON has_parent.parent_url = parent.url
-      INNER JOIN graph.taxon AS child ON child.url = has_parent.url
-      INNER JOIN content.taxon_levels ON taxon_levels.url = child.url
-      WHERE parent.title = @name
-      ;
-    `, { name })
-  ]);
+  const bqTaxon = await bigQuery(
+    `SELECT * FROM search.taxon WHERE lower(name) = lower(@name);`, { name }
+  );
 
   return {
     type: MetaResultType.Taxon,
-    name: bqTaxon[0].title,
+    name: bqTaxon[0].name,
     homepage: bqTaxon[0].homepage,
     description: bqTaxon[0].description,
     level: parseInt(bqTaxon[0].level),
-    ancestorTaxons: bqAncestors,
-    childTaxons: bqChildren
+    ancestorTaxons: bqTaxon[0].ancestorTaxons,
+    childTaxons: bqTaxon[0].childTaxons
   };
 };
 
 
 const getOrganisationInfo: GetOrganisationInfoSignature = async function(name) {
-  const [ bqOrganisation, bqParent, bqChildren, bqPersonRole, bqSuccessor, bqPredecessor ] = await Promise.all([
-    bigQuery(`
-      SELECT
-        page.url AS homepage,
-        page.description AS description,
-      FROM graph.organisation AS org
-      INNER JOIN graph.has_homepage AS hh on hh.url = org.url
-      INNER JOIN graph.page on hh.homepage_url = page.url
-      WHERE org.title = @name
-      ;
-   `, { name }),
-    bigQuery(`
-      SELECT parent.title AS parent
-      FROM graph.organisation
-      INNER JOIN graph.has_parent USING (url)
-      INNER JOIN graph.organisation AS parent ON has_parent.parent_url = parent.url
-      WHERE organisation.title = @name
-      ;
-    `, { name }),
-    bigQuery(`
-      SELECT child.title
-      FROM graph.organisation AS parent
-      INNER JOIN graph.has_parent ON has_parent.parent_url = parent.url
-      INNER JOIN graph.organisation AS child ON child.url = has_parent.url
-      WHERE parent.title = @name
-      ;
-    `, { name }),
-    bigQuery(`
-      SELECT person.title AS personName, role.title AS roleName
-      FROM graph.organisation AS org
-      INNER JOIN graph.belongs_to ON org.url = belongs_to.organisation_url
-      INNER JOIN graph.role ON belongs_to.role_url = role.url
-      INNER JOIN graph.has_role ON role.url = has_role.role_url
-      INNER JOIN graph.person ON has_role.person_url = person.url
-      WHERE org.title = @name
-      AND has_role.ended_on IS NULL
-      ;
-    `, { name }),
-    bigQuery(`
-      SELECT successor.title AS title
-      FROM graph.organisation
-      INNER JOIN graph.has_successor USING (url)
-      INNER JOIN graph.organisation AS successor ON has_successor.successor_url = successor.url
-      WHERE organisation.title = @name
-      ;
-    `, { name }),
-    bigQuery(`
-      SELECT organisation.title
-      FROM graph.organisation
-      INNER JOIN graph.has_successor USING (url)
-      INNER JOIN graph.organisation AS successor ON has_successor.successor_url = successor.url
-      WHERE successor.title = @name
-    `, { name })
-  ]);
+  const bqOrganisation = await bigQuery(
+    `SELECT * FROM search.organisation WHERE lower(name) = lower(@name);`, { name }
+  );
 
   return {
     type: MetaResultType.Organisation,
-    name,
+    name: bqOrganisation[0].name,
     description: bqOrganisation[0].description,
     homepage: bqOrganisation[0].homepage,
-    parentName: bqParent.title,
-    childOrgNames: bqChildren.map((child: any) => child.title),
-    personRoleNames: bqPersonRole,
-    supersededBy: bqSuccessor.map((successor: any) => successor.title),
-    supersedes: bqPredecessor.map((predecessor: any) => predecessor.title)
+    parentName: bqOrganisation[0].parentName,
+    childOrgNames: bqOrganisation[0].childOrgNames,
+    personRoleNames: bqOrganisation[0].personRoleNames,
+    supersededBy: bqOrganisation[0].supersededBy,
+    supersedes: bqOrganisation[0].supersedes
   };
 };
 
 
 const getBankHolidayInfo: GetBankHolidayInfoSignature = async function(name) {
-  const bqBankHoliday = await bigQuery(`
-    SELECT
-      title AS name,
-      ARRAY_AGG(DISTINCT division) AS divisions,
-      ARRAY_AGG(DISTINCT date) AS dates
-    FROM \`content.bank_holiday\`
-    WHERE title = @name
-    GROUP BY title
-  `, { name });
+  const bqBankHoliday = await bigQuery(
+    `SELECT * FROM search.bank_holiday WHERE lower(name) = lower(@name);`, { name }
+  );
 
   return {
     type: MetaResultType.BankHoliday,
@@ -224,76 +134,47 @@ const getBankHolidayInfo: GetBankHolidayInfoSignature = async function(name) {
 };
 
 const getTransactionInfo: GetTransactionInfoSignature = async function(name) {
-  const bqTransaction = await bigQuery(`
-    SELECT
-      url AS homepage,
-      title AS name,
-      description
-    FROM \`graph.page\`
-    WHERE title = @name
-  `, { name });
+  const bqTransaction = await bigQuery(
+    `SELECT * FROM search.transaction WHERE lower(name) = lower(@name);`, { name }
+  );
 
   const result:Transaction = {
     type: MetaResultType.Transaction,
-    homepage: bqTransaction[0].homepage,
     name: bqTransaction[0].name,
+    homepage: bqTransaction[0].homepage,
     description: bqTransaction[0].description
   };
   return result;
 };
 
-
-/*
 const getRoleInfo: GetRoleInfoSignature = async function(name) {
-  const [ bqRole, bqPersons ] = await Promise.all([
-    bigQuery(`
-      ...
-    `),
-    bigQuery(`
-      ...
-    `)]);
+  const bqRole = await bigQuery(
+    `SELECT * FROM search.role WHERE lower(name) = lower(@name);`, { name }
+  );
 
   return {
     type: MetaResultType.Role,
-    name: string,
-    description: string,
-    personNames: {
-      name: string,
-      homepage: string,
-      startDate: Date,
-      endDate: Date | null
-    }[],
-    orgNames: string[]
+    name: bqRole[0].name,
+    description: bqRole[0].description,
+    personNames: bqRole[0].personNames,
+    orgNames: bqRole[0].orgNames
   };
 };
 
 const getPersonInfo: GetPersonInfoSignature = async function(name) {
-  const [ bqPerson, bqRoles ] = await Promise.all([
-    bigQuery(`
-      ...
-    `),
-    bigQuery(`
-      ...
-    `)
-  ]);
+  const bqPerson = await bigQuery(
+      `SELECT * FROM search.person WHERE lower(name) = lower(@name);`, { name }
+    )
+  ;
 
   return {
     type: MetaResultType.Person,
-    name: string,
-    homepage: string,
-    description: string,
-    roles: {
-      title: string,
-      orgName: string,
-      orgUrl: string,
-      startDate: Date,
-      endDate: Date | null
-    }[]
+    name: bqPerson[0].name,
+    homepage: bqPerson[0].name,
+    description: bqPerson[0].name,
+    roles: bqPerson[0].roles
   }
 };
-*/
-
-
 
 const sendSearchQuery: SendSearchQuerySignature = async function(searchParams) {
   const keywords = splitKeywords(searchParams.selectedWords);
@@ -314,29 +195,11 @@ const sendSearchQuery: SendSearchQuerySignature = async function(searchParams) {
     selectedWordsWithoutQuotes.length > 5 &&
     selectedWordsWithoutQuotes.includes(' ')) {
     queries.push(bigQuery(
-`      WITH things AS (
---        SELECT 'Person' AS type, url, title AS name
---        FROM graph.person
---        UNION ALL
-        SELECT 'Organisation' AS type, url, title AS name
-        FROM graph.organisation
-        UNION ALL
---        SELECT 'Role' AS type, url, title AS name
---        FROM graph.role
---        UNION ALL
-        SELECT 'BankHoliday' AS type, url, title AS name
-        FROM graph.bank_holiday_title
-        UNION ALL
-        SELECT 'Taxon' AS type, url, title AS name
-        FROM graph.taxon
-        UNION ALL
-        SELECT 'Transaction' AS type, url, title AS name
-        FROM graph.page
-        WHERE document_type = 'transaction'
-      )
-      SELECT type, url, name from things
-      WHERE CONTAINS_SUBSTR(name, @selected_words_without_quotes)
-    `, { selectedWordsWithoutQuotes }))
+    `SELECT *
+     FROM search.thing
+     WHERE CONTAINS_SUBSTR(name, @selected_words_without_quotes)
+     ;`
+    , { selectedWordsWithoutQuotes }))
   }
 
 
@@ -400,7 +263,7 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
     taxonClause = `
       AND EXISTS
         (
-          SELECT 1 FROM UNNEST (taxon_ancestors) AS taxon
+          SELECT 1 FROM UNNEST (taxons) AS taxon
           WHERE taxon = @taxon
         )
     `;
@@ -433,8 +296,8 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
     SELECT
       url,
       title,
-      document_type AS documentType,
-      content_id AS contentId,
+      documentType,
+      contentId,
       locale,
       publishing_app,
       first_published_at,
@@ -442,14 +305,12 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
       withdrawn_at,
       withdrawn_explanation,
       pagerank,
-      taxon_ancestors AS taxons,
-      primary_publishing_organisation AS primary_organisation,
+      taxons,
+      primary_organisation,
       organisations AS all_organisations
-    FROM graph.page
+    FROM search.page
 
     WHERE TRUE
-    AND (page.document_type IS NULL
-    OR NOT page.document_type IN ('gone', 'redirect', 'placeholder', 'placeholder_person'))
     ${includeClause}
     ${excludeClause}
     ${areaClause}
@@ -466,8 +327,9 @@ export {
   getBankHolidayInfo,
   getTransactionInfo,
   getOrganisationInfo,
+  getPersonInfo,
+  getRoleInfo,
   getTaxonInfo,
   sendInitQuery,
   sendSearchQuery
 };
-//export { sendSearchQuery, getTaxonInfo, getOrganisationInfo, getPersonInfo, getBankHolidayInfo, getRoleInfo };
