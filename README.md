@@ -1,7 +1,6 @@
-# knowledge-graph-search
+# Gov Search
 
-This is a single-page app providing a simple way to query the GovGraph
-without having to use Cypher.
+A search engine for GOV.UK, with advanced functionality for content designers
 
 
 # Running

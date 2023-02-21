@@ -1,7 +1,7 @@
 import { state, searchState, resetSearch } from './state';
 import { id, getFormInputValue } from './utils';
 import { view } from './view/view';
-import { queryGraph } from './search-api';
+import { queryBackend } from './search-api';
 import { EventType, SearchApiCallback } from './event-types';
 import { SearchType, SearchArea, Combinator } from './search-api-types';
 import { languageCode } from './lang'
@@ -119,7 +119,7 @@ const searchButtonClicked = async function(): Promise<void> {
     case 'ready-to-search':
       if (state.searchParams.selectedWords !== '' || state.searchParams.selectedLocale !== '' || state.searchParams.selectedTaxon !== '' || state.searchParams.linkSearchUrl !== '') {
         state.waiting = true;
-        queryGraph(state.searchParams, handleEvent);
+        queryBackend(state.searchParams, handleEvent);
       }
       break;
     case 'error':

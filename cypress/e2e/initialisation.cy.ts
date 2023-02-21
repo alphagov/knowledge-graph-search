@@ -1,10 +1,10 @@
 describe('Initialisation', () => {
   it('Connects to the server', () => {
     cy.visit('');
-    cy.contains('GovGraph Search');
+    cy.contains('Gov Search');
   });
 
-  it('Connects to GovGraph', () => {
+  it('Connects to the backend', () => {
     cy.visit('');
     cy.contains('#error-summary-title').should('not.exist');
 
