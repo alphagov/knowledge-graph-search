@@ -62,6 +62,7 @@ app.get('/csv', async (req: any, res) => {
     excludedWords: req.query['excluded-words'] || '',
     selectedTaxon: req.query['selected-taxon'] || '',
     selectedLocale: req.query['lang'] || '',
+    selectedOrganisation: req.query['organisation'] || '',
     caseSensitive: req.query['case-sensitive'] || false,
     combinator: req.query['combinator'] || Combinator.All,
     whereToSearch: {
