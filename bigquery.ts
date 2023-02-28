@@ -1,4 +1,4 @@
-import { Transaction, MetaResultType, SearchParams, Combinator, SearchResults } from './src/ts/search-api-types';
+import { Transaction, MetaResultType, MetaResult, MainResult, SearchParams, Combinator, SearchResults, SearchType } from './src/ts/search-api-types';
 import { splitKeywords } from './src/ts/utils';
 import { languageCode } from './src/ts/lang';
 import { GetBankHolidayInfoSignature, GetTransactionInfoSignature, GetOrganisationInfoSignature, GetPersonInfoSignature, GetRoleInfoSignature, GetTaxonInfoSignature, SendInitQuerySignature, SendSearchQuerySignature } from './db-api-types';
@@ -97,6 +97,10 @@ const getTaxonInfo: GetTaxonInfoSignature = async function(name) {
     `SELECT * FROM search.taxon WHERE lower(name) = lower(@name);`, { name }
   );
 
+  if (bqTaxon.length === 0) {
+    return undefined;
+  }
+
   return {
     type: MetaResultType.Taxon,
     name: bqTaxon[0].name,
@@ -113,6 +117,10 @@ const getOrganisationInfo: GetOrganisationInfoSignature = async function(name) {
   const bqOrganisation = await bigQuery(
     `SELECT * FROM search.organisation WHERE lower(name) = lower(@name);`, { name }
   );
+
+  if (bqOrganisation.length === 0) {
+    return undefined;
+  }
 
   return {
     type: MetaResultType.Organisation,
@@ -198,30 +206,43 @@ const sendSearchQuery: SendSearchQuerySignature = async function(searchParams) {
   const queries = [
     bigQuery(query, { keywords, excludedKeywords, locale, taxon, organisation, link })
   ];
-  if (selectedWordsWithoutQuotes &&
-    selectedWordsWithoutQuotes.length > 5 &&
-    selectedWordsWithoutQuotes.includes(' ')) {
-    queries.push(bigQuery(
-    `SELECT *
-     FROM search.thing
-     WHERE CONTAINS_SUBSTR(name, @selected_words_without_quotes)
-     ;`
-    , { selectedWordsWithoutQuotes }))
+
+  let bqMetaResults: MetaResult[] = [], results: any, bqMainResults: MainResult[] = [];
+  switch (searchParams.searchType) {
+    case SearchType.Taxon:
+      console.log('SearchType taxon');
+      results = await Promise.all(queries);
+      bqMainResults = results[0];
+      const taxonInfo = await getTaxonInfo(searchParams.selectedTaxon);
+      if (taxonInfo) bqMetaResults = [taxonInfo];
+      break;
+    case SearchType.Organisation:
+      results = await Promise.all(queries);
+      bqMainResults = results[0];
+      const organisationInfo = await getOrganisationInfo(searchParams.selectedOrganisation);
+      if (organisationInfo) bqMetaResults = [organisationInfo];
+      break;
+    default:
+      if (selectedWordsWithoutQuotes &&
+        selectedWordsWithoutQuotes.length > 5 &&
+        selectedWordsWithoutQuotes.includes(' ')) {
+        queries.push(bigQuery(
+        `SELECT *
+         FROM search.thing
+         WHERE CONTAINS_SUBSTR(name, @selected_words_without_quotes)
+         ;`
+        , { selectedWordsWithoutQuotes }))
+      }
+      results = await Promise.all(queries);
+      bqMainResults = results[0]
+      bqMetaResults = results.length > 1 ? results[1] : [];
+      break;
   }
-
-
-  const results = await Promise.all(queries);
-
-  const bqMainResults = results[0];
-  const bqMetaResults = results.length > 1 ? results[1] : [];
-
   const result:SearchResults = {
     main: bqMainResults,
     meta: bqMetaResults
   }
-
   return result;
-
 };
 
 

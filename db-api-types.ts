@@ -2,8 +2,8 @@ import { InitResults, SearchResults, SearchParams, Person, Organisation, BankHol
 
 
 export type GetRoleInfoSignature = (str: string) => Promise<Role>;
-export type GetOrganisationInfoSignature = (str: string) => Promise<Organisation>;
-export type GetTaxonInfoSignature = (str: string) => Promise<Taxon>;
+export type GetOrganisationInfoSignature = (str: string) => Promise<Organisation | undefined>;
+export type GetTaxonInfoSignature = (str: string) => Promise<Taxon | undefined>;
 export type GetBankHolidayInfoSignature = (str: string) => Promise<BankHoliday>;
 export type GetTransactionInfoSignature = (str: string) => Promise<Transaction>;
 export type GetPersonInfoSignature = (str: string) => Promise<Person>;
