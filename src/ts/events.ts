@@ -63,6 +63,10 @@ const handleEvent: SearchApiCallback = async function(event) {
           resetSearch();
           state.searchParams.searchType = SearchType.Taxon;
           break;
+        case 'search-organisation':
+          resetSearch();
+          state.searchParams.searchType = SearchType.Organisation;
+          break;
         case 'search-language':
           resetSearch();
           state.searchParams.searchType = SearchType.Language;
@@ -169,6 +173,13 @@ const updateUrl = function() {
         searchParams.set('search-type', state.searchParams.searchType);
         if (state.searchParams.selectedTaxon !== '')
           searchParams.set('selected-taxon', state.searchParams.selectedTaxon);
+        if (state.searchParams.areaToSearch !== SearchArea.Any)
+          searchParams.set('area', state.searchParams.areaToSearch);
+        break;
+      case SearchType.Organisation:
+        searchParams.set('search-type', state.searchParams.searchType);
+        if (state.searchParams.selectedOrganisation !== '')
+          searchParams.set('organisation', state.searchParams.selectedOrganisation);
         if (state.searchParams.areaToSearch !== SearchArea.Any)
           searchParams.set('area', state.searchParams.areaToSearch);
         break;

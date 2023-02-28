@@ -1,6 +1,7 @@
 export enum SearchType {
   Keyword = 'keyword',
   Link = 'link',
+  Organisation = 'organisation',
   Taxon = 'taxon',
   Language = 'language',
   Mixed = 'mixed',

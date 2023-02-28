@@ -116,6 +116,27 @@ const viewSearchPanel = () => {
       </form>
     `);
       break;
+    case SearchType.Organisation:
+      result.push(`
+      <form id="search-form" class="search-panel govuk-form">
+        <div class="search-mode-panel">
+          <a class="govuk-skip-link" href="#results-table">Skip to results</a>
+          ${viewPublishingOrgSelector()}
+          <details class="govuk-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+              <span class="govuk-details__summary-text">
+                Filters
+              </span>
+            </summary>
+            <div class="govuk-details__text">
+              ${viewPublishingAppSelector()}
+            </div>
+          </details>
+          ${viewSearchButton()}
+        </div>
+      </form>
+    `);
+      break;
     default:
       console.log('viewSearchPanel: unknown value', state.searchParams.searchType);
   }
