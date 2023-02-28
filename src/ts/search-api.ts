@@ -45,7 +45,7 @@ const fetchWithTimeout = async function(url: string, timeoutSeconds: number = 60
 
 
 // called from browser
-const queryGraph: (searchParams: SearchParams, callback: SearchApiCallback) => Promise<void> = async function(searchParams, callback) {
+const queryBackend: (searchParams: SearchParams, callback: SearchApiCallback) => Promise<void> = async function(searchParams, callback) {
   callback({ type: EventType.SearchRunning });
   const url = `/search?${makeQueryString(searchParams)}`;
   let apiResults: SearchResults;
@@ -110,4 +110,4 @@ const buildMetaboxInfo = async function(info: any) {
 };
 
 
-export { makeQueryString, fetchWithTimeout, queryGraph };
+export { makeQueryString, fetchWithTimeout, queryBackend };
