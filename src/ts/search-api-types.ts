@@ -110,7 +110,7 @@ export type BankHoliday = {
   type: MetaResultType,
   name: string,
   dates: string[],
-  regions: string[]
+  divisions: string[]
 }
 
 export type Role = {
@@ -136,5 +136,6 @@ export type SearchResults = {
 
 export type InitResults = {
   taxons: string[],
-  locales: string[]
+  locales: string[],
+  organisations: string[]
 }

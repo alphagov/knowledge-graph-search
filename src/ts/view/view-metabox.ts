@@ -3,7 +3,7 @@ import { viewMetaLink } from './view-components';
 import { MetaResultType, Taxon, Organisation, Person, Role, Transaction, BankHoliday } from '../search-api-types';
 
 
-const viewDetails = (title: string, list: any[], itemFormatFn: (item: any) => string) => {
+const viewDetails = (title: string, list: any[], itemFormatFn: (item: any) => string): string => {
   if (list.length === 0) return '';
   return `
     <details class="govuk-details">
@@ -22,7 +22,7 @@ const viewDetails = (title: string, list: any[], itemFormatFn: (item: any) => st
 };
 
 
-const viewOrgPersonRoles = (personRoles: Record<string, any>[]) =>
+const viewOrgPersonRoles = (personRoles: Record<string, any>[]): string =>
   viewDetails(
     `${personRoles.length} ${personRoles.length === 1 ? 'person' : 'people'}`,
     sortedBy(personRoles, 'personName'),
@@ -30,7 +30,7 @@ const viewOrgPersonRoles = (personRoles: Record<string, any>[]) =>
   );
 
 
-const viewOrgChildren = (childOrgNames: string[]) =>
+const viewOrgChildren = (childOrgNames: string[]): string =>
   viewDetails(
     `${childOrgNames.length} sub-organisations`,
     childOrgNames.sort(),
@@ -38,7 +38,7 @@ const viewOrgChildren = (childOrgNames: string[]) =>
   );
 
 
-const viewPersonRoles = function(roles: any[]) {
+const viewPersonRoles = function(roles: any[]): string {
   const title: string = roles.length === 1 ? 'Role' : 'Roles';
   const roleFormatter: (role: any) => string = role => `
     ${viewMetaLink(role.title)} ${role.orgs ? ' at ' + viewMetaLink(role.orgs[0].orgName) : ''}
@@ -49,8 +49,8 @@ const viewPersonRoles = function(roles: any[]) {
 };
 
 
-const viewRolePersons = (persons: any[]) => {
-  const formatPerson = (person: any) => {
+const viewRolePersons = (persons: any[]): string => {
+  const formatPerson = (person: any): string => {
     return `
     ${viewMetaLink(person.name)}
     (${person.startDate ? new Date(person.startDate.value).getFullYear() : ''}
@@ -100,18 +100,18 @@ const viewRolePersons = (persons: any[]) => {
 };
 
 
-const viewBankHolidayDetails = function(holiday: any) {
+const viewBankHolidayDetails = function(holiday: BankHoliday): string {
   const datesDetails: string = viewDetails(
     'dates',
     holiday.dates.sort().reverse(),
     date => date
   );
-  const regionDetails: string = viewDetails(
+  const divisionDetails: string = viewDetails(
     'Observed in',
-    holiday.regions.sort(),
-    region => region
+    holiday.divisions.sort(),
+    division => division
   );
-  return `${datesDetails}${regionDetails}`;
+  return `${datesDetails}${divisionDetails}`;
 };
 
 
@@ -125,7 +125,7 @@ const viewBankHoliday = (record: BankHoliday): string => `
   </div>
 `;
 
-const viewPerson = (record: any) => `
+const viewPerson = (record: any): string => `
   <div class="meta-results-panel">
     <h2 class="govuk-heading-m">
       <a class="govuk-link" href="${record.homepage}">${record.name}</a>
@@ -136,7 +136,7 @@ const viewPerson = (record: any) => `
 `;
 
 
-const viewRoleOrgs = (orgs: any[]) =>
+const viewRoleOrgs = (orgs: any[]): string =>
   viewDetails(
     `belongs to ${orgs.length} ${orgs.length === 1 ? 'organisation' : 'organisations'}`,
     orgs.sort(),
@@ -144,16 +144,7 @@ const viewRoleOrgs = (orgs: any[]) =>
   );
 
 
-/*
-const viewRolePersons = (persons: any[]) =>
-  viewDetails(
-    `${persons.length} ${persons.length === 1 ? 'person' : 'people'}`,
-    persons,
-    viewMetaLink
-  );
-*/
-
-const viewRole = function(record: any) {
+const viewRole = function(record: any): string {
   const nameHtml = record.homePage ? `
     <a class="govuk-link" href="${record.homepage}">${record.name}</a>
   ` : record.name;
@@ -275,8 +266,8 @@ const viewMetaResultsExpandToggle = () =>
 
 //=================== public ====================
 
-const viewMetaResults = function() {
-  if (!state.metaSearchResults) return;
+const viewMetaResults = function(): string {
+  if (!state.metaSearchResults || state.metaSearchResults.length !== 1) return '';
   //  if (state.metaSearchResults.length > 1) {
   //    const expandedClass = state.metaSearchResults.length > 5 && !state.disamboxExpanded ? 'meta-results-panel--collapsed' : '';
   //    return `
@@ -293,8 +284,6 @@ const viewMetaResults = function() {
   //  } else {
 
   const record = state.metaSearchResults[0];
-  console.log(`meta: found a ${record.type}`)
-  console.log(record);
   switch (record.type) {
     case 'BankHoliday': return viewBankHoliday(record);
     case 'Organisation': return viewOrg(record);

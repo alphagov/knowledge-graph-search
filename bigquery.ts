@@ -1,7 +1,6 @@
-import { Transaction, MetaResultType, MetaResult, MainResult, SearchParams, Combinator, SearchResults, SearchType } from './src/ts/search-api-types';
+import { Transaction, Taxon, Organisation, Person, Role, MetaResultType, MetaResult, MainResult, SearchParams, Combinator, SearchResults, SearchType, InitResults, BankHoliday } from './src/ts/search-api-types';
 import { splitKeywords } from './src/ts/utils';
 import { languageCode } from './src/ts/lang';
-import { GetBankHolidayInfoSignature, GetTransactionInfoSignature, GetOrganisationInfoSignature, GetPersonInfoSignature, GetRoleInfoSignature, GetTaxonInfoSignature, SendInitQuerySignature, SendSearchQuerySignature } from './db-api-types';
 const { BigQuery } = require('@google-cloud/bigquery');
 
 //====== private ======
@@ -60,7 +59,7 @@ const bigQuery = async function(userQuery: string, options?: any) {
 
 //====== public ======
 
-const sendInitQuery: SendInitQuerySignature = async function() {
+const sendInitQuery = async function(): Promise<InitResults> {
   let bqLocales: any, bqTaxons: any, bqOrganisations: any;
   try {
     [ bqLocales, bqTaxons, bqOrganisations ] = await Promise.all([
@@ -92,107 +91,58 @@ const sendInitQuery: SendInitQuerySignature = async function() {
   };
 };
 
-const getTaxonInfo: GetTaxonInfoSignature = async function(name) {
-  const bqTaxon = await bigQuery(
-    `SELECT * FROM search.taxon WHERE lower(name) = lower(@name);`, { name }
+
+const getTaxonInfo = async function(name: string): Promise<Taxon[]> {
+  return await bigQuery(
+    `SELECT "Taxon" as type, * FROM search.taxon WHERE lower(name) = lower(@name);`, { name }
   );
-
-  if (bqTaxon.length === 0) {
-    return undefined;
-  }
-
-  return {
-    type: MetaResultType.Taxon,
-    name: bqTaxon[0].name,
-    homepage: bqTaxon[0].homepage,
-    description: bqTaxon[0].description,
-    level: parseInt(bqTaxon[0].level),
-    ancestorTaxons: bqTaxon[0].ancestorTaxons,
-    childTaxons: bqTaxon[0].childTaxons
-  };
 };
 
 
-const getOrganisationInfo: GetOrganisationInfoSignature = async function(name) {
-  const bqOrganisation = await bigQuery(
-    `SELECT * FROM search.organisation WHERE lower(name) = lower(@name);`, { name }
+const getOrganisationInfo = async function(name: string): Promise<Organisation[]> {
+  return await bigQuery(
+    `SELECT "Organisation" as type, * FROM search.organisation WHERE lower(name) = lower(@name);`, { name }
   );
-
-  if (bqOrganisation.length === 0) {
-    return undefined;
-  }
-
-  return {
-    type: MetaResultType.Organisation,
-    name: bqOrganisation[0].name,
-    description: bqOrganisation[0].description,
-    homepage: bqOrganisation[0].homepage,
-    parentName: bqOrganisation[0].parentName,
-    childOrgNames: bqOrganisation[0].childOrgNames,
-    personRoleNames: bqOrganisation[0].personRoleNames,
-    supersededBy: bqOrganisation[0].supersededBy,
-    supersedes: bqOrganisation[0].supersedes
-  };
 };
 
 
-const getBankHolidayInfo: GetBankHolidayInfoSignature = async function(name) {
-  const bqBankHoliday = await bigQuery(
+const getBankHolidayInfo = async function(name: string): Promise<BankHoliday[]> {
+  const bqBankHolidays: BankHoliday[] = await bigQuery(
     `SELECT * FROM search.bank_holiday WHERE lower(name) = lower(@name);`, { name }
   );
-
-  return {
-    type: MetaResultType.BankHoliday,
-    name: bqBankHoliday[0].name,
-    dates: bqBankHoliday[0].dates.map((date: any) => date.value),
-    regions: bqBankHoliday[0].divisions
-  };
+  return bqBankHolidays.map((bqBankHoliday: BankHoliday) => {
+    return {
+      type: MetaResultType.BankHoliday,
+      name: bqBankHoliday.name,
+      dates: bqBankHoliday.dates.map((date: any) => date.value),
+      divisions: bqBankHoliday.divisions
+    }
+  });
 };
 
-const getTransactionInfo: GetTransactionInfoSignature = async function(name) {
-  const bqTransaction = await bigQuery(
-    `SELECT * FROM search.transaction WHERE lower(name) = lower(@name);`, { name }
+
+const getTransactionInfo = async function(name: string): Promise<Transaction[]> {
+  return await bigQuery(
+    `SELECT "Transaction" as type, * FROM search.transaction WHERE lower(name) = lower(@name);`, { name }
   );
-
-  const result:Transaction = {
-    type: MetaResultType.Transaction,
-    name: bqTransaction[0].name,
-    homepage: bqTransaction[0].homepage,
-    description: bqTransaction[0].description
-  };
-  return result;
 };
 
-const getRoleInfo: GetRoleInfoSignature = async function(name) {
-  const bqRole = await bigQuery(
-    `SELECT * FROM search.role WHERE lower(name) = lower(@name);`, { name }
+
+const getRoleInfo = async function(name: string): Promise<Role[]> {
+  return await bigQuery(
+    `SELECT "Role" as type, * FROM search.role WHERE lower(name) = lower(@name);`, { name }
   );
-
-  return {
-    type: MetaResultType.Role,
-    name: bqRole[0].name,
-    description: bqRole[0].description,
-    personNames: bqRole[0].personNames,
-    orgNames: bqRole[0].orgNames
-  };
 };
 
-const getPersonInfo: GetPersonInfoSignature = async function(name) {
-  const bqPerson = await bigQuery(
-      `SELECT * FROM search.person WHERE lower(name) = lower(@name);`, { name }
-    )
-  ;
 
-  return {
-    type: MetaResultType.Person,
-    name: bqPerson[0].name,
-    homepage: bqPerson[0].name,
-    description: bqPerson[0].name,
-    roles: bqPerson[0].roles
-  }
+const getPersonInfo = async function(name: string): Promise<Person[]> {
+  return await bigQuery(
+    `SELECT "Person" as type, * FROM search.person WHERE lower(name) = lower(@name);`, { name }
+  );
 };
 
-const sendSearchQuery: SendSearchQuerySignature = async function(searchParams) {
+
+const sendSearchQuery = async function(searchParams: SearchParams): Promise<SearchResults> {
   const keywords = splitKeywords(searchParams.selectedWords);
   const excludedKeywords = splitKeywords(searchParams.excludedWords);
   const query = buildSqlQuery(searchParams, keywords, excludedKeywords);
@@ -207,20 +157,20 @@ const sendSearchQuery: SendSearchQuerySignature = async function(searchParams) {
     bigQuery(query, { keywords, excludedKeywords, locale, taxon, organisation, link })
   ];
 
-  let bqMetaResults: MetaResult[] = [], results: any, bqMainResults: MainResult[] = [];
+  let bqMetaResults: MetaResult[] = [];
+  let bqMainResults: MainResult[] = [];
+  let results: any;
+
   switch (searchParams.searchType) {
     case SearchType.Taxon:
-      console.log('SearchType taxon');
       results = await Promise.all(queries);
       bqMainResults = results[0];
-      const taxonInfo = await getTaxonInfo(searchParams.selectedTaxon);
-      if (taxonInfo) bqMetaResults = [taxonInfo];
+      bqMetaResults = await getTaxonInfo(searchParams.selectedTaxon);
       break;
     case SearchType.Organisation:
       results = await Promise.all(queries);
       bqMainResults = results[0];
-      const organisationInfo = await getOrganisationInfo(searchParams.selectedOrganisation);
-      if (organisationInfo) bqMetaResults = [organisationInfo];
+      bqMetaResults = await getOrganisationInfo(searchParams.selectedOrganisation);
       break;
     default:
       if (selectedWordsWithoutQuotes &&
