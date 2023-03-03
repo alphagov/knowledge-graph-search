@@ -337,9 +337,9 @@ const fieldFormatters: Record<string, any> = {
     name: 'All publishing organisations',
     format: formatNames
   },
-  'pagerank': {
-    name: 'Popularity',
-    format: (val: string) => val ? parseFloat(val).toFixed(2) : 'n/a'
+  'page_views': {
+    name: 'Page views',
+    format: (val: string) => val ? parseInt(val).toString() : '<5'
   },
   'withdrawn_at': {
     name: 'Withdrawn at',

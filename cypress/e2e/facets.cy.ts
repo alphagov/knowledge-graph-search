@@ -71,8 +71,8 @@ describe('Search results facets', () => {
     cy.get('td:eq(8)').then($th => cy.expect($th.text()).to.match(dateRegexOrNotWithdrawn));
     cy.get('input#show-field-withdrawn_explanation').check();
     cy.get('td:eq(9)').then($th => cy.expect($th.text()).to.not.equal('null'));
-    cy.get('input#show-field-pagerank').check();
-    cy.get('td:eq(10)').then($th => cy.expect($th.text()).to.match(/^[0-9]\d*(\.\d+)?$/));
+    cy.get('input#show-field-page_views').check();
+    cy.get('td:eq(10)').then($th => cy.expect($th.text()).to.match(/^\d+?$/));
     cy.get('input#show-field-taxons').check();
     cy.get('td:eq(11)').then($th => cy.expect($th.text()).to.not.equal('null'));
     cy.get('input#show-field-primary_organisation').check();
