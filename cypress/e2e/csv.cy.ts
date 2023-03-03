@@ -6,6 +6,6 @@ describe('CSV download link', () => {
     cy.get('#search-text').uncheck();
     cy.get('input#keyword').type('ministry');
     cy.get('button#search').click();
-    cy.get('a[download="export.csv"]').contains('Download all').invoke('attr', 'href').should('match', /^blob:https?:\/\/localhost:8080\/[a-z0-9-]+$/);
+    cy.get('a[download="export.csv"]').contains('Download all').invoke('attr', 'href').should('eq', '/csv?selected-words=ministry&search-in-text=false');
   });
 });

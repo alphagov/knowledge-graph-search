@@ -19,6 +19,7 @@ const viewSearchPanel = () => {
           ${viewCaseSensitiveSelector()}
           ${viewScopeSelector()}
           ${viewLinkSearch()}
+          ${viewPublishingOrgSelector()}
           ${viewPublishingAppSelector()}
           ${viewTaxonSelector()}
           ${viewLocaleSelector()}
@@ -100,6 +101,27 @@ const viewSearchPanel = () => {
         <div class="search-mode-panel">
           <a class="govuk-skip-link" href="#results-table">Skip to results</a>
           ${viewLocaleSelector()}
+          <details class="govuk-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+              <span class="govuk-details__summary-text">
+                Filters
+              </span>
+            </summary>
+            <div class="govuk-details__text">
+              ${viewPublishingAppSelector()}
+            </div>
+          </details>
+          ${viewSearchButton()}
+        </div>
+      </form>
+    `);
+      break;
+    case SearchType.Organisation:
+      result.push(`
+      <form id="search-form" class="search-panel govuk-form">
+        <div class="search-mode-panel">
+          <a class="govuk-skip-link" href="#results-table">Skip to results</a>
+          ${viewPublishingOrgSelector()}
           <details class="govuk-details" data-module="govuk-details">
             <summary class="govuk-details__summary">
               <span class="govuk-details__summary-text">
@@ -301,6 +323,33 @@ const viewKeywordsCombinator = () =>
         </div>
       </div>
     </fieldset>
+  </div>
+`;
+
+
+const viewPublishingOrgSelector = () => `
+  <div class="govuk-body">
+    <div class="taxon-facet">
+      <label class="govuk-label label--bold" for="publishing-organisation">
+        Search for publishing organisations
+      </label>
+      <div class="govuk-hint">
+        Type the first letters of an organisation or select from the dropdown
+      </div>
+      <datalist id="orgList">
+        ${state.organisations.map(organisation => `<option>${organisation}</option>`)}
+      </datalist>
+      <div>
+      <input
+        ${state.waiting && 'disabled="disabled"'}
+        style="display: inline-block"
+        list="orgList"
+        value="${state.searchParams.selectedOrganisation}"
+        class="govuk-input"
+        id="organisation"
+        autocomplete="off" />
+      </div>
+    </div>
   </div>
 `;
 

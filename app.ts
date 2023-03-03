@@ -33,6 +33,7 @@ app.get('/search', async (req: any, res) => {
     selectedWords: req.query['selected-words'] || '',
     excludedWords: req.query['excluded-words'] || '',
     selectedTaxon: req.query['selected-taxon'] || '',
+    selectedOrganisation: req.query['selected-organisation'] || '',
     selectedLocale: req.query['lang'] || '',
     caseSensitive: req.query['case-sensitive'] || false,
     combinator: req.query['combinator'] || Combinator.All,
@@ -61,6 +62,7 @@ app.get('/csv', async (req: any, res) => {
     excludedWords: req.query['excluded-words'] || '',
     selectedTaxon: req.query['selected-taxon'] || '',
     selectedLocale: req.query['lang'] || '',
+    selectedOrganisation: req.query['organisation'] || '',
     caseSensitive: req.query['case-sensitive'] || false,
     combinator: req.query['combinator'] || Combinator.All,
     whereToSearch: {

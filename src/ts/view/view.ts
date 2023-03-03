@@ -67,6 +67,7 @@ const viewSearchTypeSelector = () => `
       Search for:
       <button class="${state.searchParams.searchType === 'keyword' ? 'active' : ''}" id="search-keyword">Keywords</button>
       <button class="${state.searchParams.searchType === 'link' ? 'active' : ''}" id="search-link">Links</button>
+      <button class="${state.searchParams.searchType === 'organisation' ? 'active' : ''}" id="search-organisation">Organisations</button>
       <button class="${state.searchParams.searchType === 'taxon' ? 'active' : ''}" id="search-taxon">Taxons</button>
       <button class="${state.searchParams.searchType === 'language' ? 'active' : ''}" id="search-language">Languages</button>
       <button class="${state.searchParams.searchType === 'mixed' ? 'active' : ''}" id="search-mixed">Mixed</button>

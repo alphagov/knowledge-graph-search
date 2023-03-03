@@ -1,6 +1,7 @@
 export enum SearchType {
   Keyword = 'keyword',
   Link = 'link',
+  Organisation = 'organisation',
   Taxon = 'taxon',
   Language = 'language',
   Mixed = 'mixed',
@@ -24,6 +25,7 @@ export type SearchParams = {
   selectedWords: string, // list of words to search
   excludedWords: string, // list of words to exclude
   selectedTaxon: string, // taxon to search in
+  selectedOrganisation: string, // organisation to search in
   selectedLocale: string, // the language to search for
   linkSearchUrl: string, // URL to find all pages linking to
   whereToSearch: {
@@ -108,7 +110,7 @@ export type BankHoliday = {
   type: MetaResultType,
   name: string,
   dates: string[],
-  regions: string[]
+  divisions: string[]
 }
 
 export type Role = {
@@ -134,5 +136,6 @@ export type SearchResults = {
 
 export type InitResults = {
   taxons: string[],
-  locales: string[]
+  locales: string[],
+  organisations: string[]
 }

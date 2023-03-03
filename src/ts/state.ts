@@ -14,6 +14,7 @@ const initialSearchParams: SearchParams = {
   selectedWords: '',
   excludedWords: '',
   selectedTaxon: '',
+  selectedOrganisation: '',
   selectedLocale: '',
   linkSearchUrl: '',
   whereToSearch: {
@@ -30,6 +31,7 @@ const state: State = {
   searchParams: JSON.parse(JSON.stringify(initialSearchParams)), // deep copy
   taxons: [], // list of names of all the taxons
   locales: [], // all the languages found in the content store
+  organisations: [], // list of names of all the organisations
   systemErrorText: null,
   userErrors: [], // error codes due to user not entering valid search criteria
   searchResults: null,
@@ -55,6 +57,7 @@ const setQueryParamsFromQS = function(): void {
   state.searchParams.excludedWords = maybeReplace('excludedWords', 'excluded-words');
   state.searchParams.linkSearchUrl = maybeReplace('linkSearchUrl', 'link-search-url');
   state.searchParams.selectedTaxon = maybeReplace('selectedTaxon', 'selected-taxon');
+  state.searchParams.selectedOrganisation = maybeReplace('selectedOrganisation', 'selected-organisation');
 
   const lang: (string | null) = searchParams.get('lang');
   state.searchParams.selectedLocale = lang ? languageName(lang) : initialSearchParams.selectedLocale;
@@ -83,7 +86,7 @@ const searchState = function(): { code: string, errors: string[] } {
 
   if (state.waiting) return { code: 'waiting', errors };
 
-  if (state.searchParams.selectedWords === '' && state.searchParams.excludedWords === '' && state.searchParams.selectedTaxon === '' && state.searchParams.selectedLocale === '' && state.searchParams.linkSearchUrl === '' && state.searchParams.whereToSearch.title === false && state.searchParams.whereToSearch.text === false) {
+  if (state.searchParams.selectedWords === '' && state.searchParams.excludedWords === '' && state.searchParams.selectedTaxon === '' && state.searchParams.selectedOrganisation === '' && state.searchParams.selectedLocale === '' && state.searchParams.linkSearchUrl === '' && state.searchParams.whereToSearch.title === false && state.searchParams.whereToSearch.text === false) {
     return { code: 'initial', errors };
   }
 
@@ -103,6 +106,7 @@ const resetSearch = function(): void {
   state.searchParams.selectedWords = '';
   state.searchParams.excludedWords = '';
   state.searchParams.selectedTaxon = '';
+  state.searchParams.selectedOrganisation = '';
   state.searchParams.selectedLocale = '';
   state.searchParams.whereToSearch.title = true;
   state.searchParams.whereToSearch.text = true;

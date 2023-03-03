@@ -9,6 +9,7 @@ const makeQueryString = function(sp: SearchParams): string {
   if (sp.selectedWords !== '') usp.set('selected-words', sp.selectedWords);
   if (sp.excludedWords !== '') usp.set('excluded-words', sp.excludedWords);
   if (sp.selectedTaxon !== '') usp.set('selected-taxon', sp.selectedTaxon);
+  if (sp.selectedOrganisation !== '') usp.set('selected-organisation', sp.selectedOrganisation);
   if (sp.selectedLocale !== '') usp.set('lang', languageCode(sp.selectedLocale));
   if (sp.caseSensitive) usp.set('case-sensitive', sp.caseSensitive.toString());
   if (!sp.whereToSearch.title) usp.set('search-in-title', 'false');
@@ -57,7 +58,6 @@ const queryBackend: (searchParams: SearchParams, callback: SearchApiCallback) =>
   }
   let { main, meta } = apiResults;
 
-
   // If there's an exact match within the meta results, just keep that one
   const searchKeywords: string = searchParams.selectedWords.replace(/"/g, '');
   const exactMetaResults = meta.filter((result: any) => {
@@ -69,7 +69,7 @@ const queryBackend: (searchParams: SearchParams, callback: SearchApiCallback) =>
   if (meta.length === 1) {
     // one meta result: show the knowledge panel (may require more API queries)
     const fullMetaResults = await buildMetaboxInfo(meta[0]);
-    callback({ type: EventType.SearchApiCallbackOk, results: { main, meta: [fullMetaResults] } });
+    callback({ type: EventType.SearchApiCallbackOk, results: { main, meta: fullMetaResults } });
   // } else if (metaResults.length >= 1) {
   //   // multiple meta results: we'll show a disambiguation page
   //   callback({ type: EventType.SearchApiCallbackOk, results: { main, meta: metaResults } });
