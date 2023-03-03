@@ -90,7 +90,7 @@ const handleEvent: SearchApiCallback = async function(event) {
       state.waiting = true;
       break;
     case EventType.SearchApiCallbackOk:
-      state.searchResults = event.results?.main.sort((a: any, b: any) => b.pagerank - a.pagerank);
+      state.searchResults = event.results?.main.sort((a: any, b: any) => b.page_views - a.page_views);
       state.metaSearchResults = event.results?.meta;
       state.waiting = false;
       state.systemErrorText = null;

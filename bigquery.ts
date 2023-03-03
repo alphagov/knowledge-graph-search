@@ -293,7 +293,7 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
       public_updated_at,
       withdrawn_at,
       withdrawn_explanation,
-      pagerank,
+      page_views,
       taxons,
       primary_organisation,
       organisations AS all_organisations

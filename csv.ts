@@ -48,9 +48,9 @@ const csvFieldFormatters: Record<string, any> = {
     name: 'All publishing organisations',
     format: formatNames
   },
-  'pagerank': {
-    name: 'Popularity',
-    format: (val: string):string => val ? parseFloat(val).toFixed(2) : 'n/a'
+  'page_views': {
+    name: 'Page views',
+    format: (val: string):string => val ? parseInt(val).toString() : '<5'
   },
   'withdrawn_at': {
     name: 'Withdrawn at',
@@ -93,7 +93,7 @@ const makeHeaders = function(obj:Record<string, any>) {
 const formatForCsv = function(lines:any) {
   const headers = makeHeaders(lines[0])
   const body = lines
-    .sort((a:any, b:any) => parseFloat(b.pagerank) - parseFloat(a.pagerank))
+    .sort((a:any, b:any) => parseInt(b.page_views) - parseInt(a.page_views))
     .map((record:any) => {
       const formattedRowObj:any = {}
       for (const [key, value] of Object.entries(record)) {
