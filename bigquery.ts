@@ -308,7 +308,9 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
     ${organisationClause}
     ${linkClause}
 
-    LIMIT 50000
+    ORDER BY page_views DESC
+
+    LIMIT 10000
   `;
 };
 

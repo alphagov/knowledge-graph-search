@@ -230,7 +230,7 @@ const viewResults = function() {
     const html = [];
     const nbRecords = state.searchResults.length;
 
-    if (nbRecords < 50000) {
+    if (nbRecords < 10000) {
       html.push(`
         <h1 tabindex="0" id="results-heading" class="govuk-heading-l">${nbRecords} result${nbRecords !== 0 ? 's' : ''}</h1>`);
     } else {
@@ -239,7 +239,7 @@ const viewResults = function() {
           <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
           <strong class="govuk-warning-text__text">
             <span class="govuk-warning-text__assistive">Warning</span>
-            There are more than 50000 results. Try to narrow down your search.
+            There are more than 10000 results. Try to narrow down your search.
           </strong>
         </div>
       `);
