@@ -339,6 +339,7 @@ const buildLinkQuery = function(searchParams: SearchParams, keywords: string[], 
     ${localeClause}
     ${taxonClause}
     ${organisationClause}
+
     ORDER BY page_views DESC
     LIMIT 10000
   `;

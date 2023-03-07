@@ -402,7 +402,6 @@ const viewWaiting = () => `
 
 const viewResults = function() {
   const html = [];
-
   const nbRecords = state.searchResults.keywords.length;
 
   if (nbRecords > 10000) {
