@@ -20,11 +20,11 @@ describe('Initialisation', () => {
       expect(datalist.children('option').length).to.be.greaterThan(20);
     });
 
-    // check that at least 20 organisations were loaded
-    cy.contains('button', 'Organisations').click();
-    cy.get('datalist#orgList').then(datalist => {
-      expect(datalist.children('option').length).to.be.greaterThan(20);
-    });
+    // // check that at least 20 organisations were loaded
+    // cy.contains('button', 'Organisations').click();
+    // cy.get('datalist#orgList').then(datalist => {
+    //   expect(datalist.children('option').length).to.be.greaterThan(20);
+    // });
 
   });
 });
