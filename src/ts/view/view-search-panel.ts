@@ -7,12 +7,12 @@ import { SearchType } from '../search-api-types';
 const viewSearchPanel = () => {
   const result = [];
   switch (state.searchParams.searchType) {
-    case SearchType.Mixed:
+    case SearchType.Advanced:
     case SearchType.Results:
       result.push(`
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
-          <h1 class="govuk-heading-xl">Mixed search</h1>
+          <h1 class="govuk-heading-xl">Advanced search</h1>
           ${viewKeywordsInput()}
           ${viewKeywordsCombinator()}
           ${viewExclusionsInput()}

@@ -72,17 +72,17 @@ const viewSearchTypeSelector = () => `
       -->
       <button class="${state.searchParams.searchType === 'taxon' ? 'active' : ''}" id="search-taxon">Taxons</button>
       <button class="${state.searchParams.searchType === 'language' ? 'active' : ''}" id="search-language">Languages</button>
-      <button class="${state.searchParams.searchType === 'mixed' ? 'active' : ''}" id="search-mixed">Mixed</button>
+      <button class="${state.searchParams.searchType === 'advanced' ? 'active' : ''}" id="search-advanced">Advanced</button>
     </p>
   `;
 
 
 const viewMainLayout = () => {
   const result = [];
-  if (state.searchParams.searchType === 'mixed') {
+  if (state.searchParams.searchType === 'advanced') {
     if (!state.searchResults) {
       result.push(`
-        <div class="govuk-grid-row mixed-layout--no-results">
+        <div class="govuk-grid-row advanced-layout--no-results">
           <div class="govuk-grid-column-two-thirds">
             ${viewSearchPanel()}
           </div>
@@ -90,7 +90,7 @@ const viewMainLayout = () => {
       `);
     } else {
       result.push(`
-        <div class="govuk-grid-row mixed-layout">
+        <div class="govuk-grid-row advanced-layout">
           <div class="govuk-grid-column-one-third">
             ${viewSearchPanel()}
           </div>

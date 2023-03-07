@@ -4,7 +4,7 @@ export enum SearchType {
   Organisation = 'organisation',
   Taxon = 'taxon',
   Language = 'language',
-  Mixed = 'mixed',
+  Advanced = 'advanced',
   Results = 'results'
 };
 

@@ -6,8 +6,8 @@ describe('Interface', () => {
     cy.contains('button', 'Links').click();
     cy.contains('Search for links');
     cy.contains('Search for keywords').should('not.exist');
-    cy.contains('button', 'Mixed').click();
-    cy.contains('Mixed search');
+    cy.contains('button', 'Advanced').click();
+    cy.contains('Advanced search');
   });
 
   it('Shows the correct filters in keywords search', () => {
@@ -82,10 +82,10 @@ describe('Interface', () => {
     cy.contains('button', 'Search');
   });
 
-  it('Shows the correct filters in mixed search', () => {
+  it('Shows the correct filters in advanced search', () => {
     cy.visit('');
-    cy.contains('button', 'Mixed').click();
-    cy.get('button#search-mixed.active');
+    cy.contains('button', 'Advanced').click();
+    cy.get('button#search-advanced.active');
     cy.get('input#keyword');
     cy.contains('details', 'Filters').should('not.exist');
     cy.contains('Exclude keywords');

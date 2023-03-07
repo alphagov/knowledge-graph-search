@@ -71,9 +71,9 @@ const handleEvent: SearchApiCallback = async function(event) {
           resetSearch();
           state.searchParams.searchType = SearchType.Language;
           break;
-        case 'search-mixed':
+        case 'search-advanced':
           resetSearch();
-          state.searchParams.searchType = SearchType.Mixed;
+          state.searchParams.searchType = SearchType.Advanced;
           break;
         default:
           fieldClicked = event.id ? event.id.match(/show-field-(.*)/) : null;
