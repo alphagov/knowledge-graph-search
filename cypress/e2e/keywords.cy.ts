@@ -76,9 +76,9 @@ describe('Keyword searching', () => {
     cy.contains('You need to select a keyword location');
   });
 
-  it('returns results when searching for \'education\' everywhere', () => {
+  it('returns results when searching for \'disaster\' everywhere', () => {
     cy.visit('');
-    cy.get('input#keyword').type('education');
+    cy.get('input#keyword').type('disaster');
     cy.get('.govuk-details__summary').click();
     cy.get('button#search').click();
     cy.contains('button', 'Searching');
@@ -87,12 +87,12 @@ describe('Keyword searching', () => {
       numUnfilteredResults = parseInt(heading.text().match(/^(\d+) results$/)[1]);
     });
     cy.get('#results-table');
-    cy.title().should('eq', 'GOV.UK pages that contain "education" - Gov Search')
+    cy.title().should('eq', 'GOV.UK pages that contain "disaster" - Gov Search')
   });
 
   it('returns fewer results when searching in Publisher only', () => {
     cy.visit('');
-    cy.get('input#keyword').type('education');
+    cy.get('input#keyword').type('disaster');
     cy.get('.govuk-details__summary').click();
     cy.get('#search-text').uncheck();
     cy.get('#area-publisher').check();
@@ -105,12 +105,12 @@ describe('Keyword searching', () => {
     });
     cy.contains('in their title');
     cy.get('#results-table');
-    cy.title().should('eq', 'GOV.UK pages that contain "education" in their title and are published using "publisher" - Gov Search')
+    cy.title().should('eq', 'GOV.UK pages that contain "disaster" in their title and are published using "publisher" - Gov Search')
   });
 
   it('returns fewer results when searching in Whitehall only', () => {
     cy.visit('');
-    cy.get('input#keyword').type('education');
+    cy.get('input#keyword').type('disaster');
     cy.get('.govuk-details__summary').click();
     cy.get('#search-text').uncheck();
     cy.get('#area-whitehall').check();
@@ -123,19 +123,19 @@ describe('Keyword searching', () => {
     });
     cy.contains('in their title');
     cy.get('#results-table');
-    cy.title().should('eq', 'GOV.UK pages that contain "education" in their title and are published using "whitehall" - Gov Search')
+    cy.title().should('eq', 'GOV.UK pages that contain "disaster" in their title and are published using "whitehall" - Gov Search')
   });
 
   it('returns no results when doing an empty case-sensitive search', () => {
     cy.visit('');
-    cy.get('input#keyword').type('edUcatIon');
+    cy.get('input#keyword').type('DiSaStEr');
     cy.get('.govuk-details__summary').click();
     cy.get('#search-text').uncheck();
     cy.get('#case-sensitive').check();
     cy.get('button#search').click();
     cy.contains('button', 'Searching');
     cy.get('#results-heading', { timeout: 60000 }).contains('No results');
-    cy.title().should('eq', 'GOV.UK pages that contain "edUcatIon" in their title - Gov Search')
+    cy.title().should('eq', 'GOV.UK pages that contain "DiSaStEr" in their title - Gov Search')
   });
 
   it('returns results when doing an "any keywords" search', () => {

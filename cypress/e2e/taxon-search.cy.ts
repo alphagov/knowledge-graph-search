@@ -21,7 +21,7 @@ describe('Taxon search', () => {
   it('returns results for an existing taxon search', () => {
     cy.visit('');
     cy.contains('button', 'Taxons').click();
-    cy.get('input#taxon').type('Environment');
+    cy.get('input#taxon').type('Local government');
     cy.get('button#search').click();
     cy.get('#results-heading', { timeout: 60000 }).contains(/^\d+ results$/);
     cy.get('#results-heading').then(heading => {
@@ -33,7 +33,7 @@ describe('Taxon search', () => {
   it('returns fewer results for a Publisher taxon search', () => {
     cy.visit('');
     cy.contains('button', 'Taxons').click();
-    cy.get('input#taxon').type('Environment');
+    cy.get('input#taxon').type('Local government');
     cy.get('.govuk-details__summary').click();
     cy.get('#area-publisher').check();
     cy.get('button#search').click();
@@ -49,7 +49,7 @@ describe('Taxon search', () => {
   it('returns fewer results for a Whitehall taxon search', () => {
     cy.visit('');
     cy.contains('button', 'Taxons').click();
-    cy.get('input#taxon').type('Environment');
+    cy.get('input#taxon').type('Local government');
     cy.get('.govuk-details__summary').click();
     cy.get('#area-whitehall').check();
     cy.get('button#search').click();
