@@ -22,6 +22,7 @@ const viewSearchPanel = () => {
           ${viewPublishingOrgSelector()}
           ${viewPublishingAppSelector()}
           ${viewTaxonSelector()}
+          ${viewEntityTypeSelector()}
           ${viewLocaleSelector()}
           ${viewSearchButton()}
         </div>
@@ -88,6 +89,27 @@ const viewSearchPanel = () => {
             </summary>
             <div class="govuk-details__text">
               ${viewPublishingAppSelector()}
+            </div>
+          </details>
+          ${viewSearchButton()}
+        </div>
+      </form>
+    `);
+      break;
+    case SearchType.EntityType:
+      result.push(`
+      <form id="search-form" class="search-panel govuk-form">
+        <div class="search-mode-panel">
+          <a class="govuk-skip-link" href="#results-table">Skip to results</a>
+          ${viewEntityTypeSelector()}
+          <details class="govuk-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+              <span class="govuk-details__summary-text">
+                Filters
+              </span>
+            </summary>
+            <div class="govuk-details__text">
+              ${viewEntityTypeSelector()}
             </div>
           </details>
           ${viewSearchButton()}
@@ -210,6 +232,33 @@ const viewTaxonSelector = () => `
         value="${state.searchParams.selectedTaxon}"
         class="govuk-input"
         id="taxon"
+        autocomplete="off" />
+      </div>
+    </div>
+  </div>
+`;
+
+
+const viewEntityTypeSelector = () => `
+  <div class="govuk-body">
+    <div class="entity-type-facet">
+      <label class="govuk-label label--bold" for="entity-type">
+        Search for entity types
+      </label>
+      <div class="govuk-hint">
+        Type the first letters of a type of entity or select from the dropdown
+      </div>
+      <datalist id="entityTypeList">
+        ${state.entityTypes.map(entityType => `<option>${entityType}</option>`)}
+      </datalist>
+      <div>
+      <input
+        ${state.waiting && 'disabled="disabled"'}
+        style="display: inline-block"
+        list="entityTypeList"
+        value="${state.searchParams.selectedEntityType}"
+        class="govuk-input"
+        id="entity-type"
         autocomplete="off" />
       </div>
     </div>

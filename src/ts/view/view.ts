@@ -5,10 +5,23 @@ import { languageName } from '../lang';
 import { viewMetaResults } from './view-metabox';
 import { viewSearchPanel } from './view-search-panel';
 import { EventType } from '../event-types';
+import { EntityType } from '../search-api-types';
 
 
 declare const window: any;
 
+
+const entityTypes: Record<string, string> = {
+  'GPE': 'Geo-political entity',
+  'ORG': 'Organisation',
+  'POSTCODE': 'Postcode',
+  'DATE': 'Date',
+  'PERSON': 'Person',
+  'EMAIL': 'Email',
+  'PHONE': 'Phone',
+  'FORM': 'Form',
+  'MONEY': 'Money'
+};
 
 const view = () => {
   console.log('view')
@@ -71,6 +84,9 @@ const viewSearchTypeSelector = () => `
         <button class="${state.searchParams.searchType === 'organisation' ? 'active' : ''}" id="search-organisation">Organisations</button>
       -->
       <button class="${state.searchParams.searchType === 'taxon' ? 'active' : ''}" id="search-taxon">Taxons</button>
+      <!-- Entity search is disabled until we have tested a new design with users
+      <button class="${state.searchParams.searchType === 'entityType' ? 'active' : ''}" id="search-entity-type">Entity types</button>
+      -->
       <button class="${state.searchParams.searchType === 'language' ? 'active' : ''}" id="search-language">Languages</button>
       <button class="${state.searchParams.searchType === 'advanced' ? 'active' : ''}" id="search-advanced">Advanced</button>
     </p>
@@ -123,7 +139,7 @@ const viewErrorBanner = () => {
       let errorText: string = '';
       switch (state.systemErrorText) {
         case 'TIMEOUT':
-        errorText = "The databse took too long to respond. This is usually due to too many query results. Please try a more precise query.";
+        errorText = "The database took too long to respond. This is usually due to too many query results. Please try a more precise query.";
         break;
         default:
         errorText = "A problem has occurred with the database.";
@@ -305,6 +321,10 @@ const viewSearchResults = () => {
 
 const formatNames = (array: []) => [...new Set(array)].map(x => `“${x}”`).join(', ');
 
+const formatEntityTypes = (array: EntityType[]) => [...new Set(array)].map(x => {
+    return `${entityTypes[x['type']]}: ${x['total_count']}`;
+}).join('<div>');
+
 
 const formatDateTime = (date: any) =>
   `${date.value.slice(0, 10)} at ${date.value.slice(11, 16)}`;
@@ -350,6 +370,10 @@ const fieldFormatters: Record<string, any> = {
   'withdrawn_explanation': {
     name: 'Withdrawn reason',
     format: (text: string) => text || 'n/a'
+  },
+  'entities': {
+    name: 'Entities',
+    format: formatEntityTypes
   }
 };
 

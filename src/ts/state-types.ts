@@ -3,6 +3,7 @@ import { SearchParams } from './search-api-types';
 export interface State {
   searchParams: SearchParams,
   taxons: string[],
+  entityTypes: string[],
   organisations: string[],
   locales: string[],
   systemErrorText: string | null,

@@ -1,6 +1,19 @@
 import { stringify } from 'csv-stringify/sync'
 import { languageName } from './src/ts/lang';
+import {  EntityType } from './src/ts/search-api-types';
 
+
+const entityTypes: Record<string, string> = {
+  'GPE': 'Geo-political entity',
+  'ORG': 'Organisation',
+  'POSTCODE': 'Postcode',
+  'DATE': 'Date',
+  'PERSON': 'Person',
+  'EMAIL': 'Email',
+  'PHONE': 'Phone',
+  'FORM': 'Form',
+  'MONEY': 'Money'
+};
 
 // turn an array of strings (from db results) into a string (for human-friendly
 // display)
@@ -9,6 +22,9 @@ const formatNames = (array: string[]):string =>
     ? array[0] // if there's only one element just output it
     : [...new Set(array)].map(x => `“${x}”`).join(', '); // otherwise dedupe
 
+const formatEntityTypes = (array: EntityType[]) => [...new Set(array)].map(x => {
+    return `${entityTypes[x['type']]}: ${x['total_count']}`;
+}).join(', ');
 
 const formatDateTime = (date: any) =>
   `${date.value.slice(0, 10)} at ${date.value.slice(11, 16)}`;
@@ -39,6 +55,10 @@ const csvFieldFormatters: Record<string, any> = {
   'taxons': {
     name: 'Taxons',
     format: formatNames
+  },
+  'entities': {
+    name: 'Taxons',
+    format: formatEntityTypes
   },
   'primary_organisation': {
     name: 'Primary publishing organisation',

@@ -27,6 +27,7 @@ const handleEvent: SearchApiCallback = async function(event) {
           state.searchParams.selectedWords = getFormInputValue('keyword');
           state.searchParams.excludedWords = getFormInputValue('excluded-keyword');
           state.searchParams.selectedTaxon = getFormInputValue('taxon');
+          state.searchParams.selectedEntityType = getFormInputValue('entity-type');
           state.searchParams.selectedOrganisation = getFormInputValue('organisation');
           state.searchParams.selectedLocale = getFormInputValue('locale');
           state.searchParams.whereToSearch.title = (<HTMLInputElement>id('search-title'))?.checked;
@@ -62,6 +63,10 @@ const handleEvent: SearchApiCallback = async function(event) {
         case 'search-taxon':
           resetSearch();
           state.searchParams.searchType = SearchType.Taxon;
+          break;
+        case 'search-entity-type':
+          resetSearch();
+          state.searchParams.searchType = SearchType.EntityType;
           break;
         case 'search-organisation':
           resetSearch();
@@ -122,7 +127,7 @@ const searchButtonClicked = async function(): Promise<void> {
   const searchStatus = searchState();
   switch (searchStatus.code) {
     case 'ready-to-search':
-      if (state.searchParams.selectedWords !== '' || state.searchParams.selectedLocale !== '' || state.searchParams.selectedTaxon !== '' || state.searchParams.selectedOrganisation !== '' || state.searchParams.linkSearchUrl !== '') {
+      if (state.searchParams.selectedWords !== '' || state.searchParams.selectedLocale !== '' || state.searchParams.selectedTaxon !== '' || state.searchParams.selectedEntityType !== '' || state.searchParams.selectedOrganisation !== '' || state.searchParams.linkSearchUrl !== '') {
         state.waiting = true;
         queryBackend(state.searchParams, handleEvent);
       }
@@ -198,6 +203,8 @@ const updateUrl = function() {
           searchParams.set('excluded-words', state.searchParams.excludedWords);
         if (state.searchParams.selectedTaxon !== '')
           searchParams.set('selected-taxon', state.searchParams.selectedTaxon);
+        if (state.searchParams.selectedEntityType !== '')
+          searchParams.set('selected-entity-type', state.searchParams.selectedEntityType);
         if (state.searchParams.selectedOrganisation !== '')
           searchParams.set('selected-organisation', state.searchParams.selectedOrganisation);
         if (state.searchParams.selectedLocale !== '')

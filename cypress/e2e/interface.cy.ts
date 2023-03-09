@@ -23,6 +23,7 @@ describe('Interface', () => {
     cy.contains('Keyword location');
     cy.contains('Search for links').should('not.exist');
     cy.contains('Search for taxons').should('not.exist');
+    cy.contains('Search for entity types').should('not.exist');
     cy.contains('Search for languages').should('not.exist');
     cy.contains('Limit search');
     cy.contains('button', 'Search');
@@ -41,6 +42,7 @@ describe('Interface', () => {
     cy.contains('Keyword location').should('not.exist');
     cy.contains('Search for links');
     cy.contains('Search for taxons').should('not.exist');
+    cy.contains('Search for entity types').should('not.exist');
     cy.contains('Search for languages').should('not.exist');
     cy.contains('Limit search');
     cy.contains('button', 'Search');
@@ -59,6 +61,7 @@ describe('Interface', () => {
     cy.contains('Keyword location').should('not.exist');
     cy.contains('Search for links').should('not.exist');
     cy.contains('Search for taxons');
+    cy.contains('Search for entity types').should('not.exist');
     cy.contains('Search for languages').should('not.exist');
     cy.contains('Limit search');
     cy.contains('button', 'Search');
@@ -77,6 +80,7 @@ describe('Interface', () => {
     cy.contains('Keyword location').should('not.exist');
     cy.contains('Search for links').should('not.exist');
     cy.contains('Search for taxons').should('not.exist');
+    cy.contains('Search for entity types').should('not.exist');
     cy.contains('Search for languages');
     cy.contains('Limit search');
     cy.contains('button', 'Search');
@@ -93,6 +97,7 @@ describe('Interface', () => {
     cy.contains('Keyword location');
     cy.contains('Search for links');
     cy.contains('Search for taxons');
+    cy.contains('Search for entity types');
     cy.contains('Search for languages');
     cy.contains('Limit search');
     cy.contains('button', 'Search');

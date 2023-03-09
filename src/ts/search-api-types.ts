@@ -3,6 +3,7 @@ export enum SearchType {
   Link = 'link',
   Organisation = 'organisation',
   Taxon = 'taxon',
+  EntityType = 'entityType',
   Language = 'language',
   Advanced = 'advanced',
   Results = 'results'
@@ -25,6 +26,7 @@ export type SearchParams = {
   selectedWords: string, // list of words to search
   excludedWords: string, // list of words to exclude
   selectedTaxon: string, // taxon to search in
+  selectedEntityType: string, // entity type to search for
   selectedOrganisation: string, // organisation to search in
   selectedLocale: string, // the language to search for
   linkSearchUrl: string, // URL to find all pages linking to
@@ -136,6 +138,12 @@ export type SearchResults = {
 
 export type InitResults = {
   taxons: string[],
+  entityTypes: string[],
   locales: string[],
   organisations: string[]
+}
+
+export type EntityType = {
+  type: string,
+  total_count: number
 }

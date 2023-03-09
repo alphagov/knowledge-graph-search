@@ -9,9 +9,10 @@ import { fetchWithTimeout, queryBackend } from './search-api';
 //==================================================
 
 const initDatabase = async function() {
-  console.log('retrieving taxons, locales and organisations');
+  console.log('retrieving taxons, entity types, locales and organisations');
   const apiResponse = await fetchWithTimeout('/get-init-data');
-  if (apiResponse.taxons.length === 0 || apiResponse.locales.length === 3 || apiResponse.organisations.length === 0) {
+  console.log(114, apiResponse.entityTypes)
+  if (apiResponse.taxons.length === 0 || apiResponse.entityTypes.length === 0 || apiResponse.locales.length === 3 || apiResponse.organisations.length === 0) {
     throw 'Received no or incomplete data from the backend.';
   }
   return apiResponse;
@@ -23,6 +24,7 @@ const init = async function() {
   try {
     const dbInitResults = await initDatabase();
     state.taxons = dbInitResults.taxons;
+    state.entityTypes = dbInitResults.entityTypes;
     state.organisations = dbInitResults.organisations;
     state.locales = dbInitResults.locales;
   } catch (error) {
@@ -40,7 +42,7 @@ const init = async function() {
     state.searchResults = null;
     view();
     // Find if we need to run a search
-    if (state.searchParams.selectedWords !== '' || state.searchParams.selectedLocale !== '' || state.searchParams.selectedTaxon !== '' || state.searchParams.selectedOrganisation !== '' || state.searchParams.linkSearchUrl !== '') {
+    if (state.searchParams.selectedWords !== '' || state.searchParams.selectedLocale !== '' || state.searchParams.selectedTaxon !== '' || state.searchParams.selectedEntityType !== '' || state.searchParams.selectedOrganisation !== '' || state.searchParams.linkSearchUrl !== '') {
       state.waiting = true;
       queryBackend(state.searchParams, handleEvent);
     }

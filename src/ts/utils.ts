@@ -71,6 +71,8 @@ const queryDescription = (search: SearchParams, includeMarkup = true) => {
   }
   if (search.selectedTaxon !== '')
     clauses.push(`belong to the ${makeBold(search.selectedTaxon, includeMarkup)} taxon (or its sub-taxons)`);
+  if (search.selectedEntityType !== '')
+    clauses.push(`includes any entities of the type ${makeBold(search.selectedEntityType, includeMarkup)}`);
   if (search.selectedOrganisation !== '')
     clauses.push(`are published by the ${makeBold(search.selectedOrganisation, includeMarkup)}`);
   if (search.selectedLocale !== '')

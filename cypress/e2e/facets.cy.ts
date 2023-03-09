@@ -79,5 +79,7 @@ describe('Search results facets', () => {
     cy.get('td:eq(12)').then($th => cy.expect($th.text()).to.not.equal('null'));
     cy.get('input#show-field-all_organisations').check();
     cy.get('td:eq(13)').then($th => cy.expect($th.text()).to.not.equal('null'));
+    cy.get('input#show-field-entity-types').check();
+    cy.get('td:eq(14)').then($th => cy.expect($th.text()).to.not.equal('null'));
   });
 });

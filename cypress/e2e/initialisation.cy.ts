@@ -14,6 +14,12 @@ describe('Initialisation', () => {
       expect(datalist.children('option').length).to.be.greaterThan(100);
     });
 
+    // check that at least 5 entity types were loaded
+    cy.contains('button', 'Advanced').click();
+    cy.get('datalist#entityTypeList').then(datalist => {
+      expect(datalist.children('option').length).to.be.greaterThan(4);
+    });
+
     // check that at least 20 languages were loaded
     cy.contains('button', 'Languages').click();
     cy.get('datalist#localeList').then(datalist => {

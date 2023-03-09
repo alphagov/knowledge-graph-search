@@ -1,4 +1,4 @@
-import { Transaction, Taxon, Organisation, Person, Role, MetaResultType, MetaResult, MainResult, SearchParams, Combinator, SearchResults, SearchType, InitResults, BankHoliday } from './src/ts/search-api-types';
+import { Transaction, Taxon, EntityType, Organisation, Person, Role, MetaResultType, MetaResult, MainResult, SearchParams, Combinator, SearchResults, SearchType, InitResults, BankHoliday } from './src/ts/search-api-types';
 import { splitKeywords } from './src/ts/utils';
 import { languageCode } from './src/ts/lang';
 const { BigQuery } = require('@google-cloud/bigquery');
@@ -35,6 +35,9 @@ const bigQuery = async function(userQuery: string, options?: any) {
     if (options.taxon) {
       params.taxon = options.taxon;
     }
+    if (options.entityType) {
+      params.entityType = options.entityType;
+    }
     if (options.organisation) {
       params.organisation = options.organisation;
     }
@@ -60,9 +63,9 @@ const bigQuery = async function(userQuery: string, options?: any) {
 //====== public ======
 
 const sendInitQuery = async function(): Promise<InitResults> {
-  let bqLocales: any, bqTaxons: any, bqOrganisations: any;
+  let bqLocales: any, bqTaxons: any, bqEntityTypes: any, bqOrganisations: any;
   try {
-    [ bqLocales, bqTaxons, bqOrganisations ] = await Promise.all([
+    [ bqLocales, bqTaxons, bqEntityTypes, bqOrganisations ] = await Promise.all([
       bigQuery(`
         SELECT DISTINCT locale
         FROM \`content.locale\`
@@ -70,6 +73,10 @@ const sendInitQuery = async function(): Promise<InitResults> {
       bigQuery(`
         SELECT title
         FROM \`graph.taxon\`
+        `),
+      bigQuery(`
+        SELECT type
+        FROM \`search.entityTypes\`
         `),
       bigQuery(`
         SELECT DISTINCT title
@@ -87,6 +94,7 @@ const sendInitQuery = async function(): Promise<InitResults> {
         .filter((locale: string) => locale !== 'en' && locale !== 'cy')
       ),
     taxons: bqTaxons.map((taxon: any) => taxon.title),
+    entityTypes: bqEntityTypes.map((entityType: any) => entityType.type),
     organisations: bqOrganisations.map((organisation: any) => organisation.title)
   };
 };
@@ -148,13 +156,14 @@ const sendSearchQuery = async function(searchParams: SearchParams): Promise<Sear
   const query = buildSqlQuery(searchParams, keywords, excludedKeywords);
   const locale = languageCode(searchParams.selectedLocale);
   const taxon = searchParams.selectedTaxon;
+  const entityType = searchParams.selectedEntityType;
   const organisation = searchParams.selectedOrganisation;
   const selectedWordsWithoutQuotes = searchParams.selectedWords.replace(/"/g, '');
   const link = searchParams.linkSearchUrl && internalLinkRegExp.test(searchParams.linkSearchUrl)
     ? searchParams.linkSearchUrl.replace(internalLinkRegExp, 'https://www.gov.uk/')
     : searchParams.linkSearchUrl;
   const queries = [
-    bigQuery(query, { keywords, excludedKeywords, locale, taxon, organisation, link })
+    bigQuery(query, { keywords, excludedKeywords, locale, taxon, entityType, organisation, link })
   ];
 
   let bqMetaResults: MetaResult[] = [];
@@ -247,6 +256,17 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
     `;
   }
 
+  let entityTypeClause = '';
+  if (searchParams.selectedEntityType !== '') {
+    entityTypeClause = `
+      AND EXISTS
+        (
+          SELECT 1 FROM UNNEST (entities) AS entity
+          WHERE entity.type = @entityType
+        )
+    `;
+  }
+
   let organisationClause = '';
   if (searchParams.selectedOrganisation !== '') {
     organisationClause = `
@@ -296,7 +316,8 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
       page_views,
       taxons,
       primary_organisation,
-      organisations AS all_organisations
+      organisations AS all_organisations,
+      entities
     FROM search.page
 
     WHERE TRUE
@@ -305,6 +326,7 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
     ${areaClause}
     ${localeClause}
     ${taxonClause}
+    ${entityTypeClause}
     ${organisationClause}
     ${linkClause}
 
