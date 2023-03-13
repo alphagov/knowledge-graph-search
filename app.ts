@@ -1,6 +1,6 @@
 // Import the express in typescript file
 import express from 'express';
-import { sendSearchQuery, sendInitQuery, getOrganisationInfo, getPersonInfo, getRoleInfo, getTaxonInfo, getBankHolidayInfo, getTransactionInfo } from './bigquery';
+import { sendSearchQuery, sendInitQuery, getOrganisationInfo, getPersonInfo, getRoleInfo, getTaxonInfo, getBankHolidayInfo, getTransactionInfo, getAbbreviationTextInfo } from './bigquery';
 import { SearchArea, Combinator, SearchType, SearchParams } from './src/ts/search-api-types';
 import { csvStringify } from './csv';
 
@@ -154,6 +154,17 @@ app.get('/person', async (req: any, res) => {
   console.log('API call to /person', req.query);
   try {
     const data = await getPersonInfo(req.query['name']);
+    res.send(data);
+  } catch (e: any) {
+    res.status(500).send(e);
+  }
+});
+
+
+app.get('/abbreviation-text', async (req: any, res) => {
+  console.log('API call to /abbreviation-text', req.query);
+  try {
+    const data = await getAbbreviationTextInfo(req.query['name']);
     res.send(data);
   } catch (e: any) {
     res.status(500).send(e);

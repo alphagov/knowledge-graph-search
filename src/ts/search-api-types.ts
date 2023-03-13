@@ -38,6 +38,7 @@ export type SearchParams = {
 }
 
 export enum MetaResultType {
+  AbbreviationText = "AbbreviationText",
   Person = "Person",
   Organisation = "Organisation",
   BankHoliday = "BankHoliday",
@@ -46,7 +47,14 @@ export enum MetaResultType {
   Transaction = "Transaction"
 }
 
-export type MetaResult = Person | Organisation | BankHoliday | Transaction | Role | Taxon
+
+export type MetaResult = Person | Organisation | BankHoliday | Transaction | Role | Taxon | AbbreviationText
+
+export type AbbreviationText = {
+  type: MetaResultType,
+  abbreviation_titles: string[],
+  abbreviation_text: string
+}
 
 export type Person = {
   type: MetaResultType,

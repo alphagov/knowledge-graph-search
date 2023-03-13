@@ -1,6 +1,6 @@
 import { state } from '../state';
 import { viewMetaLink } from './view-components';
-import { MetaResultType, Taxon, Organisation, Person, Role, Transaction, BankHoliday } from '../search-api-types';
+import { MetaResultType, Taxon, Organisation, Person, Role, AbbreviationText, Transaction, BankHoliday } from '../search-api-types';
 
 
 const viewDetails = (title: string, list: any[], itemFormatFn: (item: any) => string): string => {
@@ -204,6 +204,17 @@ const viewMetaLinkList = (names: string[], title?: string, noneTitle?: string): 
 };
 
 
+const viewAbbreviationText = (record: AbbreviationText): string => `
+  <div class="meta-results-panel">
+    <h2 class="govuk-heading-m">${record.abbreviation_text}</h2>
+    <p class="govuk-body">stands for</p>
+    <ul class="govuk-list govuk-list--bullet">
+      ${record.abbreviation_titles.map(title => `<li>${viewMetaLink(title)}</li>`).join('')}
+    </ul>
+  </div>
+`;
+
+
 const viewTransaction = (record: Transaction): string =>
   `<div class="meta-results-panel">
      <h2 class="govuk-heading-m">
@@ -285,6 +296,7 @@ const viewMetaResults = function(): string {
 
   const record = state.metaSearchResults[0];
   switch (record.type) {
+    case 'AbbreviationText': return viewAbbreviationText(record);
     case 'BankHoliday': return viewBankHoliday(record);
     case 'Organisation': return viewOrg(record);
     case 'Person': return viewPerson(record);

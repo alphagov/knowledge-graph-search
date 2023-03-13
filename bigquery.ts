@@ -1,4 +1,4 @@
-import { Transaction, Taxon, Organisation, Person, Role, MetaResultType, MetaResult, MainResult, SearchParams, Combinator, SearchResults, SearchType, InitResults, BankHoliday } from './src/ts/search-api-types';
+import { AbbreviationText, Transaction, Taxon, Organisation, Person, Role, MetaResultType, MetaResult, MainResult, SearchParams, Combinator, SearchResults, SearchType, InitResults, BankHoliday } from './src/ts/search-api-types';
 import { splitKeywords } from './src/ts/utils';
 import { languageCode } from './src/ts/lang';
 const { BigQuery } = require('@google-cloud/bigquery');
@@ -141,6 +141,16 @@ const getPersonInfo = async function(name: string): Promise<Person[]> {
   );
 };
 
+const getAbbreviationTextInfo = async function(name: string): Promise<AbbreviationText[]> {
+  return await bigQuery(`
+    SELECT "AbbreviationText" as type, @name as abbreviation_text,
+    ARRAY_AGG(DISTINCT abbreviation_title) AS abbreviation_titles
+    FROM content.abbreviations
+    WHERE abbreviation_text = @name
+    ;
+  `, { name });
+};
+
 
 const sendSearchQuery = async function(searchParams: SearchParams): Promise<SearchResults> {
   const keywords = splitKeywords(searchParams.selectedWords);
@@ -173,15 +183,20 @@ const sendSearchQuery = async function(searchParams: SearchParams): Promise<Sear
       bqMetaResults = await getOrganisationInfo(searchParams.selectedOrganisation);
       break;
     default:
-      if (selectedWordsWithoutQuotes &&
-        selectedWordsWithoutQuotes.length > 5 &&
-        selectedWordsWithoutQuotes.includes(' ')) {
-        queries.push(bigQuery(
-        `SELECT *
-         FROM search.thing
-         WHERE CONTAINS_SUBSTR(name, @selected_words_without_quotes)
-         ;`
-        , { selectedWordsWithoutQuotes }))
+      if (selectedWordsWithoutQuotes) {
+        queries.push(bigQuery(`
+          SELECT
+            *
+          FROM
+            search.thing
+          WHERE
+            CASE type
+              WHEN "AbbreviationText" THEN name = @selected_words_without_quotes
+            ELSE
+            CONTAINS_SUBSTR(name, @selected_words_without_quotes)
+          END
+         ;
+       ` , { selectedWordsWithoutQuotes }))
       }
       results = await Promise.all(queries);
       bqMainResults = results[0]
@@ -316,6 +331,7 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
 
 
 export {
+  getAbbreviationTextInfo,
   getBankHolidayInfo,
   getTransactionInfo,
   getOrganisationInfo,

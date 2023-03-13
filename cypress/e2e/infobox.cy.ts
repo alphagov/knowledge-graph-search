@@ -36,4 +36,11 @@ describe('Infobox results', () => {
     cy.contains('div.meta-results-panel p', 'Online government service');
   });
 
+  it('Shows the AbbreviationText infobox', () => {
+    cy.visit('?selected-words=%22MOD%22&search-in-text=false')
+    cy.contains('div.meta-results-panel h2', 'MOD');
+    cy.contains('div.meta-results-panel p', 'stands for');
+    cy.contains('div.meta-results-panel p', 'Ministry of Defence');
+  });
+
 });

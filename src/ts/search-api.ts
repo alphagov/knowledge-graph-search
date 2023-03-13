@@ -85,6 +85,9 @@ const buildMetaboxInfo = async function(info: any) {
   console.log(`Found a ${info.type}. Running extra queries`);
   console.log(info);
   switch (info.type) {
+    case 'AbbreviationText': {
+      return await fetchWithTimeout(`/abbreviation-text?name=${encodeURIComponent(info.name)}`);
+    }
     case 'BankHoliday': {
       return await fetchWithTimeout(`/bank-holiday?name=${encodeURIComponent(info.name)}`);
     }
