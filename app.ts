@@ -6,8 +6,8 @@ const bodyParser = require('body-parser');
 // OAuth is enabled
 let OAuth2Strategy, passport, session, ensureLoggedIn;
 
-import { sendSearchQuery, sendInitQuery, getOrganisationInfo, getPersonInfo, getRoleInfo, getTaxonInfo, getBankHolidayInfo, getTransactionInfo } from './bigquery';
-import { SearchArea, Combinator, SearchType, SearchParams } from './src/ts/search-api-types';
+import { sendSearchQuery, sendInitQuery } from './bigquery';
+import { SearchArea, Combinator, SearchParams } from './src/ts/search-api-types';
 import { csvStringify } from './csv';
 
 
@@ -107,7 +107,6 @@ app.get('/search', checkLoggedIn('/'), async (req: any, res) => {
   console.log('API call to /search', req.query);
   // retrieve qsp params
   const params: SearchParams = {
-    searchType: req.query['search-type'] || SearchType.Keyword,
     selectedWords: req.query['selected-words'] || '',
     excludedWords: req.query['excluded-words'] || '',
     selectedTaxon: req.query['selected-taxon'] || '',
@@ -135,7 +134,6 @@ app.get('/csv', async (req: any, res) => {
   console.log('API call to /csv', req.query);
   // retrieve qsp params
   const params: SearchParams = {
-    searchType: req.query['search-type'] || SearchType.Keyword,
     selectedWords: req.query['selected-words'] || '',
     excludedWords: req.query['excluded-words'] || '',
     selectedTaxon: req.query['selected-taxon'] || '',
@@ -157,83 +155,6 @@ app.get('/csv', async (req: any, res) => {
     res.send(csvData);
   } catch (e: any) {
     console.log('/csv fail:', JSON.stringify(e));
-    res.status(500).send(e);
-  }
-});
-
-
-app.get('/taxon', checkLoggedIn('/'), async (req: any, res) => {
-  console.log('API call to /taxon', req.query);
-  try {
-    const data = await getTaxonInfo(req.query['name']);
-    res.send(data);
-  } catch (e: any) {
-    if (e.status === 404) {
-      res.status(e.status).send(e.message);
-    } else {
-      res.status(500).send(e.message);
-    }
-  }
-});
-
-
-app.get('/organisation', checkLoggedIn('/'), async (req: any, res) => {
-  console.log('API call to /organisation', req.query);
-  try {
-    const data = await getOrganisationInfo(req.query['name']);
-    res.send(data);
-  } catch (e: any) {
-    if (e.status === 404) {
-      res.status(e.status).send(e.message);
-    } else {
-      res.status(500).send(e.message);
-    }
-  }
-});
-
-
-app.get('/role', checkLoggedIn('/'), async (req: any, res) => {
-  console.log('API call to /role', req.query);
-  try {
-    const data = await getRoleInfo(req.query['name']);
-    res.send(data);
-  } catch (e: any) {
-    res.status(500).send(e);
-  }
-});
-
-
-app.get('/bank-holiday', checkLoggedIn('/'), async (req: any, res) => {
-  console.log('API call to /bank-holiday', req.query);
-  try {
-    const data = await getBankHolidayInfo(req.query['name']);
-    res.send(data);
-  } catch (e: any) {
-    if (e.status === 404) {
-      res.status(e.status).send(e.message);
-    } else {
-      res.status(500).send(e.message);
-    }
-  }
-});
-
-app.get('/transaction', checkLoggedIn('/'), async (req: any, res) => {
-  console.log('API call to /transaction', req.query);
-  try {
-    const data = await getTransactionInfo(req.query['name']);
-    res.send(data);
-  } catch (e: any) {
-    res.status(500).send(e);
-  }
-});
-
-
-app.get('/person', checkLoggedIn('/'), async (req: any, res) => {
-  console.log('API call to /person', req.query);
-  try {
-    const data = await getPersonInfo(req.query['name']);
-    res.send(data);
-  } catch (e: any) {
     res.status(500).send(e);
   }
 });

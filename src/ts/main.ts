@@ -57,9 +57,10 @@ const init = async function() {
   if (!state.systemErrorText) {
     setQueryParamsFromQS();
     view();
-    // the above is needed to set the form input values from the state in case it
-    // was modified by the query string
-    searchButtonClicked();
+    if (state.searchParams.selectedWords !== '' || state.searchParams.selectedLocale !== '' || state.searchParams.selectedTaxon !== '' || state.searchParams.selectedOrganisation !== '' || state.searchParams.linkSearchUrl !== '') {
+      state.waiting = true;
+      queryBackend(state.searchParams, handleEvent);
+    }
   }
   view();
 })();

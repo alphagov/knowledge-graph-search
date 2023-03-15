@@ -1,4 +1,4 @@
-import { Transaction, Taxon, Organisation, Person, Role, MetaResultType, MetaResult, MainResult, SearchParams, Combinator, SearchResults, SearchType, InitResults, BankHoliday } from './src/ts/search-api-types';
+import { Transaction, Taxon, Organisation, Person, Role, MetaResultType, SearchParams, Combinator, SearchResults, InitResults, BankHoliday } from './src/ts/search-api-types';
 import { splitKeywords } from './src/ts/utils';
 import { languageCode } from './src/ts/lang';
 const { BigQuery } = require('@google-cloud/bigquery');
@@ -92,57 +92,7 @@ const sendInitQuery = async function(): Promise<InitResults> {
 };
 
 
-const getTaxonInfo = async function(name: string): Promise<Taxon[]> {
-  return await bigQuery(
-    `SELECT "Taxon" as type, * FROM search.taxon WHERE lower(name) = lower(@name);`, { name }
-  );
-};
-
-
-const getOrganisationInfo = async function(name: string): Promise<Organisation[]> {
-  return await bigQuery(
-    `SELECT "Organisation" as type, * FROM search.organisation WHERE lower(name) = lower(@name);`, { name }
-  );
-};
-
-
-const getBankHolidayInfo = async function(name: string): Promise<BankHoliday[]> {
-  const bqBankHolidays: BankHoliday[] = await bigQuery(
-    `SELECT * FROM search.bank_holiday WHERE lower(name) = lower(@name);`, { name }
-  );
-  return bqBankHolidays.map((bqBankHoliday: BankHoliday) => {
-    return {
-      type: MetaResultType.BankHoliday,
-      name: bqBankHoliday.name,
-      dates: bqBankHoliday.dates.map((date: any) => date.value),
-      divisions: bqBankHoliday.divisions
-    }
-  });
-};
-
-
-const getTransactionInfo = async function(name: string): Promise<Transaction[]> {
-  return await bigQuery(
-    `SELECT "Transaction" as type, * FROM search.transaction WHERE lower(name) = lower(@name);`, { name }
-  );
-};
-
-
-const getRoleInfo = async function(name: string): Promise<Role[]> {
-  return await bigQuery(
-    `SELECT "Role" as type, * FROM search.role WHERE lower(name) = lower(@name);`, { name }
-  );
-};
-
-
-const getPersonInfo = async function(name: string): Promise<Person[]> {
-  return await bigQuery(
-    `SELECT "Person" as type, * FROM search.person WHERE lower(name) = lower(@name);`, { name }
-  );
-};
-
-
-const sendSearchQuery = async function(searchParams: SearchParams): Promise<SearchResults> {
+const sendSearchQuery = async function(searchParams: SearchParams): Promise<any> {
   const keywords = splitKeywords(searchParams.selectedWords);
   const excludedKeywords = splitKeywords(searchParams.excludedWords);
   const query = buildSqlQuery(searchParams, keywords, excludedKeywords);
@@ -153,46 +103,51 @@ const sendSearchQuery = async function(searchParams: SearchParams): Promise<Sear
   const link = searchParams.linkSearchUrl && internalLinkRegExp.test(searchParams.linkSearchUrl)
     ? searchParams.linkSearchUrl.replace(internalLinkRegExp, 'https://www.gov.uk/')
     : searchParams.linkSearchUrl;
+  const keywordsBqParam = { name: selectedWordsWithoutQuotes };
   const queries = [
-    bigQuery(query, { keywords, excludedKeywords, locale, taxon, organisation, link })
+    bigQuery(query, { keywords, excludedKeywords, locale, taxon, organisation, link }),
+    // TODO: for links we need an extra query, modified from the keyword query above
+    bigQuery(`
+      SELECT "Taxon" as type, * FROM search.taxon WHERE CONTAINS_SUBSTR(name, @name);
+    `, keywordsBqParam),
+    bigQuery(`
+      SELECT "Organisation" as type, * FROM search.organisation WHERE CONTAINS_SUBSTR(name, @name);
+    `, keywordsBqParam),
+    bigQuery(`
+      SELECT * FROM search.bank_holiday WHERE CONTAINS_SUBSTR(name, @name);
+    `, keywordsBqParam),
+    bigQuery(`
+      SELECT "Transaction" as type, * FROM search.transaction WHERE CONTAINS_SUBSTR(name, @name);
+    `, keywordsBqParam),
+    bigQuery(`
+      SELECT "Role" as type, * FROM search.role WHERE CONTAINS_SUBSTR(name, @name);
+    `, keywordsBqParam),
+    bigQuery(`
+      SELECT "Person" as type, * FROM search.person WHERE CONTAINS_SUBSTR(name, @name);
+    `, keywordsBqParam),
   ];
 
-  let bqMetaResults: MetaResult[] = [];
-  let bqMainResults: MainResult[] = [];
-  let results: any;
-
-  switch (searchParams.searchType) {
-    case SearchType.Taxon:
-      results = await Promise.all(queries);
-      bqMainResults = results[0];
-      bqMetaResults = await getTaxonInfo(searchParams.selectedTaxon);
-      break;
-    case SearchType.Organisation:
-      results = await Promise.all(queries);
-      bqMainResults = results[0];
-      bqMetaResults = await getOrganisationInfo(searchParams.selectedOrganisation);
-      break;
-    default:
-      if (selectedWordsWithoutQuotes &&
-        selectedWordsWithoutQuotes.length > 5 &&
-        selectedWordsWithoutQuotes.includes(' ')) {
-        queries.push(bigQuery(
-        `SELECT *
-         FROM search.thing
-         WHERE CONTAINS_SUBSTR(name, @selected_words_without_quotes)
-         ;`
-        , { selectedWordsWithoutQuotes }))
+  const bqResults = await Promise.all(queries);
+  const results: SearchResults = {
+    keywords: bqResults[0],
+    // todo links: bqResults[?]
+    taxons: bqResults[1],
+    organisations: bqResults[2],
+    bankHolidays: bqResults[3].map((bqBankHoliday: BankHoliday) => {
+      return {
+        type: MetaResultType.BankHoliday,
+        name: bqBankHoliday.name,
+        dates: bqBankHoliday.dates.map((date: any) => date.value),
+        divisions: bqBankHoliday.divisions
       }
-      results = await Promise.all(queries);
-      bqMainResults = results[0]
-      bqMetaResults = results.length > 1 ? results[1] : [];
-      break;
-  }
-  const result:SearchResults = {
-    main: bqMainResults,
-    meta: bqMetaResults
-  }
-  return result;
+    }),
+    transactions: bqResults[4],
+    roles: bqResults[5],
+    persons: bqResults[6]
+  };
+
+  return results;
+
 };
 
 
@@ -316,12 +271,6 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
 
 
 export {
-  getBankHolidayInfo,
-  getTransactionInfo,
-  getOrganisationInfo,
-  getPersonInfo,
-  getRoleInfo,
-  getTaxonInfo,
   sendInitQuery,
   sendSearchQuery
 };

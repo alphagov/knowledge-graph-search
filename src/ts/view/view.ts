@@ -1,10 +1,18 @@
 import { id, queryDescription } from '../utils';
-import { state, searchState } from '../state';
+import { state, searchState, thereAreResults } from '../state';
 import { handleEvent } from '../events';
 import { languageName } from '../lang';
-import { viewMetaResults } from './view-metabox';
-import { viewSearchPanel } from './view-search-panel';
+import {
+  viewPerson,
+  viewOrganisation,
+  viewBankHoliday,
+  viewTaxon,
+  viewRole,
+  viewTransaction
+ } from './view-metabox';
+import { viewSearchPanel, viewKeywordsInput, viewSearchButton } from './view-search-panel';
 import { EventType } from '../event-types';
+import { SearchResults } from '../search-api-types';
 
 
 declare const window: any;
@@ -18,7 +26,6 @@ const view = () => {
     pageContent.innerHTML = `
       <main class="govuk-main-wrapper" id="main-content" role="main">
         ${viewErrorBanner()}
-        ${viewSearchTypeSelector()}
         ${viewMainLayout()}
         <p class="govuk-body-s">
           Searches do not include history mode content, Publisher GitHub smart answers or service domains.
@@ -33,6 +40,11 @@ const view = () => {
     .forEach(input => input.addEventListener(
       'click',
       event => handleEvent({ type: EventType.Dom, id: (event.target as HTMLElement).getAttribute('id') || undefined })));
+
+  document.querySelectorAll('span.govuk-tabs__tab').forEach(tab =>
+    tab.addEventListener(
+      'click',
+      event => handleEvent({ type: EventType.Dom, id: (event.target as HTMLElement).getAttribute('data-target') || undefined })));
 
   // Not sure this is even fired, since browser blocks submit because "the form is not connected"
   id('search-form')?.addEventListener(
@@ -49,32 +61,9 @@ const view = () => {
       handleEvent({ type: EventType.Dom, id: 'search' });
     });
 
-
-  id('meta-results-expand')?.addEventListener(
-    'click',
-    () => handleEvent({ type: EventType.Dom, id: 'toggleDisamBox' })
-  );
-
-
   // focus on the results heading if present
   id('results-heading')?.focus();
-
 };
-
-
-const viewSearchTypeSelector = () => `
-    <p class="govuk-body search-selector">
-      Search for:
-      <button class="${state.searchParams.searchType === 'keyword' ? 'active' : ''}" id="search-keyword">Keywords</button>
-      <button class="${state.searchParams.searchType === 'link' ? 'active' : ''}" id="search-link">Links</button>
-      <!-- Org search is disabled until we have tested a new design with users
-        <button class="${state.searchParams.searchType === 'organisation' ? 'active' : ''}" id="search-organisation">Organisations</button>
-      -->
-      <button class="${state.searchParams.searchType === 'taxon' ? 'active' : ''}" id="search-taxon">Taxons</button>
-      <button class="${state.searchParams.searchType === 'language' ? 'active' : ''}" id="search-language">Languages</button>
-      <button class="${state.searchParams.searchType === 'advanced' ? 'active' : ''}" id="search-advanced">Advanced</button>
-    </p>
-  `;
 
 
 const viewMainLayout = () => {
@@ -106,11 +95,13 @@ const viewMainLayout = () => {
         <div class="govuk-grid-column-two-thirds">
           ${viewSearchPanel()}
         </div>
+        <div class="govuk-grid-column-two-thirds">
+          ${viewSearchResults()}
+        </div>
       </div>
-      ${viewSearchResults()}
     `);
   }
-  return result.join('');
+  return html.join('');
 };
 
 
@@ -167,16 +158,21 @@ const viewErrorBanner = () => {
 };
 
 
-const viewSearchResultsTable = () => {
+const viewKeywordResults = (results: any[]) => {
   const html = [];
-  if (state.searchResults && state.searchResults?.length > 0) {
-    const recordsToShow = state.searchResults?.slice(state.skip, state.skip + state.resultsPerPage);
+  if (results && results?.length > 0) {
+    const recordsToShow = results.slice(state.skip, state.skip + state.resultsPerPage);
+    const nbRecords = state.searchResults.keywords.length;
     html.push(`
       <div class="govuk-body">
+        <h3 class="govuk-heading-m">${queryDescription(state.searchParams, false)}</h3>
+        <p class="govuk-body">results ${state.skip + 1} to ${Math.min(nbRecords, state.skip + state.resultsPerPage)}, in descending popularity</p>
+        <a class="govuk-skip-link" href="#results-table">Skip to results</a>
+        <a class="govuk-skip-link" href="#search-form">Back to search filters</a>
         <fieldset class="govuk-fieldset" ${state.waiting && 'disabled="disabled"'}>
           <legend class="govuk-fieldset__legend">For each result, display:</legend>
           <ul class="kg-checkboxes" id="show-fields">`);
-    html.push(Object.keys(state.searchResults[0]).map(key => `
+    html.push(Object.keys(results[0]).map(key => `
             <li class="kg-checkboxes__item">
               <input class="kg-checkboxes__input"
                      data-interactive="true"
@@ -212,11 +208,172 @@ const viewSearchResultsTable = () => {
           </tbody>
         </table>
       </div>`);
+    html.push(`
+      <p class="govuk-body">
+        <button type="button" class="govuk-button" id="button-prev-page" ${state.skip < state.resultsPerPage ? "disabled" : ""}>Previous</button>
+        <button type="button" class="govuk-button" id="button-next-page" ${state.skip + state.resultsPerPage >= results.length ? "disabled" : ""}>Next</button>
+      </p>`);
+    html.push(`
+      <p class="govuk-body"><a class="govuk-link" href="/csv${window.location.search}" download="export.csv">Download all ${state.searchResults.keywords.length} records in CSV</a></p>`);
     return html.join('');
   } else {
     return '';
   }
 };
+
+
+// Add a count of something, possibly including the plural s
+// e.g. count('page', 34) will return '34 pages'
+// e.g. count('page', 1) will return '1 page'
+const count = (thing: string, count: number) =>
+  `${count} ${thing}${count>1 ? 's' : ''}`
+
+
+const viewSearchResultsTabs = (results: SearchResults) => {
+  const html = [];
+
+  html.push(`
+    <div class="govuk-tabs" data-module="govuk-tabs">
+      <h2 class="govuk-tabs__title">
+        Contents
+      </h2>
+      <ul class="govuk-tabs__list">
+  `);
+
+  // The actual tabs
+  if (results.keywords.length > 0) {
+    html.push(`
+      <li class="govuk-tabs__list-item ${state.selectedTabId === 'keyword-results' ? 'govuk-tabs__list-item--selected' : ''}">
+        <span class="govuk-tabs__tab" data-target="keyword-results">
+          ${count('page', state.searchResults.keywords.length)}
+        </span>
+      </li>
+    `);
+  }
+  if (results.persons.length > 0) {
+    html.push(`
+      <li class="govuk-tabs__list-item ${state.selectedTabId === 'person-results' ? 'govuk-tabs__list-item--selected' : ''}">
+        <span class="govuk-tabs__tab" data-target="person-results">
+          ${count('person', state.searchResults.persons.length)}
+        </span>
+      </li>
+    `);
+  }
+  if (results.organisations.length > 0) {
+    html.push(`
+      <li class="govuk-tabs__list-item ${state.selectedTabId === 'organisation-results' ? 'govuk-tabs__list-item--selected' : ''}">
+        <span class="govuk-tabs__tab" data-target="organisation-results">
+          ${count('organisation', state.searchResults.organisations.length)}
+        </span>
+      </li>
+    `);
+  }
+  if (results.taxons.length > 0) {
+    html.push(`
+      <li class="govuk-tabs__list-item ${state.selectedTabId === 'taxon-results' ? 'govuk-tabs__list-item--selected' : ''}">
+        <span class="govuk-tabs__tab" data-target="taxon-results">
+          ${count('taxon', state.searchResults.taxons.length)}
+        </span>
+      </li>
+    `);
+  }
+  if (results.roles.length > 0) {
+    html.push(`
+      <li class="govuk-tabs__list-item ${state.selectedTabId === 'role-results' ? 'govuk-tabs__list-item--selected' : ''}">
+        <span class="govuk-tabs__tab" data-target="role-results">
+          ${count('role', state.searchResults.roles.length)}
+        </span>
+      </li>
+    `);
+  }
+  if (results.bankHolidays.length > 0) {
+    html.push(`
+      <li class="govuk-tabs__list-item ${state.selectedTabId === 'bank-holiday-results' ? 'govuk-tabs__list-item--selected' : ''}">
+        <span class="govuk-tabs__tab" data-target="bank-holiday-results">
+          ${count('bank holiday', state.searchResults.bankHolidays.length)}
+        </span>
+      </li>
+    `);
+  }
+  if (results.transactions.length > 0) {
+    html.push(`
+      <li class="govuk-tabs__list-item ${state.selectedTabId === 'transaction-results' ? 'govuk-tabs__list-item--selected' : ''}">
+        <span class="govuk-tabs__tab" data-target="transaction-results">
+          ${count('online service', state.searchResults.transactions.length)}
+        </span>
+      </li>
+    `);
+  }
+
+  html.push(`
+    </ul>
+  `);
+
+  // The panels
+
+  if (results.keywords.length > 0) {
+    html.push(`
+      <div id="keyword-results" class="govuk-tabs__panel ${state.selectedTabId === 'keyword-results' ? '' : 'govuk-tabs__panel--hidden'}">
+        ${viewKeywordResults(results.keywords)}
+      </div>
+    `);
+  }
+  if (results.persons.length > 0) {
+    html.push(`
+      <div id="person-results" class="govuk-tabs__panel ${state.selectedTabId === 'person-results' ? '' : 'govuk-tabs__panel--hidden'}">
+        <h1 class="govuk-heading-m">Matching persons</h1>
+        ${results.persons.map(viewPerson).join('<hr class="govuk-section-break govuk-section-break--visible"/>')}
+      </div>
+    `);
+  }
+  if (results.organisations.length > 0) {
+    html.push(`
+      <div id="organisation-results" class="govuk-tabs__panel ${state.selectedTabId === 'organisation-results' ? '' : 'govuk-tabs__panel--hidden'}">
+        <h1 class="govuk-heading-m">Organisations matching: ${state.searchParams.selectedWords}</h1>
+        ${results.organisations.map(viewOrganisation).join('<hr class="govuk-section-break govuk-section-break--visible"/>')}
+      </div>
+    `);
+  }
+  if (results.bankHolidays.length > 0) {
+    html.push(`
+      <div id="bank-holiday-results" class="govuk-tabs__panel ${state.selectedTabId === 'bank-holiday-results' ? '' : 'govuk-tabs__panel--hidden'}">
+        <h1 class="govuk-heading-m">Bank holidays matching: ${state.searchParams.selectedWords}</h1>
+        ${results.bankHolidays.map(viewBankHoliday).join('<hr class="govuk-section-break govuk-section-break--visible"/>')}
+      </div>
+    `);
+  }
+  if (results.taxons.length > 0) {
+    html.push(`
+      <div id="taxon-results" class="govuk-tabs__panel ${state.selectedTabId === 'taxon-results' ? '' : 'govuk-tabs__panel--hidden'}">
+        <h1 class="govuk-heading-m">GOV.UK Taxons matching: ${state.searchParams.selectedWords}</h1>
+        ${results.taxons.map(viewTaxon).join('<hr class="govuk-section-break govuk-section-break--visible"/>')}
+      </div>
+    `);
+  }
+  if (results.roles.length > 0) {
+    html.push(`
+      <div id="role-results" class="govuk-tabs__panel ${state.selectedTabId === 'role-results' ? '' : 'govuk-tabs__panel--hidden'}">
+        <h1 class="govuk-heading-m">Official roles matching: ${state.searchParams.selectedWords}</h1>
+        ${results.roles.map(viewRole).join('<hr class="govuk-section-break govuk-section-break--visible"/>')}
+      </div>
+    `);
+  }
+  if (results.transactions.length > 0) {
+    html.push(`
+      <div id="transaction-results" class="govuk-tabs__panel ${state.selectedTabId === 'transaction-results' ? '' : 'govuk-tabs__panel--hidden'}">
+        <h1 class="govuk-heading-m">Online services matching: ${state.searchParams.selectedWords}</h1>
+        ${results.transactions.map(viewTransaction).join('<hr class="govuk-section-break govuk-section-break--visible"/>')}
+      </div>
+    `);
+  }
+
+  html.push(`
+    </div>
+  `);
+
+  return html.join('');
+}
+
 
 
 const viewWaiting = () => `
@@ -228,50 +385,25 @@ const viewWaiting = () => `
 
 
 const viewResults = function() {
-  if (state.searchResults) {
-    const html = [];
-    const nbRecords = state.searchResults.length;
+  const html = [];
 
-    if (nbRecords < 10000) {
-      html.push(`
-        <h1 tabindex="0" id="results-heading" class="govuk-heading-l">${nbRecords} result${nbRecords !== 0 ? 's' : ''}</h1>`);
-    } else {
-      html.push(`
-        <div class="govuk-warning-text">
-          <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-          <strong class="govuk-warning-text__text">
-            <span class="govuk-warning-text__assistive">Warning</span>
-            There are more than 10000 results. Try to narrow down your search.
-          </strong>
-        </div>
-      `);
-    }
+  const nbRecords = state.searchResults.keywords.length;
 
-    html.push(`<div class="govuk-body">for ${queryDescription(state.searchParams)}</div>`);
-
-    if (nbRecords > state.resultsPerPage) {
-
-      html.push(`
-        <p class="govuk-body">Showing results ${state.skip + 1} to ${Math.min(nbRecords, state.skip + state.resultsPerPage)}, in descending popularity</p>
-        <a class="govuk-skip-link" href="#results-table">Skip to results</a>
-        <a class="govuk-skip-link" href="#search-form">Back to search filters</a>
-     `);
-    }
-
-    html.push(viewSearchResultsTable());
-
+  if (nbRecords > 10000) {
     html.push(`
-      <p class="govuk-body">
-        <button type="button" class="govuk-button" id="button-prev-page" ${state.skip < state.resultsPerPage ? "disabled" : ""}>Previous</button>
-        <button type="button" class="govuk-button" id="button-next-page" ${state.skip + state.resultsPerPage >= nbRecords ? "disabled" : ""}>Next</button>
-      </p>`);
-
-    html.push(`
-      <p class="govuk-body"><a class="govuk-link" href="/csv${window.location.search}" download="export.csv">Download all ${state.searchResults.length} records in CSV</a></p>`);
-    return html.join('');
-  } else {
-    return '';
+      <div class="govuk-warning-text">
+        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+        <strong class="govuk-warning-text__text">
+          <span class="govuk-warning-text__assistive">Warning</span>
+          There are more than 50000 results. Try to narrow down your search.
+        </strong>
+      </div>
+    `);
   }
+
+  html.push(viewSearchResultsTabs(state.searchResults));
+
+  return html.join('');
 };
 
 
@@ -286,16 +418,16 @@ const viewNoResults = () => {
 const viewSearchResults = () => {
   switch (searchState().code) {
     case 'waiting':
-      document.title = `GOV.UK ${queryDescription(state.searchParams, false)} - Gov Search`;
+      document.title = `${queryDescription(state.searchParams, false)} - Gov Search`;
       return viewWaiting();
     case 'results':
-      document.title = `GOV.UK ${queryDescription(state.searchParams, false)} - Gov Search`;
+      document.title = `${queryDescription(state.searchParams, false)} - Gov Search`;
       if (window.ga) window.ga('send', 'search', { search: document.title, resultsFound: true });
-      return `${viewMetaResults() || ''} ${viewResults()}`; // FIXME - avoid || ''
+      return viewResults();
     case 'no-results':
-      document.title = `GOV.UK ${queryDescription(state.searchParams, false)} - Gov Search`;
+      document.title = `${queryDescription(state.searchParams, false)} - Gov Search`;
       if (window.ga) window.ga('send', 'search', { search: document.title, resultsFound: false });
-      return `${viewMetaResults() || ''} ${viewNoResults()}`; // FIXME - avoid || ''
+      return viewNoResults();
     default:
       document.title = 'Gov Search';
       return '';

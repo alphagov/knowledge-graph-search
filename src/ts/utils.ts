@@ -84,7 +84,7 @@ const queryDescription = (search: SearchParams, includeMarkup = true) => {
     clauses[0] :
     `${clauses.slice(0, clauses.length - 1).join(', ')} and ${clauses[clauses.length - 1]}`;
 
-  return `pages that ${joinedClauses}`;
+  return `GOV.UK pages that ${joinedClauses}`;
 };
 
 

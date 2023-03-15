@@ -1,6 +1,6 @@
 import { state } from '../state';
 import { viewMetaLink } from './view-components';
-import { MetaResultType, Taxon, Organisation, Person, Role, Transaction, BankHoliday } from '../search-api-types';
+import { Taxon, Organisation, Transaction, BankHoliday } from '../search-api-types';
 
 
 const viewDetails = (title: string, list: any[], itemFormatFn: (item: any) => string): string => {
@@ -64,7 +64,7 @@ const viewRolePersons = (persons: any[]): string => {
     case 0: currentsHtml = ''; break;
     case 1: currentsHtml = `
       <p class="govuk-body">Current holder:</p>
-      <p class="govuk-body-l"><a href="${currents[0].homepage}">${currents[0].name}</a></p>
+      <p class="govuk-body"><a href="${currents[0].homepage}">${currents[0].name}</a></p>
       <p class="govuk-body">(since ${new Date(currents[0].startDate.value).getFullYear()})</p>
     `;
     break;
@@ -79,10 +79,10 @@ const viewRolePersons = (persons: any[]): string => {
   let previousHtml: string;
   switch (previous.length) {
     case 0: previousHtml = ''; break;
-    case 1: return `
+    case 1: previousHtml = `
       <p class="govuk-body">Previous holder: ${formatPerson(previous[0])}</p>
     `;
-    default: return `
+    default: previousHtml = `
       <details class="govuk-details">
         <summary class="govuk-details__summary">
           <span class="govuk-details__summary-text">Previous holders</span>
@@ -116,18 +116,17 @@ const viewBankHolidayDetails = function(holiday: BankHoliday): string {
 
 
 const viewBankHoliday = (record: BankHoliday): string => `
-  <div class="meta-results-panel">
-    <h2 class="govuk-heading-m">
+  <div>
+    <h2 class="govuk-heading-s">
       ${record.name}
     </h2>
-    <p class="govuk-body">Bank holiday</p>
     ${viewBankHolidayDetails(record)}
   </div>
 `;
 
 const viewPerson = (record: any): string => `
-  <div class="meta-results-panel">
-    <h2 class="govuk-heading-m">
+  <div>
+    <h2 class="govuk-heading-s">
       <a class="govuk-link" href="${record.homepage}">${record.name}</a>
     </h2>
     <p class="govuk-body">${record.description}</p>
@@ -148,25 +147,24 @@ const viewRole = function(record: any): string {
   const nameHtml = record.homePage ? `
     <a class="govuk-link" href="${record.homepage}">${record.name}</a>
   ` : record.name;
-
   return `
-    <div class="meta-results-panel">
-      <h2 class="govuk-heading-m">${nameHtml}</h2>
-      <p class="govuk-body">Official role</p>
+    <div>
+      <h2 class="govuk-heading-s">${nameHtml}</h2>
       ${record.description ? `<p class="govuk-body">${record.description}</p>` : ''}
       ${viewRoleOrgs(record.orgNames)}
       ${viewRolePersons(record.personNames)}
-    </div>`
+    </div>
+  `;
 };
 
 
-const viewOrg = (record: Organisation): string => `
-  <div class="meta-results-panel">
-    <h2 class="govuk-heading-m">
+const viewOrganisation = (record: Organisation): string => `
+  <div>
+    <h2 class="govuk-heading-s">
       <a class="govuk-link" href="${record.homepage}">${record.name}</a>
     </h2>
     <p class="govuk-body">
-      Government organisation${record.parentName ? `, part of ${viewMetaLink(record.parentName)}` : ''}
+      ${record.parentName ? `part of ${viewMetaLink(record.parentName)}` : ''}
     </p>
     ${record.supersededBy.length > 0 ? `
       <p class="govuk-body govuk-!-font-weight-bold">
@@ -205,23 +203,21 @@ const viewMetaLinkList = (names: string[], title?: string, noneTitle?: string): 
 
 
 const viewTransaction = (record: Transaction): string =>
-  `<div class="meta-results-panel">
-     <h2 class="govuk-heading-m">
+  `<div>
+     <h2 class="govuk-heading-s">
        <a class="govuk-link" href="${record.homepage}">${record.name}</a>
      </h2>
-     <p class="govuk-body">Online government service</p>
      ${record.description ? `<p class="govuk-body">${record.description}</p>` : ''}
    </div>
   `;
 
 
 const viewTaxon = (record: Taxon): string =>
-  `<div class="meta-results-panel">
+  `<div>
      ${viewTaxonAncestors(record.ancestorTaxons)}
-     <h2 class="govuk-heading-m">
+     <h2 class="govuk-heading-s">
        <a class="govuk-link" href="${record.homepage}">${record.name}</a>
      </h2>
-     <p class="govuk-body">GOV.UK Taxon</p>
      ${record.description ? `<p class="govuk-body">${record.description}</p>` : ''}
      ${record.childTaxons?.length ? viewTaxonChildren(record.childTaxons) : ''}
    </div>
@@ -236,7 +232,7 @@ const viewTaxonAncestors = (ancestors: any[]): string =>
         <li class="govuk-breadcrumbs__list-item">
           ${viewMetaLink(taxon.name, 'govuk-breadcrumbs__link')}
         </li>
-        `)}
+        `).join('')}
       </ol>
     </div>
   ` : '';
@@ -256,45 +252,12 @@ const sortedBy = function(arrayOfObjects: Record<string, any>[], field: string):
   return deepCopy.sort((a: any, b: any) => a[field] < b[field] ? -1 : 1);
 }
 
-/*
-const viewMetaResultsExpandToggle = () =>
-  state.metaSearchResults && state.metaSearchResults.length > 5
-    ? `<button id = "meta-results-expand">${state.disamboxExpanded ? 'show less' : 'show more'}</button>`
-    : '';
-*/
 
-
-//=================== public ====================
-
-const viewMetaResults = function(): string {
-  if (!state.metaSearchResults || state.metaSearchResults.length !== 1) return '';
-  //  if (state.metaSearchResults.length > 1) {
-  //    const expandedClass = state.metaSearchResults.length > 5 && !state.disamboxExpanded ? 'meta-results-panel--collapsed' : '';
-  //    return `
-  //      <div class="meta-results-panel">
-  //        <div class="meta-results-panel__collapsible ${expandedClass}">
-  //          <h2 class="govuk-heading-s">"${state.selectedWords.replace(/"/g, '')}" can refer to:</h2>
-  //          <ul class="govuk-list govuk-list--bullet">
-  //            ${state.metaSearchResults.map(result => `<li>${viewMetaLink(result.name)}: (${result.type.toLowerCase()})</li>`).join('')}
-  //          </ul>
-  //        </div>
-  //        ${viewMetaResultsExpandToggle()}
-  //      </div>
-  //    `;
-  //  } else {
-
-  const record = state.metaSearchResults[0];
-  switch (record.type) {
-    case 'BankHoliday': return viewBankHoliday(record);
-    case 'Organisation': return viewOrg(record);
-    case 'Person': return viewPerson(record);
-    case 'Role': return viewRole(record);
-    case 'Transaction': return viewTransaction(record);
-    case 'Taxon': return viewTaxon(record);
-    default: console.log(`unknown record type: ${record.type}`); return ``;
-  }
-  //}
+export {
+  viewPerson,
+  viewOrganisation,
+  viewBankHoliday,
+  viewTaxon,
+  viewRole,
+  viewTransaction
 };
-
-
-export { viewMetaResults };

@@ -14,6 +14,11 @@
   margin-bottom: 20px;
 }
 
+.govuk-section-break--visible {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
 .govuk-header__link--service-name {
   font-size: 200%;
 }
@@ -223,4 +228,8 @@ h1:focus-visible, h2:focus-visible {
 
 .hidden {
   display: none;
+}
+
+.result-tab {
+  border: 2px solid black;
 }

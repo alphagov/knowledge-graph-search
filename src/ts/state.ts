@@ -1,5 +1,5 @@
 import { languageName } from './lang';
-import { SearchType, SearchParams, Combinator, SearchArea } from './search-api-types';
+import { SearchParams, Combinator, SearchArea, SearchResults } from './search-api-types';
 import { State } from './state-types';
 
 
@@ -8,9 +8,7 @@ import { State } from './state-types';
 // Separate from (but included in)  state to make
 // it easier to reset to those initial
 // values only while keeping the rest of the state
-
 const initialSearchParams: SearchParams = {
-  searchType: SearchType.Keyword,
   selectedWords: '',
   excludedWords: '',
   selectedTaxon: '',
@@ -35,7 +33,6 @@ const state: State = {
   systemErrorText: null,
   userErrors: [], // error codes due to user not entering valid search criteria
   searchResults: null,
-  metaSearchResults: null,
   skip: 0, // where to start the pagination (number of results)
   resultsPerPage: 10, // number of results per page
   showFields: { // what result fields to show by default
@@ -43,7 +40,7 @@ const state: State = {
     title: true
   },
   waiting: false, // whether we're waiting for a request to return,
-  disamboxExpanded: false // if there's a resizeable disamb meta box, whether it's expanded or not
+  selectedTabId: "keyword-results" // which tab to show when displaying results
 };
 
 
@@ -52,7 +49,6 @@ const setQueryParamsFromQS = function(): void {
   const maybeReplace = (stateField: keyof SearchParams, qspName: string): any =>
     searchParams.get(qspName) !== null ? searchParams.get(qspName) : initialSearchParams[stateField];
 
-  state.searchParams.searchType = maybeReplace('searchType', 'search-type');
   state.searchParams.selectedWords = maybeReplace('selectedWords', 'selected-words');
   state.searchParams.excludedWords = maybeReplace('excludedWords', 'excluded-words');
   state.searchParams.linkSearchUrl = maybeReplace('linkSearchUrl', 'link-search-url');
@@ -83,23 +79,26 @@ const searchState = function(): { code: string, errors: string[] } {
   // "waiting": there's a query running
   const errors: string[] = [];
 
-
   if (state.waiting) return { code: 'waiting', errors };
 
-  if (state.searchParams.selectedWords === '' && state.searchParams.excludedWords === '' && state.searchParams.selectedTaxon === '' && state.searchParams.selectedOrganisation === '' && state.searchParams.selectedLocale === '' && state.searchParams.linkSearchUrl === '' && state.searchParams.whereToSearch.title === false && state.searchParams.whereToSearch.text === false) {
+  if (state.searchParams.selectedWords === '' && state.searchParams.excludedWords === '' && state.searchParams.selectedTaxon === '' && state.searchParams.selectedOrganisation === '' && state.searchParams.selectedLocale === '' && state.searchParams.linkSearchUrl === '' && state.searchParams.whereToSearch.title === true && state.searchParams.whereToSearch.text === true) {
     return { code: 'initial', errors };
   }
-
   if (state.searchParams.selectedWords !== '') {
     if (!state.searchParams.whereToSearch.title && !state.searchParams.whereToSearch.text) {
       errors.push('missingWhereToSearch');
     }
   }
   if (errors.length > 0) return { code: 'error', errors };
-  if (state.searchResults && state.searchResults.length > 0) return { code: 'results', errors };
-  if (state.searchResults && state.searchResults.length === 0) return { code: 'no-results', errors };
+  if (thereAreResults(state.searchResults)) return { code: 'results', errors };
+  if (state.searchResults) return { code: 'no-results', errors };
   return { code: 'ready-to-search', errors };
 };
+
+
+const thereAreResults = function(results: SearchResults) {
+  return results !== null && Object.keys(results).length > 0;
+}
 
 
 const resetSearch = function(): void {
@@ -120,4 +119,4 @@ const resetSearch = function(): void {
 };
 
 
-export { state, setQueryParamsFromQS, searchState, resetSearch };
+export { state, setQueryParamsFromQS, searchState, resetSearch, thereAreResults };

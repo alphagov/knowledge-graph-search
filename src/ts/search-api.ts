@@ -1,11 +1,10 @@
-import { SearchParams, SearchType, SearchArea, Combinator, MetaResultType, SearchResults } from './search-api-types';
+import { SearchParams, SearchArea, Combinator, SearchResults } from './search-api-types';
 import { languageCode } from './lang';
 import { EventType, SearchApiCallback } from './event-types';
 
 
 const makeQueryString = function(sp: SearchParams): string {
   const usp = new URLSearchParams();
-  if (sp.searchType !== SearchType.Keyword) usp.set('search-type', sp.searchType);
   if (sp.selectedWords !== '') usp.set('selected-words', sp.selectedWords);
   if (sp.excludedWords !== '') usp.set('excluded-words', sp.excludedWords);
   if (sp.selectedTaxon !== '') usp.set('selected-taxon', sp.selectedTaxon);
@@ -49,64 +48,17 @@ const queryBackend: (searchParams: SearchParams, callback: SearchApiCallback) =>
   callback({ type: EventType.SearchRunning });
   const url = `/search?${makeQueryString(searchParams)}`;
   searchParams.selectedWords = searchParams.selectedWords.replace(/[“”]/g,'"');
-  let apiResults: SearchResults;
+  let results: SearchResults;
+
   try {
-    apiResults = await fetchWithTimeout(url, 300);
+    results = await fetchWithTimeout(url, 300);
   } catch (error: any) {
-    console.log('error running main+meta queries', error);
+    console.log('error running queries', error);
     callback({ type: EventType.SearchApiCallbackFail, error })
     return;
   }
-  let { main, meta } = apiResults;
 
-  // If there's an exact match within the meta results, just keep that one
-  const searchKeywords: string = searchParams.selectedWords.replace(/"/g, '');
-  const exactMetaResults = meta.filter((result: any) => {
-    return result.name.toLowerCase() === searchKeywords.toLowerCase()
-  });
-  if (exactMetaResults.length === 1) {
-    meta = exactMetaResults;
-  }
-  if (meta.length === 1) {
-    // one meta result: show the knowledge panel (may require more API queries)
-    const fullMetaResults = await buildMetaboxInfo(meta[0]);
-    callback({ type: EventType.SearchApiCallbackOk, results: { main, meta: fullMetaResults } });
-  // } else if (metaResults.length >= 1) {
-  //   // multiple meta results: we'll show a disambiguation page
-  //   callback({ type: EventType.SearchApiCallbackOk, results: { main, meta: metaResults } });
-  } else {
-    // no meta results
-    callback({ type: EventType.SearchApiCallbackOk, results: { main, meta: null } });
-  }
-};
-
-//=========== private ===========
-
-const buildMetaboxInfo = async function(info: any) {
-  console.log(`Found a ${info.type}. Running extra queries`);
-  console.log(info);
-  switch (info.type) {
-    case 'BankHoliday': {
-      return await fetchWithTimeout(`/bank-holiday?name=${encodeURIComponent(info.name)}`);
-    }
-    case 'Person': {
-      return await fetchWithTimeout(`/person?name=${encodeURIComponent(info.name)}`);
-    }
-    case 'Role': {
-      return await fetchWithTimeout(`/role?name=${encodeURIComponent(info.name)}`);
-    }
-    case 'Organisation': {
-      return await fetchWithTimeout(`/organisation?name=${encodeURIComponent(info.name)}`);
-    }
-    case 'Transaction': {
-      return await fetchWithTimeout(`/transaction?name=${encodeURIComponent(info.name)}`);
-    }
-    case 'Taxon': {
-      return await fetchWithTimeout(`/taxon?name=${encodeURIComponent(info.name)}`);
-    }
-    default:
-      console.log('unknown meta node type', info.type);
-  }
+  callback({ type: EventType.SearchApiCallbackOk, results});
 };
 
 

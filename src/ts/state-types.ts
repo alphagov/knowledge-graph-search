@@ -1,4 +1,4 @@
-import { SearchParams } from './search-api-types';
+import { SearchParams, SearchResults } from './search-api-types';
 
 export interface State {
   searchParams: SearchParams,
@@ -7,11 +7,10 @@ export interface State {
   locales: string[],
   systemErrorText: string | null,
   userErrors: string[],
-  searchResults: any[] | null,
-  metaSearchResults: any[] | null,
+  searchResults: SearchResults | null,
   skip: number,
   resultsPerPage: number,
   showFields: any,
   waiting: boolean,
-  disamboxExpanded: boolean
+  selectedTabId: string
 }

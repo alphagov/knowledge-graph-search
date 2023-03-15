@@ -1,13 +1,3 @@
-export enum SearchType {
-  Keyword = 'keyword',
-  Link = 'link',
-  Organisation = 'organisation',
-  Taxon = 'taxon',
-  Language = 'language',
-  Advanced = 'advanced',
-  Results = 'results'
-};
-
 export enum Combinator {
   Any = 'any',
   All = 'all',
@@ -21,7 +11,6 @@ export enum SearchArea {
 }
 
 export type SearchParams = {
-  searchType: SearchType,
   selectedWords: string, // list of words to search
   excludedWords: string, // list of words to exclude
   selectedTaxon: string, // taxon to search in
@@ -126,12 +115,15 @@ export type Role = {
   orgNames: string[]
 }
 
-// a neo4 search can return a variable number of records of any type
-export type MainResult = any;
-
 export type SearchResults = {
-  main: MainResult[],
-  meta: MetaResult[]
+  keywords: any[],
+//  links: any[],
+  persons: Person[],
+  organisations: Organisation[],
+  bankHolidays: BankHoliday[],
+  transactions: Transaction[],
+  roles: Role[],
+  taxons: Taxon[]
 }
 
 export type InitResults = {

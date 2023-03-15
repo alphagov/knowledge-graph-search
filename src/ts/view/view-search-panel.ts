@@ -1,147 +1,24 @@
 import { sanitiseOutput } from '../utils';
 import { state, searchState } from '../state';
 import { languageName } from '../lang';
-import { SearchType } from '../search-api-types';
 
 
-const viewSearchPanel = () => {
-  const result = [];
-  switch (state.searchParams.searchType) {
-    case SearchType.Advanced:
-    case SearchType.Results:
-      result.push(`
-      <form id="search-form" class="search-panel govuk-form">
-        <div class="search-mode-panel">
-          <h1 class="govuk-heading-xl">Advanced search</h1>
-          ${viewKeywordsInput()}
-          ${viewKeywordsCombinator()}
-          ${viewExclusionsInput()}
-          ${viewCaseSensitiveSelector()}
-          ${viewScopeSelector()}
-          ${viewLinkSearch()}
-          ${viewPublishingOrgSelector()}
-          ${viewPublishingAppSelector()}
-          ${viewTaxonSelector()}
-          ${viewLocaleSelector()}
-          ${viewSearchButton()}
-        </div>
-      </form>
-    `);
-      break;
-    case SearchType.Keyword:
-      result.push(`
-      <form id="search-form" class="search-panel govuk-form">
-        <div class="search-mode-panel">
-          <a class="govuk-skip-link" href="#results-table">Skip to results</a>
-          ${viewKeywordsInput()}
-          <details class="govuk-details" data-module="govuk-details">
-            <summary class="govuk-details__summary">
-              <span class="govuk-details__summary-text">
-                Filters
-              </span>
-            </summary>
-            <div class="govuk-details__text">
-              ${viewKeywordsCombinator()}
-              ${viewExclusionsInput()}
-              ${viewCaseSensitiveSelector()}
-              ${viewScopeSelector()}
-              ${viewPublishingAppSelector()}
-            </div>
-          </details>
-          ${viewSearchButton()}
-        </div>
-      </form>
-    `);
-      break;
-    case SearchType.Link:
-      result.push(`
-      <form id="search-form" class="search-panel govuk-form">
-        <div class="search-mode-panel">
-          <a class="govuk-skip-link" href="#results-table">Skip to results</a>
-          ${viewLinkSearch()}
-          <details class="govuk-details" data-module="govuk-details">
-            <summary class="govuk-details__summary">
-              <span class="govuk-details__summary-text">
-                Filters
-              </span>
-            </summary>
-            <div class="govuk-details__text">
-              ${viewPublishingAppSelector()}
-            </div>
-          </details>
-          ${viewSearchButton()}
-        </div>
-      </form>
-    `);
-      break;
-    case SearchType.Taxon:
-      result.push(`
-      <form id="search-form" class="search-panel govuk-form">
-        <div class="search-mode-panel">
-          <a class="govuk-skip-link" href="#results-table">Skip to results</a>
-          ${viewTaxonSelector()}
-          <details class="govuk-details" data-module="govuk-details">
-            <summary class="govuk-details__summary">
-              <span class="govuk-details__summary-text">
-                Filters
-              </span>
-            </summary>
-            <div class="govuk-details__text">
-              ${viewPublishingAppSelector()}
-            </div>
-          </details>
-          ${viewSearchButton()}
-        </div>
-      </form>
-    `);
-      break;
-    case SearchType.Language:
-      result.push(`
-      <form id="search-form" class="search-panel govuk-form">
-        <div class="search-mode-panel">
-          <a class="govuk-skip-link" href="#results-table">Skip to results</a>
-          ${viewLocaleSelector()}
-          <details class="govuk-details" data-module="govuk-details">
-            <summary class="govuk-details__summary">
-              <span class="govuk-details__summary-text">
-                Filters
-              </span>
-            </summary>
-            <div class="govuk-details__text">
-              ${viewPublishingAppSelector()}
-            </div>
-          </details>
-          ${viewSearchButton()}
-        </div>
-      </form>
-    `);
-      break;
-    case SearchType.Organisation:
-      result.push(`
-      <form id="search-form" class="search-panel govuk-form">
-        <div class="search-mode-panel">
-          <a class="govuk-skip-link" href="#results-table">Skip to results</a>
-          ${viewPublishingOrgSelector()}
-          <details class="govuk-details" data-module="govuk-details">
-            <summary class="govuk-details__summary">
-              <span class="govuk-details__summary-text">
-                Filters
-              </span>
-            </summary>
-            <div class="govuk-details__text">
-              ${viewPublishingAppSelector()}
-            </div>
-          </details>
-          ${viewSearchButton()}
-        </div>
-      </form>
-    `);
-      break;
-    default:
-      console.log('viewSearchPanel: unknown value', state.searchParams.searchType);
-  }
-  return result.join('');
-};
+const viewSearchPanel = () => `
+  <form id="search-form" class="search-panel govuk-form">
+    <div class="search-mode-panel">
+      ${viewKeywordsCombinator()}
+      ${viewExclusionsInput()}
+      ${viewCaseSensitiveSelector()}
+      ${viewScopeSelector()}
+      ${viewLinkSearch()}
+      ${viewPublishingOrgSelector()}
+      ${viewPublishingAppSelector()}
+      ${viewTaxonSelector()}
+      ${viewLocaleSelector()}
+    </div>
+  </form>
+`;
+
 
 
 const viewInlineError = (id: string, message: string): string => `
@@ -425,4 +302,4 @@ const viewExclusionsInput = () => `
 `;
 
 
-export { viewSearchPanel };
+export { viewSearchPanel, viewKeywordsInput, viewSearchButton };
