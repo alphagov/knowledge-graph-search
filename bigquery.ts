@@ -101,6 +101,7 @@ const sendSearchQuery = async function(searchParams: SearchParams): Promise<any>
   const taxon = searchParams.selectedTaxon;
   const organisation = searchParams.selectedOrganisation;
   const selectedWordsWithoutQuotes = searchParams.selectedWords.replace(/"/g, '');
+
   const keywordsBqParam = { name: selectedWordsWithoutQuotes };
   const queries = [
     bigQuery(keywordQuery, { keywords, excludedKeywords, locale, taxon, organisation }),
@@ -234,7 +235,7 @@ const buildKeywordQuery = function(searchParams: SearchParams, keywords: string[
     ${localeClause}
     ${taxonClause}
     ${organisationClause}
-    LIMIT 50000
+    LIMIT 10000
   `;
 };
 
