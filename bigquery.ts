@@ -95,18 +95,16 @@ const sendInitQuery = async function(): Promise<InitResults> {
 const sendSearchQuery = async function(searchParams: SearchParams): Promise<any> {
   const keywords = splitKeywords(searchParams.selectedWords);
   const excludedKeywords = splitKeywords(searchParams.excludedWords);
-  const query = buildSqlQuery(searchParams, keywords, excludedKeywords);
+  const keywordQuery = buildKeywordQuery(searchParams, keywords, excludedKeywords);
+  const linkQuery = buildLinkQuery(searchParams, keywords, excludedKeywords);
   const locale = languageCode(searchParams.selectedLocale);
   const taxon = searchParams.selectedTaxon;
   const organisation = searchParams.selectedOrganisation;
   const selectedWordsWithoutQuotes = searchParams.selectedWords.replace(/"/g, '');
-  const link = searchParams.linkSearchUrl && internalLinkRegExp.test(searchParams.linkSearchUrl)
-    ? searchParams.linkSearchUrl.replace(internalLinkRegExp, 'https://www.gov.uk/')
-    : searchParams.linkSearchUrl;
+
   const keywordsBqParam = { name: selectedWordsWithoutQuotes };
   const queries = [
-    bigQuery(query, { keywords, excludedKeywords, locale, taxon, organisation, link }),
-    // TODO: for links we need an extra query, modified from the keyword query above
+    bigQuery(keywordQuery, { keywords, excludedKeywords, locale, taxon, organisation }),
     bigQuery(`
       SELECT "Taxon" as type, * FROM search.taxon WHERE CONTAINS_SUBSTR(name, @name);
     `, keywordsBqParam),
@@ -125,12 +123,12 @@ const sendSearchQuery = async function(searchParams: SearchParams): Promise<any>
     bigQuery(`
       SELECT "Person" as type, * FROM search.person WHERE CONTAINS_SUBSTR(name, @name);
     `, keywordsBqParam),
+    bigQuery(linkQuery, { keywords, excludedKeywords, locale, taxon, organisation }),
   ];
 
   const bqResults = await Promise.all(queries);
   const results: SearchResults = {
     keywords: bqResults[0],
-    // todo links: bqResults[?]
     taxons: bqResults[1],
     organisations: bqResults[2],
     bankHolidays: bqResults[3].map((bqBankHoliday: BankHoliday) => {
@@ -143,15 +141,14 @@ const sendSearchQuery = async function(searchParams: SearchParams): Promise<any>
     }),
     transactions: bqResults[4],
     roles: bqResults[5],
-    persons: bqResults[6]
+    persons: bqResults[6],
+    links: bqResults[7]
   };
-
   return results;
-
 };
 
 
-const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], excludedKeywords: string[]): string {
+const buildKeywordQuery = function(searchParams: SearchParams, keywords: string[], excludedKeywords: string[]): string {
 
   const contentToSearch = [];
   if (searchParams.whereToSearch.title) {
@@ -213,27 +210,108 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
     `;
   }
 
-  let linkClause = '';
-  if (searchParams.linkSearchUrl !== '') {
-    if (internalLinkRegExp.test(searchParams.linkSearchUrl)) {
-      // internal link search: look for exact match
-      linkClause = `
-        AND EXISTS
-          (
-            SELECT 1 FROM UNNEST (hyperlinks) AS link
-            WHERE link = @link
-          )
-      `;
-    } else {
-      // external link search: look for url as substring
-      linkClause = `
-        AND EXISTS
-          (
-            SELECT 1 FROM UNNEST (hyperlinks) AS link
-            WHERE CONTAINS_SUBSTR(link, @link)
-          )
-      `;
-    }
+  return `
+    SELECT
+      url,
+      title,
+      documentType,
+      contentId,
+      locale,
+      publishing_app,
+      first_published_at,
+      public_updated_at,
+      withdrawn_at,
+      withdrawn_explanation,
+      page_views,
+      taxons,
+      primary_organisation,
+      organisations AS all_organisations
+    FROM search.page
+
+    WHERE TRUE
+    ${includeClause}
+    ${excludeClause}
+    ${areaClause}
+    ${localeClause}
+    ${taxonClause}
+    ${organisationClause}
+    LIMIT 50000
+  `;
+};
+
+
+const buildLinkQuery = function(searchParams: SearchParams, keywords: string[], excludedKeywords: string[]): string {
+
+  const contentToSearch = [];
+  if (searchParams.whereToSearch.title) {
+    contentToSearch.push('IFNULL(page.title, "")');
+  }
+  if (searchParams.whereToSearch.text) {
+    contentToSearch.push('IFNULL(page.text, "")', 'IFNULL(page.description, "")');
+  }
+  const contentToSearchString = contentToSearch.join(' || " " || ');
+
+  const includeClause = keywords.length === 0
+    ? ''
+    : 'AND (' + ([...Array(keywords.length).keys()]
+      .map(index => searchParams.caseSensitive
+        ? `STRPOS(${contentToSearchString}, @keyword${index}) <> 0`
+        : `
+       EXISTS
+         (
+           SELECT 1 FROM UNNEST (hyperlinks) AS hyperlink
+           WHERE contains_substr(hyperlink, @keyword${index})
+         )
+       `)
+      .join(searchParams.combinator === Combinator.Any ? ' OR ' : ' AND ')) + ')';
+
+  const excludeClause = excludedKeywords.length === 0
+    ? ''
+    : 'AND NOT (' + ([...Array(excludedKeywords.length).keys()]
+      .map(index => searchParams.caseSensitive
+        ? `STRPOS(${contentToSearchString}, @excluded_keyword${index}) <> 0`
+        : `
+      EXISTS
+        (
+          SELECT 1 FROM UNNEST (hyperlinks) AS hyperlink
+          WHERE contains_substr(hyperlink, @excluded_keyword${index})
+        )
+      `)
+      .join(' OR ')) + ')';
+
+
+  let areaClause = '';
+  if (searchParams.areaToSearch === 'publisher') {
+    areaClause = 'AND publishing_app = "publisher"';
+  } else if (searchParams.areaToSearch === 'whitehall') {
+    areaClause = 'AND publishing_app = "whitehall"';
+  }
+
+  let localeClause = '';
+  if (searchParams.selectedLocale !== '') {
+    localeClause = `AND locale = @locale`
+  }
+
+  let taxonClause = '';
+  if (searchParams.selectedTaxon !== '') {
+    taxonClause = `
+      AND EXISTS
+        (
+          SELECT 1 FROM UNNEST (taxons) AS taxon
+          WHERE taxon = @taxon
+        )
+    `;
+  }
+
+  let organisationClause = '';
+  if (searchParams.selectedOrganisation !== '') {
+    organisationClause = `
+      AND EXISTS
+        (
+          SELECT 1 FROM UNNEST (organisations) AS link
+          WHERE link = @organisation
+        )
+    `;
   }
 
   return `
@@ -261,13 +339,11 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
     ${localeClause}
     ${taxonClause}
     ${organisationClause}
-    ${linkClause}
-
     ORDER BY page_views DESC
-
     LIMIT 10000
   `;
 };
+
 
 
 export {

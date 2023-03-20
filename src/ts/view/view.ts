@@ -1,4 +1,4 @@
-import { id, queryDescription } from '../utils';
+import { id, keywordQueryDescription, linkQueryDescription } from '../utils';
 import { state, searchState, thereAreResults } from '../state';
 import { handleEvent } from '../events';
 import { languageName } from '../lang';
@@ -158,14 +158,14 @@ const viewErrorBanner = () => {
 };
 
 
-const viewKeywordResults = (results: any[]) => {
+const viewResultsTable = (results: any[], description: string) => {
   const html = [];
   if (results && results?.length > 0) {
     const recordsToShow = results.slice(state.skip, state.skip + state.resultsPerPage);
     const nbRecords = state.searchResults.keywords.length;
     html.push(`
       <div class="govuk-body">
-        <h3 class="govuk-heading-m">${queryDescription(state.searchParams, false)}</h3>
+        <h3 class="govuk-heading-m">${description}</h3>
         <p class="govuk-body">results ${state.skip + 1} to ${Math.min(nbRecords, state.skip + state.resultsPerPage)}, in descending popularity</p>
         <a class="govuk-skip-link" href="#results-table">Skip to results</a>
         <a class="govuk-skip-link" href="#search-form">Back to search filters</a>
@@ -250,6 +250,15 @@ const viewSearchResultsTabs = (results: SearchResults) => {
       </li>
     `);
   }
+  if (results.links.length > 0) {
+    html.push(`
+      <li class="govuk-tabs__list-item ${state.selectedTabId === 'link-results' ? 'govuk-tabs__list-item--selected' : ''}">
+        <span class="govuk-tabs__tab" data-target="link-results">
+          ${count('link', state.searchResults.links.length)}
+        </span>
+      </li>
+    `);
+  }
   if (results.persons.length > 0) {
     html.push(`
       <li class="govuk-tabs__list-item ${state.selectedTabId === 'person-results' ? 'govuk-tabs__list-item--selected' : ''}">
@@ -314,14 +323,21 @@ const viewSearchResultsTabs = (results: SearchResults) => {
   if (results.keywords.length > 0) {
     html.push(`
       <div id="keyword-results" class="govuk-tabs__panel ${state.selectedTabId === 'keyword-results' ? '' : 'govuk-tabs__panel--hidden'}">
-        ${viewKeywordResults(results.keywords)}
+        ${viewResultsTable(results.keywords, keywordQueryDescription(state.searchParams, false))}
+      </div>
+    `);
+  }
+  if (results.links.length > 0) {
+    html.push(`
+      <div id="link-results" class="govuk-tabs__panel ${state.selectedTabId === 'link-results' ? '' : 'govuk-tabs__panel--hidden'}">
+        ${viewResultsTable(results.links, linkQueryDescription(state.searchParams, false))}
       </div>
     `);
   }
   if (results.persons.length > 0) {
     html.push(`
       <div id="person-results" class="govuk-tabs__panel ${state.selectedTabId === 'person-results' ? '' : 'govuk-tabs__panel--hidden'}">
-        <h1 class="govuk-heading-m">Matching persons</h1>
+        <h1 class="govuk-heading-m">Persons whose name matches: ${state.searchParams.selectedWords}</h1>
         ${results.persons.map(viewPerson).join('<hr class="govuk-section-break govuk-section-break--visible"/>')}
       </div>
     `);
@@ -329,7 +345,7 @@ const viewSearchResultsTabs = (results: SearchResults) => {
   if (results.organisations.length > 0) {
     html.push(`
       <div id="organisation-results" class="govuk-tabs__panel ${state.selectedTabId === 'organisation-results' ? '' : 'govuk-tabs__panel--hidden'}">
-        <h1 class="govuk-heading-m">Organisations matching: ${state.searchParams.selectedWords}</h1>
+        <h1 class="govuk-heading-m">Organisations whose name matches: ${state.searchParams.selectedWords}</h1>
         ${results.organisations.map(viewOrganisation).join('<hr class="govuk-section-break govuk-section-break--visible"/>')}
       </div>
     `);
@@ -337,7 +353,7 @@ const viewSearchResultsTabs = (results: SearchResults) => {
   if (results.bankHolidays.length > 0) {
     html.push(`
       <div id="bank-holiday-results" class="govuk-tabs__panel ${state.selectedTabId === 'bank-holiday-results' ? '' : 'govuk-tabs__panel--hidden'}">
-        <h1 class="govuk-heading-m">Bank holidays matching: ${state.searchParams.selectedWords}</h1>
+        <h1 class="govuk-heading-m">Bank holidays whose name matches: ${state.searchParams.selectedWords}</h1>
         ${results.bankHolidays.map(viewBankHoliday).join('<hr class="govuk-section-break govuk-section-break--visible"/>')}
       </div>
     `);
@@ -345,7 +361,7 @@ const viewSearchResultsTabs = (results: SearchResults) => {
   if (results.taxons.length > 0) {
     html.push(`
       <div id="taxon-results" class="govuk-tabs__panel ${state.selectedTabId === 'taxon-results' ? '' : 'govuk-tabs__panel--hidden'}">
-        <h1 class="govuk-heading-m">GOV.UK Taxons matching: ${state.searchParams.selectedWords}</h1>
+        <h1 class="govuk-heading-m">GOV.UK taxons whose name matches: ${state.searchParams.selectedWords}</h1>
         ${results.taxons.map(viewTaxon).join('<hr class="govuk-section-break govuk-section-break--visible"/>')}
       </div>
     `);
@@ -353,7 +369,7 @@ const viewSearchResultsTabs = (results: SearchResults) => {
   if (results.roles.length > 0) {
     html.push(`
       <div id="role-results" class="govuk-tabs__panel ${state.selectedTabId === 'role-results' ? '' : 'govuk-tabs__panel--hidden'}">
-        <h1 class="govuk-heading-m">Official roles matching: ${state.searchParams.selectedWords}</h1>
+        <h1 class="govuk-heading-m">Official roles whose name matches: ${state.searchParams.selectedWords}</h1>
         ${results.roles.map(viewRole).join('<hr class="govuk-section-break govuk-section-break--visible"/>')}
       </div>
     `);
@@ -361,7 +377,7 @@ const viewSearchResultsTabs = (results: SearchResults) => {
   if (results.transactions.length > 0) {
     html.push(`
       <div id="transaction-results" class="govuk-tabs__panel ${state.selectedTabId === 'transaction-results' ? '' : 'govuk-tabs__panel--hidden'}">
-        <h1 class="govuk-heading-m">Online services matching: ${state.searchParams.selectedWords}</h1>
+        <h1 class="govuk-heading-m">Online services whose name matches: ${state.searchParams.selectedWords}</h1>
         ${results.transactions.map(viewTransaction).join('<hr class="govuk-section-break govuk-section-break--visible"/>')}
       </div>
     `);
@@ -378,7 +394,7 @@ const viewSearchResultsTabs = (results: SearchResults) => {
 
 const viewWaiting = () => `
   <div aria-live="polite" role="region">
-    <div class="govuk-body">Searching for ${queryDescription(state.searchParams)}</div>
+    <div class="govuk-body">Searching for ${keywordQueryDescription(state.searchParams)}</div>
     <p class="govuk-body-s">Some queries may take up to a minute</p>
   </div>
 `;
@@ -407,10 +423,10 @@ const viewResults = function() {
 };
 
 
-const viewNoResults = () => {
+const viewNoResults = (description: string): string => {
   return `
     <h1 tabindex="0" id="results-heading" class="govuk-heading-l">No results</h1>
-    <div class="govuk-body">for ${queryDescription(state.searchParams)} </div>
+    <div class="govuk-body">for ${description} </div>
   `;
 };
 
@@ -418,16 +434,16 @@ const viewNoResults = () => {
 const viewSearchResults = () => {
   switch (searchState().code) {
     case 'waiting':
-      document.title = `${queryDescription(state.searchParams, false)} - Gov Search`;
+      document.title = `${keywordQueryDescription(state.searchParams, false)} - Gov Search`;
       return viewWaiting();
     case 'results':
-      document.title = `${queryDescription(state.searchParams, false)} - Gov Search`;
+      document.title = `${keywordQueryDescription(state.searchParams, false)} - Gov Search`;
       if (window.ga) window.ga('send', 'search', { search: document.title, resultsFound: true });
       return viewResults();
     case 'no-results':
-      document.title = `${queryDescription(state.searchParams, false)} - Gov Search`;
+      document.title = `${keywordQueryDescription(state.searchParams, false)} - Gov Search`;
       if (window.ga) window.ga('send', 'search', { search: document.title, resultsFound: false });
-      return viewNoResults();
+      return viewNoResults(keywordQueryDescription(state.searchParams));
     default:
       document.title = 'Gov Search';
       return '';

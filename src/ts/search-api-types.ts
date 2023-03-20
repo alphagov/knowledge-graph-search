@@ -16,7 +16,6 @@ export type SearchParams = {
   selectedTaxon: string, // taxon to search in
   selectedOrganisation: string, // organisation to search in
   selectedLocale: string, // the language to search for
-  linkSearchUrl: string, // URL to find all pages linking to
   whereToSearch: {
     title: boolean,
     text: boolean
@@ -117,7 +116,7 @@ export type Role = {
 
 export type SearchResults = {
   keywords: any[],
-//  links: any[],
+  links: any[],
   persons: Person[],
   organisations: Organisation[],
   bankHolidays: BankHoliday[],

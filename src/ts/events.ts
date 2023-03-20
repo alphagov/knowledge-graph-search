@@ -34,6 +34,7 @@ const handleEvent: SearchApiCallback = async function(event) {
           state.skip = Math.max(state.skip - state.resultsPerPage, 0);
           break;
         case 'keyword-results':
+        case 'link-results':
         case 'taxon-results':
         case 'organisation-results':
         case 'person-results':
@@ -96,7 +97,6 @@ const setSearchParamsFromForm = function() {
   state.searchParams.whereToSearch.text = (<HTMLInputElement>id('search-text')) ?
     (<HTMLInputElement>id('search-text')).checked : true;
   state.searchParams.caseSensitive = (<HTMLInputElement>id('case-sensitive'))?.checked || false;
-  state.searchParams.linkSearchUrl = getFormInputValue('link-search');
   state.skip = 0; // reset to first page
   if ((<HTMLInputElement>id('area-publisher'))?.checked) state.searchParams.areaToSearch = SearchArea.Publisher;
   if ((<HTMLInputElement>id('area-whitehall'))?.checked) state.searchParams.areaToSearch = SearchArea.Whitehall;
@@ -115,7 +115,7 @@ const searchButtonClicked = async function(): Promise<void> {
 
   switch (searchStatus.code) {
     case 'ready-to-search':
-      if (state.searchParams.selectedWords !== '' || state.searchParams.selectedLocale !== '' || state.searchParams.selectedTaxon !== '' || state.searchParams.selectedOrganisation !== '' || state.searchParams.linkSearchUrl !== '') {
+      if (state.searchParams.selectedWords !== '' || state.searchParams.selectedLocale !== '' || state.searchParams.selectedTaxon !== '' || state.searchParams.selectedOrganisation !== '' ) {
         state.waiting = true;
         queryBackend(state.searchParams, handleEvent);
       }
@@ -158,8 +158,6 @@ const updateUrl = function() {
       searchParams.set('area', state.searchParams.areaToSearch);
     if (state.searchParams.combinator !== Combinator.All)
       searchParams.set('combinator', state.searchParams.combinator);
-    if (state.searchParams.linkSearchUrl !== '')
-      searchParams.set('link-search-url', state.searchParams.linkSearchUrl);
     const newQueryString = searchParams.toString();
     const oldQueryString = location.search.slice(1);
     if (newQueryString !== oldQueryString) {

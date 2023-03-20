@@ -60,7 +60,7 @@ const splitKeywords = function(keywords: string): string[] {
 };
 
 
-const queryDescription = (search: SearchParams, includeMarkup = true) => {
+const keywordQueryDescription = (search: SearchParams, includeMarkup = true) => {
   const clauses = [];
   if (search.selectedWords !== '') {
     let keywords = `contain ${containDescription(search, includeMarkup)}`;
@@ -75,8 +75,6 @@ const queryDescription = (search: SearchParams, includeMarkup = true) => {
     clauses.push(`are published by the ${makeBold(search.selectedOrganisation, includeMarkup)}`);
   if (search.selectedLocale !== '')
     clauses.push(`are in ${makeBold(languageName(search.selectedLocale), includeMarkup)}`);
-  if (search.linkSearchUrl !== '')
-    clauses.push(`link to ${makeBold(search.linkSearchUrl, includeMarkup)}`);
   if (search.areaToSearch === 'whitehall' || search.areaToSearch === 'publisher')
     clauses.push(`are published using ${makeBold(search.areaToSearch, includeMarkup)}`);
 
@@ -86,6 +84,33 @@ const queryDescription = (search: SearchParams, includeMarkup = true) => {
 
   return `GOV.UK pages that ${joinedClauses}`;
 };
+
+
+const linkQueryDescription = (search: SearchParams, includeMarkup = true) => {
+  const clauses = [];
+  if (search.selectedWords !== '') {
+    let keywords = `contain links whose URL includes ${containDescription(search, includeMarkup)}`;
+    if (search.excludedWords !== '') {
+      keywords = `${keywords} (but don't include ${makeBold(search.excludedWords, includeMarkup)})`;
+    }
+    clauses.push(keywords);
+  }
+  if (search.selectedTaxon !== '')
+    clauses.push(`belong to the ${makeBold(search.selectedTaxon, includeMarkup)} taxon (or its sub-taxons)`);
+  if (search.selectedOrganisation !== '')
+    clauses.push(`are published by the ${makeBold(search.selectedOrganisation, includeMarkup)}`);
+  if (search.selectedLocale !== '')
+    clauses.push(`are in ${makeBold(languageName(search.selectedLocale), includeMarkup)}`);
+  if (search.areaToSearch === 'whitehall' || search.areaToSearch === 'publisher')
+    clauses.push(`are published using ${makeBold(search.areaToSearch, includeMarkup)}`);
+
+  const joinedClauses = (clauses.length === 1) ?
+    clauses[0] :
+    `${clauses.slice(0, clauses.length - 1).join(', ')} and ${clauses[clauses.length - 1]}`;
+
+  return `GOV.UK pages that ${joinedClauses}`;
+};
+
 
 
 const containDescription = (search: SearchParams, includeMarkup: boolean) => {
@@ -111,4 +136,4 @@ const makeBold = (text: string, includeMarkup: boolean) =>
     `"${text}"`;
 
 
-export { id, sanitiseInput, sanitiseOutput, getFormInputValue, splitKeywords, queryDescription };
+export { id, sanitiseInput, sanitiseOutput, getFormInputValue, splitKeywords, keywordQueryDescription, linkQueryDescription };

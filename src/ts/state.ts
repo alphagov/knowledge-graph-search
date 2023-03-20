@@ -14,7 +14,6 @@ const initialSearchParams: SearchParams = {
   selectedTaxon: '',
   selectedOrganisation: '',
   selectedLocale: '',
-  linkSearchUrl: '',
   whereToSearch: {
     title: true, // whether search should include page titles
     text: true  // whether search should include page content
@@ -33,9 +32,15 @@ const state: State = {
   systemErrorText: null,
   userErrors: [], // error codes due to user not entering valid search criteria
   searchResults: null,
-  skip: 0, // where to start the pagination (number of results)
+  linkResults: null,
+  skip: 0, // where to start the pagination for the main results tab
+  skipLinks: 0, // where to start the pagination for the links tab
   resultsPerPage: 10, // number of results per page
-  showFields: { // what result fields to show by default
+  showFields: { // what result fields to show by default on the main results tab
+    url: true,
+    title: true
+  },
+  showFieldsLinks: { // what result fields to show by default on the links tab
     url: true,
     title: true
   },
@@ -51,7 +56,6 @@ const setQueryParamsFromQS = function(): void {
 
   state.searchParams.selectedWords = maybeReplace('selectedWords', 'selected-words');
   state.searchParams.excludedWords = maybeReplace('excludedWords', 'excluded-words');
-  state.searchParams.linkSearchUrl = maybeReplace('linkSearchUrl', 'link-search-url');
   state.searchParams.selectedTaxon = maybeReplace('selectedTaxon', 'selected-taxon');
   state.searchParams.selectedOrganisation = maybeReplace('selectedOrganisation', 'selected-organisation');
 
@@ -81,7 +85,7 @@ const searchState = function(): { code: string, errors: string[] } {
 
   if (state.waiting) return { code: 'waiting', errors };
 
-  if (state.searchParams.selectedWords === '' && state.searchParams.excludedWords === '' && state.searchParams.selectedTaxon === '' && state.searchParams.selectedOrganisation === '' && state.searchParams.selectedLocale === '' && state.searchParams.linkSearchUrl === '' && state.searchParams.whereToSearch.title === true && state.searchParams.whereToSearch.text === true) {
+  if (state.searchParams.selectedWords === '' && state.searchParams.excludedWords === '' && state.searchParams.selectedTaxon === '' && state.searchParams.selectedOrganisation === '' && state.searchParams.selectedLocale === '' && state.searchParams.whereToSearch.title === true && state.searchParams.whereToSearch.text === true) {
     return { code: 'initial', errors };
   }
   if (state.searchParams.selectedWords !== '') {
@@ -110,7 +114,6 @@ const resetSearch = function(): void {
   state.searchParams.whereToSearch.title = true;
   state.searchParams.whereToSearch.text = true;
   state.searchParams.caseSensitive = false;
-  state.searchParams.linkSearchUrl = '';
   state.skip = 0; // reset to first page
   state.searchParams.areaToSearch = SearchArea.Any;
   state.searchResults = null;

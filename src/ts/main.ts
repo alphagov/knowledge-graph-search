@@ -40,7 +40,7 @@ const init = async function() {
     state.searchResults = null;
     view();
     // Find if we need to run a search
-    if (state.searchParams.selectedWords !== '' || state.searchParams.selectedLocale !== '' || state.searchParams.selectedTaxon !== '' || state.searchParams.selectedOrganisation !== '' || state.searchParams.linkSearchUrl !== '') {
+    if (state.searchParams.selectedWords !== '' || state.searchParams.selectedLocale !== '' || state.searchParams.selectedTaxon !== '' || state.searchParams.selectedOrganisation !== '') {
       state.waiting = true;
       queryBackend(state.searchParams, handleEvent);
     }
@@ -57,7 +57,7 @@ const init = async function() {
   if (!state.systemErrorText) {
     setQueryParamsFromQS();
     view();
-    if (state.searchParams.selectedWords !== '' || state.searchParams.selectedLocale !== '' || state.searchParams.selectedTaxon !== '' || state.searchParams.selectedOrganisation !== '' || state.searchParams.linkSearchUrl !== '') {
+    if (state.searchParams.selectedWords !== '' || state.searchParams.selectedLocale !== '' || state.searchParams.selectedTaxon !== '' || state.searchParams.selectedOrganisation !== '') {
       state.waiting = true;
       queryBackend(state.searchParams, handleEvent);
     }

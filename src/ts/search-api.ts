@@ -15,7 +15,6 @@ const makeQueryString = function(sp: SearchParams): string {
   if (!sp.whereToSearch.text) usp.set('search-in-text', 'false');
   if (sp.areaToSearch !== SearchArea.Any) usp.set('area', sp.areaToSearch);
   if (sp.combinator !== Combinator.All) usp.set('combinator', sp.combinator);
-  if (sp.linkSearchUrl !== '') usp.set('link-search-url', sp.linkSearchUrl);
   return usp.toString();
 };
 
@@ -57,7 +56,6 @@ const queryBackend: (searchParams: SearchParams, callback: SearchApiCallback) =>
     callback({ type: EventType.SearchApiCallbackFail, error })
     return;
   }
-
   callback({ type: EventType.SearchApiCallbackOk, results});
 };
 

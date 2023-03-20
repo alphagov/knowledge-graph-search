@@ -10,7 +10,6 @@ const viewSearchPanel = () => `
       ${viewExclusionsInput()}
       ${viewCaseSensitiveSelector()}
       ${viewScopeSelector()}
-      ${viewLinkSearch()}
       ${viewPublishingOrgSelector()}
       ${viewPublishingAppSelector()}
       ${viewTaxonSelector()}
@@ -130,24 +129,6 @@ const viewSearchButton = () => `
       ${state.waiting ? 'Searching <img src="assets/images/loader.gif" height="20px" alt="loader"/>' : 'Search'}
     </button>
   </p>
-`;
-
-
-const viewLinkSearch = () => `
-  <div class="govuk-body">
-    <label class="govuk-label label--bold" for="link-search">
-      Search for links
-    </label>
-    <div class="govuk-hint">
-      For example: /maternity-pay-leave or youtube.com
-    </div>
-    <input
-        class="govuk-input"
-        id="link-search"
-        ${state.waiting && 'disabled="disabled"'}
-        value="${state.searchParams.linkSearchUrl}"
-     />
-  </div>
 `;
 
 

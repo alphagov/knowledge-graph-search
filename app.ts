@@ -118,8 +118,7 @@ app.get('/search', checkLoggedIn('/'), async (req: any, res) => {
       title: !(req.query['search-in-title'] === 'false'),
       text: !(req.query['search-in-text'] === 'false')
     },
-    areaToSearch: req.query['area'] || SearchArea.Any,
-    linkSearchUrl: req.query['link-search-url'] || ''
+    areaToSearch: req.query['area'] || SearchArea.Any
   };
   try {
     const data = await sendSearchQuery(params);
@@ -145,8 +144,7 @@ app.get('/csv', async (req: any, res) => {
       title: !(req.query['search-in-title'] === 'false'),
       text: !(req.query['search-in-text'] === 'false')
     },
-    areaToSearch: req.query['area'] || SearchArea.Any,
-    linkSearchUrl: req.query['link-search-url'] || ''
+    areaToSearch: req.query['area'] || SearchArea.Any
   };
   try {
     const data = await sendSearchQuery(params);
