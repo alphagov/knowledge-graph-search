@@ -8,13 +8,13 @@ let OAuth2Strategy, passport, session, ensureLoggedIn;
 
 import { sendSearchQuery, sendInitQuery } from './bigquery';
 import { SearchArea, Combinator, SearchParams } from './src/ts/search-api-types';
+const bodyParser = require('body-parser');
 import { csvStringify } from './csv';
 
 
 // Initialize the express engine
 const app: express.Application = express();
 const port: number = process.env.port ? parseInt(process.env.port) : 8080;
-
 
 if (!process.env.DISABLE_AUTH) {
   console.log('OAuth via PassportJS is enabled because DISABLE_AUTH is set')
@@ -42,6 +42,36 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static('public'));
 app.use(express.json());
+app.set('trust proxy', 1) // trust first proxy
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(new OAuth2Strategy({
+    authorizationURL: 'https://signon.integration.publishing.service.gov.uk/oauth/authorize',
+    tokenURL: 'https://signon.integration.publishing.service.gov.uk/oauth/access_token',
+    clientID: process.env.OAUTH_ID,
+    clientSecret: process.env.OAUTH_SECRET,
+    callbackURL: "https://govgraphsearchdev.dev/auth/gds/callback"
+  },
+  function(accessToken: string, refreshToken: string, profile: any, cb: any) {
+    console.log('OAuth2Strategy callback', accessToken, refreshToken, profile);
+    cb(null, profile);
+  }
+));
+
+
+app.get('/login', passport.authenticate('oauth2'));
+
+
+app.get('/',
+  ensureLoggedIn('/login'),
+  async (req, res) => res.sendFile('views/index.html', {root: __dirname })
+);
+
+app.get('/auth/gds/callback',
+  passport.authenticate('oauth2', '/error-callback'),
+  async (req, res) => res.redirect('/')
+);
 
 if (!process.env.DISABLE_AUTH) {
   app.set('trust proxy', 1) // trust first proxy
