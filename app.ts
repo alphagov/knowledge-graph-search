@@ -49,22 +49,43 @@ app.use(passport.session());
 passport.use(new OAuth2Strategy({
     authorizationURL: 'https://signon.integration.publishing.service.gov.uk/oauth/authorize',
     tokenURL: 'https://signon.integration.publishing.service.gov.uk/oauth/access_token',
-    clientID: process.env.OAUTH_ID,
-    clientSecret: process.env.OAUTH_SECRET,
+    clientID: oAuthClientId,
+    clientSecret: oAuthClientSecret,
     callbackURL: "https://govgraphsearchdev.dev/auth/gds/callback"
   },
   function(accessToken: string, refreshToken: string, profile: any, cb: any) {
     console.log('OAuth2Strategy callback', accessToken, refreshToken, profile);
     cb(null, profile);
   }
-));
+);
 
+if (spoofAuth) {
+  passport.use({
+    name: 'oauth2',
+    authenticate: function () {
+      try {
+        this.success({});
+      } catch (error) {
+        this.error(error);
+      }
+    }
+  });
+} else {
+  passport.use(authStrategy);
+}
+
+const checkLoggedIn = spoofAuth ?
+  () => (_req: any, _res: any, next: any) => next() :
+  ensureLoggedIn;
+
+
+// Routes
 
 app.get('/login', passport.authenticate('oauth2'));
 
 
 app.get('/',
-  ensureLoggedIn('/login'),
+  checkLoggedIn('/login'),
   async (req, res) => res.sendFile('views/index.html', {root: __dirname })
 );
 
