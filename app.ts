@@ -17,6 +17,7 @@ const app: express.Application = express();
 
 const port: number = process.env.port ? parseInt(process.env.port) : 8080;
 
+
 // The OAuth code is based on multiple online sources.
 // The main one is:
 // https://www.pveller.com/oauth2-with-passport-10-steps-recipe/
@@ -37,25 +38,57 @@ app.use(express.json());
 app.set('trust proxy', 1) // trust first proxy
 app.use(passport.initialize());
 app.use(passport.session());
-passport.use(new OAuth2Strategy({
+
+const spoofAuth = process.env.DISABLE_AUTH;
+
+if (spoofAuth) {
+  console.log('DISABLE_AUTH was set, so authentication is disabled');
+}
+
+const oAuthClientId = process.env.OAUTH_ID || 'not set';
+const oAuthClientSecret = process.env.OAUTH_SECRET || 'not set';
+
+const authStrategy = new OAuth2Strategy(
+  {
     authorizationURL: 'https://signon.integration.publishing.service.gov.uk/oauth/authorize',
     tokenURL: 'https://signon.integration.publishing.service.gov.uk/oauth/access_token',
-    clientID: process.env.OAUTH_ID,
-    clientSecret: process.env.OAUTH_SECRET,
+    clientID: oAuthClientId,
+    clientSecret: oAuthClientSecret,
     callbackURL: "https://govgraphsearchdev.dev/auth/gds/callback"
   },
   function(accessToken: string, refreshToken: string, profile: any, cb: any) {
     console.log('OAuth2Strategy callback', accessToken, refreshToken, profile);
     cb(null, profile);
   }
-));
+);
 
+if (spoofAuth) {
+  passport.use({
+    name: 'oauth2',
+    authenticate: function () {
+      try {
+        this.success({});
+      } catch (error) {
+        this.error(error);
+      }
+    }
+  });
+} else {
+  passport.use(authStrategy);
+}
+
+const checkLoggedIn = spoofAuth ?
+  () => (_req: any, _res: any, next: any) => next() :
+  ensureLoggedIn;
+
+
+// Routes
 
 app.get('/login', passport.authenticate('oauth2'));
 
 
 app.get('/',
-  ensureLoggedIn('/login'),
+  checkLoggedIn('/login'),
   async (req, res) => res.sendFile('views/index.html', {root: __dirname })
 );
 
@@ -66,7 +99,7 @@ app.get('/auth/gds/callback',
 
 
 // the front-end will call this upon starting to get some data needed from the server
-app.get('/get-init-data', ensureLoggedIn('/'), async (req, res) => {
+app.get('/get-init-data', checkLoggedIn('/'), async (req, res) => {
   console.log('/get-init-data');
   try {
     res.send(await sendInitQuery());
@@ -77,7 +110,7 @@ app.get('/get-init-data', ensureLoggedIn('/'), async (req, res) => {
 });
 
 
-app.get('/search', ensureLoggedIn('/'), async (req: any, res) => {
+app.get('/search', checkLoggedIn('/'), async (req: any, res) => {
   console.log('API call to /search', req.query);
   // retrieve qsp params
   const params: SearchParams = {
@@ -136,7 +169,7 @@ app.get('/csv', async (req: any, res) => {
 });
 
 
-app.get('/taxon', ensureLoggedIn('/'), async (req: any, res) => {
+app.get('/taxon', checkLoggedIn('/'), async (req: any, res) => {
   console.log('API call to /taxon', req.query);
   try {
     const data = await getTaxonInfo(req.query['name']);
@@ -151,7 +184,7 @@ app.get('/taxon', ensureLoggedIn('/'), async (req: any, res) => {
 });
 
 
-app.get('/organisation', ensureLoggedIn('/'), async (req: any, res) => {
+app.get('/organisation', checkLoggedIn('/'), async (req: any, res) => {
   console.log('API call to /organisation', req.query);
   try {
     const data = await getOrganisationInfo(req.query['name']);
@@ -166,7 +199,7 @@ app.get('/organisation', ensureLoggedIn('/'), async (req: any, res) => {
 });
 
 
-app.get('/role', ensureLoggedIn('/'), async (req: any, res) => {
+app.get('/role', checkLoggedIn('/'), async (req: any, res) => {
   console.log('API call to /role', req.query);
   try {
     const data = await getRoleInfo(req.query['name']);
@@ -177,7 +210,7 @@ app.get('/role', ensureLoggedIn('/'), async (req: any, res) => {
 });
 
 
-app.get('/bank-holiday', ensureLoggedIn('/'), async (req: any, res) => {
+app.get('/bank-holiday', checkLoggedIn('/'), async (req: any, res) => {
   console.log('API call to /bank-holiday', req.query);
   try {
     const data = await getBankHolidayInfo(req.query['name']);
@@ -191,7 +224,7 @@ app.get('/bank-holiday', ensureLoggedIn('/'), async (req: any, res) => {
   }
 });
 
-app.get('/transaction', ensureLoggedIn('/'), async (req: any, res) => {
+app.get('/transaction', checkLoggedIn('/'), async (req: any, res) => {
   console.log('API call to /transaction', req.query);
   try {
     const data = await getTransactionInfo(req.query['name']);
@@ -202,7 +235,7 @@ app.get('/transaction', ensureLoggedIn('/'), async (req: any, res) => {
 });
 
 
-app.get('/person', ensureLoggedIn('/'), async (req: any, res) => {
+app.get('/person', checkLoggedIn('/'), async (req: any, res) => {
   console.log('API call to /person', req.query);
   try {
     const data = await getPersonInfo(req.query['name']);
