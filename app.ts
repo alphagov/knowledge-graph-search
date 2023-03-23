@@ -8,7 +8,6 @@ let OAuth2Strategy, passport, session, ensureLoggedIn;
 
 import { sendSearchQuery, sendInitQuery } from './bigquery';
 import { SearchArea, Combinator, SearchParams } from './src/ts/search-api-types';
-const bodyParser = require('body-parser');
 import { csvStringify } from './csv';
 
 
