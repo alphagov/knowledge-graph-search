@@ -48,6 +48,7 @@ const fetchWithTimeout = async function(url: string, timeoutSeconds: number = 60
 const queryBackend: (searchParams: SearchParams, callback: SearchApiCallback) => Promise<void> = async function(searchParams, callback) {
   callback({ type: EventType.SearchRunning });
   const url = `/search?${makeQueryString(searchParams)}`;
+  searchParams.selectedWords = searchParams.selectedWords.replace(/[“”]/g,'"');
   let apiResults: SearchResults;
   try {
     apiResults = await fetchWithTimeout(url, 300);
