@@ -10,6 +10,8 @@ A search engine for GOV.UK, with advanced functionality for content designers
 - set an environment variable called PROJECT_ID to the name of the GCP project
   your server will be running on. This is so the server knows how to connect to
   BigQuery to get the data.
+- set an environment variable called DISABLE_AUTH (any value is ok) - this will
+  turn off OAuth for local development.
 - run the server with `npm run`.
 - Point your browser to `https://localhost:8080` (the port can be changed using the `PORT` environment variable)
 
