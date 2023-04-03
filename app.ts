@@ -50,11 +50,11 @@ const oAuthClientSecret = process.env.OAUTH_SECRET || 'not set';
 
 const authStrategy = new OAuth2Strategy(
   {
-    authorizationURL: 'https://signon.integration.publishing.service.gov.uk/oauth/authorize',
-    tokenURL: 'https://signon.integration.publishing.service.gov.uk/oauth/access_token',
-    clientID: oAuthClientId,
-    clientSecret: oAuthClientSecret,
-    callbackURL: "https://govgraphsearchdev.dev/auth/gds/callback"
+    authorizationURL: process.env.OAUTH_AUTH_URL || 'not set',
+    tokenURL: process.env.OAUTH_TOKEN_URL || 'not set',
+    clientID: process.env.OAUTH_ID || 'not set',
+    clientSecret: process.env.OAUTH_SECRET || 'not set',
+    callbackURL: process.env.OAUTH_CALLBACK_URL || 'not set'
   },
   function(accessToken: string, refreshToken: string, profile: any, cb: any) {
     console.log('OAuth2Strategy callback', accessToken, refreshToken, profile);
