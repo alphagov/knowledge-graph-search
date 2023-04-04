@@ -57,12 +57,12 @@ GTM_BODY_PLACEHOLDER='<\!-- INSERT GTM BODY SNIPPET -->'
 
 echo "Inserting snippets"
 
-sed -i".bak" -e "s/${GTM_HEAD_PLACEHOLDER}/${GTM_HEAD_SNIPPET}/" -e"s/${GTM_BODY_PLACEHOLDER}/${GTM_BODY_SNIPPET}/" public/index.html
+sed -i".bak" -e "s/${GTM_HEAD_PLACEHOLDER}/${GTM_HEAD_SNIPPET}/" -e"s/${GTM_BODY_PLACEHOLDER}/${GTM_BODY_SNIPPET}/" views/index.html
 
 
 echo "Pushing app"
 
 gcloud run deploy govuk-knowledge-graph-search --project govuk-knowledge-graph --source .
-mv public/index.html.bak public/index.html
+mv views/index.html.bak views/index.html
 
 echo "Done"
