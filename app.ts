@@ -1,101 +1,94 @@
-// Import the express in typescript file
-const OAuth2Strategy = require('passport-oauth2');
-const passport = require('passport');
-const session = require('express-session');
-const cors = require('cors');
-const { ensureLoggedIn } = require('connect-ensure-login');
 import express from 'express';
+const cors = require('cors');
 const bodyParser = require('body-parser');
 
+// these variables are used for OAuth authentication. They will only be set if
+// OAuth is enabled
+let OAuth2Strategy, passport, session, ensureLoggedIn;
 
 import { sendSearchQuery, sendInitQuery, getOrganisationInfo, getPersonInfo, getRoleInfo, getTaxonInfo, getBankHolidayInfo, getTransactionInfo } from './bigquery';
 import { SearchArea, Combinator, SearchType, SearchParams } from './src/ts/search-api-types';
 import { csvStringify } from './csv';
 
+
 // Initialize the express engine
 const app: express.Application = express();
-
 const port: number = process.env.port ? parseInt(process.env.port) : 8080;
 
 
-// The OAuth code is based on multiple online sources.
-// The main one is:
-// https://www.pveller.com/oauth2-with-passport-10-steps-recipe/
+if (!process.env.DISABLE_AUTH) {
+  console.log('OAuth via PassportJS is enabled because DISABLE_AUTH is set')
+  // The OAuth code is based on multiple online sources.
+  // The main one is:
+  // https://www.pveller.com/oauth2-with-passport-10-steps-recipe/
+  OAuth2Strategy = require('passport-oauth2');
+  passport = require('passport');
+  session = require('express-session');
+  ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
+  passport.serializeUser((user:any, done:any) => done(null, user));
+  passport.deserializeUser((user:any, done:any) => done(null, user));
 
-passport.serializeUser((user:any, done:any) => done(null, user));
-passport.deserializeUser((user:any, done:any) => done(null, user));
+  app.use(session({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: true }
+  }));
+} else {
+  console.log('OAuth via PassportJS is disabled, since DISABLE_AUTH is set')
+}
 
-app.use(session({
-  secret: 'keyboard cat',
-  resave: false,
-  saveUninitialized: true,
-  cookie: { secure: true }
-}));
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static('public'));
 app.use(express.json());
-app.set('trust proxy', 1) // trust first proxy
-app.use(passport.initialize());
-app.use(passport.session());
 
-const spoofAuth = process.env.DISABLE_AUTH;
+if (!process.env.DISABLE_AUTH) {
+  app.set('trust proxy', 1) // trust first proxy
+  app.use(passport.initialize());
+  app.use(passport.session());
 
-if (spoofAuth) {
-  console.log('DISABLE_AUTH was set, so authentication is disabled');
-}
-
-const oAuthClientId = process.env.OAUTH_ID || 'not set';
-const oAuthClientSecret = process.env.OAUTH_SECRET || 'not set';
-
-const authStrategy = new OAuth2Strategy(
-  {
-    authorizationURL: process.env.OAUTH_AUTH_URL || 'not set',
-    tokenURL: process.env.OAUTH_TOKEN_URL || 'not set',
-    clientID: process.env.OAUTH_ID || 'not set',
-    clientSecret: process.env.OAUTH_SECRET || 'not set',
-    callbackURL: process.env.OAUTH_CALLBACK_URL || 'not set'
-  },
-  function(accessToken: string, refreshToken: string, profile: any, cb: any) {
-    console.log('OAuth2Strategy callback', accessToken, refreshToken, profile);
-    cb(null, profile);
-  }
-);
-
-if (spoofAuth) {
-  passport.use({
-    name: 'oauth2',
-    authenticate: function () {
-      try {
-        this.success({});
-      } catch (error) {
-        this.error(error);
-      }
+  passport.use(new OAuth2Strategy(
+    {
+      authorizationURL: process.env.OAUTH_AUTH_URL || 'not set',
+      tokenURL: process.env.OAUTH_TOKEN_URL || 'not set',
+      clientID: process.env.OAUTH_ID || 'not set',
+      clientSecret: process.env.OAUTH_SECRET || 'not set',
+      callbackURL: process.env.OAUTH_CALLBACK_URL || 'not set'
+    },
+    function(accessToken: string, refreshToken: string, profile: any, cb: any) {
+      console.log('OAuth2Strategy callback', accessToken, refreshToken, profile);
+      cb(null, profile);
     }
-  });
-} else {
-  passport.use(authStrategy);
+  ));
 }
 
-const checkLoggedIn = spoofAuth ?
-  () => (_req: any, _res: any, next: any) => next() :
-  ensureLoggedIn;
+
+// since the routes below use this function, we always need to define it
+// so it we're not using OAuth, we make it do nothing
+// (i.e. just a middleware passthrough)
+
+
+const checkLoggedIn = ensureLoggedIn ?
+  ensureLoggedIn :
+  ((_redirect: string) => (_req: any, _res: any, next: any) => next());
 
 
 // Routes
 
-app.get('/login', passport.authenticate('oauth2'));
-
+if (!process.env.DISABLE_AUTH) {
+  app.get('/login', passport.authenticate('oauth2'));
+  app.get('/auth/gds/callback',
+          passport.authenticate('oauth2', '/error-callback'),
+          async (req, res) => res.redirect('/')
+         );
+}
 
 app.get('/',
   checkLoggedIn('/login'),
   async (req, res) => res.sendFile('views/index.html', {root: __dirname })
 );
 
-app.get('/auth/gds/callback',
-  passport.authenticate('oauth2', '/error-callback'),
-  async (req, res) => res.redirect('/')
-);
 
 
 // the front-end will call this upon starting to get some data needed from the server
