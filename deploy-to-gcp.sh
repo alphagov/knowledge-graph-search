@@ -1,10 +1,20 @@
 #!/usr/bin/env bash
 
+echo "This script is for deploying the production version of GovGraphSearch. It
+sets the GA/GTM ids in the HTML source and deploys to the production GCP
+project."
+
+echo "Do not use this script to deploy to the dev or staging servers. Instead
+use the gcloud command line directly."
+
+echo "Press return to continue or control-c to stop."
+read -r CONFIRM
+
 if [ "${GTM_ID}" != "" ]; then
     echo "GTM_ID is set to ${GTM_ID}"
 else
     echo "Enter a GTM tracking ID."
-    echi "If you're unsure, ask the GA team or check the source HTML of the current live version."
+    echo "If you're unsure, ask the GA team or check the source HTML of the current live version."
     read -r GTM_ID
     echo "You entered ${GTM_ID}"
     echo "Is that correct? (y/n)"
