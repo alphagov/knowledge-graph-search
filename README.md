@@ -1,55 +1,70 @@
-# Gov Search
+# Gov Search (frontend)
 
-A search engine for GOV.UK, with advanced functionality for content designers
+Gov Search is a search engine for GOV.UK, with advanced functionality for
+content designers. This repository includes the code of the GovSearch front-end.
 
+This is an ExpressJS application written in TypeScript. It shows the user a
+search interface and queries the backend to fetch and display search results.
 
-# Running
+The full documentation is available in the [Data Community Tech
+Docs](https://docs.data-community.publishing.service.gov.uk).
 
-- clone this repository on a server
-- install the govuk design system with `npm install` (needs NodeJS installed)
+# Running locally
+
+- clone this repository
+- run `npm install` to install all dependencies
+- Install [Sass](https://sass-lang.com/install) and compile the Sass sources to CSS with
+
+    cd src/scss
+    sass main.scss > ../../public/main.css
+
+- Install [webpack](https://webpack.js.org/) and compile the browser-side Typescript code to JavaScript by just running `webpack`
+
 - set an environment variable called PROJECT_ID to the name of the GCP project
-  your server will be running on. This is so the server knows how to connect to
-  BigQuery to get the data.
-- set an environment variable called DISABLE_AUTH (any value is ok) - this will
-  turn off OAuth for local development.
-- run the server with `npm run`.
+  your server will be running on. This is so the server knows where to connect
+  to to run searches get the data. For instance, use `govuk-knowledge-graph-dev`
+  to get the data from the development backend.
+
+- set an environment variable called `DISABLE_AUTH` to any value, as you won't
+  need authentication on your local machine
+
+- Start the server with `npm run dev`.
+
 - Point your browser to `https://localhost:8080` (the port can be changed using the `PORT` environment variable)
 
 # Developing
 
 ## Files
 
-- `app.ts`: the main server file
+- `app.ts`: the main server file. All the `.ts` files in the same folder are server-side code.
 
 - `src/ts/*.ts`: the main browser-side files (some type definitions and
-  utilities are also used server-side)
+  utilities are also used server-side). `webpack` compiles everything to `/public/main.js`.
 
-- `public/js/*`:  the main browser-side application code. See below.
-
-- `src/scss/main.scss`: sass file, that compiles to `public/main.css` with `sass
-  src/scss/main.scss > public/main.css`
-
-- `package.json`: used to retrieve the Government Design System assets and ExpressJS
+- `src/scss/main.scss`: the Sass file that `sass` compiles to `/public/main.css`
 
 - `public/assets`: fonts and images
 
-## CSS
+- `views/index.html`: the HTML source file sent to the browser
 
-`public/main.css` is generated from `public/main.scss` using sass.
 
-## Architecture
 
-The browser-side application uses the [Elm Architecture](https://elmprogramming.com/elm-architecture-intro.html) model. The whole application state is held in a variable called `state`, and a function called `view` renders the HTML that corresponds to the current value of `state`, and sets event handlers on that HTML. Whenever an event happens (user clicks something, or a search returns) the `handleEvent` function updates the state accordingly and runs `view` again. This forms the main interaction loop. For instance:
+
+## Software architecture
+
+Mostly for historical reasons, much of the functionality offered runs browser-side. That's why the application is more JavaScript-heavy than your usual `alphagov` app. Although the JavaScript code is generated from TypeScript sources, it doesn't use any framework like React.
+
+The browser-side code uses the [Elm Architecture](https://elmprogramming.com/elm-architecture-intro.html) model: the whole application's state is held in a variable called `state`, and a function called `view` renders the HTML that corresponds to the current value of `state`, and sets event handlers on that HTML. Whenever an event happens (user clicks on a button, or a search returns) the `handleEvent` function updates the state accordingly and runs `view` again. This forms the main interaction loop. For instance:
 
 - The user enters search terms and clicks "search"
-- The DOM event handler runs `handleEvent`, which:
+- The DOM event handler (defined in `view.ts`) triggered runs `handleEvent`, which:
   - retrieves the new search terms from the form
-  - and updates `state.keywords` with the new values
-  - runs the search in BigQuery via the Search API
-  - runs `view`
-- The page shows the "searching screens" and waits for the next event
-- The search api call finishes and calls `handleEvent`, which updates `state` with the search results
-- `handleEvent` calls `view`
+  - and updates the state (specifically `state.selectedKeywords`) with the new values
+  - starts the search in BigQuery via the API offered by the ExpressJS server.
+  - and meanwhile calls view to show the "Please wait" message.
+- Eventually the API call returns and triggers `handleEvent`, which updates
+  `state` with the search results
+- `handleEvent` also calls `view`
 - `view` renders the state, including the search results.
 - The page waits for the next event
 etc.
