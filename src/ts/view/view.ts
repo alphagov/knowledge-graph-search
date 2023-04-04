@@ -22,7 +22,7 @@ const view = () => {
         ${viewMainLayout()}
         <p class="govuk-body-s">
           Searches do not include history mode content, Publisher GitHub smart answers or service domains.
-          Popularity scores depend on cookie consent.
+          Page views depend on cookie consent.
         </p>
       </main>
     `;
