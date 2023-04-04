@@ -1,10 +1,20 @@
 #!/usr/bin/env bash
 
+echo "This script is for deploying the production version of GovGraphSearch. It
+sets the GA/GTM ids in the HTML source and deploys to the production GCP
+project."
+
+echo "Do not use this script to deploy to the dev or staging servers. Instead
+use the gcloud command line directly."
+
+echo "Press return to continue or control-c to stop."
+read -r CONFIRM
+
 if [ "${GTM_ID}" != "" ]; then
     echo "GTM_ID is set to ${GTM_ID}"
 else
     echo "Enter a GTM tracking ID."
-    echi "If you're unsure, ask the GA team or check the source HTML of the current live version."
+    echo "If you're unsure, ask the GA team or check the source HTML of the current live version."
     read -r GTM_ID
     echo "You entered ${GTM_ID}"
     echo "Is that correct? (y/n)"
@@ -47,12 +57,12 @@ GTM_BODY_PLACEHOLDER='<\!-- INSERT GTM BODY SNIPPET -->'
 
 echo "Inserting snippets"
 
-sed -i".bak" -e "s/${GTM_HEAD_PLACEHOLDER}/${GTM_HEAD_SNIPPET}/" -e"s/${GTM_BODY_PLACEHOLDER}/${GTM_BODY_SNIPPET}/" public/index.html
+sed -i".bak" -e "s/${GTM_HEAD_PLACEHOLDER}/${GTM_HEAD_SNIPPET}/" -e"s/${GTM_BODY_PLACEHOLDER}/${GTM_BODY_SNIPPET}/" views/index.html
 
 
 echo "Pushing app"
 
 gcloud run deploy govuk-knowledge-graph-search --project govuk-knowledge-graph --source .
-mv public/index.html.bak public/index.html
+mv views/index.html.bak views/index.html
 
 echo "Done"
