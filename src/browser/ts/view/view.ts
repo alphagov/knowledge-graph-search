@@ -146,15 +146,15 @@ const viewErrorBanner = () => {
 };
 
 
-const viewResultsTable = (results: any[], description: string) => {
+const viewResultsTable = (tabId: string, results: any[], description: string) => {
   const html = [];
   if (results && results?.length > 0) {
-    const recordsToShow = results.slice(state.skip, state.skip + state.resultsPerPage);
+    const recordsToShow = results.slice(state.skip[tabId], state.skip[tabId] + state.resultsPerPage);
     const nbRecords = state.searchResults.keywords.length;
     html.push(`
       <div class="govuk-body">
         <h3 class="govuk-heading-m">${description}</h3>
-        <p class="govuk-body">results ${state.skip + 1} to ${Math.min(nbRecords, state.skip + state.resultsPerPage)}, in descending popularity</p>
+        <p class="govuk-body">results ${state.skip[tabId] + 1} to ${Math.min(nbRecords, state.skip[tabId] + state.resultsPerPage)}, in descending popularity</p>
         <a class="govuk-skip-link" href="#results-table">Skip to results</a>
         <a class="govuk-skip-link" href="#search-form">Back to search filters</a>
         <fieldset class="govuk-fieldset" ${state.waiting && 'disabled="disabled"'}>
@@ -198,8 +198,8 @@ const viewResultsTable = (results: any[], description: string) => {
       </div>`);
     html.push(`
       <p class="govuk-body">
-        <button type="button" class="govuk-button" id="button-prev-page" ${state.skip < state.resultsPerPage ? "disabled" : ""}>Previous</button>
-        <button type="button" class="govuk-button" id="button-next-page" ${state.skip + state.resultsPerPage >= results.length ? "disabled" : ""}>Next</button>
+        <button type="button" class="govuk-button" id="button-prev-page-${tabId}" ${state.skip[tabId] < state.resultsPerPage ? "disabled" : ""}>Previous</button>
+        <button type="button" class="govuk-button" id="button-next-page-${tabId}" ${state.skip[tabId] + state.resultsPerPage >= results.length ? "disabled" : ""}>Next</button>
       </p>`);
     html.push(`
       <p class="govuk-body"><a class="govuk-link" href="/csv${window.location.search}" download="export.csv">Download all ${state.searchResults.keywords.length} records in CSV</a></p>`);
@@ -311,14 +311,14 @@ const viewSearchResultsTabs = (results: SearchResults) => {
   if (results.keywords.length > 0) {
     html.push(`
       <div id="keyword-results" class="govuk-tabs__panel ${state.selectedTabId === 'keyword-results' ? '' : 'govuk-tabs__panel--hidden'}">
-        ${viewResultsTable(results.keywords, keywordQueryDescription(state.searchParams, false))}
+        ${viewResultsTable('keywords', results.keywords, keywordQueryDescription(state.searchParams, false))}
       </div>
     `);
   }
   if (results.links.length > 0) {
     html.push(`
       <div id="link-results" class="govuk-tabs__panel ${state.selectedTabId === 'link-results' ? '' : 'govuk-tabs__panel--hidden'}">
-        ${viewResultsTable(results.links, linkQueryDescription(state.searchParams, false))}
+        ${viewResultsTable('links', results.links, linkQueryDescription(state.searchParams, false))}
       </div>
     `);
   }

@@ -33,8 +33,10 @@ const state: State = {
   userErrors: [], // error codes due to user not entering valid search criteria
   searchResults: null,
   linkResults: null,
-  skip: 0, // where to start the pagination for the main results tab
-  skipLinks: 0, // where to start the pagination for the links tab
+  skip: {
+    keywords: 0, // where to start the pagination for the main results tab
+    links: 0 // where to start the pagination for the links tab
+  },
   resultsPerPage: 10, // number of results per page
   showFields: { // what result fields to show by default on the main results tab
     url: true,
@@ -114,7 +116,8 @@ const resetSearch = function(): void {
   state.searchParams.whereToSearch.title = true;
   state.searchParams.whereToSearch.text = true;
   state.searchParams.caseSensitive = false;
-  state.skip = 0; // reset to first page
+  state.skip.keywords = 0;
+  state.skip.links = 0;
   state.searchParams.areaToSearch = SearchArea.Any;
   state.searchResults = null;
   state.waiting = false;

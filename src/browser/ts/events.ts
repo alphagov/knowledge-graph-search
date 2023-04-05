@@ -11,6 +11,8 @@ declare const window: any;
 
 const handleEvent: SearchApiCallback = async function(event) {
   let fieldClicked: RegExpMatchArray | null;
+  let paginationPrevButtonClicked: RegExpMatchArray | null;
+  let paginationNextButtonClicked: RegExpMatchArray | null;
   console.log('handleEvent:', event.type, event.id || '')
   switch (event.type) {
     case EventType.Dom:
@@ -28,10 +30,10 @@ const handleEvent: SearchApiCallback = async function(event) {
           searchButtonClicked();
           break;
         case 'button-next-page':
-          state.skip = state.skip + state.resultsPerPage;
+          state.skip[event.id] = state.skip[event.id] + state.resultsPerPage;
           break;
         case 'button-prev-page':
-          state.skip = Math.max(state.skip - state.resultsPerPage, 0);
+          state.skip[event.id] = Math.max(state.skip[event.id] - state.resultsPerPage, 0);
           break;
         case 'keyword-results':
         case 'link-results':
@@ -48,7 +50,17 @@ const handleEvent: SearchApiCallback = async function(event) {
           if (fieldClicked && event.id) {
             state.showFields[fieldClicked[1]] = (<HTMLInputElement>id(event.id))?.checked;
           } else {
-            console.log('unknown DOM event received:', event);
+            paginationPrevButtonClicked = event.id ? event.id.match(/button-prev-page-(.*)/) : null;
+            if (paginationPrevButtonClicked && event.id) {
+              state.skip[paginationPrevButtonClicked[1]] += state.resultsPerPage;
+            } else {
+              paginationNextButtonClicked = event.id ? event.id.match(/button-next-page-(.*)/) : null;
+              if (paginationNextButtonClicked && event.id) {
+                state.skip[paginationNextButtonClicked[1]] += state.resultsPerPage;
+              } else {
+                console.log('unknown DOM event received:', event);
+              }
+            }
           }
       }
       break;
@@ -97,7 +109,8 @@ const setSearchParamsFromForm = function() {
   state.searchParams.whereToSearch.text = (<HTMLInputElement>id('search-text')) ?
     (<HTMLInputElement>id('search-text')).checked : true;
   state.searchParams.caseSensitive = (<HTMLInputElement>id('case-sensitive'))?.checked || false;
-  state.skip = 0; // reset to first page
+  state.skip.keywords = 0; // reset to first page of keywords results
+  state.skip.links = 0; // reset to first page of links results
   if ((<HTMLInputElement>id('area-publisher'))?.checked) state.searchParams.areaToSearch = SearchArea.Publisher;
   if ((<HTMLInputElement>id('area-whitehall'))?.checked) state.searchParams.areaToSearch = SearchArea.Whitehall;
   if ((<HTMLInputElement>id('area-any'))?.checked) state.searchParams.areaToSearch = SearchArea.Any;
