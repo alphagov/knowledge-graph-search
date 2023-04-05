@@ -1,6 +1,6 @@
 import { state } from '../state';
 import { viewMetaLink } from './view-components';
-import { Taxon, Organisation, Transaction, BankHoliday } from '../search-api-types';
+import { Taxon, Organisation, Transaction, BankHoliday } from '../../../common/search-api-types';
 
 
 const viewDetails = (title: string, list: any[], itemFormatFn: (item: any) => string): string => {

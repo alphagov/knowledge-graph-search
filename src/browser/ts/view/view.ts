@@ -1,7 +1,7 @@
-import { id, keywordQueryDescription, linkQueryDescription } from '../utils';
+import { id, keywordQueryDescription, linkQueryDescription } from '../../../common/utils';
 import { state, searchState, thereAreResults } from '../state';
 import { handleEvent } from '../events';
-import { languageName } from '../lang';
+import { languageName } from '../../../common/lang';
 import {
   viewPerson,
   viewOrganisation,
@@ -12,7 +12,7 @@ import {
  } from './view-metabox';
 import { viewSearchPanel, viewKeywordsInput, viewSearchButton } from './view-search-panel';
 import { EventType } from '../event-types';
-import { SearchResults } from '../search-api-types';
+import { SearchResults } from '../../../common/search-api-types';
 
 
 declare const window: any;

@@ -52,6 +52,6 @@ windows:
       # synchronize: after
       panes:
         - emacs -nw .
-        - cd src/scss && ls main.scss | entr -dr sass main.scss > ../../public/main.css
+        - cd src/browser/scss && ls main.scss | entr -dr sass main.scss > ../../../public/main.css
         - npx webpack -w
         - DISABLE_AUTH=1 PROJECT_ID=govuk-knowledge-graph npm run dev

@@ -1,5 +1,5 @@
-import { languageName } from './lang';
-import { SearchParams, Combinator, SearchArea, SearchResults } from './search-api-types';
+import { languageName } from '../../common/lang';
+import { SearchParams, Combinator, SearchArea, SearchResults } from '../../common/search-api-types';
 import { State } from './state-types';
 
 

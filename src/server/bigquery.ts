@@ -1,6 +1,6 @@
-import { Transaction, Taxon, Organisation, Person, Role, MetaResultType, SearchParams, Combinator, SearchResults, InitResults, BankHoliday } from './src/ts/search-api-types';
-import { splitKeywords } from './src/ts/utils';
-import { languageCode } from './src/ts/lang';
+import { Transaction, Taxon, Organisation, Person, Role, MetaResultType, SearchParams, Combinator, SearchResults, InitResults, BankHoliday } from '../common/search-api-types';
+import { splitKeywords } from '../common/utils';
+import { languageCode } from '../common/lang';
 const { BigQuery } = require('@google-cloud/bigquery');
 
 //====== private ======

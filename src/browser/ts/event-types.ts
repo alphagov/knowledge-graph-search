@@ -1,4 +1,4 @@
-import { SearchResults } from './search-api-types';
+import { SearchResults } from '../../common/search-api-types';
 
 export interface SearchApiCallback {
   (event: AppEvent): Promise<void>

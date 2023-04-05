@@ -1,5 +1,5 @@
-import { SearchParams, SearchArea, Combinator, SearchResults } from './search-api-types';
-import { languageCode } from './lang';
+import { SearchParams, SearchArea, Combinator, SearchResults } from '../../common/search-api-types';
+import { languageCode } from '../../common/lang';
 import { EventType, SearchApiCallback } from './event-types';
 
 

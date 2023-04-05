@@ -1,6 +1,6 @@
-import { sanitiseOutput } from '../utils';
+import { sanitiseOutput } from '../../../common/utils';
 import { state, searchState } from '../state';
-import { languageName } from '../lang';
+import { languageName } from '../../../common/lang';
 
 
 const viewSearchPanel = () => `

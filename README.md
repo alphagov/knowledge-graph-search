@@ -15,8 +15,8 @@ Docs](https://docs.data-community.publishing.service.gov.uk).
 - run `npm install` to install all dependencies
 - Install [Sass](https://sass-lang.com/install) and compile the Sass sources to CSS with
 
-    cd src/scss
-    sass main.scss > ../../public/main.css
+    cd src/browese/scss
+    sass main.scss > ../../../public/main.css
 
 - Install [webpack](https://webpack.js.org/) and compile the browser-side Typescript code to JavaScript by just running `webpack`
 
@@ -36,12 +36,13 @@ Docs](https://docs.data-community.publishing.service.gov.uk).
 
 ## Files
 
-- `app.ts`: the main server file. All the `.ts` files in the same folder are server-side code.
+- `app.ts`: the main server file. All the other server-side source files in `src/server`.
 
-- `src/ts/*.ts`: the main browser-side files (some type definitions and
-  utilities are also used server-side). `webpack` compiles everything to `/public/main.js`.
+- `src/browser/ts/*.ts`: the main browser-side files. `webpack` compiles everything to `/public/main.js`.
 
-- `src/scss/main.scss`: the Sass file that `sass` compiles to `/public/main.css`
+- `src/common/*.ts`: TS source files that are used by both server and browser code.
+
+- `src/browser/scss/main.scss`: the Sass file that `sass` compiles to `/public/main.css`
 
 - `public/assets`: fonts and images
 

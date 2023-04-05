@@ -6,9 +6,9 @@ const bodyParser = require('body-parser');
 // OAuth is enabled
 let OAuth2Strategy, passport, session, ensureLoggedIn;
 
-import { sendSearchQuery, sendInitQuery } from './bigquery';
-import { SearchArea, Combinator, SearchParams } from './src/ts/search-api-types';
-import { csvStringify } from './csv';
+import { sendSearchQuery, sendInitQuery } from './src/server/bigquery';
+import { SearchArea, Combinator, SearchParams } from './src/common/search-api-types';
+import { csvStringify } from './src/server/csv';
 
 
 // Initialize the express engine
@@ -85,7 +85,7 @@ if (!process.env.DISABLE_AUTH) {
 
 app.get('/',
   checkLoggedIn('/login'),
-  async (req, res) => res.sendFile('views/index.html', {root: __dirname })
+  async (req, res) => res.sendFile('./views/index.html', {root: __dirname })
 );
 
 
