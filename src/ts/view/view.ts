@@ -27,10 +27,6 @@ const view = () => {
       <main class="govuk-main-wrapper" id="main-content" role="main">
         ${viewErrorBanner()}
         ${viewMainLayout()}
-        <p class="govuk-body-s">
-          Searches do not include history mode content, Publisher GitHub smart answers or service domains.
-          Page views depend on cookie consent.
-        </p>
       </main>
     `;
   }
@@ -61,38 +57,30 @@ const view = () => {
       handleEvent({ type: EventType.Dom, id: 'search' });
     });
 
+
   // focus on the results heading if present
   id('results-heading')?.focus();
+
 };
 
 
 const viewMainLayout = () => {
-  const result = [];
-  if (state.searchParams.searchType === 'advanced') {
-    if (!state.searchResults) {
-      result.push(`
-        <div class="govuk-grid-row advanced-layout--no-results">
-          <div class="govuk-grid-column-two-thirds">
-            ${viewSearchPanel()}
-          </div>
-        </div>
-      `);
-    } else {
-      result.push(`
-        <div class="govuk-grid-row advanced-layout">
-          <div class="govuk-grid-column-one-third">
-            ${viewSearchPanel()}
-          </div>
-          <div class="govuk-grid-column-two-thirds">
-            ${viewSearchResults()}
-          </div>
-        </div>
-      `);
-    }
-  } else {
-    result.push(`
-      <div class="govuk-grid-row simple-search">
-        <div class="govuk-grid-column-two-thirds">
+  const html: string[] = [];
+  html.push(`
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <form class="govuk-form">
+          ${viewKeywordsInput()}
+          ${viewSearchButton()}
+        </form>
+      </div>
+    </div>
+  `);
+
+  if (thereAreResults(state.searchResults)) {
+    html.push(`
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-third">
           ${viewSearchPanel()}
         </div>
         <div class="govuk-grid-column-two-thirds">

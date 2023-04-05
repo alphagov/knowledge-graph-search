@@ -19,7 +19,6 @@ const viewSearchPanel = () => `
 `;
 
 
-
 const viewInlineError = (id: string, message: string): string => `
   <p id="${id}" class="govuk-error-message">
     <span class="govuk-visually-hidden">Error:</span> ${message}
