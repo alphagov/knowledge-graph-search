@@ -45,9 +45,11 @@ const fetchWithTimeout = async function(url: string, timeoutSeconds: number = 60
 // called from browser
 const queryBackend: (searchParams: SearchParams, callback: SearchApiCallback) => Promise<void> = async function(searchParams, callback) {
   callback({ type: EventType.SearchRunning });
-  const url = `/search?${makeQueryString(searchParams)}`;
   searchParams.selectedWords = searchParams.selectedWords.replace(/[“”]/g,'"');
+  searchParams.excludedWords = searchParams.excludedWords.replace(/[“”]/g,'"');
+  const url = `/search?${makeQueryString(searchParams)}`;
   let results: SearchResults;
+
   try {
     results = await fetchWithTimeout(url, 300);
   } catch (error: any) {
