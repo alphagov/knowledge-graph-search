@@ -128,7 +128,7 @@ app.get('/search', checkLoggedIn('/'), async (req: any, res) => {
   }
 });
 
-app.get('/csv', async (req: any, res) => {
+app.get('/csv/:type', async (req: any, res) => {
   console.log('API call to /csv', req.query);
   // retrieve qsp params
   const params: SearchParams = {
@@ -147,7 +147,7 @@ app.get('/csv', async (req: any, res) => {
   };
   try {
     const data = await sendSearchQuery(params);
-    const csvData = csvStringify(data.main);
+    const csvData = csvStringify(data[req.params.type]);
     res.set('Content-Type', 'text/csv');
     res.send(csvData);
   } catch (e: any) {

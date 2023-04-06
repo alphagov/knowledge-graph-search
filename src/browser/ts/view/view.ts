@@ -202,7 +202,7 @@ const viewResultsTable = (tabId: string, results: any[], description: string) =>
         <button type="button" class="govuk-button" id="button-next-page-${tabId}" ${state.skip[tabId] + state.resultsPerPage >= results.length ? "disabled" : ""}>Next</button>
       </p>`);
     html.push(`
-      <p class="govuk-body"><a class="govuk-link" href="/csv${window.location.search}" download="export.csv">Download all ${state.searchResults.keywords.length} records in CSV</a></p>`);
+      <p class="govuk-body"><a class="govuk-link" href="/csv/${tabId}/${window.location.search}" download="export.csv">Download all ${state.searchResults[tabId].length} records in CSV</a></p>`);
     return html.join('');
   } else {
     return '';
