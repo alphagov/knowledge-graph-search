@@ -309,64 +309,115 @@ const viewSearchResultsTabs = (results: SearchResults) => {
   // The panels
 
   if (results.keywords.length > 0) {
+    const isSelectedTab = state.selectedTabId === 'keyword-results';
     html.push(`
-      <div id="keyword-results" class="govuk-tabs__panel ${state.selectedTabId === 'keyword-results' ? '' : 'govuk-tabs__panel--hidden'}">
-        ${viewResultsTable('keywords', results.keywords, keywordQueryDescription(state.searchParams, false))}
+      <div id="keyword-results" class="govuk-tabs__panel ${isSelectedTab ? '' : 'govuk-tabs__panel--hidden'}">
+        ${isSelectedTab ? viewResultsTable('keywords', results.keywords, keywordQueryDescription(state.searchParams, false)) : ''}
       </div>
     `);
   }
   if (results.links.length > 0) {
+    const isSelectedTab = state.selectedTabId === 'link-results';
     html.push(`
-      <div id="link-results" class="govuk-tabs__panel ${state.selectedTabId === 'link-results' ? '' : 'govuk-tabs__panel--hidden'}">
-        ${viewResultsTable('links', results.links, linkQueryDescription(state.searchParams, false))}
+      <div id="link-results" class="govuk-tabs__panel ${isSelectedTab ? '' : 'govuk-tabs__panel--hidden'}">
+        ${isSelectedTab ? viewResultsTable('links', results.links, linkQueryDescription(state.searchParams, false)) : ''}
       </div>
     `);
   }
+
   if (results.persons.length > 0) {
+    const isSelectedTab = state.selectedTabId === 'person-results';
     html.push(`
       <div id="person-results" class="govuk-tabs__panel ${state.selectedTabId === 'person-results' ? '' : 'govuk-tabs__panel--hidden'}">
+    `);
+    if (isSelectedTab) {
+      html.push(`
         <h1 class="govuk-heading-m">Persons whose name matches: ${state.searchParams.selectedWords}</h1>
         ${results.persons.map(viewPerson).join('<hr class="govuk-section-break govuk-section-break--visible"/>')}
+      `);
+    }
+    html.push(`
       </div>
     `);
   }
+
   if (results.organisations.length > 0) {
+    const isSelectedTab = state.selectedTabId === 'organisation-results';
     html.push(`
-      <div id="organisation-results" class="govuk-tabs__panel ${state.selectedTabId === 'organisation-results' ? '' : 'govuk-tabs__panel--hidden'}">
+      <div id="organisation-results" class="govuk-tabs__panel ${isSelectedTab ? '' : 'govuk-tabs__panel--hidden'}">
+    `);
+    if (isSelectedTab) {
+      html.push(`
         <h1 class="govuk-heading-m">Organisations whose name matches: ${state.searchParams.selectedWords}</h1>
         ${results.organisations.map(viewOrganisation).join('<hr class="govuk-section-break govuk-section-break--visible"/>')}
+      `);
+    }
+    html.push(`
       </div>
     `);
   }
+
   if (results.bankHolidays.length > 0) {
+    const isSelectedTab = state.selectedTabId === 'organisation-results';
     html.push(`
-      <div id="bank-holiday-results" class="govuk-tabs__panel ${state.selectedTabId === 'bank-holiday-results' ? '' : 'govuk-tabs__panel--hidden'}">
+      <div id="bank-holiday-results" class="govuk-tabs__panel ${isSelectedTab ? '' : 'govuk-tabs__panel--hidden'}">
+    `);
+    if (isSelectedTab) {
+      html.push(`
         <h1 class="govuk-heading-m">Bank holidays whose name matches: ${state.searchParams.selectedWords}</h1>
         ${results.bankHolidays.map(viewBankHoliday).join('<hr class="govuk-section-break govuk-section-break--visible"/>')}
       </div>
     `);
-  }
-  if (results.taxons.length > 0) {
+    }
     html.push(`
-      <div id="taxon-results" class="govuk-tabs__panel ${state.selectedTabId === 'taxon-results' ? '' : 'govuk-tabs__panel--hidden'}">
+      </div>
+    `);
+  }
+
+  if (results.taxons.length > 0) {
+    const isSelectedTab = state.selectedTabId === 'taxon-results';
+    html.push(`
+      <div id="taxon-results" class="govuk-tabs__panel ${isSelectedTab ? '' : 'govuk-tabs__panel--hidden'}">
+    `);
+    if (isSelectedTab) {
+      html.push(`
         <h1 class="govuk-heading-m">GOV.UK taxons whose name matches: ${state.searchParams.selectedWords}</h1>
         ${results.taxons.map(viewTaxon).join('<hr class="govuk-section-break govuk-section-break--visible"/>')}
+      `);
+    }
+    html.push(`
       </div>
     `);
   }
+
   if (results.roles.length > 0) {
+    const isSelectedTab = state.selectedTabId === 'role-results';
     html.push(`
-      <div id="role-results" class="govuk-tabs__panel ${state.selectedTabId === 'role-results' ? '' : 'govuk-tabs__panel--hidden'}">
+      <div id="role-results" class="govuk-tabs__panel ${isSelectedTab ? '' : 'govuk-tabs__panel--hidden'}">
+    `);
+    if (isSelectedTab) {
+      html.push(`
         <h1 class="govuk-heading-m">Official roles whose name matches: ${state.searchParams.selectedWords}</h1>
         ${results.roles.map(viewRole).join('<hr class="govuk-section-break govuk-section-break--visible"/>')}
+      `);
+    }
+    html.push(`
       </div>
     `);
   }
+
   if (results.transactions.length > 0) {
+    const isSelectedTab = state.selectedTabId === 'transaction-results';
     html.push(`
       <div id="transaction-results" class="govuk-tabs__panel ${state.selectedTabId === 'transaction-results' ? '' : 'govuk-tabs__panel--hidden'}">
+    `);
+    if (isSelectedTab) {
+      html.push(`
         <h1 class="govuk-heading-m">Online services whose name matches: ${state.searchParams.selectedWords}</h1>
         ${results.transactions.map(viewTransaction).join('<hr class="govuk-section-break govuk-section-break--visible"/>')}
+     `);
+    }
+    html.push(`
       </div>
     `);
   }
