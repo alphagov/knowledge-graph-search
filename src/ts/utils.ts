@@ -28,6 +28,7 @@ const getFormInputValue = (inputId: string): string =>
 const sanitiseInput = function(text: string): string {
   // remove text that could lead to script injections
   if (!text) return '';
+  text = text.trim();
   let oldText: string;
   do {
     oldText = text;
