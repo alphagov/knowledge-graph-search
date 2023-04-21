@@ -9,6 +9,7 @@ let OAuth2Strategy, passport, session, ensureLoggedIn;
 import { sendSearchQuery, sendInitQuery, getOrganisationInfo, getPersonInfo, getRoleInfo, getTaxonInfo, getBankHolidayInfo, getTransactionInfo } from './bigquery';
 import { SearchArea, Combinator, SearchType, SearchParams } from './src/ts/search-api-types';
 import { csvStringify } from './csv';
+import { sanitiseInput } from './src/ts/utils';
 
 
 // Initialize the express engine
@@ -107,20 +108,20 @@ app.get('/search', checkLoggedIn('/'), async (req: any, res) => {
   console.log('API call to /search', req.query);
   // retrieve qsp params
   const params: SearchParams = {
-    searchType: req.query['search-type'] || SearchType.Keyword,
-    selectedWords: req.query['selected-words'] || '',
-    excludedWords: req.query['excluded-words'] || '',
-    selectedTaxon: req.query['selected-taxon'] || '',
-    selectedOrganisation: req.query['selected-organisation'] || '',
-    selectedLocale: req.query['lang'] || '',
-    caseSensitive: req.query['case-sensitive'] || false,
-    combinator: req.query['combinator'] || Combinator.All,
+    searchType: <SearchType>sanitiseInput(req.query['search-type']) || SearchType.Keyword,
+    selectedWords: sanitiseInput(req.query['selected-words']) || '',
+    excludedWords: sanitiseInput(req.query['excluded-words']) || '',
+    selectedTaxon: sanitiseInput(req.query['selected-taxon']) || '',
+    selectedOrganisation: sanitiseInput(req.query['selected-organisation']) || '',
+    selectedLocale: sanitiseInput(req.query['lang']) || '',
+    caseSensitive: req.query['case-sensitive'] === 'true',
+    combinator: <Combinator>sanitiseInput(req.query['combinator']) || Combinator.All,
     whereToSearch: {
       title: !(req.query['search-in-title'] === 'false'),
       text: !(req.query['search-in-text'] === 'false')
     },
-    areaToSearch: req.query['area'] || SearchArea.Any,
-    linkSearchUrl: req.query['link-search-url'] || ''
+    areaToSearch: <SearchArea>sanitiseInput(req.query['area']) || SearchArea.Any,
+    linkSearchUrl: sanitiseInput(req.query['link-search-url']) || ''
   };
   try {
     const data = await sendSearchQuery(params);

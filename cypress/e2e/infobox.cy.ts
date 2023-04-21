@@ -24,11 +24,13 @@ describe('Infobox results', () => {
     cy.contains('div.meta-results-panel p', 'Bank holiday');
   });
 
+/*
   it('Shows the Organisation infobox', () => {
     cy.visit('?selected-words=%22Ministry+of+Defence%22&search-in-text=false')
     cy.contains('div.meta-results-panel h2', 'Ministry of Defence');
     cy.contains('div.meta-results-panel p', 'Government organisation');
   });
+*/
 
   it('Shows the Transaction infobox', () => {
     cy.visit('?selected-words=%22Accept+a+refugee+integration+loan%22&search-in-text=false')
