@@ -20,6 +20,19 @@ export enum SearchArea {
   Publisher = 'publisher'
 }
 
+export enum WhereToSearch {
+  Title = 'title',
+  Text = 'text',
+  All = 'all'
+}
+
+export enum Sorting {
+  PageViewsDesc = 'pageViewsDesc',
+  PageViewsAsc = 'pageViewsAsc',
+  RecentlyUpdated = 'recentlyUpdated',
+  RecentlyPublished = 'recentlyPublished'
+}
+
 export type SearchParams = {
   searchType: SearchType,
   selectedWords: string, // list of words to search
@@ -28,13 +41,17 @@ export type SearchParams = {
   selectedOrganisation: string, // organisation to search in
   selectedLocale: string, // the language to search for
   linkSearchUrl: string, // URL to find all pages linking to
+/*
   whereToSearch: {
     title: boolean,
     text: boolean
-  }, // what parts of the pages to search in
+  },
+*/
+  whereToSearch: WhereToSearch,
   combinator: Combinator, // all keywords or any keywords
   areaToSearch: SearchArea, // whitehall, publisher, both
-  caseSensitive: boolean // case sensitive keyword search?
+  caseSensitive: boolean, // case sensitive keyword search?
+  sorting: Sorting
 }
 
 export enum MetaResultType {

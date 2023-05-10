@@ -1,5 +1,5 @@
 import { languageName } from './lang';
-import { SearchParams } from './search-api-types';
+import { SearchParams, WhereToSearch } from './search-api-types';
 
 const id = (x: string): (HTMLElement | null) => document.getElementById(x);
 
@@ -23,6 +23,9 @@ const tagOrComment: RegExp = new RegExp(
 
 const getFormInputValue = (inputId: string): string =>
   sanitiseInput((<HTMLInputElement>id(inputId))?.value);
+
+const getFormSelectValue = (selectId: string): string =>
+    sanitiseInput((<HTMLSelectElement>id(selectId))?.selectedOptions[0].value);
 
 
 const sanitiseInput = function(text: string): string {
@@ -91,9 +94,11 @@ const queryDescription = (search: SearchParams, includeMarkup = true) => {
 
 const containDescription = (search: SearchParams, includeMarkup: boolean) => {
   let where: string;
-  if (search.whereToSearch.title && search.whereToSearch.text) {
+  //if (search.whereToSearch.title && search.whereToSearch.text) {
+  if (search.whereToSearch === WhereToSearch.All) {
     where = '';
-  } else if (search.whereToSearch.title) {
+  //} else if (search.whereToSearch.title) {
+  } else if (search.whereToSearch === WhereToSearch.Title) {
     where = 'in their title';
   } else {
     where = 'in their body content';
@@ -112,4 +117,4 @@ const makeBold = (text: string, includeMarkup: boolean) =>
     `"${text}"`;
 
 
-export { id, sanitiseInput, sanitiseOutput, getFormInputValue, splitKeywords, queryDescription };
+export { id, sanitiseInput, sanitiseOutput, getFormInputValue, splitKeywords, queryDescription, getFormSelectValue };

@@ -1,9 +1,9 @@
 import { state, searchState, resetSearch } from './state';
-import { id, getFormInputValue } from './utils';
+import { id, getFormInputValue, getFormSelectValue } from './utils';
 import { view } from './view/view';
 import { queryBackend } from './search-api';
 import { EventType, SearchApiCallback } from './event-types';
-import { SearchType, SearchArea, Combinator } from './search-api-types';
+import { SearchType, SearchArea, Combinator, WhereToSearch, Sorting } from './search-api-types';
 import { languageCode } from './lang'
 
 
@@ -11,11 +11,12 @@ declare const window: any;
 
 const handleEvent: SearchApiCallback = async function(event) {
   let fieldClicked: RegExpMatchArray | null;
-  console.log('handleEvent:', event.type, event.id || '')
+  //console.log('handleEvent:', event.type, event.id || '')
   switch (event.type) {
     case EventType.Dom:
       switch (event.id) {
         case 'search':
+        case 'sorting':
           // Tell GTM a search is starting
           window.dataLayer?.push({
             'event': 'formSubmission',
@@ -29,16 +30,39 @@ const handleEvent: SearchApiCallback = async function(event) {
           state.searchParams.selectedTaxon = getFormInputValue('taxon');
           state.searchParams.selectedOrganisation = getFormInputValue('organisation');
           state.searchParams.selectedLocale = getFormInputValue('locale');
-          state.searchParams.whereToSearch.title = (<HTMLInputElement>id('search-title'))?.checked;
-          state.searchParams.whereToSearch.text = (<HTMLInputElement>id('search-text'))?.checked;
+          state.searchParams.sorting = <Sorting>(getFormSelectValue('sorting'));
+
+          if ((<HTMLInputElement>id('where-to-search-all'))?.checked) state.searchParams.whereToSearch = WhereToSearch.All;
+          if ((<HTMLInputElement>id('where-to-search-title'))?.checked) state.searchParams.whereToSearch = WhereToSearch.Title;
+          if ((<HTMLInputElement>id('where-to-search-text'))?.checked) state.searchParams.whereToSearch = WhereToSearch.Text;
+
+
           state.searchParams.caseSensitive = (<HTMLInputElement>id('case-sensitive'))?.checked;
           state.searchParams.linkSearchUrl = getFormInputValue('link-search');
           state.skip = 0; // reset to first page
           if ((<HTMLInputElement>id('area-publisher'))?.checked) state.searchParams.areaToSearch = SearchArea.Publisher;
           if ((<HTMLInputElement>id('area-whitehall'))?.checked) state.searchParams.areaToSearch = SearchArea.Whitehall;
           if ((<HTMLInputElement>id('area-any'))?.checked) state.searchParams.areaToSearch = SearchArea.Any;
-          if ((<HTMLInputElement>id('combinator-any'))?.checked) state.searchParams.combinator = Combinator.Any;
-          if ((<HTMLInputElement>id('combinator-all'))?.checked) state.searchParams.combinator = Combinator.All;
+
+          if ((<HTMLInputElement>id('combinator-any'))?.checked) {
+            state.searchParams.combinator = Combinator.Any;
+            state.searchParams.searchType = SearchType.Keyword;
+          }
+          if ((<HTMLInputElement>id('combinator-all'))?.checked) {
+            state.searchParams.combinator = Combinator.All;
+            state.searchParams.searchType = SearchType.Keyword;
+          }
+          if ((<HTMLInputElement>id('combinator-notset'))?.checked) {
+            state.searchParams.combinator = Combinator.NotSet;
+            state.searchParams.linkSearchUrl = getFormInputValue('keyword');
+            state.searchParams.selectedWords = '';
+            state.searchParams.searchType = SearchType.Link;
+          }
+
+          if(state.searchParams.selectedOrganisation === 'undefined' || state.searchParams.selectedOrganisation === 'All publishing organisations') state.searchParams.selectedOrganisation = '';
+          if(state.searchParams.selectedTaxon === 'undefined' || state.searchParams.selectedTaxon === 'All taxons') state.searchParams.selectedTaxon = '';
+          if(state.searchParams.selectedLocale === 'undefined' || state.searchParams.selectedLocale === 'All languages') state.searchParams.selectedLocale = '';
+
           state.searchResults = null;
           searchButtonClicked();
           break;
@@ -90,7 +114,8 @@ const handleEvent: SearchApiCallback = async function(event) {
       state.waiting = true;
       break;
     case EventType.SearchApiCallbackOk:
-      state.searchResults = event.results?.main.sort((a: any, b: any) => b.page_views - a.page_views);
+      //state.searchResults = event.results?.main.sort((a: any, b: any) => b.page_views - a.page_views);
+      state.searchResults = event.results?.main;
       state.metaSearchResults = event.results?.meta;
       state.waiting = false;
       state.systemErrorText = null;
@@ -153,10 +178,10 @@ const updateUrl = function() {
           searchParams.set('excluded-words', state.searchParams.excludedWords);
         if (state.searchParams.caseSensitive)
           searchParams.set('case-sensitive', state.searchParams.caseSensitive.toString());
-        if (!state.searchParams.whereToSearch.title)
-          searchParams.set('search-in-title', 'false');
-        if (!state.searchParams.whereToSearch.text)
-          searchParams.set('search-in-text', 'false');
+        if (state.searchParams.whereToSearch)
+          searchParams.set('where-to-search', state.searchParams.whereToSearch);
+        if (state.searchParams.sorting)
+          searchParams.set('sorting', state.searchParams.sorting);
         if (state.searchParams.areaToSearch !== SearchArea.Any)
           searchParams.set('area', state.searchParams.areaToSearch);
         if (state.searchParams.combinator !== Combinator.All)
@@ -204,10 +229,10 @@ const updateUrl = function() {
           searchParams.set('lang', languageCode(state.searchParams.selectedLocale));
         if (state.searchParams.caseSensitive)
           searchParams.set('case-sensitive', state.searchParams.caseSensitive.toString());
-        if (!state.searchParams.whereToSearch.title)
-          searchParams.set('search-in-title', 'false');
-        if (!state.searchParams.whereToSearch.text)
-          searchParams.set('search-in-text', 'false');
+        if (state.searchParams.whereToSearch)
+          searchParams.set('where-to-search', state.searchParams.whereToSearch);
+        if (state.searchParams.sorting)
+          searchParams.set('sorting', state.searchParams.sorting);
         if (state.searchParams.areaToSearch !== SearchArea.Any)
           searchParams.set('area', state.searchParams.areaToSearch);
         if (state.searchParams.combinator !== Combinator.All)

@@ -12,10 +12,16 @@ const makeQueryString = function(sp: SearchParams): string {
   if (sp.selectedOrganisation !== '') usp.set('selected-organisation', sp.selectedOrganisation);
   if (sp.selectedLocale !== '') usp.set('lang', languageCode(sp.selectedLocale));
   if (sp.caseSensitive) usp.set('case-sensitive', sp.caseSensitive.toString());
-  if (!sp.whereToSearch.title) usp.set('search-in-title', 'false');
-  if (!sp.whereToSearch.text) usp.set('search-in-text', 'false');
+  //if (!sp.whereToSearch.title) usp.set('search-in-title', 'false');
+  //if (!sp.whereToSearch.text) usp.set('search-in-text', 'false');
+  if (sp.whereToSearch) usp.set('where-to-search', sp.whereToSearch);
+
+  if (sp.sorting) usp.set('sorting', sp.sorting);
+
+
   if (sp.areaToSearch !== SearchArea.Any) usp.set('area', sp.areaToSearch);
   if (sp.combinator !== Combinator.All) usp.set('combinator', sp.combinator);
+  if (sp.combinator == Combinator.NotSet) usp.set('search-type', SearchType.Link);
   if (sp.linkSearchUrl !== '') usp.set('link-search-url', sp.linkSearchUrl);
   return usp.toString();
 };
@@ -50,6 +56,7 @@ const queryBackend: (searchParams: SearchParams, callback: SearchApiCallback) =>
   searchParams.selectedWords = searchParams.selectedWords.replace(/[“”]/g,'"');
   searchParams.excludedWords = searchParams.excludedWords.replace(/[“”]/g,'"');
   const url = `/search?${makeQueryString(searchParams)}`;
+
   let apiResults: SearchResults;
   try {
     apiResults = await fetchWithTimeout(url, 300);

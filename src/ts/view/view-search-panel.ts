@@ -150,7 +150,7 @@ const viewInlineError = (id: string, message: string): string => `
   </p>
 `;
 
-
+/*
 const viewScopeSelector = (): string => {
   const errors = searchState()?.errors;
   const err = errors && errors.includes('missingWhereToSearch');
@@ -188,6 +188,54 @@ const viewScopeSelector = (): string => {
   </div>
   `;
 };
+*/
+
+const viewScopeSelector = (): string => `
+<div class="govuk-form-group">
+ <fieldset
+     class="govuk-fieldset"
+     id="combinator-wrapper"
+     ${state.waiting && 'disabled="disabled"'}>
+
+   <legend class="govuk-fieldset__legend">
+     Keyword location
+   </legend>
+   <div class="govuk-radios" id="whereToSearch">
+
+   <div class="govuk-radios__item">
+     <input class="govuk-radios__input"
+            type="radio" id="where-to-search-title"
+            name="whereToSearch"
+       ${state.searchParams.whereToSearch === 'title' ? 'checked' : ''}/>
+     <label for="where-to-search-title" class="govuk-label govuk-radios__label">
+       Title
+     </label>
+   </div>
+
+   <div class="govuk-radios__item">
+     <input class="govuk-radios__input"
+            type="radio" id="where-to-search-text"
+            name="whereToSearch"
+       ${state.searchParams.whereToSearch === 'text' ? 'checked' : ''}/>
+     <label for="where-to-search-text" class="govuk-label govuk-radios__label">
+       Body content and description
+     </label>
+   </div>
+
+     <div class="govuk-radios__item">
+       <input class="govuk-radios__input"
+              type="radio" id="where-to-search-all"
+              name="whereToSearch"
+         ${state.searchParams.whereToSearch === 'all' ? 'checked' : ''}/>
+       <label for="where-to-search-all" class="govuk-label govuk-radios__label">
+         All keyword locations
+       </label>
+     </div>
+
+   </div>
+ </fieldset>
+</div>
+`;
 
 
 const viewTaxonSelector = () => `

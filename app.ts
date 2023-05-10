@@ -7,7 +7,7 @@ const bodyParser = require('body-parser');
 let OAuth2Strategy, passport, session, ensureLoggedIn;
 
 import { sendSearchQuery, sendInitQuery, getOrganisationInfo, getPersonInfo, getRoleInfo, getTaxonInfo, getBankHolidayInfo, getTransactionInfo } from './bigquery';
-import { SearchArea, Combinator, SearchType, SearchParams } from './src/ts/search-api-types';
+import { SearchArea, Combinator, SearchType, SearchParams, WhereToSearch, Sorting } from './src/ts/search-api-types';
 import { csvStringify } from './csv';
 import { sanitiseInput } from './src/ts/utils';
 
@@ -116,14 +116,19 @@ app.get('/search', checkLoggedIn('/'), async (req: any, res) => {
     selectedLocale: sanitiseInput(req.query['lang']) || '',
     caseSensitive: req.query['case-sensitive'] === 'true',
     combinator: <Combinator>sanitiseInput(req.query['combinator']) || Combinator.All,
+    whereToSearch: <WhereToSearch>sanitiseInput(req.query['where-to-search']) || WhereToSearch.All,
+/*
     whereToSearch: {
       title: !(req.query['search-in-title'] === 'false'),
       text: !(req.query['search-in-text'] === 'false')
     },
+*/
     areaToSearch: <SearchArea>sanitiseInput(req.query['area']) || SearchArea.Any,
-    linkSearchUrl: sanitiseInput(req.query['link-search-url']) || ''
+    linkSearchUrl: sanitiseInput(req.query['link-search-url']) || '',
+    sorting: <Sorting>sanitiseInput(req.query['sorting']) || Sorting.PageViewsDesc,
   };
   try {
+    //console.log('++++', params)
     const data = await sendSearchQuery(params);
     res.send(data);
   } catch (e: any) {
@@ -144,12 +149,16 @@ app.get('/csv', async (req: any, res) => {
     selectedLocale: req.query['lang'] || '',
     caseSensitive: req.query['case-sensitive'] || false,
     combinator: req.query['combinator'] || Combinator.All,
+    whereToSearch: req.query['where-to-search'] || WhereToSearch.All,
+/*
     whereToSearch: {
       title: !(req.query['search-in-title'] === 'false'),
       text: !(req.query['search-in-text'] === 'false')
     },
+*/
     areaToSearch: req.query['area'] || SearchArea.Any,
-    linkSearchUrl: req.query['link-search-url'] || ''
+    linkSearchUrl: req.query['link-search-url'] || '',
+    sorting: req.query['sorting'] || Sorting.PageViewsDesc,
   };
   try {
     const data = await sendSearchQuery(params);

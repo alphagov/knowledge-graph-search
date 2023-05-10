@@ -1,13 +1,8 @@
 @import "../../node_modules/govuk-frontend/govuk/all";
+@import "./search";
 
 .govuk-phase-banner__content__tag {
   vertical-align: 30%;
-}
-
-.govuk-width-container {
-  max-width: unset;
-  margin-left: 20px;
-  margin-right: 20px;
 }
 
 .govuk-header {
@@ -223,4 +218,14 @@ h1:focus-visible, h2:focus-visible {
 
 .hidden {
   display: none;
+}
+
+
+.govuk-accordion .govuk-summary-list .govuk-summary-list__row:last-child {
+  border-bottom: none;
+}
+
+
+.js-enabled .govuk-accordion__section-content {
+  padding-bottom: 30px;
 }

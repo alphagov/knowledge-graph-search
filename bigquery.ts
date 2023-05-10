@@ -1,4 +1,4 @@
-import { Transaction, Taxon, Organisation, Person, Role, MetaResultType, MetaResult, MainResult, SearchParams, Combinator, SearchResults, SearchType, InitResults, BankHoliday } from './src/ts/search-api-types';
+import { Transaction, Taxon, Organisation, Person, Role, MetaResultType, MetaResult, MainResult, SearchParams, Combinator, SearchResults, SearchType, InitResults, BankHoliday, WhereToSearch, Sorting } from './src/ts/search-api-types';
 import { splitKeywords } from './src/ts/utils';
 import { languageCode } from './src/ts/lang';
 const { BigQuery } = require('@google-cloud/bigquery');
@@ -197,13 +197,18 @@ const sendSearchQuery = async function(searchParams: SearchParams): Promise<Sear
 
 
 const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], excludedKeywords: string[]): string {
-
   const contentToSearch = [];
-  if (searchParams.whereToSearch.title) {
+  //if (searchParams.whereToSearch.title) {
+  if (searchParams.whereToSearch === WhereToSearch.Title) {
     contentToSearch.push('IFNULL(page.title, "")');
   }
-  if (searchParams.whereToSearch.text) {
+  //if (searchParams.whereToSearch.text) {
+  if (searchParams.whereToSearch === WhereToSearch.Text) {
     contentToSearch.push('IFNULL(page.text, "")', 'IFNULL(page.description, "")');
+  }
+
+  if (searchParams.whereToSearch === WhereToSearch.All) {
+    contentToSearch.push('IFNULL(page.title, "")', 'IFNULL(page.text, "")', 'IFNULL(page.description, "")');
   }
   const contentToSearchString = contentToSearch.join(' || " " || ');
 
@@ -258,6 +263,18 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
     `;
   }
 
+
+  let sorting = '';
+  if(searchParams.sorting === Sorting.PageViewsAsc){
+    sorting =  `ORDER BY page_views ASC`;
+  } else if(searchParams.sorting === Sorting.RecentlyUpdated){
+    sorting =  `ORDER BY first_published_at DESC`;
+  } else if(searchParams.sorting === Sorting.RecentlyPublished ){
+    sorting =  `ORDER BY public_updated_at DESC`;
+  } else {
+    sorting = `ORDER BY page_views DESC`;
+  }
+
   let linkClause = '';
   if (searchParams.linkSearchUrl !== '') {
     if (internalLinkRegExp.test(searchParams.linkSearchUrl)) {
@@ -307,8 +324,7 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
     ${taxonClause}
     ${organisationClause}
     ${linkClause}
-
-    ORDER BY page_views DESC
+    ${sorting}
 
     LIMIT 10000
   `;
