@@ -15,6 +15,8 @@ const view = () => {
   //console.log('state', state)
   document.title = 'Gov Search';
   const pageContent: (HTMLElement | null) = id('page-content');
+  const initialSearch = state.searchResults === null && state.userErrors.length === 0 && !state.waiting;
+
   if (pageContent) {
     //console.log(state.userErrors.length, state.searchResults)
     pageContent.innerHTML = `
@@ -26,14 +28,40 @@ const view = () => {
           </div>
         </div>
         <div class="govuk-grid-row">
-          <div class="govuk-grid-column-one-third">
-            <div id="filters" ${state.searchResults === null && state.userErrors.length === 0  ? 'style="display: none"': ''}>
+          <div class="${ initialSearch ? `govuk-grid-column-two-thirds` : `govuk-grid-column-one-third`}">
+
+          ${ initialSearch ?
+              `<details class="govuk-details" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                  <span class="govuk-details__summary-text">
+                    Search options
+                  </span>
+                </summary>
+                <div class="govuk-details__text">
+                <div id="initialSearchFilters">
+                  ${viewSearchFilters()}
+                  <button
+                    type="submit"
+                    class="govuk-button ${state.waiting ? 'govuk-button--disabled' : ''}"
+                    ${state.waiting ? 'disabled="disabled"' : ''}
+                    id="search">
+                    Search
+                  </button>
+                </div>
+                </div>
+              </details>`
+            :
+            `<div id="filters">
               ${viewSearchFilters()}
-            </div>
+            </div>`
+          }
+
           </div>
-          <div class="govuk-grid-column-two-thirds">
-            ${viewSearchResults()}
-          </div>
+          ${ initialSearch ? '' :
+            `<div class="govuk-grid-column-two-thirds">
+              ${viewSearchResults()}
+            </div>`
+          }
         </div>
       </main>`;
   }
@@ -91,7 +119,7 @@ const view = () => {
           //showAllValues: true,
           placeholder: 'Search for a '+ (id === 'locale' ? 'language' : id),
           onConfirm: (val) => {
-            if(val){
+            if(val && document.getElementById("filters")){
               document.getElementById(id).value = (val == 'undefined' ? '' : val);
               document.getElementById("search").click()
             }
