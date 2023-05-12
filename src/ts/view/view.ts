@@ -1,6 +1,6 @@
 import { id, queryDescription } from '../utils';
 import { state, searchState } from '../state';
-import { handleEvent } from '../events';
+import { handleEvent, handleSorting } from '../events';
 import { languageName } from '../lang';
 import { viewMetaResults } from './view-metabox';
 import { viewSearchPanel } from './view-search-panel';
@@ -234,69 +234,22 @@ const viewErrorBanner = () => {
   return html.join('');
 };
 
-/*
-const viewSearchResultsTable = () => {
-  const html = [];
-  if (state.searchResults && state.searchResults?.length > 0) {
-    const recordsToShow = state.searchResults?.slice(state.skip, state.skip + state.resultsPerPage);
-    html.push(`
-      <div class="govuk-body">
-        <fieldset class="govuk-fieldset" ${state.waiting && 'disabled="disabled"'}>
-          <legend class="govuk-fieldset__legend">For each result, display:</legend>
-          <ul class="kg-checkboxes" id="show-fields">`);
-    html.push(Object.keys(state.searchResults[0]).map(key => `
-            <li class="kg-checkboxes__item">
-              <input class="kg-checkboxes__input"
-                     data-interactive="true"
-                     type="checkbox" id="show-field-${key}"
-                ${state.showFields[key] ? 'checked' : ''}/>
-              <label for="show-field-${key}" class="kg-label kg-checkboxes__label">${fieldName(key)}</label>
-            </li>`).join(''));
-    html.push(`
-          </ul>
-        </fieldset>
-        <table id="results-table" class="govuk-table">
-          <tbody class="govuk-table__body">
-          <tr class="govuk-table__row">
-            <th scope="col" class="a11y-hidden">Page</th>`);
-    Object.keys(state.showFields).forEach(key => {
-      if (state.showFields[key]) {
-        html.push(`<th scope="col" class="govuk-table__header">${fieldName(key)}</th>`);
-      }
-    });
-
-    recordsToShow.forEach((record, recordIndex) => {
-      html.push(`
-        <tr class="govuk-table__row">
-          <th class="a11y-hidden">${recordIndex}</th>`);
-      Object.keys(state.showFields).forEach(key => {
-        if (state.showFields[key]) {
-          html.push(`<td class="govuk-table__cell">${fieldFormat(key, record[key])}</td>`);
-        }
-      });
-      html.push(`</tr>`);
-    });
-    html.push(`
-          </tbody>
-        </table>
-      </div>`);
-    return html.join('');
-  } else {
-    return '';
-  }
-};
-*/
-
 const viewSearchResultsData = () => {
   const html = [];
+
+
+console.log(state)
   if (state.searchResults && state.searchResults?.length > 0) {
-    const recordsToShow = state.searchResults?.slice(state.skip, state.skip + state.resultsPerPage);
+
+    const results =  state.searchResults.sort((a: any, b: any) => handleSorting(a, b, state.searchParams.sorting));
+
+    const recordsToShow = results?.slice(state.skip, state.skip + state.resultsPerPage);
+
+
+
     html.push(`<div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">`);
 
-
     recordsToShow.forEach((record, recordIndex) => {
-
-      //console.log(record)
       html.push(`
         <div class="govuk-accordion__section">
             <div class="govuk-accordion__section-header">
@@ -382,7 +335,6 @@ if (nbRecords < 10000) {
      `);
     }
 
-    //todo: sorting
     html.push(`<div class="govuk-form-group sort-options">
       <label class="govuk-label sort-options__label" for="sort">
         Sort by
@@ -395,9 +347,7 @@ if (nbRecords < 10000) {
       </select>
     </div>`);
 
-    //html.push(viewSearchResultsTable());
     html.push(viewSearchResultsData());
-
 
     html.push(`<nav class="govuk-pagination govuk-pagination--block" role="navigation" aria-label="results"><div class="govuk-pagination__prev">
 

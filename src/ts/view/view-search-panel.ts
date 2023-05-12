@@ -150,46 +150,6 @@ const viewInlineError = (id: string, message: string): string => `
   </p>
 `;
 
-/*
-const viewScopeSelector = (): string => {
-  const errors = searchState()?.errors;
-  const err = errors && errors.includes('missingWhereToSearch');
-  return `
-  <div class="govuk-form-group ${err ? 'govuk-form-group--error' : ''}">
-    <fieldset
-        class="govuk-fieldset"
-        ${state.waiting && 'disabled="disabled"'}
-        id="search-scope-wrapper"
-        ${err ? 'aria-describedby="scope-error"' : ''}>
-      <legend class="govuk-fieldset__legend">
-        Keyword location
-      </legend>
-      ${err ? viewInlineError('scope-error', 'Please choose at least one option') : ''}
-      <div class="govuk-checkboxes" id="search-locations">
-        <div class="govuk-checkboxes__item">
-          <input
-              class="govuk-checkboxes__input"
-              type="checkbox" id="search-title"
-              ${state.searchParams.whereToSearch.title ? 'checked' : ''}/>
-          <label for="search-title" class="govuk-label govuk-checkboxes__label">title</label>
-        </div>
-        <div class="govuk-checkboxes__item">
-          <input
-              class="govuk-checkboxes__input"
-              type="checkbox"
-              id="search-text"
-            ${state.searchParams.whereToSearch.text ? 'checked' : ''}/>
-          <label for="search-text" class="govuk-label govuk-checkboxes__label">
-            body content and description
-          </label>
-        </div>
-      </div>
-    </fieldset>
-  </div>
-  `;
-};
-*/
-
 const viewScopeSelector = (): string => `
 <div class="govuk-form-group">
  <fieldset

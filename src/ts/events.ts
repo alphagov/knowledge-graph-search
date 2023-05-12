@@ -9,6 +9,23 @@ import { languageCode } from './lang'
 
 declare const window: any;
 
+export const handleSorting = (a: any, b: any, sortBy: Sorting): number => {
+  switch (sortBy) {
+    case Sorting.PageViewsAsc:
+    return a.page_views - b.page_views
+    break;
+    case Sorting.RecentlyPublished:
+    return new Date(b.first_published_at.value).getTime() - new Date(a.first_published_at.value).getTime()
+    break;
+    case Sorting.RecentlyUpdated:
+    return new Date(b.public_updated_at.value).getTime() - new Date(a.public_updated_at.value).getTime()
+    break;
+    default:
+    return b.page_views - a.page_views
+    break;
+  }
+}
+
 const handleEvent: SearchApiCallback = async function(event) {
   let fieldClicked: RegExpMatchArray | null;
   //console.log('handleEvent:', event.type, event.id || '')
@@ -16,7 +33,6 @@ const handleEvent: SearchApiCallback = async function(event) {
     case EventType.Dom:
       switch (event.id) {
         case 'search':
-        case 'sorting':
           // Tell GTM a search is starting
           window.dataLayer?.push({
             'event': 'formSubmission',
@@ -35,7 +51,6 @@ const handleEvent: SearchApiCallback = async function(event) {
           if ((<HTMLInputElement>id('where-to-search-all'))?.checked) state.searchParams.whereToSearch = WhereToSearch.All;
           if ((<HTMLInputElement>id('where-to-search-title'))?.checked) state.searchParams.whereToSearch = WhereToSearch.Title;
           if ((<HTMLInputElement>id('where-to-search-text'))?.checked) state.searchParams.whereToSearch = WhereToSearch.Text;
-
 
           state.searchParams.caseSensitive = (<HTMLInputElement>id('case-sensitive'))?.checked;
           state.searchParams.linkSearchUrl = getFormInputValue('link-search');
@@ -99,6 +114,10 @@ const handleEvent: SearchApiCallback = async function(event) {
           resetSearch();
           state.searchParams.searchType = SearchType.Advanced;
           break;
+        case 'sorting':
+          state.skip = 0;// reset to first page
+          state.searchParams.sorting = <Sorting>(getFormSelectValue('sorting'));
+        break;
         default:
           fieldClicked = event.id ? event.id.match(/show-field-(.*)/) : null;
           if (fieldClicked && event.id) {

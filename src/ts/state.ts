@@ -18,11 +18,6 @@ const initialSearchParams: SearchParams = {
   selectedLocale: '',
   linkSearchUrl: '',
   whereToSearch: WhereToSearch.All,
-  /*
-  whereToSearch: {
-    title: true, // whether search should include page titles
-    text: true  // whether search should include page content
-  },*/
   combinator: Combinator.All,
   areaToSearch: SearchArea.Any,
   caseSensitive: false, // whether the keyword search is case sensitive
@@ -68,12 +63,6 @@ const setQueryParamsFromQS = function(): void {
   state.searchParams.areaToSearch = maybeReplace('areaToSearch', 'area');
   state.searchParams.combinator = maybeReplace('combinator', 'combinator');
   state.searchParams.whereToSearch = maybeReplace('whereToSearch', 'where-to-aearch-all');
-/*
-  state.searchParams.whereToSearch.title = searchParams.get('search-in-title') === 'false' ?
-    false : initialSearchParams.whereToSearch.title;
-  state.searchParams.whereToSearch.text = searchParams.get('search-in-text') === 'false' ?
-    false : initialSearchParams.whereToSearch.text;
-*/
 };
 
 const searchState = function(): { code: string, errors: string[] } {
@@ -94,13 +83,7 @@ const searchState = function(): { code: string, errors: string[] } {
   if (state.searchParams.selectedWords === '' && state.searchParams.excludedWords === '' && state.searchParams.selectedTaxon === '' && state.searchParams.selectedOrganisation === '' && state.searchParams.selectedLocale === '' && state.searchParams.linkSearchUrl === '' /*&& state.searchParams.whereToSearch.title === false && state.searchParams.whereToSearch.text === false*/) {
     return { code: 'initial', errors };
   }
-/*
-  if (state.searchParams.selectedWords !== '') {
-    if (!state.searchParams.whereToSearch.title && !state.searchParams.whereToSearch.text) {
-      errors.push('missingWhereToSearch');
-    }
-  }
-  */
+
   if (errors.length > 0) return { code: 'error', errors };
   if (state.searchResults && state.searchResults.length > 0) return { code: 'results', errors };
   if (state.searchResults && state.searchResults.length === 0) return { code: 'no-results', errors };
@@ -114,8 +97,6 @@ const resetSearch = function(): void {
   state.searchParams.selectedTaxon = '';
   state.searchParams.selectedOrganisation = '';
   state.searchParams.selectedLocale = '';
-  //state.searchParams.whereToSearch.title = true;
-  //state.searchParams.whereToSearch.text = true;
   state.searchParams.whereToSearch = WhereToSearch.All;
 
   state.searchParams.caseSensitive = false;
