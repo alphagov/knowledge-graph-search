@@ -15,10 +15,10 @@ export const handleSorting = (a: any, b: any, sortBy: Sorting): number => {
     return a.page_views - b.page_views
     break;
     case Sorting.RecentlyPublished:
-    return new Date(b.first_published_at.value).getTime() - new Date(a.first_published_at.value).getTime()
+    return new Date(b.first_published_at?.value).getTime() - new Date(a.first_published_at?.value).getTime()
     break;
     case Sorting.RecentlyUpdated:
-    return new Date(b.public_updated_at.value).getTime() - new Date(a.public_updated_at.value).getTime()
+    return new Date(b.public_updated_at?.value).getTime() - new Date(a.public_updated_at?.value).getTime()
     break;
     default:
     return b.page_views - a.page_views
