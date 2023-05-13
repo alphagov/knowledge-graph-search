@@ -153,6 +153,10 @@ const searchButtonClicked = async function(): Promise<void> {
         queryBackend(state.searchParams, handleEvent);
       }
       break;
+    case 'specialist-publisher-search':
+      state.waiting = true;
+      queryBackend(state.searchParams, handleEvent);
+      break;
     case 'error':
       state.userErrors = searchStatus.errors;
       break;

@@ -77,10 +77,13 @@ const searchState = function(): { code: string, errors: string[] } {
   // "waiting": there's a query running
   const errors: string[] = [];
 
-
   if (state.waiting) return { code: 'waiting', errors };
 
-  if (state.searchParams.selectedWords === '' && state.searchParams.excludedWords === '' && state.searchParams.selectedTaxon === '' && state.searchParams.selectedOrganisation === '' && state.searchParams.selectedLocale === '' && state.searchParams.linkSearchUrl === '' /*&& state.searchParams.whereToSearch.title === false && state.searchParams.whereToSearch.text === false*/) {
+  if (state.searchParams.selectedWords === '' && state.searchParams.areaToSearch !== SearchArea.Any) {
+    return { code: 'specialist-publisher-search', errors };
+  }
+
+  if (state.searchParams.selectedWords === '' && state.searchParams.excludedWords === '' && state.searchParams.selectedTaxon === '' && state.searchParams.selectedOrganisation === '' && state.searchParams.selectedLocale === '' && state.searchParams.linkSearchUrl === '') {
     return { code: 'initial', errors };
   }
 
@@ -89,7 +92,6 @@ const searchState = function(): { code: string, errors: string[] } {
   if (state.searchResults && state.searchResults.length === 0) return { code: 'no-results', errors };
   return { code: 'ready-to-search', errors };
 };
-
 
 const resetSearch = function(): void {
   state.searchParams.selectedWords = '';

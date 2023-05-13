@@ -18,7 +18,6 @@ const view = () => {
   const initialSearch = state.searchResults === null && state.userErrors.length === 0 && !state.waiting;
 
   if (pageContent) {
-    //console.log(state.userErrors.length, state.searchResults)
     pageContent.innerHTML = `
       <main class="govuk-main-wrapper" id="main-content" role="main">
         <div class="govuk-grid-row">
@@ -237,15 +236,11 @@ const viewErrorBanner = () => {
 const viewSearchResultsData = () => {
   const html = [];
 
-
-console.log(state)
   if (state.searchResults && state.searchResults?.length > 0) {
 
     const results =  state.searchResults.sort((a: any, b: any) => handleSorting(a, b, state.searchParams.sorting));
 
     const recordsToShow = results?.slice(state.skip, state.skip + state.resultsPerPage);
-
-
 
     html.push(`<div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">`);
 
@@ -397,6 +392,7 @@ const viewSearchResults = () => {
       document.title = `GOV.UK ${queryDescription(state.searchParams, false)} - Gov Search`;
       return viewWaiting();
     case 'results':
+    case 'specialist-publisher-search':
       document.title = `GOV.UK ${queryDescription(state.searchParams, false)} - Gov Search`;
       if (window.ga) window.ga('send', 'search', { search: document.title, resultsFound: true });
       return `${viewMetaResults() || ''} ${viewResults()}`; // FIXME - avoid || ''
