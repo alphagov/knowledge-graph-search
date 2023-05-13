@@ -6,25 +6,7 @@ import { EventType, SearchApiCallback } from './event-types';
 import { SearchType, SearchArea, Combinator, WhereToSearch, Sorting } from './search-api-types';
 import { languageCode } from './lang'
 
-
 declare const window: any;
-
-export const handleSorting = (a: any, b: any, sortBy: Sorting): number => {
-  switch (sortBy) {
-    case Sorting.PageViewsAsc:
-    return a.page_views - b.page_views
-    break;
-    case Sorting.RecentlyPublished:
-    return new Date(b.first_published_at?.value).getTime() - new Date(a.first_published_at?.value).getTime()
-    break;
-    case Sorting.RecentlyUpdated:
-    return new Date(b.public_updated_at?.value).getTime() - new Date(a.public_updated_at?.value).getTime()
-    break;
-    default:
-    return b.page_views - a.page_views
-    break;
-  }
-}
 
 const handleEvent: SearchApiCallback = async function(event) {
   let fieldClicked: RegExpMatchArray | null;
@@ -272,8 +254,25 @@ const updateUrl = function() {
   }
 };
 
+const handleSorting = (a: any, b: any, sortBy: Sorting): number => {
+  switch (sortBy) {
+    case Sorting.PageViewsAsc:
+    return a.page_views - b.page_views
+    break;
+    case Sorting.RecentlyPublished:
+    return new Date(b.first_published_at?.value).getTime() - new Date(a.first_published_at?.value).getTime()
+    break;
+    case Sorting.RecentlyUpdated:
+    return new Date(b.public_updated_at?.value).getTime() - new Date(a.public_updated_at?.value).getTime()
+    break;
+    default:
+    return b.page_views - a.page_views
+    break;
+  }
+}
 
 export {
   handleEvent,
-  searchButtonClicked
+  searchButtonClicked,
+  handleSorting
 };
