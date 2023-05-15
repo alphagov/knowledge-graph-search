@@ -28,7 +28,7 @@ const viewScopeSelector = (): string =>  `
      id="combinator-wrapper"
      ${state.waiting && 'disabled="disabled"'}>
 
-   <legend class="govuk-fieldset__legend">
+   <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
      Keyword location
    </legend>
    <div class="govuk-radios govuk-radios--small" id="whereToSearch">
