@@ -21,46 +21,6 @@ const viewInlineError = (id: string, message: string): string => `
   </p>
 `;
 
-/*
-const viewScopeSelector = (): string => {
-  const errors = searchState()?.errors;
-  const err = errors && errors.includes('missingWhereToSearch');
-  return `
-  <div class="govuk-form-group ${err ? 'govuk-form-group--error' : ''}">
-    <fieldset
-        class="govuk-fieldset"
-        ${state.waiting && 'disabled="disabled"'}
-        id="search-scope-wrapper"
-        ${err ? 'aria-describedby="scope-error"' : ''}>
-      <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-        Keyword location
-      </legend>
-      ${err ? viewInlineError('scope-error', 'Please choose at least one option') : ''}
-      <div class="govuk-checkboxes govuk-checkboxes--small" id="search-locations">
-        <div class="govuk-checkboxes__item">
-          <input
-              class="govuk-checkboxes__input"
-              type="checkbox" id="search-title"
-              ${state.searchParams.whereToSearch.title ? 'checked' : ''}/>
-          <label for="search-title" class="govuk-label govuk-checkboxes__label">title</label>
-        </div>
-        <div class="govuk-checkboxes__item">
-          <input
-              class="govuk-checkboxes__input"
-              type="checkbox"
-              id="search-text"
-            ${state.searchParams.whereToSearch.text ? 'checked' : ''}/>
-          <label for="search-text" class="govuk-label govuk-checkboxes__label">
-            body content and description
-          </label>
-        </div>
-      </div>
-    </fieldset>
-  </div>
-  `;
-};
-*/
-
 const viewScopeSelector = (): string =>  `
 <div class="govuk-form-group">
  <fieldset
@@ -72,7 +32,15 @@ const viewScopeSelector = (): string =>  `
      Keyword location
    </legend>
    <div class="govuk-radios govuk-radios--small" id="whereToSearch">
-
+   <div class="govuk-radios__item">
+     <input class="govuk-radios__input"
+            type="radio" id="where-to-search-all"
+            name="whereToSearch"
+       ${state.searchParams.whereToSearch === 'all' ? 'checked' : ''}/>
+     <label for="where-to-search-all" class="govuk-label govuk-radios__label">
+       All keyword locations
+     </label>
+   </div>
    <div class="govuk-radios__item">
      <input class="govuk-radios__input"
             type="radio" id="where-to-search-title"
@@ -82,7 +50,6 @@ const viewScopeSelector = (): string =>  `
        Title
      </label>
    </div>
-
    <div class="govuk-radios__item">
      <input class="govuk-radios__input"
             type="radio" id="where-to-search-text"
@@ -92,17 +59,6 @@ const viewScopeSelector = (): string =>  `
        Body content and description
      </label>
    </div>
-
-     <div class="govuk-radios__item">
-       <input class="govuk-radios__input"
-              type="radio" id="where-to-search-all"
-              name="whereToSearch"
-         ${state.searchParams.whereToSearch === 'all' ? 'checked' : ''}/>
-       <label for="where-to-search-all" class="govuk-label govuk-radios__label">
-         All keyword locations
-       </label>
-     </div>
-
    </div>
  </fieldset>
 </div>
@@ -263,6 +219,13 @@ const viewPublishingAppSelector = () =>
       <div class="govuk-radios govuk-radios--small" id="site-areas">
         <div class="govuk-radios__item">
           <input class="govuk-radios__input"
+                 type="radio" id="area-any"
+                 name="area"
+            ${state.searchParams.areaToSearch === 'any' ? 'checked' : ''}/>
+          <label for="area-any" class="govuk-label govuk-radios__label">All publishing applications</label>
+        </div>
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input"
                  type="radio" id="area-publisher"
                  name="area"
             ${state.searchParams.areaToSearch === 'publisher' ? 'checked' : ''}/>
@@ -277,13 +240,6 @@ const viewPublishingAppSelector = () =>
             ${state.searchParams.areaToSearch === 'whitehall' ? 'checked' : ''}/>
           <label for="area-whitehall" class="govuk-label govuk-radios__label">Whitehall</label>
         </div>
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input"
-                 type="radio" id="area-any"
-                 name="area"
-            ${state.searchParams.areaToSearch === 'any' ? 'checked' : ''}/>
-          <label for="area-any" class="govuk-label govuk-radios__label">All publishing applications</label>
-        </div>
       </div>
     </fieldset>
   </div>
@@ -293,10 +249,11 @@ const viewPublishingAppSelector = () =>
 const viewKeywordsInput = () => `
 <div class="gem-c-search govuk-!-display-none-print  gem-c-search--on-white" data-module="gem-toggle-input-class-on-focus" data-gem-toggle-input-class-on-focus-module-started="true">
   <label for="search" class="govuk-visually-hidden">Search</label>
+  <div id="search-name-hint" class="govuk-hint">To search for an exact phrase use quotes for example, "UK driving licence"</div>
 <div class="gem-c-search__item-wrapper" data-dashlane-rid="dbf92bc43833220c" data-form-type="">
   <input
   ${state.waiting && 'disabled="disabled"'}
-  enterkeyhint="search" class="gem-c-search__item gem-c-search__input js-class-toggle" id="keyword" name="search" title="Search" type="search"
+  enterkeyhint="search" class="gem-c-search__item gem-c-search__input js-class-toggle" id="keyword" name="search" title="Search" type="search" aria-describedby="search-name-hint"
   value='${sanitiseOutput(state.searchParams.selectedWords) || sanitiseOutput(state.searchParams.linkSearchUrl)}' data-form-type="">
   <div class="gem-c-search__item gem-c-search__submit-wrapper">
     <button
