@@ -13,6 +13,19 @@ A search engine for GOV.UK, with advanced functionality for content designers
 - run the server with `npm run`.
 - Point your browser to `https://localhost:8080` (the port can be changed using the `PORT` environment variable)
 
+## Running locally
+
+In one terminal, run `npx webpack -w` to continuously compile the typescript.
+
+In another terminal, run the app with:
+
+* `PROJECT_ID=govuk-knowledge-graph-dev npm run dev` to use the dev environment
+  as the backend.
+* `PROJECT_ID=govuk-knowledge-graph-staging npm run dev` to use the staging
+  environment as the backend.
+* `PROJECT_ID=govuk-knowledge-graph npm run dev` to use the production
+  environment as the backend.
+
 # Developing
 
 ## Files
