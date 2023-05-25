@@ -1,8 +1,14 @@
 const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const fs = require('fs');
+
+const entries = {};
+const fileNames = fs.readdirSync('./src/ts/').filter((a) => !isNaN(Number(a))).forEach((a) => {
+  entries[`main${a}`] = `./src/ts/${a}/main.ts`;
+});
 
 module.exports = {
-  entry: './src/ts/main.ts',
+  entry: entries,
   mode: 'development',
   module: {
     rules: [
@@ -17,9 +23,11 @@ module.exports = {
     extensions: ['.tsx', '.ts', '.js'],
   },
   output: {
-    filename: 'main.js',
+    filename: '[name].js',
     path: path.resolve(__dirname, 'public'),
   },
+
+
   plugins: [
     new CopyWebpackPlugin({
       patterns: [{

@@ -1,4 +1,4 @@
-import { id, queryDescription } from '../utils';
+import { id, queryDescription, highlight } from '../utils';
 import { state, searchState } from '../state';
 import { handleEvent, handleSorting } from '../events';
 import { languageName } from '../lang';
@@ -7,15 +7,17 @@ import { viewSearchPanel } from './view-search-panel';
 import { viewSearchBox, viewSearchFilters } from './view-search-box';
 import { EventType } from '../event-types';
 
-
 declare const window: any;
 
-
 const view = () => {
-  //console.log('state', state)
-  document.title = 'Gov Search';
+  console.log('state', state)
+  document.title = `Gov Search`;
   const pageContent: (HTMLElement | null) = id('page-content');
   const initialSearch = state.searchResults === null && state.userErrors.length === 0 && !state.waiting;
+
+  var pathArray = window.location.pathname.split('/');
+  var version = pathArray[1];
+  document.getElementById('version').innerHTML = `v${version}`;
 
   if (pageContent) {
     pageContent.innerHTML = `
@@ -127,6 +129,17 @@ const view = () => {
       }
   });
   `)
+
+  //set autocomplete inputs disabled
+  eval(`
+    const autocompleteDisabled = document.querySelectorAll('[data-state="disabled"] input');
+    autocompleteDisabled.forEach(el => {
+      if(el){
+        el.setAttribute('disabled', 'disabled');
+      }
+    });
+    `);
+
 };
 
 const viewSearchTypeSelector = () => `
@@ -253,6 +266,8 @@ const viewSearchResultsData = () => {
                   ${record.title}
                 </span>
               </h2>
+              <div class="govuk-accordion__section-summary govuk-body" id="accordion-with-summary-sections-summary-${recordIndex}">
+              ${ record.text && state.searchParams.selectedWords ? highlight(state.searchParams.selectedWords, record.text) : ''}
             </div>
             <div
               id="accordion-default-content-${recordIndex}"
@@ -260,7 +275,7 @@ const viewSearchResultsData = () => {
               aria-labelledby="accordion-default-heading-${recordIndex}">
               <dl class="govuk-summary-list govuk-!-font-size-16">
                 ${
-                  Object.keys(record).map(key => record[key] && fieldFormat(key, record[key]).length > 0 && !['contentId', 'title'].includes(key) ? `
+                  Object.keys(record).map(key => record[key] && fieldFormat(key, record[key]).length > 0 && !['contentId', 'title', 'text'].includes(key) ? `
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">
                       ${fieldName(key)}
@@ -284,7 +299,7 @@ const viewSearchResultsData = () => {
 const viewWaiting = () => `
   <div aria-live="polite" role="region">
     <div class="govuk-body">
-    ${state.waiting ? '<img src="assets/images/loader.gif" height="20px" alt="loader" class="loader-gif"/>' : ''}
+    ${state.waiting ? '<img src="../assets/images/loader.gif" height="20px" alt="loader" class="loader-gif"/>' : ''}
     Searching for ${queryDescription(state.searchParams)}</div>
     <p class="govuk-body-s">Some queries may take up to a minute</p>
   </div>
@@ -395,11 +410,11 @@ const viewSearchResults = () => {
     case 'specialist-publisher-search':
       document.title = `GOV.UK ${queryDescription(state.searchParams, false)} - Gov Search`;
       if (window.ga) window.ga('send', 'search', { search: document.title, resultsFound: true });
-      return `${viewMetaResults() || ''} ${viewResults()}`; // FIXME - avoid || ''
+      return viewResults();
     case 'no-results':
       document.title = `GOV.UK ${queryDescription(state.searchParams, false)} - Gov Search`;
       if (window.ga) window.ga('send', 'search', { search: document.title, resultsFound: false });
-      return `${viewMetaResults() || ''} ${viewNoResults()}`; // FIXME - avoid || ''
+      return viewNoResults();
     default:
       document.title = 'Gov Search';
       return '';
@@ -411,7 +426,7 @@ const formatNames = (array: []) => [...new Set(array)].map(x => `${x}`).join(', 
 
 
 const formatDateTime = (date: any) =>
-  `${date.value.slice(0, 10)} at ${date.value.slice(11, 16)}`;
+  `${date.value.slice(0,10).split('-').reverse().join('/') }`;
 
 const formatTitleCase = (word: string) => word[0].toUpperCase() + word.slice(1).toLowerCase().replace('_', ' ');
 

@@ -2,12 +2,14 @@ import express from 'express';
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
+const fs = require('fs');
+
 // these variables are used for OAuth authentication. They will only be set if
 // OAuth is enabled
 let OAuth2Strategy, passport, session, ensureLoggedIn;
 
 import { sendSearchQuery, sendInitQuery, getOrganisationInfo, getPersonInfo, getRoleInfo, getTaxonInfo, getBankHolidayInfo, getTransactionInfo } from './bigquery';
-import { SearchArea, Combinator, SearchType, SearchParams, WhereToSearch, Sorting } from './src/ts/search-api-types';
+import { SearchArea, Combinator, SearchType, SearchParams, WhereToSearch, Sorting, Pages } from './src/ts/search-api-types';
 import { csvStringify } from './csv';
 import { sanitiseInput } from './src/ts/utils';
 
@@ -90,6 +92,21 @@ app.get('/',
   async (req, res) => res.sendFile('views/index.html', {root: __dirname })
 );
 
+const entries = {};
+const fileNames = fs.readdirSync('./src/ts/').filter((a: any) => !isNaN(Number(a)));
+
+fileNames.forEach((e: any) => {
+  app.get(`/${e}`,
+    checkLoggedIn('/login'),
+    async (req, res) => res.sendFile(`views/${e}/index.html`, {root: __dirname })
+  );
+  app.get(`/${e}/landing`,
+    async (req, res) => res.sendFile(`views/${e}/landing.html`, {root: __dirname })
+  );
+  app.get(`/${e}/signon`,
+    async (req, res) => res.sendFile(`views/${e}/signon.html`, {root: __dirname })
+  );
+});
 
 
 // the front-end will call this upon starting to get some data needed from the server
@@ -117,18 +134,12 @@ app.get('/search', checkLoggedIn('/'), async (req: any, res) => {
     caseSensitive: req.query['case-sensitive'] === 'true',
     combinator: <Combinator>sanitiseInput(req.query['combinator']) || Combinator.All,
     whereToSearch: <WhereToSearch>sanitiseInput(req.query['where-to-search']) || WhereToSearch.All,
-/*
-    whereToSearch: {
-      title: !(req.query['search-in-title'] === 'false'),
-      text: !(req.query['search-in-text'] === 'false')
-    },
-*/
     areaToSearch: <SearchArea>sanitiseInput(req.query['area']) || SearchArea.Any,
     linkSearchUrl: sanitiseInput(req.query['link-search-url']) || '',
     sorting: <Sorting>sanitiseInput(req.query['sorting']) || Sorting.PageViewsDesc,
+    pages: <Pages>sanitiseInput(req.query['pages']) || Pages.All,
   };
   try {
-    //console.log('++++', params)
     const data = await sendSearchQuery(params);
     res.send(data);
   } catch (e: any) {
@@ -150,15 +161,10 @@ app.get('/csv', async (req: any, res) => {
     caseSensitive: req.query['case-sensitive'] || false,
     combinator: req.query['combinator'] || Combinator.All,
     whereToSearch: req.query['where-to-search'] || WhereToSearch.All,
-/*
-    whereToSearch: {
-      title: !(req.query['search-in-title'] === 'false'),
-      text: !(req.query['search-in-text'] === 'false')
-    },
-*/
     areaToSearch: req.query['area'] || SearchArea.Any,
     linkSearchUrl: req.query['link-search-url'] || '',
     sorting: req.query['sorting'] || Sorting.PageViewsDesc,
+    pages: <Pages>sanitiseInput(req.query['pages']) || Pages.All,
   };
   try {
     const data = await sendSearchQuery(params);

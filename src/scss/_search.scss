@@ -439,3 +439,11 @@ svg.govuk-footer__licence-logo {
   margin-right: 10px;
   height: 20px;
 }
+
+input.gem-c-search__input:disabled,
+.autocomplete__wrapper input:disabled {
+  opacity: .5;
+  color: inherit;
+  background-color: transparent;
+  cursor: not-allowed;
+}

@@ -225,3 +225,62 @@ h1:focus-visible, h2:focus-visible {
 .js-enabled .govuk-accordion__section-content {
   padding-bottom: 30px;
 }
+
+.sort-header {
+  position: relative;
+  padding: 0 10px 0 0;
+  font-size: inherit;
+  border-width: 0;
+  display: inline;
+  background-color: transparent;
+  cursor: pointer;
+  font-weight: bold;
+  &[data-event-action="desending"]:before {
+    content: " ▼";
+    font-size: .7em;
+    position: absolute;
+    right: -2px;
+    top: 2px;
+  }
+  &[data-event-action="desending"]:after, &[data-event-action="ascending"]:after {
+    content: "";
+  }
+  &[data-event-action="ascending"]:before {
+    content: " ▲";
+    font-size: .7em;
+    position: absolute;
+    right: -2px;
+    top: 2px;
+  }
+
+  &:before {
+    content: " ▼";
+    position: absolute;
+    right: -2px;
+    top: 9px;
+    font-size: .5em;
+    text-align: right;
+  }
+  &:after {
+    content: " ▲";
+    position: absolute;
+    right: -2px;
+    top: 0px;
+    font-size: .5em;
+    text-align: right;
+  }
+}
+
+button:focus mark.highlight {
+  background-color: #ffdd00;
+}
+
+mark.highlight-bold {
+  background-color: transparent;
+  font-weight: bold;
+}
+
+#version {
+  float: right;
+  margin-top: 10px;  
+}

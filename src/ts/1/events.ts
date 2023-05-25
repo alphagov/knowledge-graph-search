@@ -3,7 +3,7 @@ import { id, getFormInputValue, getFormSelectValue } from './utils';
 import { view } from './view/view';
 import { queryBackend } from './search-api';
 import { EventType, SearchApiCallback } from './event-types';
-import { SearchType, SearchArea, Combinator, WhereToSearch, Sorting } from './search-api-types';
+import { SearchType, SearchArea, Combinator, WhereToSearch, Sorting, Pages } from './search-api-types';
 import { languageCode } from './lang'
 
 declare const window: any;
@@ -29,6 +29,11 @@ const handleEvent: SearchApiCallback = async function(event) {
           state.searchParams.selectedOrganisation = getFormInputValue('organisation');
           state.searchParams.selectedLocale = getFormInputValue('locale');
           state.searchParams.sorting = <Sorting>(getFormSelectValue('sorting'));
+
+          if ((<HTMLInputElement>id('pages-withdrawn'))?.checked) state.searchParams.pages = Pages.Withdrawn;
+          if ((<HTMLInputElement>id('pages-notWithdrawn'))?.checked) state.searchParams.pages = Pages.NotWithdrawn;
+          if ((<HTMLInputElement>id('pages-all'))?.checked) state.searchParams.pages = Pages.All;
+
 
           if ((<HTMLInputElement>id('where-to-search-all'))?.checked) state.searchParams.whereToSearch = WhereToSearch.All;
           if ((<HTMLInputElement>id('where-to-search-title'))?.checked) state.searchParams.whereToSearch = WhereToSearch.Title;
@@ -191,6 +196,8 @@ const updateUrl = function() {
           searchParams.set('area', state.searchParams.areaToSearch);
         if (state.searchParams.combinator !== Combinator.All)
           searchParams.set('combinator', state.searchParams.combinator);
+        if (state.searchParams.pages)
+          searchParams.set('pages', state.searchParams.pages);
         break;
       case SearchType.Link:
         searchParams.set('search-type', state.searchParams.searchType);
@@ -234,6 +241,8 @@ const updateUrl = function() {
           searchParams.set('lang', languageCode(state.searchParams.selectedLocale));
         if (state.searchParams.caseSensitive)
           searchParams.set('case-sensitive', state.searchParams.caseSensitive.toString());
+        if (state.searchParams.pages)
+          searchParams.set('pages', state.searchParams.pages);
         if (state.searchParams.whereToSearch)
           searchParams.set('where-to-search', state.searchParams.whereToSearch);
         if (state.searchParams.sorting)

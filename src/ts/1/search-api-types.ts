@@ -26,17 +26,17 @@ export enum WhereToSearch {
   All = 'all'
 }
 
+export enum Pages {
+  Withdrawn = 'withdrawn',
+  NotWithdrawn = 'notWithdrawn',
+  All = 'all'
+}
+
 export enum Sorting {
   PageViewsDesc = 'pageViewsDesc',
   PageViewsAsc = 'pageViewsAsc',
   RecentlyUpdated = 'recentlyUpdated',
   RecentlyPublished = 'recentlyPublished'
-}
-
-export enum Pages {
-  Withdrawn = 'withdrawn',
-  NotWithdrawn = 'notWithdrawn',
-  All = 'all'
 }
 
 export type SearchParams = {

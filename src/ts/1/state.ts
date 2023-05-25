@@ -1,5 +1,5 @@
 import { languageName } from './lang';
-import { SearchType, SearchParams, Combinator, SearchArea, WhereToSearch, Sorting } from './search-api-types';
+import { SearchType, SearchParams, Combinator, SearchArea, WhereToSearch, Sorting, Pages } from './search-api-types';
 import { State } from './state-types';
 
 
@@ -21,7 +21,8 @@ const initialSearchParams: SearchParams = {
   combinator: Combinator.All,
   areaToSearch: SearchArea.Any,
   caseSensitive: false, // whether the keyword search is case sensitive
-  sorting: Sorting.PageViewsDesc
+  sorting: Sorting.PageViewsDesc,
+  pages: Pages.All
 };
 
 
@@ -41,7 +42,8 @@ const state: State = {
     title: true
   },
   waiting: false, // whether we're waiting for a request to return,
-  disamboxExpanded: false // if there's a resizeable disamb meta box, whether it's expanded or not
+  disamboxExpanded: false, // if there's a resizeable disamb meta box, whether it's expanded or not
+  pages: Pages.All
 };
 
 
@@ -60,6 +62,7 @@ const setQueryParamsFromQS = function(): void {
   const lang: (string | null) = searchParams.get('lang');
   state.searchParams.selectedLocale = lang ? languageName(lang) : initialSearchParams.selectedLocale;
   state.searchParams.caseSensitive = maybeReplace('caseSensitive', 'case-sensitive');
+  state.searchParams.pages = maybeReplace('pages', Pages.All);
   state.searchParams.areaToSearch = maybeReplace('areaToSearch', 'area');
   state.searchParams.combinator = maybeReplace('combinator', 'combinator');
   state.searchParams.whereToSearch = maybeReplace('whereToSearch', 'where-to-aearch-all');
@@ -100,7 +103,7 @@ const resetSearch = function(): void {
   state.searchParams.selectedOrganisation = '';
   state.searchParams.selectedLocale = '';
   state.searchParams.whereToSearch = WhereToSearch.All;
-
+  state.searchParams.pages =  Pages.All;
   state.searchParams.caseSensitive = false;
   state.searchParams.linkSearchUrl = '';
   state.skip = 0; // reset to first page

@@ -66,7 +66,7 @@ const viewScopeSelector = (): string =>  `
 const viewTaxonSelector = () => {
 
 const html = [`
-  <div class="govuk-form-group">
+  <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
     <label class="govuk-label govuk-label--s" for="taxon">
       Taxons
     </label>
@@ -85,7 +85,7 @@ return html.join('');
 
 const viewLocaleSelector = () => {
   const html = [`
-    <div class="govuk-form-group">
+    <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
       <label class="govuk-label govuk-label--s" for="locale">
         Languages
       </label>
@@ -189,7 +189,7 @@ const viewKeywordsCombinator = () =>
 const viewPublishingOrgSelector = () => {
 
 const html = [`
-  <div class="govuk-form-group">
+  <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
     <label class="govuk-label govuk-label--s" for="publishing-organisation">
       Publishing organisations
     </label>

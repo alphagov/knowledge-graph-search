@@ -1,4 +1,4 @@
-import { Transaction, Taxon, Organisation, Person, Role, MetaResultType, MetaResult, MainResult, SearchParams, Combinator, SearchResults, SearchType, InitResults, BankHoliday, WhereToSearch, Sorting } from './src/ts/search-api-types';
+import { Transaction, Taxon, Organisation, Person, Role, MetaResultType, MetaResult, MainResult, SearchParams, Combinator, SearchResults, SearchType, InitResults, BankHoliday, WhereToSearch, Sorting, Pages } from './src/ts/search-api-types';
 import { splitKeywords } from './src/ts/utils';
 import { languageCode } from './src/ts/lang';
 const { BigQuery } = require('@google-cloud/bigquery');
@@ -43,6 +43,9 @@ const bigQuery = async function(userQuery: string, options?: any) {
     }
     if (options.selectedWordsWithoutQuotes !== undefined) {
       params.selected_words_without_quotes = options.selectedWordsWithoutQuotes;
+    }
+    if (options.pages) {
+      params.pages = options.pages;
     }
   }
 
@@ -236,6 +239,15 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
     areaClause = 'AND publishing_app = "whitehall"';
   }
 
+  let pagesClause = '';
+  if (searchParams.pages === Pages.NotWithdrawn) {
+    pagesClause = 'WHERE withdrawn_at IS NULL';
+  } else if(searchParams.pages === Pages.Withdrawn) {
+    pagesClause = 'WHERE withdrawn_at IS NOT NULL';
+  } else {
+    pagesClause = 'WHERE TRUE';
+  }
+
   let localeClause = '';
   if (searchParams.selectedLocale !== '') {
     localeClause = `AND locale = @locale`
@@ -313,10 +325,11 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
       page_views,
       taxons,
       primary_organisation,
-      organisations AS all_organisations
+      organisations AS all_organisations,
+      text
     FROM search.page
 
-    WHERE TRUE
+    ${pagesClause}
     ${includeClause}
     ${excludeClause}
     ${areaClause}
