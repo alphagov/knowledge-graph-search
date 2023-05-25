@@ -98,9 +98,9 @@ const containDescription = (search: SearchParams, includeMarkup: boolean) => {
   } else {
     where = 'in their body content';
   }
-  let combineOp = search.combinator === 'all' ? 'and' : 'or';
-  let combinedWords = splitKeywords(search.selectedWords)
-    .filter(w => w.length > 2)
+  const combineOp = search.combinator === 'all' ? 'and' : 'or';
+  // splitKeywords functions is being used in sendSearchQuery to determine bigquery keywords
+  const combinedWords = splitKeywords(search.selectedWords)
     .map(w => makeBold(w, includeMarkup))
     .join(` ${combineOp} `);
   return search.selectedWords !== '' ? `${combinedWords} ${where}` : '';
