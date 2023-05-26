@@ -122,7 +122,7 @@ const makeBold = (text: string, includeMarkup: boolean) =>
 const highlight = (searchTerm: string, text: string): string =>  {
   text = text.replace(/\u00a0/g, ' ');
   let term = searchTerm.replace(/['"]+/g, '');
-  const mark = `<mark class='highlight'>${term}</mark>`;
+  const mark = `<mark class='highlight-bold'>${term}</mark>`;
   if (term) {
   	let regex = new RegExp(term, 'gi');
     const padding = 50;
