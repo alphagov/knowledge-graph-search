@@ -215,6 +215,31 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
   }
   const contentToSearchString = contentToSearch.join(' || " " || ');
 
+  const padding = 50;
+
+  const truncatedContent = `(
+    SELECT
+      LEFT(
+        RIGHT(
+          text,
+          CHAR_LENGTH(text) - (
+            STRPOS(text, '${keywords[0]}')- ${keywords[0].length} - ${padding}
+          )
+        ),
+        (
+          STRPOS(
+            RIGHT(
+              text,
+              CHAR_LENGTH(text) - (
+                STRPOS(text, '${keywords[0]}') - ${keywords[0].length} - ${padding}
+              )
+            ),
+            '${keywords[0]}'
+          )+ ${keywords[0].length} + ${padding}
+        )
+      )
+  ) AS text`;
+
   const includeClause = keywords.length === 0
     ? ''
     : 'AND (' + ([...Array(keywords.length).keys()]
@@ -326,7 +351,8 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
       taxons,
       primary_organisation,
       organisations AS all_organisations,
-      text
+      ${truncatedContent}
+
     FROM search.page
 
     ${pagesClause}

@@ -116,29 +116,26 @@ const makeBold = (text: string, includeMarkup: boolean) =>
     `<span class="govuk-!-font-weight-bold">${text}</span>` :
     `"${text}"`;
 
-    const highlight = (searchTerm: string, text: string): string =>  {
-      text = text.replace(/\u00a0/g, ' ');
-      let term = searchTerm.replace(/['"]+/g, '');
-      const mark = `<mark class='highlight'>${term}</mark>`;
-      if (term) {
-      	let regex = new RegExp(term, 'gi');
-        const padding = 50;
-        const i = text.indexOf(term);
-        //TODO: handle ignored case matching
-        if(i>padding){
-            //trims left annd right
-            const trimLeft = text.substr(i - padding);
-            const trimRight = trimLeft.substr(0, trimLeft.indexOf(term) + term.length+padding);
-            return `<p>&hellip;${trimRight.replace(regex, mark)}&hellip;</p>`;
-        } else if( i > -1 && i<padding){
-            //only trims right if found at the start of copy
-            const trimRight = text.substr(0, text.indexOf(term) + term.length+(padding*2));
-          return `<p>${trimRight.replace(regex, mark)}&hellip;</p>`;
-        } else {
-          return '';
-        }
-      }
+//TODO: handle ignored case matching and multiple keywords
+const highlight = (searchTerm: string, text: string): string =>  {
+  text = text.replace(/\u00a0/g, ' ');
+  let term = searchTerm.replace(/['"]+/g, '');
+  const mark = `<mark class='highlight'>${term}</mark>`;
+  if (term) {
+  	let regex = new RegExp(term, 'gi');
+    const padding = 50;
+    const i = text.indexOf(term);
+    if(i>padding){
+      // Add elipse front to end
+      return `<p>&hellip;${text.replace(regex, mark)}&hellip;</p>`;
+    } else if( i > -1 && i<padding){
+      // Add elipse to end if found at the start of copy
+      return `<p>${text.replace(regex, mark)}&hellip;</p>`;
+    } else {
+      return '';
     }
+  }
+}
 
 
 export { id, sanitiseInput, sanitiseOutput, getFormInputValue, splitKeywords, queryDescription, getFormSelectValue, highlight };
