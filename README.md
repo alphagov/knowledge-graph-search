@@ -84,7 +84,7 @@ To run a single test file , use `--spec`. For instance:
 ## Deployment Steps
   1. Go to production site (https://govgraphsearch.dev/)
   2. Extract the value of GTM Tracking ID like GTM-XXXXXXX
-  3. Extract the value of GTM-AUTH like aWEg5ABBTyIPcsSg1cJWxg&gtm_preview=env-59&gtm_cookies_win=x
+  3. Extract the value of GTM-AUTH like aWEg5ABBXXXXXXXXXXXXXXXXX&gtm_preview=env-59&gtm_cookies_win=x
   4. Run the script deploy-to-gcp.sh located at the root directory
   5. Enter you tracking ID in step 2
   6. Enter GTM_AUTH in step 3
