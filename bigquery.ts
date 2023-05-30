@@ -217,6 +217,7 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
 
   const padding = 50;
 
+  //Currently only truncates on the first keyword
   const truncatedContent = `(
     SELECT
       LEFT(
@@ -235,7 +236,7 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
               )
             ),
             '${keywords[0]}'
-          )+ ${keywords[0].length} + ${padding}
+          ) + CASE WHEN REGEXP_CONTAINS(text, r'${keywords[0]}') THEN ${keywords[0].length} + ${padding} ELSE 0 END
         )
       )
   ) AS text`;
