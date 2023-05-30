@@ -284,6 +284,45 @@ const viewExclusionsInput = () => `
   </div>
 `;
 
+
+const viewPagesSelector = () => `
+  <div class="govuk-form-group">
+   <fieldset
+       class="govuk-fieldset"
+       id="pages-wrapper"
+       ${state.waiting && 'disabled="disabled"'}>
+     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+       Include
+     </legend>
+     <div class="govuk-radios govuk-radios--small" id="include-pages">
+       <div class="govuk-radios__item">
+         <input class="govuk-radios__input"
+                type="radio" id="pages-all"
+                name="pages"
+           ${state.searchParams.pages === 'all' ? 'checked' : ''}/>
+         <label for="pages-all" class="govuk-label govuk-radios__label">All pages</label>
+       </div>
+       <div class="govuk-radios__item">
+         <input class="govuk-radios__input"
+                type="radio" id="pages-withdrawn"
+                name="pages"
+           ${state.searchParams.pages === 'withdrawn' ? 'checked' : ''}/>
+         <label for="pages-withdrawn" class="govuk-label govuk-radios__label">Only withdrawn pages</label>
+       </div>
+       <div class="govuk-radios__item">
+         <input class="govuk-radios__input"
+                type="radio" id="pages-notWithdrawn"
+                name="pages"
+           ${state.searchParams.pages === 'notWithdrawn' ? 'checked' : ''}/>
+         <label for="pages-notWithdrawn" class="govuk-label govuk-radios__label">
+           Only non withdrawn pages
+         </label>
+       </div>
+     </div>
+   </fieldset>
+ </div>
+`;
+
 export const viewSearchFilters = () => `
   ${viewKeywordsCombinator()}
   ${viewExclusionsInput()}
@@ -293,6 +332,7 @@ export const viewSearchFilters = () => `
   ${viewPublishingOrgSelector()}
   ${viewTaxonSelector()}
   ${viewLocaleSelector()}
+  ${viewPagesSelector()}
 `;
 
 export { viewSearchBox };

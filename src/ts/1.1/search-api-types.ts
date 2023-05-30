@@ -26,13 +26,21 @@ export enum WhereToSearch {
   All = 'all'
 }
 
+export enum Pages {
+  Withdrawn = 'withdrawn',
+  NotWithdrawn = 'notWithdrawn',
+  All = 'all'
+}
+
 export enum Sorting {
   PageViewsDesc = 'pageViewsDesc',
   PageViewsAsc = 'pageViewsAsc',
   UpdatedDesc = 'UpdatedDesc',
   UpdatedAsc = 'UpdatedAsc',
   PublishedDesc = 'PublishedDesc',
-  PublishedAsc = 'PublishedAsc'
+  PublishedAsc = 'PublishedAsc',
+  WithdrawnAtDesc = 'WithdrawnAtDesc',
+  WithdrawnAtAsc = 'WithdrawnAtAsc'
 }
 
 export type SearchParams = {
@@ -47,7 +55,8 @@ export type SearchParams = {
   combinator: Combinator, // all keywords or any keywords
   areaToSearch: SearchArea, // whitehall, publisher, both
   caseSensitive: boolean, // case sensitive keyword search?
-  sorting: Sorting
+  sorting: Sorting,
+  pages: Pages
 }
 
 export enum MetaResultType {

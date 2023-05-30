@@ -218,7 +218,7 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
   const padding = 50;
 
   //Currently only truncates on the first keyword
-  const truncatedContent = `(
+  const truncatedContent = searchParams.searchType !== SearchType.Link ? `(
     SELECT
       LEFT(
         RIGHT(
@@ -239,7 +239,7 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
           ) + CASE WHEN REGEXP_CONTAINS(text, r'${keywords[0]}') THEN ${keywords[0].length} + ${padding} ELSE 0 END
         )
       )
-  ) AS text`;
+  ) AS text`: '';
 
   const includeClause = keywords.length === 0
     ? ''

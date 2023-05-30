@@ -12,6 +12,7 @@ const makeQueryString = function(sp: SearchParams): string {
   if (sp.selectedOrganisation !== '') usp.set('selected-organisation', sp.selectedOrganisation);
   if (sp.selectedLocale !== '') usp.set('lang', languageCode(sp.selectedLocale));
   if (sp.caseSensitive) usp.set('case-sensitive', sp.caseSensitive.toString());
+  if (sp.pages) usp.set('pages', sp.pages);
   if (sp.whereToSearch) usp.set('where-to-search', sp.whereToSearch);
   if (sp.sorting) usp.set('sorting', sp.sorting);
   if (sp.areaToSearch !== SearchArea.Any) usp.set('area', sp.areaToSearch);

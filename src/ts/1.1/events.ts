@@ -3,7 +3,7 @@ import { id, getFormInputValue, getFormSelectValue, getSortingSelectValue } from
 import { view } from './view/view';
 import { queryBackend } from './search-api';
 import { EventType, SearchApiCallback } from './event-types';
-import { SearchType, SearchArea, Combinator, WhereToSearch, Sorting } from './search-api-types';
+import { SearchType, SearchArea, Combinator, WhereToSearch, Sorting, Pages } from './search-api-types';
 import { languageCode } from './lang'
 
 declare const window: any;
@@ -30,6 +30,10 @@ const handleEvent: SearchApiCallback = async function(event) {
           state.searchParams.selectedLocale = getFormInputValue('locale');
           //state.searchParams.sorting = <Sorting>(getFormSelectValue('sorting'));
           //state.searchParams.sorting = <Sorting>(getSortingSelectValue('sorting'));
+
+          if ((<HTMLInputElement>id('pages-withdrawn'))?.checked) state.searchParams.pages = Pages.Withdrawn;
+          if ((<HTMLInputElement>id('pages-notWithdrawn'))?.checked) state.searchParams.pages = Pages.NotWithdrawn;
+          if ((<HTMLInputElement>id('pages-all'))?.checked) state.searchParams.pages = Pages.All;
 
           if ((<HTMLInputElement>id('where-to-search-all'))?.checked) state.searchParams.whereToSearch = WhereToSearch.All;
           if ((<HTMLInputElement>id('where-to-search-title'))?.checked) state.searchParams.whereToSearch = WhereToSearch.Title;
@@ -112,6 +116,10 @@ const handleEvent: SearchApiCallback = async function(event) {
         case 'sort-first_published_at':
           state.skip = 0;
           state.searchParams.sorting === Sorting.PublishedDesc ? state.searchParams.sorting = Sorting.PublishedAsc : state.searchParams.sorting = Sorting.PublishedDesc;
+        break;
+        case 'sort-withdrawn_at':
+          state.skip = 0;
+          state.searchParams.sorting === Sorting.WithdrawnAtDesc ? state.searchParams.sorting = Sorting.WithdrawnAtAsc : state.searchParams.sorting = Sorting.WithdrawnAtDesc;
         break;
         default:
           fieldClicked = event.id ? event.id.match(/show-field-(.*)/) : null;
@@ -204,6 +212,8 @@ const updateUrl = function() {
           searchParams.set('area', state.searchParams.areaToSearch);
         if (state.searchParams.combinator !== Combinator.All)
           searchParams.set('combinator', state.searchParams.combinator);
+        if (state.searchParams.pages)
+          searchParams.set('pages', state.searchParams.pages);
         break;
       case SearchType.Link:
         searchParams.set('search-type', state.searchParams.searchType);
@@ -247,6 +257,8 @@ const updateUrl = function() {
           searchParams.set('lang', languageCode(state.searchParams.selectedLocale));
         if (state.searchParams.caseSensitive)
           searchParams.set('case-sensitive', state.searchParams.caseSensitive.toString());
+        if (state.searchParams.pages)
+          searchParams.set('pages', state.searchParams.pages);
         if (state.searchParams.whereToSearch)
           searchParams.set('where-to-search', state.searchParams.whereToSearch);
         if (state.searchParams.sorting)
@@ -272,6 +284,11 @@ const updateUrl = function() {
 };
 
 const handleSorting = (a: any, b: any, sortBy: Sorting): number => {
+
+  const distantFuture = new Date(8640000000000000).getTime();
+  let dateA = a.withdrawn_at?.value ? new Date(a.withdrawn_at?.value).getTime() : distantFuture;
+  let dateB = b.withdrawn_at?.value ? new Date(b.withdrawn_at?.value).getTime() : distantFuture;
+
   switch (sortBy) {
     case Sorting.PageViewsAsc:
       return a.page_views - b.page_views
@@ -287,6 +304,12 @@ const handleSorting = (a: any, b: any, sortBy: Sorting): number => {
       break;
     case Sorting.UpdatedAsc:
       return new Date(a.public_updated_at?.value).getTime() - new Date(b.public_updated_at?.value).getTime()
+      break;
+    case Sorting.WithdrawnAtDesc:
+      return dateB - dateA
+      break;
+    case Sorting.WithdrawnAtAsc:
+      return dateA - dateB
       break;
     default:
       return b.page_views - a.page_views
@@ -322,6 +345,16 @@ const getSortEventAction = (sortState: Sorting, key: string) => {
           return 'desending';
           break;
         case Sorting.PublishedAsc:
+          return 'ascending';
+          break;
+      }
+      break;
+    case 'withdrawn_at':
+      switch (sortState) {
+        case Sorting.WithdrawnAtDesc:
+          return 'desending';
+          break;
+        case Sorting.WithdrawnAtAsc:
           return 'ascending';
           break;
       }

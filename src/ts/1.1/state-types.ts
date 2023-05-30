@@ -1,4 +1,4 @@
-import { SearchParams } from './search-api-types';
+import { SearchParams, Pages } from './search-api-types';
 
 export interface State {
   searchParams: SearchParams,
@@ -13,5 +13,6 @@ export interface State {
   resultsPerPage: number,
   showFields: any,
   waiting: boolean,
-  disamboxExpanded: boolean
+  disamboxExpanded: boolean,
+  pages: Pages
 }

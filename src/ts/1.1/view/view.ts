@@ -518,7 +518,7 @@ const fieldFormatters: Record<string, any> = {
     format: (val: string) => val ? parseInt(val).toString() : '<5'
   },
   'withdrawn_at': {
-    name: 'Withdrawn at',
+    name: 'Withdrawn',
     format: (date: string) => date ? formatDateTime(date) : "not withdrawn"
   },
   'withdrawn_explanation': {

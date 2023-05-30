@@ -282,5 +282,10 @@ mark.highlight-bold {
 
 #version {
   float: right;
-  margin-top: 10px;  
+  margin-top: 10px;
+}
+
+#results-table p {
+  display: inline-block;
+  word-break: break-word;
 }
