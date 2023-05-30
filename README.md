@@ -82,13 +82,12 @@ To run a single test file , use `--spec`. For instance:
     cypress run --spec cypress/e2e/url.cy.ts
 
 ## Deployment Steps
-  1. Go to production site (https://govgraphsearch.dev/)
-  2. Extract the value of GTM Tracking ID like GTM-XXXXXXX
-  3. Extract the value of GTM-AUTH like aWEg5ABBXXXXXXXXXXXXXXXXX&gtm_preview=env-59&gtm_cookies_win=x
-  4. Run the script deploy-to-gcp.sh located at the root directory
-  5. Enter you tracking ID in step 2
-  6. Enter GTM_AUTH in step 3
-  7. Continue may prompt for gcloun run login, if yes run the command else continue.
-  8. Enter your gcl region (europe-west2)
-  9. Continue and wait till DONE.
+  1. Go to production site https://govgraphsearch.dev/ and view the source.
+  2. Look for the line beginning `<!-- Google Tag Manager (noscript) --><noscript><iframe src="https://www.googletagmanager.com/ns.html?` and note the values of the URL parameters `id` and `gtm_auth`.  They look like `GTM-XXXXXXX` and `aWEg5ABBXXXXXXXXXXXXXXXXX`.
+  4. Run the script `deploy-to-gcp.sh` located at the root directory
+  5. Enter the value of `id` as in step 2 as the GTM tracking ID.
+  6. Enter the value of `gtm_auth` in step 3 as the GTM AUTH.
+  7. You may be prompted to authenticate with `gcloud run login`, in which case do so and start again.
+  8. Choose the GCP region `europe-west2`
+  9. Continue.  Check in the [web console](https://console.cloud.google.com/run/detail/europe-west2/govuk-knowledge-graph-search/revisions?project=govuk-knowledge-graph) that a revision was deployed, and try using it at https://govgraphsearch.dev.
 
