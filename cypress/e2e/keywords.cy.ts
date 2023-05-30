@@ -15,6 +15,21 @@ describe('Keyword searching', () => {
     cy.get('#results-heading', { timeout: 60000 }).contains('No results');
     cy.title().should('eq', 'GOV.UK pages that contain "wwekufsskjfdksufweuf" - Gov Search')
   });
+   //Added to ensure Uk keyword is being searched
+  it('returns results when searching for keywords that includes Uk and Bahrain', () => {
+    cy.visit('');
+    cy.get('input#keyword').type('Uk and Bahrain');
+    cy.get('button#search').click();
+    cy.contains('button', 'Searching');
+    cy.get('#results-heading', { timeout: 60000 }).contains(/^\d+ results$/);
+    cy.get('#results-heading').then(heading => {
+      numUnfilteredResults = parseInt(heading.text().match(/^(\d+) results$/)[1]);
+    });
+    cy.contains('for pages that contain');
+    cy.contains('Showing results 1 to 10, in descending popularity');
+    cy.get('#results-table');
+    cy.title().should('eq', 'GOV.UK pages that contain "Uk" and "Bahrain" - Gov Search')
+  });
 
   it('returns results when searching for keywords that exist', () => {
     cy.visit('');
