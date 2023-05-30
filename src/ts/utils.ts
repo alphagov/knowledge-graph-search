@@ -88,7 +88,7 @@ const queryDescription = (search: SearchParams, includeMarkup = true) => {
   return `pages that ${joinedClauses}`;
 };
 
-
+//combinedWords as used here must be exactly the same set of keywords as the ones submitted to BigQuery by the function sendSearchQuery.
 const containDescription = (search: SearchParams, includeMarkup: boolean) => {
   let where: string;
   if (search.whereToSearch.title && search.whereToSearch.text) {
@@ -99,7 +99,6 @@ const containDescription = (search: SearchParams, includeMarkup: boolean) => {
     where = 'in their body content';
   }
   const combineOp = search.combinator === 'all' ? 'and' : 'or';
-  // splitKeywords functions is being used in sendSearchQuery to determine bigquery keywords
   const combinedWords = splitKeywords(search.selectedWords)
     .map(w => makeBold(w, includeMarkup))
     .join(` ${combineOp} `);
