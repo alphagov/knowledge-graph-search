@@ -1,5 +1,6 @@
 import { languageName } from './lang';
 import { SearchParams } from './search-api-types';
+import * as express from "express"
 
 const id = (x: string): (HTMLElement | null) => document.getElementById(x);
 
@@ -131,4 +132,12 @@ const isReqAJAX = (req: express.Request) => {
 };
 
 
-export { id, sanitiseInput, sanitiseOutput, getFormInputValue, splitKeywords, queryDescription };
+export {
+  id,
+  sanitiseInput,
+  sanitiseOutput,
+  getFormInputValue,
+  splitKeywords,
+  queryDescription,
+  isReqAJAX,
+};
