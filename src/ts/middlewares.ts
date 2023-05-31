@@ -11,10 +11,10 @@ declare global {
 
 /*
  * Express middleware enforcing user authentication. Redirects unauthenticated users to login page,
- * or returns 401 for AJAX requests. Can bypass authentication by setting the 'DISABLE_AUTH' environment variable.
+ * or returns 401 for AJAX requests. Can bypass authentication by setting the 'ENABLE_AUTH' environment variable.
  */
 export const auth: (s?: string) => express.Handler = (redirectUrl: string = "/login") => (req, res, next) => {
-  if (process.env.DISABLE_AUTH) {
+  if (process.env.ENABLE_AUTH != 'true') {
     return next();
   }
 
