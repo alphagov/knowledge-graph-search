@@ -4,11 +4,10 @@
   "description": "Search engine for GOV.UK content",
   "main": "app.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "ts-node app.ts",
     "dev": "nodemon app.ts",
-    "build": "webpack",
-    "test": "jest"
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
@@ -25,7 +24,6 @@
     "@types/express": "^4.17.14",
     "@types/node": "^18.11.14",
     "axios": "^1.2.1",
-    "connect-ensure-login": "^0.1.1",
     "cors": "^2.8.5",
     "csv-stringify": "^6.2.4",
     "express": "^4.18.1",
