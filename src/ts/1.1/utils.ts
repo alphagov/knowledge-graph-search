@@ -139,4 +139,12 @@ const highlight = (searchTerm: string, text: string): string =>  {
   }
 }
 
-export { id, sanitiseInput, sanitiseOutput, getFormInputValue, splitKeywords, queryDescription, getFormSelectValue, getSortingSelectValue, highlight };
+const highlightLinks = (searchTerm: string, links: string[]): string =>  {
+  let term = searchTerm.replace(/['"]+/g, '');
+  const mark = `<mark class='highlight-bold'>${term}</mark>`;
+  let regex = new RegExp(term, 'gi');
+  return `<p>${links.find((link: string) =>  link.includes(term)).toString().replace(regex, mark)}</p>`
+}
+
+
+export { id, sanitiseInput, sanitiseOutput, getFormInputValue, splitKeywords, queryDescription, getFormSelectValue, getSortingSelectValue, highlight, highlightLinks };

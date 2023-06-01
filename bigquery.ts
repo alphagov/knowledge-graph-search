@@ -218,7 +218,10 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
   const padding = 50;
 
   //Currently only truncates on the first keyword
-  const truncatedContent = searchParams.searchType !== SearchType.Link ? `(
+  const truncatedContent = searchParams.searchType !== SearchType.Link &&
+  !searchParams.selectedTaxon &&
+  !searchParams.selectedOrganisation &&
+  !searchParams.selectedLocale ? `(
     SELECT
       LEFT(
         RIGHT(
@@ -352,7 +355,10 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
       taxons,
       primary_organisation,
       organisations AS all_organisations,
+      hyperlinks,
+      description,
       ${truncatedContent}
+
 
     FROM search.page
 

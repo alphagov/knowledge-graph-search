@@ -155,7 +155,7 @@ const viewKeywordsCombinator = () =>
           <input class="govuk-radios__input"
                  type="radio" id="combinator-all"
                  name="combinator"
-            ${state.searchParams.combinator === 'all' ? 'checked' : ''}/>
+            ${state.searchParams.combinator === 'all'  ? 'checked' : ''}/>
           <label for="combinator-all" class="govuk-label govuk-radios__label">
             All keywords
           </label>

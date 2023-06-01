@@ -1,4 +1,4 @@
-import { id, queryDescription, highlight } from '../utils';
+import { id, queryDescription, highlight, highlightLinks } from '../utils';
 import { state, searchState } from '../state';
 import { handleEvent, handleSorting } from '../events';
 import { languageName } from '../lang';
@@ -6,6 +6,7 @@ import { viewMetaResults } from './view-metabox';
 import { viewSearchPanel } from './view-search-panel';
 import { viewSearchBox, viewSearchFilters } from './view-search-box';
 import { EventType } from '../event-types';
+import { SearchType } from '../search-api-types';
 
 declare const window: any;
 
@@ -268,6 +269,7 @@ const viewSearchResultsData = () => {
               </h2>
               <div class="govuk-accordion__section-summary govuk-body" id="accordion-with-summary-sections-summary-${recordIndex}">
               ${ record.text && state.searchParams.selectedWords ? highlight(state.searchParams.selectedWords, record.text) : ''}
+              ${ state.searchParams.searchType === SearchType.Link && record.hyperlinks && state.searchParams.linkSearchUrl ? highlightLinks(state.searchParams.linkSearchUrl, record.hyperlinks) : ''}
             </div>
             <div
               id="accordion-default-content-${recordIndex}"

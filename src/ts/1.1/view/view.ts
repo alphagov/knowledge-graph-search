@@ -1,4 +1,4 @@
-import { id, queryDescription, highlight } from '../utils';
+import { id, queryDescription, highlight, highlightLinks } from '../utils';
 import { state, searchState } from '../state';
 import { handleEvent, handleSorting, getSortEventAction } from '../events';
 import { languageName } from '../lang';
@@ -7,7 +7,7 @@ import { viewSearchPanel } from './view-search-panel';
 import { viewSearchBox, viewSearchFilters } from './view-search-box';
 import { EventType } from '../event-types';
 import { Sorting } from '../search-api-types';
-
+import { SearchType } from '../search-api-types';
 
 declare const window: any;
 
@@ -474,8 +474,18 @@ const formatNames = (array: []) => [...new Set(array)].map(x => `${x}`).join(', 
 
 const getTitleUrl = (title: string) => state.searchResults.filter(x => x.title === title)[0].url;
 const getText = (title: string) => state.searchResults.filter(x => x.title === title)[0].text;
+const getHyperlinks = (title: string) => state.searchResults.filter(x => x.title === title)[0].hyperlinks;
 
-const formatTitle = (title: string) => `<a class="govuk-link" target="_blank" href="${getTitleUrl(title)}">${title}</a>${ getText(title) && state.searchParams.selectedWords ? `${highlight(state.searchParams.selectedWords, getText(title))}` : ''}`;
+const formatTitle = (title: string) => `<a class="govuk-link" target="_blank" href="${getTitleUrl(title)}">${title}</a>
+${ getText(title) && state.searchParams.selectedWords ? `${highlight(state.searchParams.selectedWords, getText(title))}` : ''}
+${
+  state.searchParams.searchType === SearchType.Link && state.searchParams.linkSearchUrl ? highlightLinks(state.searchParams.linkSearchUrl, getHyperlinks(title)) : ''
+}
+
+`;
+
+
+
 
 const formatDateTime = (date: any) =>
   `${date.value.slice(0,10).split('-').reverse().join('/') }`;

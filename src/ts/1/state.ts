@@ -62,10 +62,10 @@ const setQueryParamsFromQS = function(): void {
   const lang: (string | null) = searchParams.get('lang');
   state.searchParams.selectedLocale = lang ? languageName(lang) : initialSearchParams.selectedLocale;
   state.searchParams.caseSensitive = maybeReplace('caseSensitive', 'case-sensitive');
-  state.searchParams.pages = maybeReplace('pages', Pages.All);
+  state.searchParams.pages = maybeReplace('pages', 'pages');
   state.searchParams.areaToSearch = maybeReplace('areaToSearch', 'area');
-  state.searchParams.combinator = maybeReplace('combinator', 'combinator');
-  state.searchParams.whereToSearch = maybeReplace('whereToSearch', 'where-to-aearch-all');
+  state.searchParams.combinator = searchParams.get('search-type') === SearchType.Link ? Combinator.NotSet : maybeReplace('combinator', 'combinator');
+  state.searchParams.whereToSearch = maybeReplace('whereToSearch', 'where-to-search');
 };
 
 const searchState = function(): { code: string, errors: string[] } {
