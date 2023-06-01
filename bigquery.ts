@@ -82,8 +82,8 @@ const sendInitQuery = async function (): Promise<InitResults> {
         FROM \`content.locale\`
         `),
       bigQuery(`
-        SELECT title
-        FROM \`graph.taxon\`
+        SELECT name
+        FROM \`search.taxon\`
         `),
       bigQuery(`
         SELECT DISTINCT title
@@ -100,7 +100,7 @@ const sendInitQuery = async function (): Promise<InitResults> {
         .map((row: any) => row.locale)
         .filter((locale: string) => locale !== 'en' && locale !== 'cy')
     ),
-    taxons: bqTaxons.map((taxon: any) => taxon.title),
+    taxons: bqTaxons.map((taxon: any) => taxon.name),
     organisations: bqOrganisations.map(
       (organisation: any) => organisation.title
     ),
