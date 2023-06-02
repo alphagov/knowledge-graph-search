@@ -9,24 +9,28 @@ declare global {
   }
 }
 
+/*
+ * Express middleware enforcing user authentication. Redirects unauthenticated users to login page,
+ * or returns 401 for AJAX requests. Can bypass authentication by setting the 'DISABLE_AUTH' environment variable.
+ */
 export const auth: (s?: string) => express.Handler = (redirectUrl: string = "/login") => (req, res, next) => {
-    if (process.env.DISABLE_AUTH) {
-        return next()
-    }
-    
-    const isAuthenticated = req.isAuthenticated && req.isAuthenticated();
-    if (isAuthenticated) {
-      return next();
-    }
+  if (process.env.DISABLE_AUTH) {
+    return next();
+  }
 
-    if (isReqAJAX(req)) {
-        return res.status(401).json({ error: "Not authenticated" });
-    }
+  const isAuthenticated = req.isAuthenticated && req.isAuthenticated();
+  if (isAuthenticated) {
+    return next();
+  }
 
-    // Save the url to return to once logged in
-    if (req.session) {
-        req.session.returnTo = req.originalUrl || req.url;
-    }
+  if (isReqAJAX(req)) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
 
-    return res.redirect(redirectUrl);
+  // Store the requested URL in session to enable post-login redirection.
+  if (req.session) {
+    req.session.returnTo = req.originalUrl || req.url;
+  }
+
+  return res.redirect(redirectUrl);
 }
