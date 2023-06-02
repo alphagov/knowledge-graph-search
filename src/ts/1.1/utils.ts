@@ -143,7 +143,8 @@ const highlightLinks = (searchTerm: string, links: string[]): string =>  {
   let term = searchTerm.replace(/['"]+/g, '');
   const mark = `<mark class='highlight-bold'>${term}</mark>`;
   let regex = new RegExp(term, 'gi');
-  return `<p>${links.find((link: string) =>  link.includes(term)).toString().replace(regex, mark)}</p>`
+  const result = links.find((link: string) => link.includes(term))
+  return result ? `<p>${result?.toString().replace(regex, mark)}</p>` : '';
 }
 
 

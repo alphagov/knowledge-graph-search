@@ -471,17 +471,12 @@ const viewSearchResults = () => {
 
 
 const formatNames = (array: []) => [...new Set(array)].map(x => `${x}`).join(', ');
+const getDataByTitle = (title: string) => state.searchResults.filter(x => x.title === title)[0];
 
-const getTitleUrl = (title: string) => state.searchResults.filter(x => x.title === title)[0].url;
-const getText = (title: string) => state.searchResults.filter(x => x.title === title)[0].text;
-const getHyperlinks = (title: string) => state.searchResults.filter(x => x.title === title)[0].hyperlinks;
-
-const formatTitle = (title: string) => `<a class="govuk-link" target="_blank" href="${getTitleUrl(title)}">${title}</a>
-${ getText(title) && state.searchParams.selectedWords ? `${highlight(state.searchParams.selectedWords, getText(title))}` : ''}
-${
-  state.searchParams.searchType === SearchType.Link && state.searchParams.linkSearchUrl ? highlightLinks(state.searchParams.linkSearchUrl, getHyperlinks(title)) : ''
-}
-
+const formatTitle = (title: string) => `<a class="govuk-link" target="_blank" href="${getDataByTitle(title).url}">${title}</a>
+${ getDataByTitle(title).text && state.searchParams.selectedWords && state.searchParams.whereToSearch !== 'title' ? `${highlight(state.searchParams.selectedWords, getDataByTitle(title).text)}` : ''}
+${ !getDataByTitle(title).text && getDataByTitle(title).description && state.searchParams.selectedWords && state.searchParams.whereToSearch !== 'title' ? highlight(state.searchParams.selectedWords, getDataByTitle(title).description) : ''}
+${ state.searchParams.searchType === SearchType.Link && state.searchParams.linkSearchUrl ? highlightLinks(state.searchParams.linkSearchUrl, getDataByTitle(title).hyperlinks) : ''}
 `;
 
 

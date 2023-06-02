@@ -219,6 +219,7 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
 
   //Currently only truncates on the first keyword
   const truncatedContent = searchParams.searchType !== SearchType.Link &&
+  searchParams.searchType !==  SearchType.Advanced &&
   !searchParams.selectedTaxon &&
   !searchParams.selectedOrganisation &&
   !searchParams.selectedLocale ? `(
@@ -358,7 +359,6 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
       hyperlinks,
       description,
       ${truncatedContent}
-
 
     FROM search.page
 

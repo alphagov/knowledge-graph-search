@@ -106,6 +106,9 @@ fileNames.forEach((e: any) => {
   app.get(`/${e}/signon`,
     async (req, res) => res.sendFile(`views/${e}/signon.html`, {root: __dirname })
   );
+  app.get(`/${e}/signon-applications`,
+    async (req, res) => res.sendFile(`views/${e}/signon-applications.html`, {root: __dirname })
+  );
 });
 
 

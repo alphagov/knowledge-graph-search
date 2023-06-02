@@ -268,7 +268,8 @@ const viewSearchResultsData = () => {
                 </span>
               </h2>
               <div class="govuk-accordion__section-summary govuk-body" id="accordion-with-summary-sections-summary-${recordIndex}">
-              ${ record.text && state.searchParams.selectedWords ? highlight(state.searchParams.selectedWords, record.text) : ''}
+              ${ record.text && state.searchParams.selectedWords && state.searchParams.whereToSearch !== 'title' ? highlight(state.searchParams.selectedWords, record.text) : ''}
+              ${ !record.text && record.description && state.searchParams.selectedWords && state.searchParams.whereToSearch !== 'title' ? highlight(state.searchParams.selectedWords, record.description) : ''}
               ${ state.searchParams.searchType === SearchType.Link && record.hyperlinks && state.searchParams.linkSearchUrl ? highlightLinks(state.searchParams.linkSearchUrl, record.hyperlinks) : ''}
             </div>
             <div
@@ -277,7 +278,7 @@ const viewSearchResultsData = () => {
               aria-labelledby="accordion-default-heading-${recordIndex}">
               <dl class="govuk-summary-list govuk-!-font-size-16">
                 ${
-                  Object.keys(record).map(key => record[key] && fieldFormat(key, record[key]).length > 0 && !['contentId', 'title', 'text'].includes(key) ? `
+                  Object.keys(record).map(key => record[key] && fieldFormat(key, record[key]).length > 0 && !['contentId', 'title', 'text', 'description', 'hyperlinks'].includes(key) ? `
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">
                       ${fieldName(key)}

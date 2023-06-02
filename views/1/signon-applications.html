@@ -4,14 +4,14 @@
 <html lang="en" class="govuk-template">
   <head>
     <meta charset="utf-8" />
-    <title>Sign in to GOV.UK - GOV.UK Signon</title>
+    <title>Your applications - GOV.UK Signon</title>
     <meta name="robots" content="noindex,nofollow,noimageindex">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-param" content="authenticity_token" />
-<meta name="csrf-token" content="SpZKu9bTCZUGdvkERurb41lcpARGPDWiSlt4gMMtq-l4cv0rYQtxqlqmQgiyegU08WjnAkWicW7OKaw61RxbhA" />
-    <link rel="icon" type="image/x-icon" href="https://signon.publishing.service.gov.uk/assets/signon/govuk_publishing_components/favicon-production-82dcaf8d444262af5875af0a4524927494e34509e399f02a1b19ff24e83b982a.png" />
-    <link rel="stylesheet" href="https://signon.publishing.service.gov.uk/assets/signon/application-eb9fb295a00e91c22aa759100e324c5a2a9a7a8c872125b7e528e752b1575316.css" media="all" />
-    <script src="https://signon.publishing.service.gov.uk/assets/signon/govuk_publishing_components/vendor/modernizr-249c9d6e99b31161d8e6ffe2279f04d061ee22afa2eef5e8976d1677303cb370.js"></script>
+<meta name="csrf-token" content="LLgFo8KHJIqX1ElFv_M1-nOZNntHSvSSO38SEL9G1PVBWDY8HBxm_F8B_q1HRWbGqirYEt3_Z58cR-cFVm9MnA" />
+    <link rel="icon" type="image/x-icon" href="https://signon.integration.publishing.service.gov.uk/assets/signon/govuk_publishing_components/favicon-integration-0c301805486d3c53df37e9ef5b99cac6f1f59b70a49fcaafe068a4ef612439dd.png" />
+    <link rel="stylesheet" href="https://signon.integration.publishing.service.gov.uk/assets/signon/application-eb9fb295a00e91c22aa759100e324c5a2a9a7a8c872125b7e528e752b1575316.css" media="all" />
+    <script src="https://signon.integration.publishing.service.gov.uk/assets/signon/govuk_publishing_components/vendor/modernizr-249c9d6e99b31161d8e6ffe2279f04d061ee22afa2eef5e8976d1677303cb370.js"></script>
 
   </head>
   <body class="gem-c-layout-for-admin govuk-template__body">
@@ -55,6 +55,28 @@
 </div>
 
         </div>
+          <div class="govuk-header__content gem-c-header__content govuk-grid-column-full">
+
+  <nav class="gem-c-header__nav govuk-header__navigation govuk-header__navigation--end" aria-label="Top level">
+    <button
+      aria-controls="navigation"
+      aria-label="Show or hide Top Level Navigation"
+      class="govuk-header__menu-button govuk-js-header-toggle gem-c-header__menu-button govuk-!-display-none-print"
+      type="button"
+      data-button-name="menu"
+    >
+      Menu
+    </button>
+    <ul id="navigation" class="govuk-header__navigation-list">
+        <li class="govuk-header__navigation-item govuk-header__navigation-item--active">
+          <a class="govuk-header__link" href="#">Dashboard</a>
+</li>        <li class="govuk-header__navigation-item">
+          <a class="govuk-header__link" href="#">Jo Bloggs</a>
+</li>        <li class="govuk-header__navigation-item">
+          <a class="govuk-header__link" href="#">Sign out</a>
+</li>    </ul>
+</nav>
+          </div>
       </div>
   </div>
 </header>
@@ -68,55 +90,61 @@
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
           <span class="govuk-caption-l"></span>
-          <h1 class="govuk-heading-l">Sign in to GOV.UK</h1>
+          <h1 class="govuk-heading-l">Your applications</h1>
         </div>
       </div>
 
 <div class="govuk-grid-row">
-  <div class="govuk-grid-column-one-half">
-    <form class="new_user" id="new_user" autocomplete="on" action="/users/sign_in" accept-charset="UTF-8" method="post"><input type="hidden" name="authenticity_token" value="51XPAcYAoJlza8qmE8-15ZNo42oowqgQnPNCBhrAUn501pu20JRcBx_ikS18hKFcHOqihDr1-IWwKYARvEmJKQ" autocomplete="off" />
-
-<div class="govuk-form-group">
-
-
-  <label for="input-d74187d3" class="gem-c-label govuk-label">Email</label>
+  <div class="govuk-grid-column-two-thirds">
 
 
 
+      <div class="app-application-list__item">
+        <h3 class="govuk-heading-m govuk-!-margin-bottom-1">
+          <a class="govuk-link" href="#">Asset Manager</a>
+        </h3>
 
+        <p class="govuk-body">
+          Manages assets
+        </p>
+      </div>
+      <div class="app-application-list__item">
+        <h3 class="govuk-heading-m govuk-!-margin-bottom-1">
+          <a class="govuk-link" href="#">Content Data</a>
+        </h3>
 
+        <p class="govuk-body">
+          Explore data about your content, currently in beta
+        </p>
+      </div>
+      <div class="app-application-list__item">
+        <h3 class="govuk-heading-m govuk-!-margin-bottom-1">
+          <a class="govuk-link" href="./">GovSearch</a>
+        </h3>
 
+        <p class="govuk-body">
+          Search engine for gov.uk content
+        </p>
+      </div>
+      <div class="app-application-list__item">
+        <h3 class="govuk-heading-m govuk-!-margin-bottom-1">
+          <a class="govuk-link" href="#">Support</a>
+        </h3>
 
+        <p class="govuk-body">
+          Raise support requests
+        </p>
+      </div>
+  </div>
 
-    <input autofocus="autofocus" class="gem-c-input govuk-input" id="input-d74187d3" name="user[email]" spellcheck="false" tabindex="0" type="email">
-</div>
+  <div class="govuk-grid-column-one-third">
+    <ul class="govuk-list app-dashboard-side">
+      <li>
+        <a class="govuk-link" href="#">Change your email or password</a>
+      </li>
 
-
-<div class="govuk-form-group">
-
-
-  <label for="input-fd54f119" class="gem-c-label govuk-label">Password</label>
-
-
-
-
-
-
-
-
-    <input class="gem-c-input govuk-input" id="input-fd54f119" name="user[password]" spellcheck="false" type="password">
-</div>
-
-
-
-
-  <a href="./signon-applications" class="gem-c-button govuk-button">Sign in</a>
-
-
-</form>
-    <p class="govuk-body govuk-!-margin-top-5">
-      <a class="govuk-link" href="#">Forgot your password?</a>
-    </p>
+        <li><a class="govuk-link" href="#">Change your 2-step verification phone</a></li>
+    </ul>
   </div>
 </div>
 
@@ -130,7 +158,10 @@
               <h2 class="govuk-footer__heading govuk-heading-m">Support and feedback</h2>
                 <ul class="govuk-footer__list">
                       <li class="govuk-footer__list-item">
-                        <a class="govuk-footer__link" data-track-category="footerClicked" data-ga4-link="{&quot;event_name&quot;:&quot;navigation&quot;,&quot;type&quot;:&quot;footer&quot;,&quot;index&quot;:{&quot;index_link&quot;:&quot;1&quot;,&quot;index_section&quot;:&quot;1&quot;,&quot;index_section_count&quot;:&quot;3&quot;},&quot;index_total&quot;:&quot;1&quot;,&quot;section&quot;:&quot;Support and feedback&quot;}" href="https://www.gov.uk/government/content-publishing">How to write, publish, and improve content</a>
+                        <a class="govuk-footer__link" data-track-category="footerClicked" data-ga4-link="{&quot;event_name&quot;:&quot;navigation&quot;,&quot;type&quot;:&quot;footer&quot;,&quot;index&quot;:{&quot;index_link&quot;:&quot;1&quot;,&quot;index_section&quot;:&quot;1&quot;,&quot;index_section_count&quot;:&quot;3&quot;},&quot;index_total&quot;:&quot;2&quot;,&quot;section&quot;:&quot;Support and feedback&quot;}" href="#">Raise a support request</a>
+                      </li>
+                      <li class="govuk-footer__list-item">
+                        <a class="govuk-footer__link" data-track-category="footerClicked" data-ga4-link="{&quot;event_name&quot;:&quot;navigation&quot;,&quot;type&quot;:&quot;footer&quot;,&quot;index&quot;:{&quot;index_link&quot;:&quot;2&quot;,&quot;index_section&quot;:&quot;1&quot;,&quot;index_section_count&quot;:&quot;3&quot;},&quot;index_total&quot;:&quot;2&quot;,&quot;section&quot;:&quot;Support and feedback&quot;}" href="#">How to write, publish, and improve content</a>
                       </li>
                 </ul>
             </div>
@@ -176,5 +207,7 @@
 </footer>
 
 
+
+    <script src="https://signon.integration.publishing.service.gov.uk/assets/signon/application-77d5b478747d9c7c7d468b720b6ad89b1d28c23ceb6f8eddd77799cd1e64a177.js"></script>
   </body>
 </html>

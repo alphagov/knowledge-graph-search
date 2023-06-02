@@ -21,7 +21,8 @@ const viewInlineError = (id: string, message: string): string => `
   </p>
 `;
 
-const viewScopeSelector = (): string =>  `
+const viewScopeSelector = (): string =>  state.searchParams.searchType !== 'link' ?
+`
 <div class="govuk-form-group">
  <fieldset
      class="govuk-fieldset"
@@ -62,7 +63,7 @@ const viewScopeSelector = (): string =>  `
    </div>
  </fieldset>
 </div>
-  `;
+  `: '';
 const viewTaxonSelector = () => {
 
 const html = [`
