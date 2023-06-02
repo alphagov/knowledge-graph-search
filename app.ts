@@ -1,10 +1,11 @@
 import express from 'express';
+import {auth} from './src/ts/middlewares'
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
 // these variables are used for OAuth authentication. They will only be set if
 // OAuth is enabled
-let OAuth2Strategy, passport, session, ensureLoggedIn;
+let OAuth2Strategy, passport, session;
 
 import { sendSearchQuery, sendInitQuery, getOrganisationInfo, getPersonInfo, getRoleInfo, getTaxonInfo, getBankHolidayInfo, getTransactionInfo } from './bigquery';
 import { SearchArea, Combinator, SearchType, SearchParams } from './src/ts/search-api-types';
@@ -25,7 +26,6 @@ if (!process.env.DISABLE_AUTH) {
   OAuth2Strategy = require('passport-oauth2');
   passport = require('passport');
   session = require('express-session');
-  ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
   passport.serializeUser((user:any, done:any) => done(null, user));
   passport.deserializeUser((user:any, done:any) => done(null, user));
 
@@ -64,17 +64,6 @@ if (!process.env.DISABLE_AUTH) {
   ));
 }
 
-
-// since the routes below use this function, we always need to define it
-// so it we're not using OAuth, we make it do nothing
-// (i.e. just a middleware passthrough)
-
-
-const checkLoggedIn = ensureLoggedIn ?
-  ensureLoggedIn :
-  ((_redirect: string) => (_req: any, _res: any, next: any) => next());
-
-
 // Routes
 
 if (!process.env.DISABLE_AUTH) {
@@ -86,14 +75,14 @@ if (!process.env.DISABLE_AUTH) {
 }
 
 app.get('/',
-  checkLoggedIn('/login'),
+  auth(),
   async (req, res) => res.sendFile('views/index.html', {root: __dirname })
 );
 
 
 
 // the front-end will call this upon starting to get some data needed from the server
-app.get('/get-init-data', checkLoggedIn('/'), async (req, res) => {
+app.get('/get-init-data', auth('/'), async (req, res) => {
   console.log('/get-init-data');
   try {
     res.send(await sendInitQuery());
@@ -104,7 +93,7 @@ app.get('/get-init-data', checkLoggedIn('/'), async (req, res) => {
 });
 
 
-app.get('/search', checkLoggedIn('/'), async (req: any, res) => {
+app.get('/search', auth('/'), async (req: any, res) => {
   console.log('API call to /search', req.query);
   // retrieve qsp params
   const params: SearchParams = {
@@ -163,7 +152,7 @@ app.get('/csv', async (req: any, res) => {
 });
 
 
-app.get('/taxon', checkLoggedIn('/'), async (req: any, res) => {
+app.get('/taxon', auth('/'), async (req: any, res) => {
   console.log('API call to /taxon', req.query);
   try {
     const data = await getTaxonInfo(req.query['name']);
@@ -178,7 +167,7 @@ app.get('/taxon', checkLoggedIn('/'), async (req: any, res) => {
 });
 
 
-app.get('/organisation', checkLoggedIn('/'), async (req: any, res) => {
+app.get('/organisation', auth('/'), async (req: any, res) => {
   console.log('API call to /organisation', req.query);
   try {
     const data = await getOrganisationInfo(req.query['name']);
@@ -193,7 +182,7 @@ app.get('/organisation', checkLoggedIn('/'), async (req: any, res) => {
 });
 
 
-app.get('/role', checkLoggedIn('/'), async (req: any, res) => {
+app.get('/role', auth('/'), async (req: any, res) => {
   console.log('API call to /role', req.query);
   try {
     const data = await getRoleInfo(req.query['name']);
@@ -204,7 +193,7 @@ app.get('/role', checkLoggedIn('/'), async (req: any, res) => {
 });
 
 
-app.get('/bank-holiday', checkLoggedIn('/'), async (req: any, res) => {
+app.get('/bank-holiday', auth('/'), async (req: any, res) => {
   console.log('API call to /bank-holiday', req.query);
   try {
     const data = await getBankHolidayInfo(req.query['name']);
@@ -218,7 +207,7 @@ app.get('/bank-holiday', checkLoggedIn('/'), async (req: any, res) => {
   }
 });
 
-app.get('/transaction', checkLoggedIn('/'), async (req: any, res) => {
+app.get('/transaction', auth('/'), async (req: any, res) => {
   console.log('API call to /transaction', req.query);
   try {
     const data = await getTransactionInfo(req.query['name']);
@@ -229,7 +218,7 @@ app.get('/transaction', checkLoggedIn('/'), async (req: any, res) => {
 });
 
 
-app.get('/person', checkLoggedIn('/'), async (req: any, res) => {
+app.get('/person', auth('/'), async (req: any, res) => {
   console.log('API call to /person', req.query);
   try {
     const data = await getPersonInfo(req.query['name']);

@@ -27,20 +27,29 @@ const fetchWithTimeout = async function(url: string, timeoutSeconds: number = 60
   const fetchResult = await fetch(url, {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'fetch'
     },
     signal: controller.signal
   });
-  const responseBody = await fetchResult.json();
-  if (!fetchResult.ok) {
-    if (/^timeout of \d+ms exceeded/.test(responseBody.message)) {
-      throw 'TIMEOUT';
-    } else {
-      throw 'UNKNOWN';
-    }
-  } else {
-    return responseBody;
+
+
+  if (fetchResult.status === 401) {
+    // Reload the page to trigger server-side authentication
+    location.reload()
   }
+  
+  const responseBody = await fetchResult.json();
+
+    if (!fetchResult.ok) {
+      if (/^timeout of \d+ms exceeded/.test(responseBody.message)) {
+        throw "TIMEOUT";
+      } else {
+        throw "UNKNOWN";
+      }
+    } else {
+      return responseBody;
+    }
 };
 
 
