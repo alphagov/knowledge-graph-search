@@ -144,7 +144,7 @@ const getPersonInfo = async function(name: string): Promise<Person[]> {
   );
 };
 
-
+//keywords as used here must be exactly the same set of combinedWords as used by the function containDescription.
 const sendSearchQuery = async function(searchParams: SearchParams): Promise<SearchResults> {
   const keywords = splitKeywords(searchParams.selectedWords);
   const excludedKeywords = splitKeywords(searchParams.excludedWords);

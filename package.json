@@ -4,9 +4,10 @@
   "description": "Search engine for GOV.UK content",
   "main": "app.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "ts-node app.ts",
-    "dev": "nodemon app.ts"
+    "dev": "nodemon app.ts",
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
@@ -36,11 +37,14 @@
     "save": "^2.9.0"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.2",
     "@types/passport-oauth2": "^1.4.12",
     "cypress": "^12.2.0",
     "ignore-webpack-plugin": "^0.3.0",
+    "jest": "^29.5.0",
     "nodemon": "^2.0.20",
     "passport": "^0.6.0",
+    "ts-jest": "^29.1.0",
     "ts-loader": "^9.4.1",
     "ts-node": "^10.9.1",
     "typescript": "^4.9.4",

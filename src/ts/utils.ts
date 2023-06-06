@@ -1,5 +1,6 @@
 import { languageName } from './lang';
 import { SearchParams, WhereToSearch } from './search-api-types';
+import * as express from "express"
 
 const id = (x: string): (HTMLElement | null) => document.getElementById(x);
 
@@ -91,7 +92,7 @@ const queryDescription = (search: SearchParams, includeMarkup = true) => {
   return `pages that ${joinedClauses}`;
 };
 
-
+//combinedWords as used here must be exactly the same set of keywords as the ones submitted to BigQuery by the function sendSearchQuery.
 const containDescription = (search: SearchParams, includeMarkup: boolean) => {
   let where: string;
   //if (search.whereToSearch.title && search.whereToSearch.text) {
@@ -103,9 +104,8 @@ const containDescription = (search: SearchParams, includeMarkup: boolean) => {
   } else {
     where = 'in their body content';
   }
-  let combineOp = search.combinator === 'all' ? 'and' : 'or';
-  let combinedWords = splitKeywords(search.selectedWords)
-    .filter(w => w.length > 2)
+  const combineOp = search.combinator === 'all' ? 'and' : 'or';
+  const combinedWords = splitKeywords(search.selectedWords)
     .map(w => makeBold(w, includeMarkup))
     .join(` ${combineOp} `);
   return search.selectedWords !== '' ? `${combinedWords} ${where}` : '';
@@ -117,4 +117,31 @@ const makeBold = (text: string, includeMarkup: boolean) =>
     `"${text}"`;
 
 
-export { id, sanitiseInput, sanitiseOutput, getFormInputValue, splitKeywords, queryDescription, getFormSelectValue };
+
+const isReqAJAX = (req: express.Request) => {
+  // This header has to be manually set in the frontend
+  const headerValue = req.header("x-requested-with");
+  // This can be expanded if the frontend uses new ajax tools
+  // e.g "xhr" with Axios etc.
+  const supportedAjaxAPIs = ["fetch"];
+  if (!headerValue) {
+    return false;
+  }
+  if (Array.isArray(headerValue)) {
+    console.log('Having multiple values is not supported for header "X-Requested-With"');
+    return false;
+  }
+
+  return supportedAjaxAPIs.includes(headerValue);
+};
+
+
+export {
+  id,
+  sanitiseInput,
+  sanitiseOutput,
+  getFormInputValue,
+  splitKeywords,
+  queryDescription,
+  isReqAJAX,
+};

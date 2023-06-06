@@ -29,8 +29,8 @@ fi
 if [ "${GTM_AUTH}" != "" ]; then
     echo "GTM_AUTH is set to ${GTM_AUTH}"
 else
-    echo "Enter a GTM tracking ID"
-    echi "If you're unsure, ask the GA team or check the source HTML of the current live version."
+    echo "Enter a GTM AUTH"
+    echo "If you're unsure, ask the GA team or check the source HTML of the current live version."
     read -r GTM_AUTH
     echo "You entered ${GTM_AUTH}"
     echo "Is that correct? (y/n)"

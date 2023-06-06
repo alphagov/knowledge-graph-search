@@ -1,4 +1,5 @@
 import express from 'express';
+import {auth} from './src/ts/middlewares'
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
@@ -6,7 +7,7 @@ const fs = require('fs');
 
 // these variables are used for OAuth authentication. They will only be set if
 // OAuth is enabled
-let OAuth2Strategy, passport, session, ensureLoggedIn;
+let OAuth2Strategy, passport, session;
 
 import { sendSearchQuery, sendInitQuery, getOrganisationInfo, getPersonInfo, getRoleInfo, getTaxonInfo, getBankHolidayInfo, getTransactionInfo } from './bigquery';
 import { SearchArea, Combinator, SearchType, SearchParams, WhereToSearch, Sorting, Pages } from './src/ts/search-api-types';
@@ -19,15 +20,14 @@ const app: express.Application = express();
 const port: number = process.env.port ? parseInt(process.env.port) : 8080;
 
 
-if (!process.env.DISABLE_AUTH) {
-  console.log('OAuth via PassportJS is enabled because DISABLE_AUTH is set')
+if (process.env.ENABLE_AUTH == 'true') {
+  console.log('OAuth via PassportJS is enabled because ENABLE_AUTH is set to "true"')
   // The OAuth code is based on multiple online sources.
   // The main one is:
   // https://www.pveller.com/oauth2-with-passport-10-steps-recipe/
   OAuth2Strategy = require('passport-oauth2');
   passport = require('passport');
   session = require('express-session');
-  ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
   passport.serializeUser((user:any, done:any) => done(null, user));
   passport.deserializeUser((user:any, done:any) => done(null, user));
 
@@ -38,7 +38,7 @@ if (!process.env.DISABLE_AUTH) {
     cookie: { secure: true }
   }));
 } else {
-  console.log('OAuth via PassportJS is disabled, since DISABLE_AUTH is set')
+  console.log('OAuth via PassportJS is disabled because ENABLE_AUTH is not set to "true"')
 }
 
 app.use(cors());
@@ -46,7 +46,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static('public'));
 app.use(express.json());
 
-if (!process.env.DISABLE_AUTH) {
+if (process.env.ENABLE_AUTH == 'true') {
   app.set('trust proxy', 1) // trust first proxy
   app.use(passport.initialize());
   app.use(passport.session());
@@ -66,20 +66,9 @@ if (!process.env.DISABLE_AUTH) {
   ));
 }
 
-
-// since the routes below use this function, we always need to define it
-// so it we're not using OAuth, we make it do nothing
-// (i.e. just a middleware passthrough)
-
-
-const checkLoggedIn = ensureLoggedIn ?
-  ensureLoggedIn :
-  ((_redirect: string) => (_req: any, _res: any, next: any) => next());
-
-
 // Routes
 
-if (!process.env.DISABLE_AUTH) {
+if (process.env.ENABLE_AUTH == 'true') {
   app.get('/login', passport.authenticate('oauth2'));
   app.get('/auth/gds/callback',
           passport.authenticate('oauth2', '/error-callback'),
@@ -88,7 +77,7 @@ if (!process.env.DISABLE_AUTH) {
 }
 
 app.get('/',
-  checkLoggedIn('/login'),
+  auth(),
   async (req, res) => res.sendFile('views/index.html', {root: __dirname })
 );
 
@@ -97,7 +86,6 @@ const fileNames = fs.readdirSync('./src/ts/').filter((a: any) => !isNaN(Number(a
 
 fileNames.forEach((e: any) => {
   app.get(`/${e}`,
-    checkLoggedIn('/login'),
     async (req, res) => res.sendFile(`views/${e}/index.html`, {root: __dirname })
   );
   app.get(`/${e}/landing`,
@@ -113,7 +101,7 @@ fileNames.forEach((e: any) => {
 
 
 // the front-end will call this upon starting to get some data needed from the server
-app.get('/get-init-data', checkLoggedIn('/'), async (req, res) => {
+app.get('/get-init-data', auth('/'), async (req, res) => {
   console.log('/get-init-data');
   try {
     res.send(await sendInitQuery());
@@ -124,7 +112,7 @@ app.get('/get-init-data', checkLoggedIn('/'), async (req, res) => {
 });
 
 
-app.get('/search', checkLoggedIn('/'), async (req: any, res) => {
+app.get('/search', auth('/'), async (req: any, res) => {
   console.log('API call to /search', req.query);
   // retrieve qsp params
   const params: SearchParams = {
@@ -181,7 +169,7 @@ app.get('/csv', async (req: any, res) => {
 });
 
 
-app.get('/taxon', checkLoggedIn('/'), async (req: any, res) => {
+app.get('/taxon', auth('/'), async (req: any, res) => {
   console.log('API call to /taxon', req.query);
   try {
     const data = await getTaxonInfo(req.query['name']);
@@ -196,7 +184,7 @@ app.get('/taxon', checkLoggedIn('/'), async (req: any, res) => {
 });
 
 
-app.get('/organisation', checkLoggedIn('/'), async (req: any, res) => {
+app.get('/organisation', auth('/'), async (req: any, res) => {
   console.log('API call to /organisation', req.query);
   try {
     const data = await getOrganisationInfo(req.query['name']);
@@ -211,7 +199,7 @@ app.get('/organisation', checkLoggedIn('/'), async (req: any, res) => {
 });
 
 
-app.get('/role', checkLoggedIn('/'), async (req: any, res) => {
+app.get('/role', auth('/'), async (req: any, res) => {
   console.log('API call to /role', req.query);
   try {
     const data = await getRoleInfo(req.query['name']);
@@ -222,7 +210,7 @@ app.get('/role', checkLoggedIn('/'), async (req: any, res) => {
 });
 
 
-app.get('/bank-holiday', checkLoggedIn('/'), async (req: any, res) => {
+app.get('/bank-holiday', auth('/'), async (req: any, res) => {
   console.log('API call to /bank-holiday', req.query);
   try {
     const data = await getBankHolidayInfo(req.query['name']);
@@ -236,7 +224,7 @@ app.get('/bank-holiday', checkLoggedIn('/'), async (req: any, res) => {
   }
 });
 
-app.get('/transaction', checkLoggedIn('/'), async (req: any, res) => {
+app.get('/transaction', auth('/'), async (req: any, res) => {
   console.log('API call to /transaction', req.query);
   try {
     const data = await getTransactionInfo(req.query['name']);
@@ -247,7 +235,7 @@ app.get('/transaction', checkLoggedIn('/'), async (req: any, res) => {
 });
 
 
-app.get('/person', checkLoggedIn('/'), async (req: any, res) => {
+app.get('/person', auth('/'), async (req: any, res) => {
   console.log('API call to /person', req.query);
   try {
     const data = await getPersonInfo(req.query['name']);
