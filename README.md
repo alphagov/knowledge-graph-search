@@ -27,8 +27,9 @@ Docs](https://docs.data-community.publishing.service.gov.uk).
   to to run searches get the data. For instance, use `govuk-knowledge-graph-dev`
   to get the data from the development backend.
 
-- set an environment variable called `DISABLE_AUTH` to any value, as you won't
-  need authentication on your local machine
+- set an environment variable called `ENABLE_AUTH` to `"false"` (or anthing but
+  `"true"`, or don't set one at all), as you won't need authentication on your
+  local machine
 
 - Start the server with `npm run dev`.
 
@@ -90,4 +91,3 @@ To run a single test file , use `--spec`. For instance:
   7. You may be prompted to authenticate with `gcloud run login`, in which case do so and start again.
   8. Choose the GCP region `europe-west2`
   9. Continue.  Check in the [web console](https://console.cloud.google.com/run/detail/europe-west2/govuk-knowledge-graph-search/revisions?project=govuk-knowledge-graph) that a revision was deployed, and try using it at https://govgraphsearch.dev.
-

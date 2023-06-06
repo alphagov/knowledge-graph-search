@@ -18,8 +18,8 @@ const app: express.Application = express();
 const port: number = process.env.port ? parseInt(process.env.port) : 8080;
 
 
-if (!process.env.DISABLE_AUTH) {
-  console.log('OAuth via PassportJS is enabled because DISABLE_AUTH is set')
+if (process.env.ENABLE_AUTH == 'true') {
+  console.log('OAuth via PassportJS is enabled because ENABLE_AUTH is set to "true"')
   // The OAuth code is based on multiple online sources.
   // The main one is:
   // https://www.pveller.com/oauth2-with-passport-10-steps-recipe/
@@ -36,7 +36,7 @@ if (!process.env.DISABLE_AUTH) {
     cookie: { secure: true }
   }));
 } else {
-  console.log('OAuth via PassportJS is disabled, since DISABLE_AUTH is set')
+  console.log('OAuth via PassportJS is disabled because ENABLE_AUTH is not set to "true"')
 }
 
 app.use(cors());
@@ -44,7 +44,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static('public'));
 app.use(express.json());
 
-if (!process.env.DISABLE_AUTH) {
+if (process.env.ENABLE_AUTH == 'true') {
   app.set('trust proxy', 1) // trust first proxy
   app.use(passport.initialize());
   app.use(passport.session());
@@ -66,7 +66,7 @@ if (!process.env.DISABLE_AUTH) {
 
 // Routes
 
-if (!process.env.DISABLE_AUTH) {
+if (process.env.ENABLE_AUTH == 'true') {
   app.get('/login', passport.authenticate('oauth2'));
   app.get('/auth/gds/callback',
           passport.authenticate('oauth2', '/error-callback'),
