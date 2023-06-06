@@ -1,46 +1,30 @@
-import {
-  Transaction,
-  Taxon,
-  Organisation,
-  Person,
-  Role,
-  MetaResultType,
-  MetaResult,
-  MainResult,
-  SearchParams,
-  Combinator,
-  SearchResults,
-  SearchType,
-  InitResults,
-  BankHoliday,
-} from "./src/ts/search-api-types";
-import { splitKeywords } from "./src/ts/utils";
-import { languageCode } from "./src/ts/lang";
-const { BigQuery } = require("@google-cloud/bigquery");
+import { Transaction, Taxon, Organisation, Person, Role, MetaResultType, MetaResult, MainResult, SearchParams, Combinator, SearchResults, SearchType, InitResults, BankHoliday } from './src/ts/search-api-types';
+import { splitKeywords } from './src/ts/utils';
+import { languageCode } from './src/ts/lang';
+const { BigQuery } = require('@google-cloud/bigquery');
 
 //====== private ======
 
 const internalLinkRegExp = /^((https:\/\/)?((www\.)?gov\.uk))?\//;
 
+
 const bigquery = new BigQuery({
-  projectId: process.env.PROJECT_ID,
+  projectId: process.env.PROJECT_ID
 });
 
-const bigQuery = async function (userQuery: string, options?: any) {
+
+const bigQuery = async function(userQuery: string, options?: any) {
   const params: Record<string, string> = {};
 
   if (options) {
     if (options.keywords) {
-      options.keywords.forEach(
-        (keyword: string, index: number) =>
-          (params[`keyword${index}`] = keyword)
+      options.keywords.forEach((keyword: string, index: number) =>
+        params[`keyword${index}`] = keyword
       );
     }
     if (options.excludedKeywords) {
-      options.excludedKeywords.forEach(
-        (keyword: string, index: number) =>
-          (params[`excluded_keyword${index}`] = keyword)
-      );
+      options.excludedKeywords.forEach((keyword: string, index: number) =>
+        params[`excluded_keyword${index}`] = keyword);
     }
     if (options.name) {
       params.name = options.name;
@@ -64,8 +48,8 @@ const bigQuery = async function (userQuery: string, options?: any) {
 
   const bqOptions = {
     query: userQuery,
-    location: "europe-west2",
-    params,
+    location: 'europe-west2',
+    params
   };
 
   const [rows] = await bigquery.query(bqOptions);
@@ -75,10 +59,10 @@ const bigQuery = async function (userQuery: string, options?: any) {
 
 //====== public ======
 
-const sendInitQuery = async function (): Promise<InitResults> {
+const sendInitQuery = async function(): Promise<InitResults> {
   let bqLocales: any, bqTaxons: any, bqOrganisations: any;
   try {
-    [bqLocales, bqTaxons, bqOrganisations] = await Promise.all([
+    [ bqLocales, bqTaxons, bqOrganisations ] = await Promise.all([
       bigQuery(`
         SELECT DISTINCT locale
         FROM \`content.locale\`
@@ -90,112 +74,87 @@ const sendInitQuery = async function (): Promise<InitResults> {
       bigQuery(`
         SELECT DISTINCT title
         FROM \`graph.organisation\`
-        `),
+        `)
     ]);
-  } catch (e) {
-    console.log("sendInitQueryError", e);
+  } catch(e) {
+    console.log('sendInitQueryError', e);
   }
 
   return {
-    locales: ["", "en", "cy"].concat(
+    locales: ['', 'en', 'cy'].concat(
       bqLocales
         .map((row: any) => row.locale)
-        .filter((locale: string) => locale !== "en" && locale !== "cy")
-    ),
+        .filter((locale: string) => locale !== 'en' && locale !== 'cy')
+      ),
     taxons: bqTaxons.map((taxon: any) => taxon.title),
-    organisations: bqOrganisations.map(
-      (organisation: any) => organisation.title
-    ),
+    organisations: bqOrganisations.map((organisation: any) => organisation.title)
   };
 };
 
-const getTaxonInfo = async function (name: string): Promise<Taxon[]> {
+
+const getTaxonInfo = async function(name: string): Promise<Taxon[]> {
   return await bigQuery(
-    `SELECT "Taxon" as type, * FROM search.taxon WHERE lower(name) = lower(@name);`,
-    { name }
+    `SELECT "Taxon" as type, * FROM search.taxon WHERE lower(name) = lower(@name);`, { name }
   );
 };
 
-const getOrganisationInfo = async function (
-  name: string
-): Promise<Organisation[]> {
+
+const getOrganisationInfo = async function(name: string): Promise<Organisation[]> {
   return await bigQuery(
-    `SELECT "Organisation" as type, * FROM search.organisation WHERE lower(name) = lower(@name);`,
-    { name }
+    `SELECT "Organisation" as type, * FROM search.organisation WHERE lower(name) = lower(@name);`, { name }
   );
 };
 
-const getBankHolidayInfo = async function (
-  name: string
-): Promise<BankHoliday[]> {
+
+const getBankHolidayInfo = async function(name: string): Promise<BankHoliday[]> {
   const bqBankHolidays: BankHoliday[] = await bigQuery(
-    `SELECT * FROM search.bank_holiday WHERE lower(name) = lower(@name);`,
-    { name }
+    `SELECT * FROM search.bank_holiday WHERE lower(name) = lower(@name);`, { name }
   );
   return bqBankHolidays.map((bqBankHoliday: BankHoliday) => {
     return {
       type: MetaResultType.BankHoliday,
       name: bqBankHoliday.name,
       dates: bqBankHoliday.dates.map((date: any) => date.value),
-      divisions: bqBankHoliday.divisions,
-    };
+      divisions: bqBankHoliday.divisions
+    }
   });
 };
 
-const getTransactionInfo = async function (
-  name: string
-): Promise<Transaction[]> {
+
+const getTransactionInfo = async function(name: string): Promise<Transaction[]> {
   return await bigQuery(
-    `SELECT "Transaction" as type, * FROM search.transaction WHERE lower(name) = lower(@name);`,
-    { name }
+    `SELECT "Transaction" as type, * FROM search.transaction WHERE lower(name) = lower(@name);`, { name }
   );
 };
 
-const getRoleInfo = async function (name: string): Promise<Role[]> {
+
+const getRoleInfo = async function(name: string): Promise<Role[]> {
   return await bigQuery(
-    `SELECT "Role" as type, * FROM search.role WHERE lower(name) = lower(@name);`,
-    { name }
+    `SELECT "Role" as type, * FROM search.role WHERE lower(name) = lower(@name);`, { name }
   );
 };
 
-const getPersonInfo = async function (name: string): Promise<Person[]> {
+
+const getPersonInfo = async function(name: string): Promise<Person[]> {
   return await bigQuery(
-    `SELECT "Person" as type, * FROM search.person WHERE lower(name) = lower(@name);`,
-    { name }
+    `SELECT "Person" as type, * FROM search.person WHERE lower(name) = lower(@name);`, { name }
   );
 };
 
 //keywords as used here must be exactly the same set of combinedWords as used by the function containDescription.
-const sendSearchQuery = async function (
-  searchParams: SearchParams
-): Promise<SearchResults> {
+const sendSearchQuery = async function(searchParams: SearchParams): Promise<SearchResults> {
   const keywords = splitKeywords(searchParams.selectedWords);
   const excludedKeywords = splitKeywords(searchParams.excludedWords);
   const query = buildSqlQuery(searchParams, keywords, excludedKeywords);
   const locale = languageCode(searchParams.selectedLocale);
   const taxon = searchParams.selectedTaxon;
   const organisation = searchParams.selectedOrganisation;
-  const selectedWordsWithoutQuotes = searchParams.selectedWords.replace(
-    /"/g,
-    ""
-  );
-  const link =
-    searchParams.linkSearchUrl &&
-    internalLinkRegExp.test(searchParams.linkSearchUrl)
-      ? searchParams.linkSearchUrl.replace(
-          internalLinkRegExp,
-          "https://www.gov.uk/"
-        )
-      : searchParams.linkSearchUrl;
+  const selectedWordsWithoutQuotes = searchParams.selectedWords.replace(/"/g, '');
+  const link = searchParams.linkSearchUrl && internalLinkRegExp.test(searchParams.linkSearchUrl)
+    ? searchParams.linkSearchUrl.replace(internalLinkRegExp, 'https://www.gov.uk/')
+    : searchParams.linkSearchUrl;
   const queries = [
-    bigQuery(query, {
-      keywords,
-      excludedKeywords,
-      locale,
-      taxon,
-      organisation,
-      link,
-    }),
+    bigQuery(query, { keywords, excludedKeywords, locale, taxon, organisation, link })
   ];
 
   let bqMetaResults: MetaResult[] = [];
@@ -211,94 +170,74 @@ const sendSearchQuery = async function (
     case SearchType.Organisation:
       results = await Promise.all(queries);
       bqMainResults = results[0];
-      bqMetaResults = await getOrganisationInfo(
-        searchParams.selectedOrganisation
-      );
+      bqMetaResults = await getOrganisationInfo(searchParams.selectedOrganisation);
       break;
     default:
-      if (
-        selectedWordsWithoutQuotes &&
+      if (selectedWordsWithoutQuotes &&
         selectedWordsWithoutQuotes.length > 5 &&
-        selectedWordsWithoutQuotes.includes(" ")
-      ) {
-        queries.push(
-          bigQuery(
-            `SELECT *
+        selectedWordsWithoutQuotes.includes(' ')) {
+        queries.push(bigQuery(
+        `SELECT *
          FROM search.thing
          WHERE CONTAINS_SUBSTR(name, @selected_words_without_quotes)
-         ;`,
-            { selectedWordsWithoutQuotes }
-          )
-        );
+         ;`
+        , { selectedWordsWithoutQuotes }))
       }
       results = await Promise.all(queries);
-      bqMainResults = results[0];
+      bqMainResults = results[0]
       bqMetaResults = results.length > 1 ? results[1] : [];
       break;
   }
-  const result: SearchResults = {
+  const result:SearchResults = {
     main: bqMainResults,
-    meta: bqMetaResults,
-  };
+    meta: bqMetaResults
+  }
   return result;
 };
 
-const buildSqlQuery = function (
-  searchParams: SearchParams,
-  keywords: string[],
-  excludedKeywords: string[]
-): string {
+
+const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], excludedKeywords: string[]): string {
+
   const contentToSearch = [];
   if (searchParams.whereToSearch.title) {
     contentToSearch.push('IFNULL(page.title, "")');
   }
   if (searchParams.whereToSearch.text) {
-    contentToSearch.push(
-      'IFNULL(page.text, "")',
-      'IFNULL(page.description, "")'
-    );
+    contentToSearch.push('IFNULL(page.text, "")', 'IFNULL(page.description, "")');
   }
   const contentToSearchString = contentToSearch.join(' || " " || ');
 
-  const includeClause =
-    keywords.length === 0
-      ? ""
-      : "AND (" +
-        [...Array(keywords.length).keys()]
-          .map((index) =>
-            searchParams.caseSensitive
-              ? `STRPOS(${contentToSearchString}, @keyword${index}) <> 0`
-              : `CONTAINS_SUBSTR(${contentToSearchString}, @keyword${index})`
-          )
-          .join(searchParams.combinator === Combinator.Any ? " OR " : " AND ") +
-        ")";
+  const includeClause = keywords.length === 0
+    ? ''
+    : 'AND (' + ([...Array(keywords.length).keys()]
+      .map(index => searchParams.caseSensitive
+        ? `STRPOS(${contentToSearchString}, @keyword${index}) <> 0`
+        : `CONTAINS_SUBSTR(${contentToSearchString}, @keyword${index})`)
+      .join(searchParams.combinator === Combinator.Any ? ' OR ' : ' AND ')) + ')';
 
-  const excludeClause =
-    excludedKeywords.length === 0
-      ? ""
-      : "AND NOT (" +
-        [...Array(excludedKeywords.length).keys()]
-          .map((index) =>
-            searchParams.caseSensitive
-              ? `STRPOS(${contentToSearchString}, @excluded_keyword${index}) <> 0`
-              : `CONTAINS_SUBSTR(${contentToSearchString}, @excluded_keyword${index})`
-          )
-          .join(" OR ") +
-        ")";
-  let areaClause = "";
-  if (searchParams.areaToSearch === "publisher") {
+  const excludeClause = excludedKeywords.length === 0
+    ? ''
+    : 'AND NOT (' + ([...Array(excludedKeywords.length).keys()]
+      .map(index => searchParams.caseSensitive
+        ? `STRPOS(${contentToSearchString}, @excluded_keyword${index}) <> 0`
+        : `CONTAINS_SUBSTR(${contentToSearchString}, @excluded_keyword${index})`)
+      .join(' OR ')) + ')';
+;
+
+  let areaClause = '';
+  if (searchParams.areaToSearch === 'publisher') {
     areaClause = 'AND publishing_app = "publisher"';
-  } else if (searchParams.areaToSearch === "whitehall") {
+  } else if (searchParams.areaToSearch === 'whitehall') {
     areaClause = 'AND publishing_app = "whitehall"';
   }
 
-  let localeClause = "";
-  if (searchParams.selectedLocale !== "") {
-    localeClause = `AND locale = @locale`;
+  let localeClause = '';
+  if (searchParams.selectedLocale !== '') {
+    localeClause = `AND locale = @locale`
   }
 
-  let taxonClause = "";
-  if (searchParams.selectedTaxon !== "") {
+  let taxonClause = '';
+  if (searchParams.selectedTaxon !== '') {
     taxonClause = `
       AND EXISTS
         (
@@ -308,8 +247,8 @@ const buildSqlQuery = function (
     `;
   }
 
-  let organisationClause = "";
-  if (searchParams.selectedOrganisation !== "") {
+  let organisationClause = '';
+  if (searchParams.selectedOrganisation !== '') {
     organisationClause = `
       AND EXISTS
         (
@@ -319,8 +258,8 @@ const buildSqlQuery = function (
     `;
   }
 
-  let linkClause = "";
-  if (searchParams.linkSearchUrl !== "") {
+  let linkClause = '';
+  if (searchParams.linkSearchUrl !== '') {
     // Link search: look for url as substring
     linkClause = `
       AND EXISTS
@@ -364,6 +303,7 @@ const buildSqlQuery = function (
   `;
 };
 
+
 export {
   buildSqlQuery,
   getBankHolidayInfo,
@@ -373,5 +313,5 @@ export {
   getRoleInfo,
   getTaxonInfo,
   sendInitQuery,
-  sendSearchQuery,
+  sendSearchQuery
 };
