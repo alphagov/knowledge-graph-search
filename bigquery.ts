@@ -5,8 +5,6 @@ const { BigQuery } = require('@google-cloud/bigquery');
 
 //====== private ======
 
-const internalLinkRegExp = /^((https:\/\/)?((www\.)?gov\.uk))?\//;
-
 
 const bigquery = new BigQuery({
   projectId: process.env.PROJECT_ID
@@ -150,9 +148,7 @@ const sendSearchQuery = async function(searchParams: SearchParams): Promise<Sear
   const taxon = searchParams.selectedTaxon;
   const organisation = searchParams.selectedOrganisation;
   const selectedWordsWithoutQuotes = searchParams.selectedWords.replace(/"/g, '');
-  const link = searchParams.linkSearchUrl && internalLinkRegExp.test(searchParams.linkSearchUrl)
-    ? searchParams.linkSearchUrl.replace(internalLinkRegExp, 'https://www.gov.uk/')
-    : searchParams.linkSearchUrl;
+  const link = searchParams.linkSearchUrl
   const queries = [
     bigQuery(query, { keywords, excludedKeywords, locale, taxon, organisation, link })
   ];
@@ -260,25 +256,14 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
 
   let linkClause = '';
   if (searchParams.linkSearchUrl !== '') {
-    if (internalLinkRegExp.test(searchParams.linkSearchUrl)) {
-      // internal link search: look for exact match
-      linkClause = `
-        AND EXISTS
-          (
-            SELECT 1 FROM UNNEST (hyperlinks) AS link
-            WHERE link = @link
-          )
-      `;
-    } else {
-      // external link search: look for url as substring
-      linkClause = `
-        AND EXISTS
-          (
-            SELECT 1 FROM UNNEST (hyperlinks) AS link
-            WHERE CONTAINS_SUBSTR(link, @link)
-          )
-      `;
-    }
+    // Link search: look for url as substring
+    linkClause = `
+      AND EXISTS
+        (
+          SELECT 1 FROM UNNEST (hyperlinks) AS link
+          WHERE CONTAINS_SUBSTR(link, @link)
+        )
+    `;
   }
 
   return `
@@ -316,6 +301,7 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
 
 
 export {
+  buildSqlQuery,
   getBankHolidayInfo,
   getTransactionInfo,
   getOrganisationInfo,
