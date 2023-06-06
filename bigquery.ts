@@ -5,8 +5,6 @@ const { BigQuery } = require('@google-cloud/bigquery');
 
 //====== private ======
 
-const internalLinkRegExp = /^((https:\/\/)?((www\.)?gov\.uk))?\//;
-
 
 const bigquery = new BigQuery({
   projectId: process.env.PROJECT_ID
@@ -150,9 +148,7 @@ const sendSearchQuery = async function(searchParams: SearchParams): Promise<Sear
   const taxon = searchParams.selectedTaxon;
   const organisation = searchParams.selectedOrganisation;
   const selectedWordsWithoutQuotes = searchParams.selectedWords.replace(/"/g, '');
-  const link = searchParams.linkSearchUrl && internalLinkRegExp.test(searchParams.linkSearchUrl)
-    ? searchParams.linkSearchUrl.replace(internalLinkRegExp, 'https://www.gov.uk/')
-    : searchParams.linkSearchUrl;
+  const link = searchParams.linkSearchUrl
   const queries = [
     bigQuery(query, { keywords, excludedKeywords, locale, taxon, organisation, link })
   ];
