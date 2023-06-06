@@ -153,9 +153,7 @@ const sendSearchQuery = async function(searchParams: SearchParams): Promise<Sear
   const taxon = searchParams.selectedTaxon;
   const organisation = searchParams.selectedOrganisation;
   const selectedWordsWithoutQuotes = searchParams.selectedWords.replace(/"/g, '');
-  const link = searchParams.linkSearchUrl && internalLinkRegExp.test(searchParams.linkSearchUrl)
-    ? searchParams.linkSearchUrl.replace(internalLinkRegExp, 'https://www.gov.uk/')
-    : searchParams.linkSearchUrl;
+  const link = searchParams.linkSearchUrl;
   const queries = [
     bigQuery(query, { keywords, excludedKeywords, locale, taxon, organisation, link })
   ];
@@ -228,7 +226,7 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
         RIGHT(
           text,
           CHAR_LENGTH(text) - (
-            STRPOS(text, '${keywords[0]}')- ${keywords[0].length} - ${padding}
+            STRPOS(text, "${keywords[0]}")- ${keywords[0].length} - ${padding}
           )
         ),
         (
@@ -236,11 +234,11 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
             RIGHT(
               text,
               CHAR_LENGTH(text) - (
-                STRPOS(text, '${keywords[0]}') - ${keywords[0].length} - ${padding}
+                STRPOS(text, "${keywords[0]}") - ${keywords[0].length} - ${padding}
               )
             ),
-            '${keywords[0]}'
-          ) + CASE WHEN REGEXP_CONTAINS(text, r'${keywords[0]}') THEN ${keywords[0].length} + ${padding} ELSE 0 END
+            "${keywords[0]}"
+          ) + CASE WHEN REGEXP_CONTAINS(text, r"${keywords[0]}") THEN ${keywords[0].length} + ${padding} ELSE 0 END
         )
       )
   ) AS text`: '';
@@ -319,25 +317,14 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
 
   let linkClause = '';
   if (searchParams.linkSearchUrl !== '') {
-    if (internalLinkRegExp.test(searchParams.linkSearchUrl)) {
-      // internal link search: look for exact match
-      linkClause = `
-        AND EXISTS
-          (
-            SELECT 1 FROM UNNEST (hyperlinks) AS link
-            WHERE link = @link
-          )
-      `;
-    } else {
-      // external link search: look for url as substring
-      linkClause = `
-        AND EXISTS
-          (
-            SELECT 1 FROM UNNEST (hyperlinks) AS link
-            WHERE CONTAINS_SUBSTR(link, @link)
-          )
-      `;
-    }
+    // external link search: look for url as substring
+    linkClause = `
+      AND EXISTS
+        (
+          SELECT 1 FROM UNNEST (hyperlinks) AS link
+          WHERE CONTAINS_SUBSTR(link, @link)
+        )
+    `;
   }
 
   return `
