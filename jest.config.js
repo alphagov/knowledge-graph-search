@@ -8,5 +8,6 @@ module.exports = {
     "^.+\\.tsx?$": "ts-jest",
   },
   moduleFileExtensions: ["js", "ts", "json", "node"],
-  collectCoverage: true,
+  // Uncomment this if we want to use coverage
+  // collectCoverage: true,
 };
