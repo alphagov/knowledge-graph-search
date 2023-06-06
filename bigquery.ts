@@ -365,6 +365,7 @@ const buildSqlQuery = function (
 };
 
 export {
+  buildSqlQuery,
   getBankHolidayInfo,
   getTransactionInfo,
   getOrganisationInfo,
