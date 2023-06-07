@@ -112,6 +112,7 @@ app.get('/search', auth('/'), async (req: any, res) => {
     areaToSearch: <SearchArea>sanitiseInput(req.query['area']) || SearchArea.Any,
     linkSearchUrl: sanitiseInput(req.query['link-search-url']) || ''
   };
+  console.log({ params });
   try {
     const data = await sendSearchQuery(params);
     res.send(data);

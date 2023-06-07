@@ -49,7 +49,7 @@ const bigQuery = async function(userQuery: string, options?: any) {
     location: 'europe-west2',
     params
   };
-
+  console.log({ bqOptions });
   const [rows] = await bigquery.query(bqOptions);
 
   return rows;
@@ -142,9 +142,13 @@ const getPersonInfo = async function(name: string): Promise<Person[]> {
 //keywords as used here must be exactly the same set of combinedWords as used by the function containDescription.
 const sendSearchQuery = async function(searchParams: SearchParams): Promise<SearchResults> {
   const keywords = splitKeywords(searchParams.selectedWords);
+  console.log({ keywords });
   const excludedKeywords = splitKeywords(searchParams.excludedWords);
+  console.log({ excludedKeywords });
   const query = buildSqlQuery(searchParams, keywords, excludedKeywords);
+  console.log({ query });
   const locale = languageCode(searchParams.selectedLocale);
+  console.log({ locale });
   const taxon = searchParams.selectedTaxon;
   const organisation = searchParams.selectedOrganisation;
   const selectedWordsWithoutQuotes = searchParams.selectedWords.replace(/"/g, '');
@@ -169,9 +173,11 @@ const sendSearchQuery = async function(searchParams: SearchParams): Promise<Sear
       bqMetaResults = await getOrganisationInfo(searchParams.selectedOrganisation);
       break;
     default:
+      console.log({ selectedWordsWithoutQuotes });
       if (selectedWordsWithoutQuotes &&
         selectedWordsWithoutQuotes.length > 5 &&
         selectedWordsWithoutQuotes.includes(' ')) {
+        console.log("Doing extra query");
         queries.push(bigQuery(
         `SELECT *
          FROM search.thing
@@ -188,6 +194,7 @@ const sendSearchQuery = async function(searchParams: SearchParams): Promise<Sear
     main: bqMainResults,
     meta: bqMetaResults
   }
+  console.log({ result });
   return result;
 };
 
