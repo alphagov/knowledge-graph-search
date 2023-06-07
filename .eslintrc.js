@@ -9,6 +9,7 @@ module.exports = {
     'standard',
     'prettier',
     'plugin:cypress/recommended',
+    'plugin:jest/recommended',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -16,7 +17,7 @@ module.exports = {
     sourceType: 'module',
     project: './tsconfig.json',
   },
-  plugins: ['@typescript-eslint'],
+  plugins: ['@typescript-eslint', 'jest'],
   rules: {
     // Add custom rules here
   },
