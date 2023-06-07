@@ -20,5 +20,7 @@ module.exports = {
   plugins: ['@typescript-eslint', 'jest'],
   rules: {
     // Add custom rules here
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': 'error',
   },
 }
