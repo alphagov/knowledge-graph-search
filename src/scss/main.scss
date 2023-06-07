@@ -1,4 +1,4 @@
-@import "../../node_modules/govuk-frontend/govuk/all";
+@import '../../node_modules/govuk-frontend/govuk/all';
 
 .govuk-phase-banner__content__tag {
   vertical-align: 30%;
@@ -71,11 +71,13 @@ pre {
   background: #ddd;
 }
 
-.kg-checkboxes, .kg-radios {
+.kg-checkboxes,
+.kg-radios {
   padding: 0;
   display: inline;
   line-height: 1.2;
-  .kg-checkboxes__item, .kg-radios__item {
+  .kg-checkboxes__item,
+  .kg-radios__item {
     display: inline-block;
     padding: 0 1em 0 0;
     background: #ddd;
@@ -100,7 +102,8 @@ pre {
   }
 }
 
-h1:focus-visible, h2:focus-visible {
+h1:focus-visible,
+h2:focus-visible {
   outline: none;
 }
 
@@ -133,7 +136,6 @@ h1:focus-visible, h2:focus-visible {
     padding: 0 2px 0 2px;
     border: 1px solid black;
   }
-
 }
 
 #taxon-label {
@@ -197,7 +199,8 @@ h1:focus-visible, h2:focus-visible {
     border-top: 1px solid #ccc;
     margin: 5px 15px 30px 15px;
   }
-  h2, .govuk-body {
+  h2,
+  .govuk-body {
     color: white;
     margin-bottom: 20px;
   }
