@@ -1,11 +1,8 @@
 import { state } from '../state'
 import { viewMetaLink } from './view-components'
 import {
-  MetaResultType,
   Taxon,
   Organisation,
-  Person,
-  Role,
   Transaction,
   BankHoliday,
 } from '../search-api-types'

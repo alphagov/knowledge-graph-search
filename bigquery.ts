@@ -16,7 +16,7 @@ import {
 } from './src/ts/search-api-types'
 import { splitKeywords } from './src/ts/utils'
 import { languageCode } from './src/ts/lang'
-const { BigQuery } = require('@google-cloud/bigquery')
+import { BigQuery } from '@google-cloud/bigquery'
 
 //= ===== private ======
 
