@@ -3,7 +3,6 @@ import {
   SearchType,
   SearchArea,
   Combinator,
-  MetaResultType,
   SearchResults,
 } from './search-api-types'
 import { languageCode } from './lang'
@@ -28,10 +27,7 @@ const makeQueryString = function (sp: SearchParams): string {
   return usp.toString()
 }
 
-const fetchWithTimeout = async function (
-  url: string,
-  timeoutSeconds = 60
-) {
+const fetchWithTimeout = async function (url: string, timeoutSeconds = 60) {
   const controller = new AbortController()
   setTimeout(() => controller.abort(), timeoutSeconds * 1000)
   const fetchResult = await fetch(url, {
@@ -52,9 +48,9 @@ const fetchWithTimeout = async function (
 
   if (!fetchResult.ok) {
     if (/^timeout of \d+ms exceeded/.test(responseBody.message)) {
-      throw 'TIMEOUT'
+      throw new Error('TIMEOUT')
     } else {
-      throw 'UNKNOWN'
+      throw new Error('UNKNOWN')
     }
   } else {
     return responseBody

@@ -191,7 +191,7 @@ const sendSearchQuery = async function (
 
   let bqMetaResults: MetaResult[] = []
   let bqMainResults: MainResult[] = []
-  let results: any
+  let results: unknown[][]
 
   switch (searchParams.searchType) {
     case SearchType.Taxon:
