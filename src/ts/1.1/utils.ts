@@ -121,7 +121,8 @@ const makeBold = (text: string, includeMarkup: boolean) =>
 //TODO: handle ignored case matching and multiple keywords
 const highlight = (searchTerm: string, text: string): string =>  {
   text = text.replace(/\u00a0/g, ' ');
-  let term = searchTerm.replace(/['"]+/g, '');
+  let term = searchTerm.replace(/"/g, '');
+  console.log(term)
   const mark = `<mark class='highlight-bold'>${term}</mark>`;
   if (term) {
   	let regex = new RegExp(term, 'gi');
@@ -140,7 +141,7 @@ const highlight = (searchTerm: string, text: string): string =>  {
 }
 
 const highlightLinks = (searchTerm: string, links: string[]): string =>  {
-  let term = searchTerm.replace(/['"]+/g, '');
+  let term = searchTerm.replace(/"/g, '');
   const mark = `<mark class='highlight-bold'>${term}</mark>`;
   let regex = new RegExp(term, 'gi');
   const result = links.find((link: string) => link.includes(term))
