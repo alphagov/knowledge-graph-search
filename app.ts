@@ -19,18 +19,18 @@ import {
 } from './src/ts/search-api-types'
 import { csvStringify } from './csv'
 import { sanitiseInput } from './src/ts/utils'
-const cors = require('cors')
-const bodyParser = require('body-parser')
+import cors from 'cors'
+import bodyParser from 'body-parser'
 
 // these variables are used for OAuth authentication. They will only be set if
 // OAuth is enabled
 let OAuth2Strategy, passport, session
 
 // Initialize the express engine
-const app: express.Application = express()
+const app: express.Express = express()
 const port: number = process.env.port ? parseInt(process.env.port) : 8080
 
-if (process.env.ENABLE_AUTH == 'true') {
+if (process.env.ENABLE_AUTH === 'true') {
   console.log(
     'OAuth via PassportJS is enabled because ENABLE_AUTH is set to "true"'
   )
@@ -62,7 +62,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static('public'))
 app.use(express.json())
 
-if (process.env.ENABLE_AUTH == 'true') {
+if (process.env.ENABLE_AUTH === 'true') {
   app.set('trust proxy', 1) // trust first proxy
   app.use(passport.initialize())
   app.use(passport.session())
@@ -96,7 +96,7 @@ if (process.env.ENABLE_AUTH == 'true') {
 
 // Routes
 
-if (process.env.ENABLE_AUTH == 'true') {
+if (process.env.ENABLE_AUTH === 'true') {
   app.get('/login', passport.authenticate('oauth2'))
   app.get(
     '/auth/gds/callback',
@@ -139,8 +139,7 @@ app.get('/search', auth('/'), async (req: any, res) => {
       title: !(req.query['search-in-title'] === 'false'),
       text: !(req.query['search-in-text'] === 'false'),
     },
-    areaToSearch:
-      <SearchArea>sanitiseInput(req.query.area) || SearchArea.Any,
+    areaToSearch: <SearchArea>sanitiseInput(req.query.area) || SearchArea.Any,
     linkSearchUrl: sanitiseInput(req.query['link-search-url']) || '',
   }
   try {
