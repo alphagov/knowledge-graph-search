@@ -346,7 +346,7 @@ const viewMetaResultsExpandToggle = () =>
     : '';
 */
 
-//=================== public ====================
+//= ================== public ====================
 
 const viewMetaResults = function (): string {
   if (!state.metaSearchResults || state.metaSearchResults.length !== 1)
@@ -384,7 +384,7 @@ const viewMetaResults = function (): string {
       console.log(`unknown record type: ${record.type}`)
       return ``
   }
-  //}
+  // }
 }
 
 export { viewMetaResults }

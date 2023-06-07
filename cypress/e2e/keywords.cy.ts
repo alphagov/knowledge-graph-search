@@ -18,7 +18,7 @@ describe('Keyword searching', () => {
       'GOV.UK pages that contain "wwekufsskjfdksufweuf" - Gov Search'
     )
   })
-  //Added to ensure Uk keyword is being searched
+  // Added to ensure Uk keyword is being searched
   it('returns results when searching for keywords that includes Uk and Bahrain', () => {
     cy.visit('')
     cy.get('input#keyword').type('Uk and Bahrain')

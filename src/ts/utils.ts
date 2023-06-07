@@ -4,9 +4,9 @@ import * as express from 'express'
 
 const id = (x: string): HTMLElement | null => document.getElementById(x)
 
-const tagBody: string = '(?:[^"\'>]|"[^"]*"|\'[^\']*\')*'
+const tagBody = '(?:[^"\'>]|"[^"]*"|\'[^\']*\')*'
 
-const tagOrComment: RegExp = new RegExp(
+const tagOrComment = new RegExp(
   '<(?:' +
     // Comment body.
     '!--(?:(?:-*[^->])*--+|-?)' +
@@ -108,7 +108,7 @@ const queryDescription = (search: SearchParams, includeMarkup = true) => {
   return `pages that ${joinedClauses}`
 }
 
-//combinedWords as used here must be exactly the same set of keywords as the ones submitted to BigQuery by the function sendSearchQuery.
+// combinedWords as used here must be exactly the same set of keywords as the ones submitted to BigQuery by the function sendSearchQuery.
 const containDescription = (search: SearchParams, includeMarkup: boolean) => {
   let where: string
   if (search.whereToSearch.title && search.whereToSearch.text) {

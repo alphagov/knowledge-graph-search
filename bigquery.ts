@@ -18,7 +18,7 @@ import { splitKeywords } from './src/ts/utils'
 import { languageCode } from './src/ts/lang'
 const { BigQuery } = require('@google-cloud/bigquery')
 
-//====== private ======
+//= ===== private ======
 
 const bigquery = new BigQuery({
   projectId: process.env.PROJECT_ID,
@@ -71,7 +71,7 @@ const bigQuery = async function (userQuery: string, options?: any) {
   return rows
 }
 
-//====== public ======
+//= ===== public ======
 
 const sendInitQuery = async function (): Promise<InitResults> {
   let bqLocales: any, bqTaxons: any, bqOrganisations: any
@@ -163,7 +163,7 @@ const getPersonInfo = async function (name: string): Promise<Person[]> {
   )
 }
 
-//keywords as used here must be exactly the same set of combinedWords as used by the function containDescription.
+// keywords as used here must be exactly the same set of combinedWords as used by the function containDescription.
 const sendSearchQuery = async function (
   searchParams: SearchParams
 ): Promise<SearchResults> {

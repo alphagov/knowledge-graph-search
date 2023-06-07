@@ -30,7 +30,7 @@ const makeQueryString = function (sp: SearchParams): string {
 
 const fetchWithTimeout = async function (
   url: string,
-  timeoutSeconds: number = 60
+  timeoutSeconds = 60
 ) {
   const controller = new AbortController()
   setTimeout(() => controller.abort(), timeoutSeconds * 1000)
@@ -107,7 +107,7 @@ const queryBackend: (
   }
 }
 
-//=========== private ===========
+//= ========== private ===========
 
 const buildMetaboxInfo = async function (info: any) {
   console.log(`Found a ${info.type}. Running extra queries`)

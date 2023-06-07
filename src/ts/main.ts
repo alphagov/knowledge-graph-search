@@ -3,9 +3,9 @@ import { state, setQueryParamsFromQS, resetSearch } from './state'
 import { searchButtonClicked, handleEvent } from './events'
 import { fetchWithTimeout, queryBackend } from './search-api'
 
-//==================================================
+//= =================================================
 // INIT
-//==================================================
+//= =================================================
 
 const initDatabase = async function () {
   console.log('retrieving taxons, locales and organisations')
@@ -55,9 +55,9 @@ const init = async function () {
   })
 }
 
-//==================================================
+//= =================================================
 // START
-//==================================================
+//= =================================================
 
 ;(async () => {
   await init()

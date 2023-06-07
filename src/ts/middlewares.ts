@@ -14,7 +14,7 @@ declare global {
  * or returns 401 for AJAX requests. Can bypass authentication by setting the 'ENABLE_AUTH' environment variable.
  */
 export const auth: (s?: string) => express.Handler =
-  (redirectUrl: string = '/login') =>
+  (redirectUrl = '/login') =>
   (req, res, next) => {
     if (process.env.ENABLE_AUTH != 'true') {
       return next()

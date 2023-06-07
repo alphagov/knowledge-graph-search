@@ -127,7 +127,7 @@ const viewErrorBanner = () => {
     html.push(`
         <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">`)
     if (state.systemErrorText) {
-      let errorText: string = ''
+      let errorText = ''
       switch (state.systemErrorText) {
         case 'TIMEOUT':
           errorText =
