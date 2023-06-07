@@ -1,16 +1,24 @@
 module.exports = {
     "env": {
         "browser": true,
-        "commonjs": true,
-        "es2021": true,
-        "es6": true,
-        "node": true
+        "es2021": true
     },
-    "extends": "eslint:recommended",
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        'standard',
+        'prettier',
+    ],
+    "parser": "@typescript-eslint/parser",
     "parserOptions": {
-        "ecmaVersion": 12,
-        "sourceType": "module"
+        "ecmaVersion": "latest",
+        "sourceType": "module",
+        "project": './tsconfig.json'
     },
+    "plugins": [
+        "@typescript-eslint"
+    ],
     "rules": {
+        // Add custom rules here
     }
-};
+}
