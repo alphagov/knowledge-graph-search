@@ -6,5 +6,7 @@
     "outDir": "./",
     "esModuleInterop": true,
     "strict": true
-  }
+  },
+  "include": ["./**/*.ts"],                
+  "exclude": ["node_modules", "coverage"]  
 }
