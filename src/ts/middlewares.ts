@@ -5,6 +5,7 @@ declare global {
   namespace Express {
     interface Request {
       session: any
+      isAuthenticated?: () => boolean
     }
   }
 }
@@ -16,7 +17,7 @@ declare global {
 export const auth: (s?: string) => express.Handler =
   (redirectUrl = '/login') =>
   (req, res, next) => {
-    if (process.env.ENABLE_AUTH != 'true') {
+    if (process.env.ENABLE_AUTH !== 'true') {
       return next()
     }
 

@@ -236,7 +236,7 @@ const viewLocaleSelector = () => {
     ...state.locales.map(
       (code) =>
         `<option data-value="${code}" ${
-          state.searchParams.selectedLocale == code ? 'selected' : ''
+          state.searchParams.selectedLocale === code ? 'selected' : ''
         }>${languageName(code)}</option>`
     )
   )

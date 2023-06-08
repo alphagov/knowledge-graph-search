@@ -62,6 +62,8 @@ const queryBackend: (
   searchParams: SearchParams,
   callback: SearchApiCallback
 ) => Promise<void> = async function (searchParams, callback) {
+  // TODO: find another way than using a callback function to get rid of the eslint error
+  // eslint-disable-next-line n/no-callback-literal
   callback({ type: EventType.SearchRunning })
   searchParams.selectedWords = searchParams.selectedWords.replace(/[“”]/g, '"')
   searchParams.excludedWords = searchParams.excludedWords.replace(/[“”]/g, '"')
@@ -71,6 +73,8 @@ const queryBackend: (
     apiResults = await fetchWithTimeout(url, 300)
   } catch (error: any) {
     console.log('error running main+meta queries', error)
+    // TODO: find another way than using a callback function to get rid of the eslint error
+    // eslint-disable-next-line n/no-callback-literal
     callback({ type: EventType.SearchApiCallbackFail, error })
     return
   }
@@ -87,6 +91,8 @@ const queryBackend: (
   if (meta.length === 1) {
     // one meta result: show the knowledge panel (may require more API queries)
     const fullMetaResults = await buildMetaboxInfo(meta[0])
+    // TODO: find another way than using a callback function to get rid of the eslint error
+    // eslint-disable-next-line n/no-callback-literal
     callback({
       type: EventType.SearchApiCallbackOk,
       results: { main, meta: fullMetaResults },
@@ -96,6 +102,8 @@ const queryBackend: (
     //   callback({ type: EventType.SearchApiCallbackOk, results: { main, meta: metaResults } });
   } else {
     // no meta results
+    // TODO: find another way than using a callback function to get rid of the eslint error
+    // eslint-disable-next-line n/no-callback-literal
     callback({
       type: EventType.SearchApiCallbackOk,
       results: { main, meta: null },

@@ -66,13 +66,6 @@ const fieldFormat = function (key: string, val: any): string {
   return f && f.format ? f.format(val) : val
 }
 
-// generate a human-readable string for the CSV header depending on
-// the name of the field (url, title, publishing_app, etc)
-const fieldName = function (key: string) {
-  const f = csvFieldFormatters[key]
-  return f ? f.name : key
-}
-
 // generates a copy of the passed array of results with all fields modified to
 // be human-readable
 const formatForCsv = function (lines: any) {

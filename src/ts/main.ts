@@ -15,7 +15,7 @@ const initDatabase = async function () {
     apiResponse.locales.length === 3 ||
     apiResponse.organisations.length === 0
   ) {
-    throw 'Received no or incomplete data from the backend.'
+    throw new Error('Received no or incomplete data from the backend.')
   }
   return apiResponse
 }
