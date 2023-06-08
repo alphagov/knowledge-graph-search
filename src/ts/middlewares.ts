@@ -5,7 +5,6 @@ declare global {
   namespace Express {
     interface Request {
       session: any
-      isAuthenticated?: () => boolean
     }
   }
 }
@@ -21,6 +20,7 @@ export const auth: (s?: string) => express.Handler =
       return next()
     }
 
+    // eslint-disable-next-line
     const isAuthenticated = req.isAuthenticated && req.isAuthenticated()
     if (isAuthenticated) {
       return next()
