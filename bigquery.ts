@@ -224,7 +224,7 @@ const sendSearchQuery = async function (
       }
       results = await Promise.all(queries)
       bqMainResults = results[0]
-      bqMetaResults = results.length > 1 ? results[1] : []
+      bqMetaResults = results.length > 1 ? results[1] as MetaResult[] : [] as MetaResult[]
       break
   }
   const result: SearchResults = {
