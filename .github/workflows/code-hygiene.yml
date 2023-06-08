@@ -23,7 +23,9 @@ jobs:
 
       - name: Formatting
         run: npm run check-format
-        
+
       - name: Linting
         run: npm run check-lint
 
+      - name: Build
+        run: npm run build
