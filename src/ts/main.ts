@@ -3,9 +3,9 @@ import { state, setQueryParamsFromQS, resetSearch } from './state'
 import { searchButtonClicked, handleEvent } from './events'
 import { fetchWithTimeout, queryBackend } from './search-api'
 
-//==================================================
+//= =================================================
 // INIT
-//==================================================
+//= =================================================
 
 const initDatabase = async function () {
   console.log('retrieving taxons, locales and organisations')
@@ -15,7 +15,7 @@ const initDatabase = async function () {
     apiResponse.locales.length === 3 ||
     apiResponse.organisations.length === 0
   ) {
-    throw 'Received no or incomplete data from the backend.'
+    throw new Error('Received no or incomplete data from the backend.')
   }
   return apiResponse
 }
@@ -55,9 +55,9 @@ const init = async function () {
   })
 }
 
-//==================================================
+//= =================================================
 // START
-//==================================================
+//= =================================================
 
 ;(async () => {
   await init()

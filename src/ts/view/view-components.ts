@@ -1,4 +1,4 @@
-const viewMetaLink = (text: String, extraClasses: String = '') =>
+const viewMetaLink = (text: string, extraClasses = '') =>
   `<a class="govuk-link ${extraClasses}" href="/?selected-words=${encodeURIComponent(
     `"${text}"`
   )}">${text}</a>`

@@ -11,7 +11,7 @@ describe('Search results pagination', () => {
     cy.get('#button-next-page').should('not.exist')
   })
 
-  it("Doesn't show the pagination buttons when less than 10 results ", () => {
+  it("Doesn't show the pagination buttons when less than 10 results", () => {
     cy.visit('?selected-words=Disraeli&search-in-text=false')
     cy.get('#button-prev-page').should('not.exist')
     cy.get('#button-next-page').should('not.exist')

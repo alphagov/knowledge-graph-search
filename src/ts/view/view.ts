@@ -127,7 +127,7 @@ const viewErrorBanner = () => {
     html.push(`
         <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">`)
     if (state.systemErrorText) {
-      let errorText: string = ''
+      let errorText = ''
       switch (state.systemErrorText) {
         case 'TIMEOUT':
           errorText =
@@ -139,7 +139,7 @@ const viewErrorBanner = () => {
       html.push(`
           <h1 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h1>
           <p class="govuk-body">${errorText}</p>
-          <p>Please <a class=\"govuk-link\" href=\"mailto:data-products-research@digital.cabinet-office.gov.uk\">contact the Data Products team</a> if the problem persists.</p>
+          <p>Please <a class="govuk-link" href="mailto:data-products-research@digital.cabinet-office.gov.uk">contact the Data Products team</a> if the problem persists.</p>
       `)
     } else {
       if (state.userErrors.length > 0) {

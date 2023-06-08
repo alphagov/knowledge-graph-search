@@ -66,29 +66,9 @@ const fieldFormat = function (key: string, val: any): string {
   return f && f.format ? f.format(val) : val
 }
 
-// generate a human-readable string for the CSV header depending on
-// the name of the field (url, title, publishing_app, etc)
-const fieldName = function (key: string) {
-  const f = csvFieldFormatters[key]
-  return f ? f.name : key
-}
-
-// generate a lookup object with all the header names and their
-// human-readable version
-const makeHeaders = function (obj: Record<string, any>) {
-  const result: Record<string, string> = {}
-
-  Object.keys(obj).forEach((key: any) => {
-    result[key] = fieldName(key)
-  })
-
-  return result
-}
-
 // generates a copy of the passed array of results with all fields modified to
 // be human-readable
 const formatForCsv = function (lines: any) {
-  const headers = makeHeaders(lines[0])
   const body = lines
     .sort((a: any, b: any) => parseInt(b.page_views) - parseInt(a.page_views))
     .map((record: any) => {

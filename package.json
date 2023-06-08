@@ -37,6 +37,7 @@
     "passport-oauth2": "^1.7.0"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.13",
     "@types/jest": "^29.5.2",
     "@types/passport-oauth2": "^1.4.12",
     "@typescript-eslint/eslint-plugin": "^5.59.9",
@@ -45,7 +46,9 @@
     "eslint": "^8.42.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-cypress": "^2.13.3",
     "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-jest": "^27.2.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.1.1",
     "ignore-webpack-plugin": "^0.3.0",

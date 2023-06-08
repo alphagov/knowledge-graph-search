@@ -1,11 +1,5 @@
 import express from 'express'
 import { auth } from './src/ts/middlewares'
-const cors = require('cors')
-const bodyParser = require('body-parser')
-
-// these variables are used for OAuth authentication. They will only be set if
-// OAuth is enabled
-let OAuth2Strategy, passport, session
 
 import {
   sendSearchQuery,
@@ -25,12 +19,18 @@ import {
 } from './src/ts/search-api-types'
 import { csvStringify } from './csv'
 import { sanitiseInput } from './src/ts/utils'
+import cors from 'cors'
+import bodyParser from 'body-parser'
+
+// these variables are used for OAuth authentication. They will only be set if
+// OAuth is enabled
+let OAuth2Strategy, passport, session
 
 // Initialize the express engine
-const app: express.Application = express()
+const app: express.Express = express()
 const port: number = process.env.port ? parseInt(process.env.port) : 8080
 
-if (process.env.ENABLE_AUTH == 'true') {
+if (process.env.ENABLE_AUTH === 'true') {
   console.log(
     'OAuth via PassportJS is enabled because ENABLE_AUTH is set to "true"'
   )
@@ -62,7 +62,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static('public'))
 app.use(express.json())
 
-if (process.env.ENABLE_AUTH == 'true') {
+if (process.env.ENABLE_AUTH === 'true') {
   app.set('trust proxy', 1) // trust first proxy
   app.use(passport.initialize())
   app.use(passport.session())
@@ -96,7 +96,7 @@ if (process.env.ENABLE_AUTH == 'true') {
 
 // Routes
 
-if (process.env.ENABLE_AUTH == 'true') {
+if (process.env.ENABLE_AUTH === 'true') {
   app.get('/login', passport.authenticate('oauth2'))
   app.get(
     '/auth/gds/callback',
@@ -131,16 +131,15 @@ app.get('/search', auth('/'), async (req: any, res) => {
     selectedTaxon: sanitiseInput(req.query['selected-taxon']) || '',
     selectedOrganisation:
       sanitiseInput(req.query['selected-organisation']) || '',
-    selectedLocale: sanitiseInput(req.query['lang']) || '',
+    selectedLocale: sanitiseInput(req.query.lang) || '',
     caseSensitive: req.query['case-sensitive'] === 'true',
     combinator:
-      <Combinator>sanitiseInput(req.query['combinator']) || Combinator.All,
+      <Combinator>sanitiseInput(req.query.combinator) || Combinator.All,
     whereToSearch: {
       title: !(req.query['search-in-title'] === 'false'),
       text: !(req.query['search-in-text'] === 'false'),
     },
-    areaToSearch:
-      <SearchArea>sanitiseInput(req.query['area']) || SearchArea.Any,
+    areaToSearch: <SearchArea>sanitiseInput(req.query.area) || SearchArea.Any,
     linkSearchUrl: sanitiseInput(req.query['link-search-url']) || '',
   }
   try {
@@ -161,14 +160,14 @@ app.get('/csv', async (req: any, res) => {
     excludedWords: req.query['excluded-words'] || '',
     selectedTaxon: req.query['selected-taxon'] || '',
     selectedOrganisation: req.query['selected-organisation'] || '',
-    selectedLocale: req.query['lang'] || '',
+    selectedLocale: req.query.lang || '',
     caseSensitive: req.query['case-sensitive'] || false,
-    combinator: req.query['combinator'] || Combinator.All,
+    combinator: req.query.combinator || Combinator.All,
     whereToSearch: {
       title: !(req.query['search-in-title'] === 'false'),
       text: !(req.query['search-in-text'] === 'false'),
     },
-    areaToSearch: req.query['area'] || SearchArea.Any,
+    areaToSearch: req.query.area || SearchArea.Any,
     linkSearchUrl: req.query['link-search-url'] || '',
   }
   try {
@@ -185,7 +184,7 @@ app.get('/csv', async (req: any, res) => {
 app.get('/taxon', auth('/'), async (req: any, res) => {
   console.log('API call to /taxon', req.query)
   try {
-    const data = await getTaxonInfo(req.query['name'])
+    const data = await getTaxonInfo(req.query.name)
     res.send(data)
   } catch (e: any) {
     if (e.status === 404) {
@@ -199,7 +198,7 @@ app.get('/taxon', auth('/'), async (req: any, res) => {
 app.get('/organisation', auth('/'), async (req: any, res) => {
   console.log('API call to /organisation', req.query)
   try {
-    const data = await getOrganisationInfo(req.query['name'])
+    const data = await getOrganisationInfo(req.query.name)
     res.send(data)
   } catch (e: any) {
     if (e.status === 404) {
@@ -213,7 +212,7 @@ app.get('/organisation', auth('/'), async (req: any, res) => {
 app.get('/role', auth('/'), async (req: any, res) => {
   console.log('API call to /role', req.query)
   try {
-    const data = await getRoleInfo(req.query['name'])
+    const data = await getRoleInfo(req.query.name)
     res.send(data)
   } catch (e: any) {
     res.status(500).send(e)
@@ -223,7 +222,7 @@ app.get('/role', auth('/'), async (req: any, res) => {
 app.get('/bank-holiday', auth('/'), async (req: any, res) => {
   console.log('API call to /bank-holiday', req.query)
   try {
-    const data = await getBankHolidayInfo(req.query['name'])
+    const data = await getBankHolidayInfo(req.query.name)
     res.send(data)
   } catch (e: any) {
     if (e.status === 404) {
@@ -237,7 +236,7 @@ app.get('/bank-holiday', auth('/'), async (req: any, res) => {
 app.get('/transaction', auth('/'), async (req: any, res) => {
   console.log('API call to /transaction', req.query)
   try {
-    const data = await getTransactionInfo(req.query['name'])
+    const data = await getTransactionInfo(req.query.name)
     res.send(data)
   } catch (e: any) {
     res.status(500).send(e)
@@ -247,7 +246,7 @@ app.get('/transaction', auth('/'), async (req: any, res) => {
 app.get('/person', auth('/'), async (req: any, res) => {
   console.log('API call to /person', req.query)
   try {
-    const data = await getPersonInfo(req.query['name'])
+    const data = await getPersonInfo(req.query.name)
     res.send(data)
   } catch (e: any) {
     res.status(500).send(e)

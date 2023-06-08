@@ -4,3 +4,4 @@ public/main.js
 public/main.css
 cypress/videos
 cypress/screenshots
+.vscode

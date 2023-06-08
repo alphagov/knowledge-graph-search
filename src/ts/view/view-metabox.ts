@@ -1,11 +1,8 @@
 import { state } from '../state'
 import { viewMetaLink } from './view-components'
 import {
-  MetaResultType,
   Taxon,
   Organisation,
-  Person,
-  Role,
   Transaction,
   BankHoliday,
 } from '../search-api-types'
@@ -346,7 +343,7 @@ const viewMetaResultsExpandToggle = () =>
     : '';
 */
 
-//=================== public ====================
+//= ================== public ====================
 
 const viewMetaResults = function (): string {
   if (!state.metaSearchResults || state.metaSearchResults.length !== 1)
@@ -384,7 +381,7 @@ const viewMetaResults = function (): string {
       console.log(`unknown record type: ${record.type}`)
       return ``
   }
-  //}
+  // }
 }
 
 export { viewMetaResults }

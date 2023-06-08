@@ -3,7 +3,6 @@ import {
   SearchType,
   SearchArea,
   Combinator,
-  MetaResultType,
   SearchResults,
 } from './search-api-types'
 import { languageCode } from './lang'
@@ -28,10 +27,7 @@ const makeQueryString = function (sp: SearchParams): string {
   return usp.toString()
 }
 
-const fetchWithTimeout = async function (
-  url: string,
-  timeoutSeconds: number = 60
-) {
+const fetchWithTimeout = async function (url: string, timeoutSeconds = 60) {
   const controller = new AbortController()
   setTimeout(() => controller.abort(), timeoutSeconds * 1000)
   const fetchResult = await fetch(url, {
@@ -52,9 +48,9 @@ const fetchWithTimeout = async function (
 
   if (!fetchResult.ok) {
     if (/^timeout of \d+ms exceeded/.test(responseBody.message)) {
-      throw 'TIMEOUT'
+      throw new Error('TIMEOUT')
     } else {
-      throw 'UNKNOWN'
+      throw new Error('UNKNOWN')
     }
   } else {
     return responseBody
@@ -66,6 +62,8 @@ const queryBackend: (
   searchParams: SearchParams,
   callback: SearchApiCallback
 ) => Promise<void> = async function (searchParams, callback) {
+  // TODO: find another way than using a callback function to get rid of the eslint error
+  // eslint-disable-next-line n/no-callback-literal
   callback({ type: EventType.SearchRunning })
   searchParams.selectedWords = searchParams.selectedWords.replace(/[“”]/g, '"')
   searchParams.excludedWords = searchParams.excludedWords.replace(/[“”]/g, '"')
@@ -75,6 +73,8 @@ const queryBackend: (
     apiResults = await fetchWithTimeout(url, 300)
   } catch (error: any) {
     console.log('error running main+meta queries', error)
+    // TODO: find another way than using a callback function to get rid of the eslint error
+    // eslint-disable-next-line n/no-callback-literal
     callback({ type: EventType.SearchApiCallbackFail, error })
     return
   }
@@ -91,6 +91,8 @@ const queryBackend: (
   if (meta.length === 1) {
     // one meta result: show the knowledge panel (may require more API queries)
     const fullMetaResults = await buildMetaboxInfo(meta[0])
+    // TODO: find another way than using a callback function to get rid of the eslint error
+    // eslint-disable-next-line n/no-callback-literal
     callback({
       type: EventType.SearchApiCallbackOk,
       results: { main, meta: fullMetaResults },
@@ -100,6 +102,8 @@ const queryBackend: (
     //   callback({ type: EventType.SearchApiCallbackOk, results: { main, meta: metaResults } });
   } else {
     // no meta results
+    // TODO: find another way than using a callback function to get rid of the eslint error
+    // eslint-disable-next-line n/no-callback-literal
     callback({
       type: EventType.SearchApiCallbackOk,
       results: { main, meta: null },
@@ -107,7 +111,7 @@ const queryBackend: (
   }
 }
 
-//=========== private ===========
+//= ========== private ===========
 
 const buildMetaboxInfo = async function (info: any) {
   console.log(`Found a ${info.type}. Running extra queries`)

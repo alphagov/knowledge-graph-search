@@ -164,7 +164,7 @@ const searchButtonClicked = async function (): Promise<void> {
 
 const updateUrl = function () {
   if ('URLSearchParams' in window) {
-    var searchParams = new URLSearchParams()
+    const searchParams = new URLSearchParams()
     switch (state.searchParams.searchType) {
       case SearchType.Keyword:
         if (state.searchParams.selectedWords !== '')
