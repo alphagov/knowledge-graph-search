@@ -1,11 +1,10 @@
-import { sanitiseOutput } from '../utils';
-import { state, searchState } from '../state';
-import { languageName } from '../lang';
-import { SearchType } from '../search-api-types';
-
+import { sanitiseOutput } from '../utils'
+import { state, searchState } from '../state'
+import { languageName } from '../lang'
+import { SearchType } from '../search-api-types'
 
 const viewSearchPanel = () => {
-  const result = [];
+  const result = []
   switch (state.searchParams.searchType) {
     case SearchType.Advanced:
     case SearchType.Results:
@@ -26,8 +25,8 @@ const viewSearchPanel = () => {
           ${viewSearchButton()}
         </div>
       </form>
-    `);
-      break;
+    `)
+      break
     case SearchType.Keyword:
       result.push(`
       <form id="search-form" class="search-panel govuk-form">
@@ -51,8 +50,8 @@ const viewSearchPanel = () => {
           ${viewSearchButton()}
         </div>
       </form>
-    `);
-      break;
+    `)
+      break
     case SearchType.Link:
       result.push(`
       <form id="search-form" class="search-panel govuk-form">
@@ -72,8 +71,8 @@ const viewSearchPanel = () => {
           ${viewSearchButton()}
         </div>
       </form>
-    `);
-      break;
+    `)
+      break
     case SearchType.Taxon:
       result.push(`
       <form id="search-form" class="search-panel govuk-form">
@@ -93,8 +92,8 @@ const viewSearchPanel = () => {
           ${viewSearchButton()}
         </div>
       </form>
-    `);
-      break;
+    `)
+      break
     case SearchType.Language:
       result.push(`
       <form id="search-form" class="search-panel govuk-form">
@@ -114,8 +113,8 @@ const viewSearchPanel = () => {
           ${viewSearchButton()}
         </div>
       </form>
-    `);
-      break;
+    `)
+      break
     case SearchType.Organisation:
       result.push(`
       <form id="search-form" class="search-panel govuk-form">
@@ -135,25 +134,26 @@ const viewSearchPanel = () => {
           ${viewSearchButton()}
         </div>
       </form>
-    `);
-      break;
+    `)
+      break
     default:
-      console.log('viewSearchPanel: unknown value', state.searchParams.searchType);
+      console.log(
+        'viewSearchPanel: unknown value',
+        state.searchParams.searchType
+      )
   }
-  return result.join('');
-};
-
+  return result.join('')
+}
 
 const viewInlineError = (id: string, message: string): string => `
   <p id="${id}" class="govuk-error-message">
     <span class="govuk-visually-hidden">Error:</span> ${message}
   </p>
-`;
-
+`
 
 const viewScopeSelector = (): string => {
-  const errors = searchState()?.errors;
-  const err = errors && errors.includes('missingWhereToSearch');
+  const errors = searchState()?.errors
+  const err = errors && errors.includes('missingWhereToSearch')
   return `
   <div class="govuk-form-group ${err ? 'govuk-form-group--error' : ''}">
     <fieldset
@@ -164,7 +164,11 @@ const viewScopeSelector = (): string => {
       <legend class="govuk-fieldset__legend">
         Keyword location
       </legend>
-      ${err ? viewInlineError('scope-error', 'Please choose at least one option') : ''}
+      ${
+        err
+          ? viewInlineError('scope-error', 'Please choose at least one option')
+          : ''
+      }
       <div class="govuk-checkboxes" id="search-locations">
         <div class="govuk-checkboxes__item">
           <input
@@ -186,9 +190,8 @@ const viewScopeSelector = (): string => {
       </div>
     </fieldset>
   </div>
-  `;
-};
-
+  `
+}
 
 const viewTaxonSelector = () => `
   <div class="govuk-body">
@@ -200,7 +203,7 @@ const viewTaxonSelector = () => `
         Type the first letters of a taxon or select from the dropdown
       </div>
       <datalist id="taxonList">
-        ${state.taxons.map(taxon => `<option>${taxon}</option>`)}
+        ${state.taxons.map((taxon) => `<option>${taxon}</option>`)}
       </datalist>
       <div>
       <input
@@ -214,11 +217,11 @@ const viewTaxonSelector = () => `
       </div>
     </div>
   </div>
-`;
-
+`
 
 const viewLocaleSelector = () => {
-  const html = [`
+  const html = [
+    `
     <div class="govuk-body taxon-facet">
       <label class="govuk-label label--bold" for="locale">
         Search for languages
@@ -227,8 +230,16 @@ const viewLocaleSelector = () => {
         Type the first letters of a language or select from the dropdown
       </div>
       <datalist id="localeList">
-  `];
-  html.push(...state.locales.map(code => `<option data-value="${code}" ${state.searchParams.selectedLocale == code ? 'selected' : ''}>${languageName(code)}</option>`))
+  `,
+  ]
+  html.push(
+    ...state.locales.map(
+      (code) =>
+        `<option data-value="${code}" ${
+          state.searchParams.selectedLocale == code ? 'selected' : ''
+        }>${languageName(code)}</option>`
+    )
+  )
   html.push(`
       </datalist>
       <input type="text"
@@ -238,10 +249,9 @@ const viewLocaleSelector = () => {
          list="localeList"
          id="locale" name="locale"
          autocomplete="off" />
-    </div>`);
-  return html.join('');
-};
-
+    </div>`)
+  return html.join('')
+}
 
 const viewSearchButton = () => `
   <p class="govuk-body">
@@ -250,11 +260,14 @@ const viewSearchButton = () => `
       class="govuk-button ${state.waiting ? 'govuk-button--disabled' : ''}"
       ${state.waiting ? 'disabled="disabled"' : ''}
       id="search">
-      ${state.waiting ? 'Searching <img src="assets/images/loader.gif" height="20px" alt="loader"/>' : 'Search'}
+      ${
+        state.waiting
+          ? 'Searching <img src="assets/images/loader.gif" height="20px" alt="loader"/>'
+          : 'Search'
+      }
     </button>
   </p>
-`;
-
+`
 
 const viewLinkSearch = () => `
   <div class="govuk-body">
@@ -271,8 +284,7 @@ const viewLinkSearch = () => `
         value="${state.searchParams.linkSearchUrl}"
      />
   </div>
-`;
-
+`
 
 const viewCaseSensitiveSelector = () => `
   <div class="govuk-body">
@@ -289,8 +301,7 @@ const viewCaseSensitiveSelector = () => `
       </div>
     </div>
   </div>
-`;
-
+`
 
 const viewKeywordsCombinator = () =>
   ` <div class="govuk-form-group">
@@ -324,8 +335,7 @@ const viewKeywordsCombinator = () =>
       </div>
     </fieldset>
   </div>
-`;
-
+`
 
 const viewPublishingOrgSelector = () => `
   <div class="govuk-body">
@@ -337,7 +347,9 @@ const viewPublishingOrgSelector = () => `
         Type the first letters of an organisation or select from the dropdown
       </div>
       <datalist id="orgList">
-        ${state.organisations.map(organisation => `<option>${organisation}</option>`)}
+        ${state.organisations.map(
+          (organisation) => `<option>${organisation}</option>`
+        )}
       </datalist>
       <div>
       <input
@@ -351,8 +363,7 @@ const viewPublishingOrgSelector = () => `
       </div>
     </div>
   </div>
-`;
-
+`
 
 const viewPublishingAppSelector = () =>
   ` <div class="govuk-form-group">
@@ -368,7 +379,9 @@ const viewPublishingAppSelector = () =>
           <input class="govuk-radios__input"
                  type="radio" id="area-publisher"
                  name="area"
-            ${state.searchParams.areaToSearch === 'publisher' ? 'checked' : ''}/>
+            ${
+              state.searchParams.areaToSearch === 'publisher' ? 'checked' : ''
+            }/>
           <label for="area-publisher" class="govuk-label govuk-radios__label">
             Publisher
           </label>
@@ -377,7 +390,9 @@ const viewPublishingAppSelector = () =>
           <input class="govuk-radios__input"
                  type="radio" id="area-whitehall"
                  name="area"
-            ${state.searchParams.areaToSearch === 'whitehall' ? 'checked' : ''}/>
+            ${
+              state.searchParams.areaToSearch === 'whitehall' ? 'checked' : ''
+            }/>
           <label for="area-whitehall" class="govuk-label govuk-radios__label">Whitehall</label>
         </div>
         <div class="govuk-radios__item">
@@ -390,8 +405,7 @@ const viewPublishingAppSelector = () =>
       </div>
     </fieldset>
   </div>
-`;
-
+`
 
 const viewKeywordsInput = () => `
   <div class="govuk-body">
@@ -406,8 +420,7 @@ const viewKeywordsInput = () => `
       value='${sanitiseOutput(state.searchParams.selectedWords)}'
     />
   </div>
-`;
-
+`
 
 const viewExclusionsInput = () => `
   <div class="govuk-body">
@@ -420,9 +433,11 @@ const viewExclusionsInput = () => `
     <input class="govuk-input"
         ${state.waiting && 'disabled="disabled"'}
         id="excluded-keyword"
-        value='${sanitiseOutput(state.searchParams.excludedWords).replace('"', '&quot;')}'/>
+        value='${sanitiseOutput(state.searchParams.excludedWords).replace(
+          '"',
+          '&quot;'
+        )}'/>
   </div>
-`;
+`
 
-
-export { viewSearchPanel };
+export { viewSearchPanel }

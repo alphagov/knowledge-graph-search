@@ -2,11 +2,8 @@
   "compilerOptions": {
     "sourceMap": false,
     "target": "es2017",
-    "lib": [
-       "dom",
-       "es2017"
-    ]
+    "lib": ["dom", "es2017"]
   },
   "files": ["main.ts"],
-  "include": [ "./*.ts" ]
+  "include": ["./*.ts"]
 }

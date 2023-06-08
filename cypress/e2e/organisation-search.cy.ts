@@ -62,6 +62,4 @@
 //     cy.get('#results-table');
 //   });
 
-
-
 // });
