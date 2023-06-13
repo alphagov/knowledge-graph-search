@@ -34,8 +34,6 @@ const redisInstance = new Redis(
   process.env.REDIS_HOST || 'localhost'
 )
 
-console.log({ redisInstance })
-
 redisInstance.set('debugValue', 'Success')
 
 // these variables are used for OAuth authentication. They will only be set if
