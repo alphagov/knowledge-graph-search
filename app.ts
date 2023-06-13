@@ -22,6 +22,7 @@ import { sanitiseInput } from './src/ts/utils'
 import cors from 'cors'
 import bodyParser from 'body-parser'
 import Redis from 'ioredis'
+import RedisStore from 'connect-redis'
 
 console.log('Logging into Redis with following data')
 console.log({
@@ -35,6 +36,11 @@ const redisInstance = new Redis(
 )
 
 redisInstance.set('debugValue', 'Success')
+
+const redisStore = new RedisStore({
+  client: redisInstance,
+  prefix: 'GovSearch::',
+})
 
 // these variables are used for OAuth authentication. They will only be set if
 // OAuth is enabled
@@ -61,8 +67,9 @@ if (process.env.ENABLE_AUTH === 'true') {
     session({
       secret: 'keyboard cat',
       resave: false,
-      saveUninitialized: true,
+      saveUninitialized: false,
       cookie: { secure: true },
+      store: redisStore,
     })
   )
 } else {
