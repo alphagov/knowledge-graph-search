@@ -21,6 +21,22 @@ import { csvStringify } from './csv'
 import { sanitiseInput } from './src/ts/utils'
 import cors from 'cors'
 import bodyParser from 'body-parser'
+import Redis from 'ioredis'
+
+console.log('Logging into Redis with following data')
+console.log({
+  port: process.env.REDIS_PORT || 6379,
+  host: process.env.REDIS_HOST || 'localhost',
+})
+
+const redisInstance = new Redis(
+  Number(process.env.REDIS_PORT) || 6379,
+  process.env.REDIS_HOST || 'localhost'
+)
+
+console.log({ redisInstance })
+
+redisInstance.set('debugValue', 'Success')
 
 // these variables are used for OAuth authentication. They will only be set if
 // OAuth is enabled
