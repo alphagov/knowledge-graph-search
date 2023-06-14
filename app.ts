@@ -24,18 +24,10 @@ import bodyParser from 'body-parser'
 import Redis from 'ioredis'
 import RedisStore from 'connect-redis'
 
-console.log('Logging into Redis with following data')
-console.log({
-  port: process.env.REDIS_PORT || 6379,
-  host: process.env.REDIS_HOST || 'localhost',
-})
-
 const redisInstance = new Redis(
   Number(process.env.REDIS_PORT) || 6379,
   process.env.REDIS_HOST || 'localhost'
 )
-
-redisInstance.set('debugValue', 'Success')
 
 const redisStore = new RedisStore({
   client: redisInstance,
