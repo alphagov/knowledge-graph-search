@@ -13,4 +13,4 @@ RUN sass src/scss/main.scss > public/main.css
 # Compile TypeScript to JavaScript (browser)
 RUN npx webpack
 
-CMD npm start
+CMD ["npm", "start"]

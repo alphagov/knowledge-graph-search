@@ -1,3 +1,6 @@
+import fs from 'fs'
+import path from 'path'
+
 import express from 'express'
 import { auth } from './src/ts/middlewares'
 
@@ -105,9 +108,16 @@ if (process.env.ENABLE_AUTH === 'true') {
   )
 }
 
-app.get('/', auth(), async (req, res) =>
-  res.sendFile('views/index.html', { root: __dirname })
-)
+app.get('/', auth(), async (req, res) => {
+  const fileName = path.join(__dirname, 'views', 'index.html')
+  const content = fs.readFileSync(fileName, 'utf-8')
+  const processedContent = content.replace(
+    '__NODE_ENV__',
+    process.env.NODE_ENV || ''
+  )
+
+  res.send(processedContent)
+})
 
 // the front-end will call this upon starting to get some data needed from the server
 app.get('/get-init-data', auth('/'), async (req, res) => {
