@@ -1,5 +1,6 @@
 import { languageName } from './lang';
 import { SearchParams, WhereToSearch } from './search-api-types';
+import { makeQueryString } from './search-api';
 
 const id = (x: string): (HTMLElement | null) => document.getElementById(x);
 
@@ -107,7 +108,7 @@ const containDescription = (search: SearchParams, includeMarkup: boolean) => {
   }
   let combineOp = search.combinator === 'all' ? 'and' : 'or';
   let combinedWords = splitKeywords(search.selectedWords)
-    .filter(w => w.length > 2)
+    //.filter(w => w.length > 2)
     .map(w => makeBold(w, includeMarkup))
     .join(` ${combineOp} `);
   return search.selectedWords !== '' ? `${combinedWords} ${where}` : '';
@@ -148,5 +149,6 @@ const highlightLinks = (searchTerm: string, links: string[]): string =>  {
   return result ? `<p>${result?.toString().replace(regex, mark)}</p>` : '';
 }
 
+const getAnyKeywordSearchUrl = (searchParams: SearchParams) => `${makeQueryString(searchParams)}&combinator=any`;
 
-export { id, sanitiseInput, sanitiseOutput, getFormInputValue, splitKeywords, queryDescription, getFormSelectValue, getSortingSelectValue, highlight, highlightLinks };
+export { id, sanitiseInput, sanitiseOutput, getFormInputValue, splitKeywords, queryDescription, getFormSelectValue, getSortingSelectValue, highlight, highlightLinks, getAnyKeywordSearchUrl };

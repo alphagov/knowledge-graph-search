@@ -148,7 +148,7 @@ const viewKeywordsCombinator = () =>
         id="combinator-wrapper"
         ${state.waiting && 'disabled="disabled"'}>
       <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-        Search for
+        Search for pages with
       </legend>
       <div class="govuk-radios govuk-radios--small" id="combinators">
 
@@ -156,7 +156,8 @@ const viewKeywordsCombinator = () =>
           <input class="govuk-radios__input"
                  type="radio" id="combinator-all"
                  name="combinator"
-            ${state.searchParams.combinator === 'all' ? 'checked' : ''}/>
+            ${state.searchParams.combinator === 'all' ? 'checked' : ''}
+            />
           <label for="combinator-all" class="govuk-label govuk-radios__label">
             All keywords
           </label>
@@ -166,7 +167,8 @@ const viewKeywordsCombinator = () =>
           <input class="govuk-radios__input"
                  type="radio" id="combinator-any"
                  name="combinator"
-            ${state.searchParams.combinator === 'any' ? 'checked' : ''}/>
+            ${state.searchParams.combinator === 'any' ? 'checked' : ''}
+            />
           <label for="combinator-any" class="govuk-label govuk-radios__label">
             Any keyword
           </label>
@@ -176,10 +178,15 @@ const viewKeywordsCombinator = () =>
           <input class="govuk-radios__input"
                  type="radio" id="combinator-notset"
                  name="combinator"
-            ${state.searchParams.combinator === 'notset' ? 'checked' : ''}/>
+            ${state.searchParams.combinator === 'notset' ? 'checked' : ''}
+            aria-describedby="pages-with-links-hint"
+            />
           <label for="combinator-notset" class="govuk-label govuk-radios__label">
             Links
           </label>
+          <div id="pages-with-links-hint" class="govuk-hint govuk-radios__hint">
+            For example, youtube or /maternity-pay-leave
+          </div>
         </div>
       </div>
     </fieldset>
@@ -215,7 +222,7 @@ const viewPublishingAppSelector = () =>
         id="search-areas-wrapper"
         ${state.waiting && 'disabled="disabled"'}>
       <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-        Limit search
+        Publishing applications
       </legend>
       <div class="govuk-radios govuk-radios--small" id="site-areas">
         <div class="govuk-radios__item">
@@ -231,7 +238,7 @@ const viewPublishingAppSelector = () =>
                  name="area"
             ${state.searchParams.areaToSearch === 'publisher' ? 'checked' : ''}/>
           <label for="area-publisher" class="govuk-label govuk-radios__label">
-            Publisher
+            Publisher (mainstream)
           </label>
         </div>
         <div class="govuk-radios__item">
@@ -239,7 +246,9 @@ const viewPublishingAppSelector = () =>
                  type="radio" id="area-whitehall"
                  name="area"
             ${state.searchParams.areaToSearch === 'whitehall' ? 'checked' : ''}/>
-          <label for="area-whitehall" class="govuk-label govuk-radios__label">Whitehall</label>
+          <label for="area-whitehall" class="govuk-label govuk-radios__label">
+            Whithall (specialist)
+          </label>
         </div>
       </div>
     </fieldset>
@@ -250,7 +259,7 @@ const viewPublishingAppSelector = () =>
 const viewKeywordsInput = () => `
 <div class="gem-c-search govuk-!-display-none-print  gem-c-search--on-white" data-module="gem-toggle-input-class-on-focus" data-gem-toggle-input-class-on-focus-module-started="true">
   <label for="search" class="govuk-visually-hidden">Search</label>
-  <div id="search-name-hint" class="govuk-hint">To search for an exact phrase use quotes for example, "UK driving licence"</div>
+  <div id="search-name-hint" class="govuk-hint">For an exact phrase use quotes for example, "UK driving licence"</div>
 <div class="gem-c-search__item-wrapper" data-dashlane-rid="dbf92bc43833220c" data-form-type="">
   <input
   ${state.waiting && 'disabled="disabled"'}
@@ -292,7 +301,7 @@ const viewPagesSelector = () => `
        id="pages-wrapper"
        ${state.waiting && 'disabled="disabled"'}>
      <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-       Include
+       Pages
      </legend>
      <div class="govuk-radios govuk-radios--small" id="include-pages">
        <div class="govuk-radios__item">
@@ -315,7 +324,7 @@ const viewPagesSelector = () => `
                 name="pages"
            ${state.searchParams.pages === 'notWithdrawn' ? 'checked' : ''}/>
          <label for="pages-notWithdrawn" class="govuk-label govuk-radios__label">
-           Only non withdrawn pages
+           Hide withdrawn pages
          </label>
        </div>
      </div>

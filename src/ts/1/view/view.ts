@@ -1,4 +1,4 @@
-import { id, queryDescription, highlight, highlightLinks } from '../utils';
+import { id, queryDescription, highlight, highlightLinks, getAnyKeywordSearchUrl, splitKeywords } from '../utils';
 import { state, searchState } from '../state';
 import { handleEvent, handleSorting } from '../events';
 import { languageName } from '../lang';
@@ -36,7 +36,7 @@ const view = () => {
               `<details class="govuk-details" data-module="govuk-details">
                 <summary class="govuk-details__summary">
                   <span class="govuk-details__summary-text">
-                    Search options
+                    Advanced search
                   </span>
                 </summary>
                 <div class="govuk-details__text">
@@ -51,7 +51,8 @@ const view = () => {
                   </button>
                 </div>
                 </div>
-              </details>`
+              </details>
+              `
             :
             `<div id="filters">
               ${viewSearchFilters()}
@@ -63,6 +64,8 @@ const view = () => {
             `<div class="govuk-grid-column-two-thirds">
               ${viewSearchResults()}
             </div>`
+
+
           }
         </div>
       </main>`;
@@ -395,14 +398,13 @@ if (nbRecords < 10000) {
   }
 };
 
-
 const viewNoResults = () => {
   return `
     <h1 tabindex="0" id="results-heading" class="govuk-heading-l">No results</h1>
-    <div class="govuk-body">for ${queryDescription(state.searchParams)} </div>
+    <p class="govuk-body">for ${queryDescription(state.searchParams)}</p>
+    ${state.searchParams.combinator === 'all' && splitKeywords(state.searchParams.selectedWords).length > 1 ? `<p class="govuk-body">Try searching for <a class="govuk-link" href="?${getAnyKeywordSearchUrl(state.searchParams)}">any of your keywords</a></p>` : ''}
   `;
 };
-
 
 const viewSearchResults = () => {
   switch (searchState().code) {

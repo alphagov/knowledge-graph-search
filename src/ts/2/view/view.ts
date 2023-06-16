@@ -1,4 +1,4 @@
-import { id, queryDescription, highlight, highlightLinks } from '../utils';
+import { id, queryDescription, highlight, highlightLinks, getAnyKeywordSearchUrl, splitKeywords } from '../utils';
 import { state, searchState } from '../state';
 import { handleEvent, handleSorting, getSortEventAction } from '../events';
 import { languageName } from '../lang';
@@ -37,7 +37,7 @@ const view = () => {
               `<details class="govuk-details" data-module="govuk-details">
                 <summary class="govuk-details__summary">
                   <span class="govuk-details__summary-text">
-                    Search options
+                    Advanced search
                   </span>
                 </summary>
                 <div class="govuk-details__text">
@@ -255,7 +255,7 @@ const viewSearchResultsTable = () => {
 
    const recordsToShow = results?.slice(state.skip, state.skip + state.resultsPerPage);
 
-   //const recordsToShow = state.searchResults?.slice(state.skip, state.skip + state.resultsPerPage);
+
    html.push(`
        <table id="results-table" class="govuk-table">
          <tbody class="govuk-table__body govuk-!-font-size-16">
@@ -263,7 +263,7 @@ const viewSearchResultsTable = () => {
            <th scope="col" class="a11y-hidden">Page</th>`);
    Object.keys(state.showFields).forEach(key => {
      if (state.showFields[key] && key !== 'title') {
-       //html.push(`<th scope="col" class="govuk-table__header">${fieldName(key)}<button id="sort-${key}">Desc</button></th>`);
+
        html.push(`<th scope="col" class="govuk-table__header">
        <button
         id="sort-${key}"
@@ -279,7 +279,7 @@ const viewSearchResultsTable = () => {
        <tr class="govuk-table__row">
          <th class="a11y-hidden">${recordIndex}</th>`);
      Object.keys(state.showFields).forEach(key => {
-       if (state.showFields[key] && state.showFields[key] !== 'url') {
+       if (state.showFields[key] && state.showFields[key] !== 'url' ) {
          html.push(`<td class="govuk-table__cell">${fieldFormat(key, record[key])}</td>`);
        }
      });
@@ -294,54 +294,6 @@ const viewSearchResultsTable = () => {
    return '';
  }
 };
-
-const viewSearchResultsData = () => {
-  const html = [];
-
-  if (state.searchResults && state.searchResults?.length > 0) {
-
-    const results =  state.searchResults.sort((a: any, b: any) => handleSorting(a, b, state.searchParams.sorting));
-
-    const recordsToShow = results?.slice(state.skip, state.skip + state.resultsPerPage);
-
-    html.push(`<div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">`);
-
-    recordsToShow.forEach((record, recordIndex) => {
-      html.push(`
-        <div class="govuk-accordion__section">
-            <div class="govuk-accordion__section-header">
-              <h2 class="govuk-accordion__section-heading">
-                <span class="govuk-accordion__section-button" id="accordion-default-heading-${recordIndex}">
-                  ${record.title}
-                </span>
-              </h2>
-            </div>
-            <div
-              id="accordion-default-content-${recordIndex}"
-              class="govuk-accordion__section-content"
-              aria-labelledby="accordion-default-heading-${recordIndex}">
-              <dl class="govuk-summary-list govuk-!-font-size-16">
-                ${
-                  Object.keys(record).map(key => record[key] && fieldFormat(key, record[key]).length > 0 && !['contentId', 'title'].includes(key) ? `
-                  <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">
-                      ${fieldName(key)}
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                      ${fieldFormat(key, record[key])}
-                    </dd>
-                  </div>`: '').join('')}
-              </dl>
-            </div>
-          </div>`);
-    });
-    html.push(`</div>`);
-    return html.join('');
-  } else {
-    return '';
-  }
-};
-
 
 const viewWaiting = () => `
   <div aria-live="polite" role="region">
@@ -391,20 +343,7 @@ if (nbRecords < 10000) {
         <a class="govuk-skip-link" href="#search-form">Back to search filters</a>
      `);
     }
-/*
-    html.push(`<div class="govuk-form-group sort-options">
-      <label class="govuk-label sort-options__label" for="sort">
-        Sort by
-      </label>
-      <select class="govuk-select" id="sorting" name="sort">
-        <option value="pageViewsDesc" ${state.searchParams.sorting === "pageViewsDesc" ? "selected" : ''}>Page views (highest)</option>
-        <option value="pageViewsAsc" ${state.searchParams.sorting === "pageViewsAsc" ? "selected" : ''}>Page views (lowest)</option>
-        <option value="recentlyUpdated" ${state.searchParams.sorting === "recentlyUpdated" ? "selected" : ''}>Recently updated</option>
-        <option value="recentlyPublished" ${state.searchParams.sorting === "recentlyPublished" ? "selected" : ''}>Recently published</option>
-      </select>
-    </div>`);
-*/
-    //html.push(viewSearchResultsData());
+
     html.push(viewSearchResultsTable());
 
     html.push(`<nav class="govuk-pagination govuk-pagination--block" role="navigation" aria-label="results"><div class="govuk-pagination__prev">
@@ -444,7 +383,8 @@ if (nbRecords < 10000) {
 const viewNoResults = () => {
   return `
     <h1 tabindex="0" id="results-heading" class="govuk-heading-l">No results</h1>
-    <div class="govuk-body">for ${queryDescription(state.searchParams)} </div>
+    <p class="govuk-body">for ${queryDescription(state.searchParams)}</p>
+    ${state.searchParams.combinator === 'all' && splitKeywords(state.searchParams.selectedWords).length > 1 ? `<p class="govuk-body">Try searching for <a class="govuk-link" href="?${getAnyKeywordSearchUrl(state.searchParams)}">any of your keywords</a></p>` : ''}
   `;
 };
 
@@ -524,7 +464,7 @@ const fieldFormatters: Record<string, any> = {
   },
   'withdrawn_at': {
     name: 'Withdrawn',
-    format: (date: string) => date ? formatDateTime(date) : "not withdrawn"
+    format: (date: string) => date ? formatDateTime(date) : 'n/a'
   },
   'withdrawn_explanation': {
     name: 'Withdrawn reason',

@@ -32,7 +32,12 @@ const handleEvent: SearchApiCallback = async function(event) {
           //state.searchParams.sorting = <Sorting>(getSortingSelectValue('sorting'));
 
           if ((<HTMLInputElement>id('pages-withdrawn'))?.checked) state.searchParams.pages = Pages.Withdrawn;
-          if ((<HTMLInputElement>id('pages-notWithdrawn'))?.checked) state.searchParams.pages = Pages.NotWithdrawn;
+          if ((<HTMLInputElement>id('pages-notWithdrawn'))?.checked) {
+              state.searchParams.pages = Pages.NotWithdrawn;
+              delete state.showFields.withdrawn_at;
+          } else {
+            state.showFields.withdrawn_at = true;
+          }
           if ((<HTMLInputElement>id('pages-all'))?.checked) state.searchParams.pages = Pages.All;
 
           if ((<HTMLInputElement>id('where-to-search-all'))?.checked) state.searchParams.whereToSearch = WhereToSearch.All;
@@ -64,6 +69,8 @@ const handleEvent: SearchApiCallback = async function(event) {
           if(state.searchParams.selectedOrganisation === 'undefined' || state.searchParams.selectedOrganisation === 'All publishing organisations') state.searchParams.selectedOrganisation = '';
           if(state.searchParams.selectedTaxon === 'undefined' || state.searchParams.selectedTaxon === 'All taxons') state.searchParams.selectedTaxon = '';
           if(state.searchParams.selectedLocale === 'undefined' || state.searchParams.selectedLocale === 'All languages') state.searchParams.selectedLocale = '';
+
+
 
           state.searchResults = null;
           searchButtonClicked();
