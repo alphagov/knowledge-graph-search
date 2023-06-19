@@ -21,6 +21,18 @@ import { csvStringify } from './csv'
 import { sanitiseInput } from './src/ts/utils'
 import cors from 'cors'
 import bodyParser from 'body-parser'
+import Redis from 'ioredis'
+import RedisStore from 'connect-redis'
+
+const redisInstance = new Redis(
+  Number(process.env.REDIS_PORT) || 6379,
+  process.env.REDIS_HOST || 'localhost'
+)
+
+const redisStore = new RedisStore({
+  client: redisInstance,
+  prefix: 'GovSearch::',
+})
 
 // these variables are used for OAuth authentication. They will only be set if
 // OAuth is enabled
@@ -47,8 +59,9 @@ if (process.env.ENABLE_AUTH === 'true') {
     session({
       secret: 'keyboard cat',
       resave: false,
-      saveUninitialized: true,
+      saveUninitialized: false,
       cookie: { secure: true },
+      store: redisStore,
     })
   )
 } else {
