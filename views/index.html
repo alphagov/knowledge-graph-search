@@ -66,6 +66,10 @@
     <!-- INSERT GTM BODY SNIPPET -->
 
     <script>
+      window.NODE_ENV = '__NODE_ENV__' // optionally overriden at build time
+    </script>
+
+    <script>
       document.body.className = document.body.className
         ? document.body.className + ' js-enabled'
         : 'js-enabled'

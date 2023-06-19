@@ -5,6 +5,7 @@ import { languageName } from '../lang'
 import { viewMetaResults } from './view-metabox'
 import { viewSearchPanel } from './view-search-panel'
 import { EventType } from '../event-types'
+import { ENV } from '../constants'
 
 declare const window: any
 
@@ -15,6 +16,7 @@ const view = () => {
   if (pageContent) {
     pageContent.innerHTML = `
       <main class="govuk-main-wrapper" id="main-content" role="main">
+        ${viewContextBanner()}
         ${viewErrorBanner()}
         ${viewSearchTypeSelector()}
         ${viewMainLayout()}
@@ -119,6 +121,25 @@ const viewMainLayout = () => {
     `)
   }
   return result.join('')
+}
+
+const viewContextBanner = () => {
+  const isIntegrationEnv = window.NODE_ENV === ENV.DEVELOPMENT
+  if (isIntegrationEnv) {
+    return ` 
+    <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__header">
+            <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                Important
+            </h2>
+        </div>
+        <div class="govuk-notification-banner__content">
+            <p class="govuk-notification-banner__heading">This is the integration environment and may not be stable please use the <a class="govuk-notification-banner__link" href="https://gov-search.service.gov.uk/">live application</a>.</p>
+        </div>
+    </div>
+    `
+  }
+  return ''
 }
 
 const viewErrorBanner = () => {
