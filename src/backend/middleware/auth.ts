@@ -1,14 +1,6 @@
 import * as express from 'express'
 import { isReqAJAX } from '../utils/isReqAJAX'
 
-declare global {
-  namespace Express {
-    interface Request {
-      session: any
-    }
-  }
-}
-
 /*
  * Express middleware enforcing user authentication. Redirects unauthenticated users to login page,
  * or returns 401 for AJAX requests. Can bypass authentication by setting the 'ENABLE_AUTH' environment variable.
@@ -32,6 +24,7 @@ export const auth: (s?: string) => express.Handler =
 
     // Store the requested URL in session to enable post-login redirection.
     if (req.session) {
+      // @ts-ignore
       req.session.returnTo = req.originalUrl || req.url
     }
 
