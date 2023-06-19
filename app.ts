@@ -26,6 +26,7 @@ import cors from 'cors'
 import bodyParser from 'body-parser'
 import Redis from 'ioredis'
 import RedisStore from 'connect-redis'
+import axios from 'axios'
 
 const redisInstance = new Redis(
   Number(process.env.REDIS_PORT) || 6379,
@@ -92,11 +93,11 @@ if (process.env.ENABLE_AUTH === 'true') {
         clientSecret: process.env.OAUTH_SECRET || 'not set',
         callbackURL: process.env.OAUTH_CALLBACK_URL || 'not set',
       },
-      function (
+      async function (
         accessToken: string,
         refreshToken: string,
         profile: any,
-        cb: any
+        doneCallback: any
       ) {
         console.log(
           'OAuth2Strategy callback',
@@ -104,7 +105,32 @@ if (process.env.ENABLE_AUTH === 'true') {
           refreshToken,
           profile
         )
-        cb(null, profile)
+
+        // TODO: Implement fetch user data here
+
+        console.log(`Fetching user data at ${url}`)
+        const url = `${process.env.SIGNON_URL}/user.json`
+        try {
+          const { data: profile } = await axios.get(url, {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          })
+
+          console.log('Successful')
+
+          const userSessionData = {
+            profile,
+            refreshToken,
+            accessToken,
+          }
+
+          doneCallback(null, userSessionData)
+        } catch (error) {
+          console.log('ERROR fetching user data')
+          console.log({ error })
+          return doneCallback(error)
+        }
       }
     )
   )
