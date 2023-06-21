@@ -132,6 +132,23 @@ app.get('/', auth(), async (req, res) => {
   res.send(processedContent)
 })
 
+app.get('/cookies', async (req, res) => {
+  const fileName = path.join(__dirname, 'views', 'cookies.html')
+  const content = fs.readFileSync(fileName, 'utf-8')
+  res.send(content)
+})
+
+app.post('/submit-cookies', async (req, res) => {
+  // We need to check whether a valid cookie exists, and use its value to prime
+  // the radio buttons.
+  //
+  // We need to handle errors.
+
+  const cookieSetting = req.body.analytics
+  res.cookie('cookie_settings', cookieSetting);
+  res.redirect('/cookies?cookies_set=true');
+})
+
 // the front-end will call this upon starting to get some data needed from the server
 app.get('/get-init-data', auth('/'), async (req, res) => {
   console.log('/get-init-data')
