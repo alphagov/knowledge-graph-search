@@ -4,6 +4,8 @@ import path from 'path'
 import express from 'express'
 import { auth } from './src/ts/middlewares'
 
+import * as nunjucks from 'nunjucks'
+
 import {
   sendSearchQuery,
   sendInitQuery,
@@ -45,6 +47,11 @@ let OAuth2Strategy, passport, session
 const app: express.Express = express()
 const port: number = process.env.port ? parseInt(process.env.port) : 8080
 
+nunjucks.configure('views', {
+    autoescape: true,
+    express: app
+});
+
 if (process.env.ENABLE_AUTH === 'true') {
   console.log(
     'OAuth via PassportJS is enabled because ENABLE_AUTH is set to "true"'
@@ -77,6 +84,9 @@ app.use(cors())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static('public'))
 app.use(express.json())
+
+app.engine('html', nunjucks.render)
+app.set('view engine', 'html')
 
 if (process.env.ENABLE_AUTH === 'true') {
   app.set('trust proxy', 1) // trust first proxy
