@@ -1,0 +1,24 @@
+{% extends "layout.njk" %}
+
+{% block content %}
+
+<script>
+  window.NODE_ENV = '{{environment}}'
+</script>
+
+<div class="govuk-width-container" id="page-content">
+  <main
+    class="govuk-main-wrapper"
+    id="main-content"
+    role="main"
+    aria-busy="true"
+  >
+    <h1 aria-live="assertive" class="govuk-heading-xl loading initial">
+      Loading, please wait
+    </h1>
+  </main>
+</div>
+{% block pageScripts %}
+  <script type="module" src="/main.js"></script>
+{% endblock %}
+{% endblock %}

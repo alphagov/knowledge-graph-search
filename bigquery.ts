@@ -167,6 +167,7 @@ const getPersonInfo = async function (name: string): Promise<Person[]> {
 const sendSearchQuery = async function (
   searchParams: SearchParams
 ): Promise<SearchResults> {
+  console.log(1, searchParams)
   const keywords = splitKeywords(searchParams.selectedWords)
   const excludedKeywords = splitKeywords(searchParams.excludedWords)
   const query = buildSqlQuery(searchParams, keywords, excludedKeywords)

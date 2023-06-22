@@ -46,6 +46,8 @@ const fetchWithTimeout = async function (url: string, timeoutSeconds = 60) {
 
   const responseBody = await fetchResult.json()
 
+
+
   if (!fetchResult.ok) {
     if (/^timeout of \d+ms exceeded/.test(responseBody.message)) {
       throw new Error('TIMEOUT')
@@ -68,9 +70,11 @@ const queryBackend: (
   searchParams.selectedWords = searchParams.selectedWords.replace(/[“”]/g, '"')
   searchParams.excludedWords = searchParams.excludedWords.replace(/[“”]/g, '"')
   const url = `/search?${makeQueryString(searchParams)}`
+
   let apiResults: SearchResults
   try {
     apiResults = await fetchWithTimeout(url, 300)
+
   } catch (error: any) {
     console.log('error running main+meta queries', error)
     // TODO: find another way than using a callback function to get rid of the eslint error
@@ -79,7 +83,6 @@ const queryBackend: (
     return
   }
   let { main, meta } = apiResults
-
   // If there's an exact match within the meta results, just keep that one
   const searchKeywords: string = searchParams.selectedWords.replace(/"/g, '')
   const exactMetaResults = meta.filter((result: any) => {

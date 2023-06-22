@@ -66,7 +66,7 @@
     <!-- INSERT GTM BODY SNIPPET -->
 
     <script>
-      window.NODE_ENV = '__NODE_ENV__' // optionally overriden at build time
+      window.NODE_ENV = '{{environment}}'
     </script>
 
     <script>
@@ -132,6 +132,7 @@
         role="main"
         aria-busy="true"
       >
+
         <h1 aria-live="assertive" class="govuk-heading-xl loading initial">
           Loading, please wait
         </h1>

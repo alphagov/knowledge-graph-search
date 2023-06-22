@@ -47,7 +47,13 @@ let OAuth2Strategy, passport, session
 const app: express.Express = express()
 const port: number = process.env.port ? parseInt(process.env.port) : 8080
 
-nunjucks.configure('views', {
+const views = [
+  path.join(__dirname, './node_modules/govuk-frontend/'),
+  path.join(__dirname, './node_modules/govuk-frontend/components'),
+  path.join(__dirname, './views')
+];
+
+nunjucks.configure(views, {
     autoescape: true,
     express: app
 });
@@ -86,6 +92,7 @@ app.use(express.static('public'))
 app.use(express.json())
 
 app.engine('html', nunjucks.render)
+app.set('views', views);
 app.set('view engine', 'html')
 
 if (process.env.ENABLE_AUTH === 'true') {
@@ -132,14 +139,12 @@ if (process.env.ENABLE_AUTH === 'true') {
 }
 
 app.get('/', auth(), async (req, res) => {
-  const fileName = path.join(__dirname, 'views', 'index.html')
-  const content = fs.readFileSync(fileName, 'utf-8')
-  const processedContent = content.replace(
-    '__NODE_ENV__',
-    process.env.NODE_ENV || ''
-  )
+  const environment = process.env.NODE_ENV || '__NODE_ENV__';
+  res.render('search.njk', { environment });
+})
 
-  res.send(processedContent)
+app.get('/cookies', async (req, res) => {
+  res.render('cookies.njk');
 })
 
 // the front-end will call this upon starting to get some data needed from the server
