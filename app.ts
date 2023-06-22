@@ -27,6 +27,7 @@ import bodyParser from 'body-parser'
 import Redis from 'ioredis'
 import RedisStore from 'connect-redis'
 import axios from 'axios'
+import session from 'express-session'
 
 const redisInstance = new Redis(
   Number(process.env.REDIS_PORT) || 6379,
@@ -35,12 +36,12 @@ const redisInstance = new Redis(
 
 const redisStore = new RedisStore({
   client: redisInstance,
-  prefix: 'GovSearch::',
+  prefix: 'GovSearchSession::',
 })
 
 // these variables are used for OAuth authentication. They will only be set if
 // OAuth is enabled
-let OAuth2Strategy, passport, session
+let OAuth2Strategy, passport
 
 // Initialize the express engine
 const app: express.Express = express()
@@ -55,7 +56,7 @@ if (process.env.ENABLE_AUTH === 'true') {
   // https://www.pveller.com/oauth2-with-passport-10-steps-recipe/
   OAuth2Strategy = require('passport-oauth2')
   passport = require('passport')
-  session = require('express-session')
+
   passport.serializeUser((user: any, done: any) => done(null, user))
   passport.deserializeUser((user: any, done: any) => done(null, user))
 
@@ -92,24 +93,28 @@ if (process.env.ENABLE_AUTH === 'true') {
         clientID: process.env.OAUTH_ID || 'not set',
         clientSecret: process.env.OAUTH_SECRET || 'not set',
         callbackURL: process.env.OAUTH_CALLBACK_URL || 'not set',
+        passReqToCallback: true,
       },
       async function (
+        req: Request,
         accessToken: string,
         refreshToken: string,
         profile: any,
         doneCallback: any
       ) {
+        const sessionId = (req as any).session.id
         console.log(
           'OAuth2Strategy callback',
           accessToken,
           refreshToken,
-          profile
+          profile,
+          sessionId
         )
 
         // TODO: Implement fetch user data here
 
-        console.log(`Fetching user data at ${url}`)
         const url = `${process.env.SIGNON_URL}/user.json`
+        console.log(`Fetching user data at ${url}`)
         try {
           const { data: profile } = await axios.get(url, {
             headers: {
@@ -118,13 +123,24 @@ if (process.env.ENABLE_AUTH === 'true') {
           })
 
           console.log('Successful')
+          console.log(JSON.stringify({ profile }))
+          console.log({ sessionId })
+
+          // Create the hash
+          console.log('Create the session hash')
+          redisInstance.hset(
+            'UserIdSessionMapping',
+            String(profile.user.uid),
+            String((req as any).session.id)
+          )
+          console.log('Session hash created')
 
           const userSessionData = {
             profile,
             refreshToken,
             accessToken,
+            sessionId,
           }
-
           doneCallback(null, userSessionData)
         } catch (error) {
           console.log('ERROR fetching user data')
@@ -146,6 +162,10 @@ if (process.env.ENABLE_AUTH === 'true') {
     async (req, res) => res.redirect('/')
   )
 }
+
+// app.get('/users/:userId/reauth', async (req, res) => {
+//   const { userId } = req.params
+// })
 
 app.get('/', auth(), async (req, res) => {
   const fileName = path.join(__dirname, 'views', 'index.html')
