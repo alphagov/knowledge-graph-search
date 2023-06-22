@@ -163,11 +163,32 @@ if (process.env.ENABLE_AUTH === 'true') {
   )
 }
 
-// app.get('/users/:userId/reauth', async (req, res) => {
-//   const { userId } = req.params
-// })
+app.get('/users/:userId/reauth', async (req, res) => {
+  const { userId } = req.params
+
+  // find the session ID
+  try {
+    const sessionId = await redisInstance.hget('UserIdSessionMapping', userId)
+    // Return 404 if not found
+    if (!sessionId) {
+      return res
+        .status(404)
+        .send(`GovSearch could not find a session for this user id: ${userId}`)
+    }
+  } catch (error) {
+    // TODO improve logging system
+    console.log(
+      'ERROR looking for a sessionID based on user ID',
+      JSON.stringify(error)
+    )
+    return res.status(500).send('Server error')
+  }
+
+  // Invalidate the session
+})
 
 app.get('/', auth(), async (req, res) => {
+  console.log(JSON.stringify({ session: req.session }))
   const fileName = path.join(__dirname, 'views', 'index.html')
   const content = fs.readFileSync(fileName, 'utf-8')
   const processedContent = content.replace(
