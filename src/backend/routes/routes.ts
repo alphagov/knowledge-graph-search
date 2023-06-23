@@ -42,6 +42,36 @@ class IndexRoute implements Routes {
       this.searchController.downladCSV,
     );
 
+    this.router.get(
+      Route.infoBoxOrganisation,
+      auth(),
+      this.searchController.infoBoxOrganisation,
+    );
+
+    this.router.get(
+      Route.infoBoxRole,
+      auth(),
+      this.searchController.infoBoxRole,
+    );
+
+    this.router.get(
+      Route.infoBoxBankHoliday,
+      auth(),
+      this.searchController.infoBoxBankHoliday,
+    );
+
+    this.router.get(
+      Route.infoBoxTransaction,
+      auth(),
+      this.searchController.infoBoxTransaction,
+    );
+
+    this.router.get(
+      Route.infoBoxPerson,
+      auth(),
+      this.searchController.infoBoxPerson,
+    );
+
   }
 }
 

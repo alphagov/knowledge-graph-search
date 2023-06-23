@@ -10,7 +10,12 @@ export enum Route {
   getInitData = '/get-init-data',
   searchApi = '/search',
   searchTaxon = '/taxon',
-  downladCSV = '/csv'
+  downladCSV = '/csv',
+  infoBoxOrganisation = '/organisation',
+  infoBoxRole = '/role',
+  infoBoxBankHoliday = '/bank-holiday',
+  infoBoxTransaction = '/transaction',
+  infoBoxPerson = '/person',
 }
 
 export default Routes;
