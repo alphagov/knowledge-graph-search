@@ -5,7 +5,7 @@ import {
   Organisation,
   Transaction,
   BankHoliday,
-} from '../search-api-types'
+} from '../types/search-api-types'
 
 const viewDetails = (
   title: string,

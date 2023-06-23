@@ -3,8 +3,8 @@ import {
   Combinator,
   SearchArea,
   SearchType,
-} from '../ts/search-api-types'
-import { buildSqlQuery } from '../../bigquery'
+} from '../../frontend/types/search-api-types'
+import { buildSqlQuery } from './bigquery'
 
 const makeParams = (opts = {}) =>
   ({

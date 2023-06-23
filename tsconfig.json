@@ -8,5 +8,11 @@
     "strict": true
   },
   "include": ["./**/*.ts"],
-  "exclude": ["node_modules", "coverage"]
+  "exclude": [
+    "./cypress.config.ts",
+    "cypress",
+    "**/*.cy.tsx",
+    "node_modules",
+    "coverage"
+  ]
 }

@@ -1,3 +1,5 @@
+//todo: split into models
+
 import {
   Transaction,
   Taxon,
@@ -13,9 +15,9 @@ import {
   SearchType,
   InitResults,
   BankHoliday,
-} from './src/ts/search-api-types'
-import { splitKeywords } from './src/ts/utils'
-import { languageCode } from './src/ts/lang'
+} from '../../frontend/types/search-api-types'
+import { splitKeywords } from '../../utils/utils'
+import { languageCode } from '../..//utils/lang'
 import { BigQuery } from '@google-cloud/bigquery'
 
 //= ===== private ======
@@ -167,7 +169,6 @@ const getPersonInfo = async function (name: string): Promise<Person[]> {
 const sendSearchQuery = async function (
   searchParams: SearchParams
 ): Promise<SearchResults> {
-  console.log(1, searchParams)
   const keywords = splitKeywords(searchParams.selectedWords)
   const excludedKeywords = splitKeywords(searchParams.excludedWords)
   const query = buildSqlQuery(searchParams, keywords, excludedKeywords)

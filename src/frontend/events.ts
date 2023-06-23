@@ -1,10 +1,10 @@
 import { state, searchState, resetSearch } from './state'
-import { id, getFormInputValue } from './utils'
+import { id, getFormInputValue } from '../utils/utils'
 import { view } from './view/view'
 import { queryBackend } from './search-api'
-import { EventType, SearchApiCallback } from './event-types'
-import { SearchType, SearchArea, Combinator } from './search-api-types'
-import { languageCode } from './lang'
+import { EventType, SearchApiCallback } from './types/event-types'
+import { SearchType, SearchArea, Combinator } from './types/search-api-types'
+import { languageCode } from '../utils/lang'
 
 declare const window: any
 

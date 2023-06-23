@@ -1,6 +1,5 @@
-/* istanbul ignore file */
 import App from './app';
-import IndexRoute from './routes/index.route';
+import IndexRoute from './backend/routes/routes';
 
 const app = new App([
   new IndexRoute(),

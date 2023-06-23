@@ -4,9 +4,9 @@ import {
   SearchArea,
   Combinator,
   SearchResults,
-} from './search-api-types'
-import { languageCode } from './lang'
-import { EventType, SearchApiCallback } from './event-types'
+} from './types/search-api-types'
+import { languageCode } from '../utils/lang'
+import { EventType, SearchApiCallback } from './types/event-types'
 
 const makeQueryString = function (sp: SearchParams): string {
   const usp = new URLSearchParams()

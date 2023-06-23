@@ -1,11 +1,11 @@
-import { languageName } from './lang'
+import { languageName } from '../utils/lang'
 import {
   SearchType,
   SearchParams,
   Combinator,
   SearchArea,
-} from './search-api-types'
-import { State } from './state-types'
+} from './types/search-api-types'
+import { State } from './types/state-types'
 
 // user inputs that are used to build the query.
 // (basically, everything whose value could be found in the URL)

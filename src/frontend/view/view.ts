@@ -1,10 +1,10 @@
-import { id, queryDescription } from '../utils'
+import { id, queryDescription } from '../../utils/utils'
 import { state, searchState } from '../state'
 import { handleEvent } from '../events'
-import { languageName } from '../lang'
+import { languageName } from '../../utils/lang'
 import { viewMetaResults } from './view-metabox'
 import { viewSearchPanel } from './view-search-panel'
-import { EventType } from '../event-types'
+import { EventType } from '../types/event-types'
 import { ENV } from '../constants'
 
 declare const window: any
@@ -126,7 +126,7 @@ const viewMainLayout = () => {
 const viewContextBanner = () => {
   const isIntegrationEnv = window.NODE_ENV === ENV.DEVELOPMENT
   if (isIntegrationEnv) {
-    return ` 
+    return `
     <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
         <div class="govuk-notification-banner__header">
             <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">

@@ -3,12 +3,6 @@
 {% set serviceUrl = "/" %}
 {% set titleSuffix = "GOV.UK" %}
 
-{% set footerItems = [{
-    href: "/cookies",
-    text: "Cookies"
-  }]
-%}
-
 {% extends "govuk/template.njk" %}
 
 {% from "govuk/components/skip-link/macro.njk" import govukSkipLink -%}
@@ -69,7 +63,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 {% block footer %}
   {{ govukFooter({
     meta: {
-        items: footerItems
+        items: {}
       }
   }) }}
 {% endblock %}

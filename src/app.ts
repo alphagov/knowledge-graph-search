@@ -3,12 +3,12 @@ import path from 'path'
 import * as http from 'http';
 import cors from 'cors';
 import express from 'express'
-import Routes from './interfaces/routes.interface';
+import Routes from './backend/interfaces/routes';
 import * as nunjucks from 'nunjucks'
 import bodyParser from 'body-parser'
 import Redis from 'ioredis'
 import RedisStore from 'connect-redis'
-// https://www.pveller.com/oauth2-with-passport-10-steps-recipe/
+
 const OAuth2Strategy = require('passport-oauth2');
 const passport = require('passport');
 const session = require('express-session');
@@ -26,9 +26,8 @@ const redisStore = new RedisStore({
 const views = [
   path.join(__dirname, '../node_modules/govuk-frontend/'),
   path.join(__dirname, '../node_modules/govuk-frontend/components'),
-  //path.join(__dirname, './views'),
+  path.join(__dirname, '../src/layouts'),
   path.join(__dirname, '../src'),
-  path.join(__dirname, '../src/views'),
 ];
 
 class App {
@@ -65,7 +64,6 @@ class App {
     this.app.use(express.static('public'))
     this.app.use(bodyParser.urlencoded({ extended: true }));
     this.app.use(bodyParser.json());
-
   }
 
   private initializeRoutes(routes: Routes[]) {
@@ -135,7 +133,6 @@ class App {
       passport.authenticate('oauth2', '/error-callback'),
       async (req, res) => res.redirect('/')
     )
-
   }
 
 }

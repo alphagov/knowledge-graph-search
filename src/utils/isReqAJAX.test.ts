@@ -1,5 +1,5 @@
 import { Request } from 'express'
-import { isReqAJAX } from '../ts/utils'
+import { isReqAJAX } from './isReqAJAX'
 
 describe('isReqAJAX', () => {
   it('should return false if no header is present', () => {

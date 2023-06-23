@@ -1,7 +1,7 @@
-import { sanitiseOutput } from '../utils'
+import { sanitiseOutput } from '../../utils/utils'
 import { state, searchState } from '../state'
-import { languageName } from '../lang'
-import { SearchType } from '../search-api-types'
+import { languageName } from '../../utils/lang'
+import { SearchType } from '../types/search-api-types'
 
 const viewSearchPanel = () => {
   const result = []
