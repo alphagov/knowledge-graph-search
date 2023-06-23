@@ -13,8 +13,8 @@ class IndexRoute implements Routes {
 
   private initializeRoutes() {
     this.router.get(
-      Route.search,
-      this.searchController.search,
+      Route.index,
+      this.searchController.index,
     );
 
     this.router.get(
@@ -25,6 +25,11 @@ class IndexRoute implements Routes {
     this.router.get(
       Route.searchApi,
       this.searchController.searchApi,
+    );
+
+    this.router.get(
+      Route.searchTaxon,
+      this.searchController.searchTaxon,
     );
 
   }

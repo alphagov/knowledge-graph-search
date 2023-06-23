@@ -27,7 +27,7 @@ const tagOrComment = new RegExp(
 const getFormInputValue = (inputId: string): string =>
   sanitiseInput((<HTMLInputElement>id(inputId))?.value)
 
-const sanitiseInput = function (text: string): string {
+const sanitiseInput = function (text: string | undefined): string {
   // remove text that could lead to script injections
   if (!text) return ''
   text = text.trim()

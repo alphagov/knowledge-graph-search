@@ -6,9 +6,10 @@ interface Routes {
 }
 
 export enum Route {
-  search = '/',
+  index = '/',
   getInitData = '/get-init-data',
   searchApi = '/search',
+  searchTaxon = '/taxon',
 }
 
 export default Routes;
