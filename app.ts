@@ -344,6 +344,17 @@ app.get('/person', auth('/'), async (req: any, res) => {
 })
 
 // Server setup
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}/`)
 })
+
+const handleShutdown = () => {
+  redisInstance.quit()
+  server.close(() => {
+    console.log('Server gracefully shut down')
+    process.exit(0)
+  })
+}
+
+process.on('SIGINT', handleShutdown)
+process.on('SIGTERM', handleShutdown)
