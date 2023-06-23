@@ -4,3 +4,5 @@ export enum ENV {
   STAGING = 'staging',
   PRODUCTION = 'production',
 }
+
+export const USER_SESSION_PREFIX = 'GovSearchSession__'

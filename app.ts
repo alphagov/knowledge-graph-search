@@ -24,35 +24,23 @@ import { csvStringify } from './csv'
 import { sanitiseInput } from './src/ts/utils'
 import cors from 'cors'
 import bodyParser from 'body-parser'
-import Redis from 'ioredis'
-import RedisStore from 'connect-redis'
-import axios from 'axios'
 import session from 'express-session'
-import { createSubscriber, subscribeToEvents } from './src/ts/redisSub'
+import {
+  getStore,
+  destroySessionForUserId,
+  SessionNotFoundError,
+} from './src/ts/services/redisStore'
+import { getUserProfile } from './src/ts/services/signon'
 
 // these variables are used for OAuth authentication. They will only be set if
 // OAuth is enabled
-let OAuth2Strategy, passport, redisStore
-let redisInstance: Redis | null = null
+let OAuth2Strategy, passport
 
 // Initialize the express engine
 const app: express.Express = express()
 const port: number = process.env.port ? parseInt(process.env.port) : 8080
 
 if (process.env.ENABLE_AUTH === 'true') {
-  const subscriber = createSubscriber()
-  subscribeToEvents(subscriber)
-
-  redisInstance = new Redis(
-    Number(process.env.REDIS_PORT) || 6379,
-    process.env.REDIS_HOST || 'localhost'
-  )
-
-  redisStore = new RedisStore({
-    client: redisInstance,
-    prefix: 'GovSearchSession::',
-  })
-
   console.log(
     'OAuth via PassportJS is enabled because ENABLE_AUTH is set to "true"'
   )
@@ -68,10 +56,10 @@ if (process.env.ENABLE_AUTH === 'true') {
   app.use(
     session({
       secret: 'keyboard cat',
-      resave: false,
+      resave: true,
       saveUninitialized: false,
       cookie: { secure: true },
-      store: redisStore,
+      store: getStore(),
     })
   )
 } else {
@@ -107,38 +95,22 @@ if (process.env.ENABLE_AUTH === 'true') {
         profile: any,
         doneCallback: any
       ) {
-        console.log(
-          'OAuth2Strategy callback',
-          accessToken,
-          refreshToken,
-          profile
-        )
-
-        // TODO: Implement fetch user data here
-
-        const url = `${process.env.SIGNON_URL}/user.json`
-        console.log(`Fetching user data at ${url}`)
+        let profileData
         try {
-          const { data: profile } = await axios.get(url, {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          })
-
-          console.log('Successful')
-          console.log(JSON.stringify({ profile }))
-
-          const userSessionData = {
-            profile,
-            refreshToken,
-            accessToken,
-          }
-          doneCallback(null, userSessionData)
+          profileData = await getUserProfile(accessToken)
         } catch (error) {
-          console.log('ERROR fetching user data')
-          console.log({ error })
+          console.error('ERROR fetching user data')
+          console.error({ error })
           return doneCallback(error)
         }
+
+        const userSessionData = {
+          profileData,
+          refreshToken,
+          accessToken,
+        }
+        console.log('User data fetched successfully', { userSessionData })
+        doneCallback(null, userSessionData)
       }
     )
   )
@@ -156,33 +128,16 @@ if (process.env.ENABLE_AUTH === 'true') {
 }
 
 if (process.env.ENABLE_AUTH === 'true') {
-  app.get('/users/:userId/reauth', async (req, res) => {
+  app.post('/users/:userId/reauth', async (req, res) => {
     const { userId } = req.params
-
-    // find the session ID
     try {
-      const sessionId = await (redisInstance as Redis).hget(
-        'UserIdSessionMapping',
-        userId
-      )
-      // Return 404 if not found
-      if (!sessionId) {
-        return res
-          .status(404)
-          .send(
-            `GovSearch could not find a session for this user id: ${userId}`
-          )
-      }
+      await destroySessionForUserId(userId)
     } catch (error) {
-      // TODO improve logging system
-      console.log(
-        'ERROR looking for a sessionID based on user ID',
-        JSON.stringify(error)
-      )
+      if (error instanceof SessionNotFoundError) {
+        return res.status(404).send(`No session found for user ID ${userId}`)
+      }
       return res.status(500).send('Server error')
     }
-
-    // Invalidate the session
   })
 }
 
@@ -348,8 +303,9 @@ const server = app.listen(port, () => {
 })
 
 const handleShutdown = () => {
-  if (process.env.ENABLE_AUTH === 'true' && redisInstance) {
-    redisInstance.disconnect()
+  if (process.env.ENABLE_AUTH === 'true') {
+    const { getClient } = require('./src/ts/services/redis')
+    getClient().disconnect()
   }
   server.close(() => {
     console.log('Server gracefully shut down')

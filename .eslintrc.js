@@ -24,6 +24,7 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': 'error',
     'no-callback-literal': 'off',
     '@typescript-eslint/no-namespace': 'off',
+    '@typescript-eslint/no-var-requires': 'off',
   },
   overrides: [
     // Exclude the 'jest' plugin for .cy.ts files
