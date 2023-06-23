@@ -28,6 +28,7 @@ import Redis from 'ioredis'
 import RedisStore from 'connect-redis'
 import axios from 'axios'
 import session from 'express-session'
+import { createSubscriber, subscribeToEvents } from './src/ts/redisSub'
 
 // these variables are used for OAuth authentication. They will only be set if
 // OAuth is enabled
@@ -39,6 +40,9 @@ const app: express.Express = express()
 const port: number = process.env.port ? parseInt(process.env.port) : 8080
 
 if (process.env.ENABLE_AUTH === 'true') {
+  const subscriber = createSubscriber()
+  subscribeToEvents(subscriber)
+
   redisInstance = new Redis(
     Number(process.env.REDIS_PORT) || 6379,
     process.env.REDIS_HOST || 'localhost'
@@ -103,13 +107,11 @@ if (process.env.ENABLE_AUTH === 'true') {
         profile: any,
         doneCallback: any
       ) {
-        const sessionId = (req as any).session.id
         console.log(
           'OAuth2Strategy callback',
           accessToken,
           refreshToken,
-          profile,
-          sessionId
+          profile
         )
 
         // TODO: Implement fetch user data here
@@ -125,22 +127,11 @@ if (process.env.ENABLE_AUTH === 'true') {
 
           console.log('Successful')
           console.log(JSON.stringify({ profile }))
-          console.log({ sessionId })
-
-          // Create the hash
-          console.log('Create the session hash')
-          ;(redisInstance as Redis).hset(
-            'UserIdSessionMapping',
-            String(profile.user.uid),
-            String((req as any).session.id)
-          )
-          console.log('Session hash created')
 
           const userSessionData = {
             profile,
             refreshToken,
             accessToken,
-            sessionId,
           }
           doneCallback(null, userSessionData)
         } catch (error) {
