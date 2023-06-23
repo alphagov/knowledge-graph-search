@@ -8,6 +8,18 @@ module.exports = {
     '^.+\\.tsx?$': 'ts-jest',
   },
   moduleFileExtensions: ['js', 'ts', 'json', 'node'],
-  // Uncomment this if we want to use coverage
-  // collectCoverage: true,
+  collectCoverage: true,
+  collectCoverageFrom: [
+    './src/backend/**/*.ts',
+    './src/utils/*.ts'
+  ],
+  /* uncomment when we want to enforce these thresholds
+  coverageThreshold: {
+  "global": {
+    "branches": 95,
+    "functions": 95,
+    "lines": 95,
+    "statements": 95
+    }
+  },*/
 }

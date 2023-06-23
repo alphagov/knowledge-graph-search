@@ -4,7 +4,7 @@
   "description": "Search engine for GOV.UK content",
   "main": "src/server.ts",
   "scripts": {
-    "test": "jest",
+    "test": "jest --watchAll --coverage --verbose",
     "start": "ts-node src/server.ts",
     "dev": "nodemon src/server.ts",
     "build": "webpack",
