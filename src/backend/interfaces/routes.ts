@@ -6,11 +6,11 @@ interface Routes {
 }
 
 export enum Route {
-  index = '/',
+  search = '/',
   getInitData = '/get-init-data',
   searchApi = '/search',
   searchTaxon = '/taxon',
-  downladCSV = '/csv',
+  downloadCSV = '/csv',
   infoBoxOrganisation = '/organisation',
   infoBoxRole = '/role',
   infoBoxBankHoliday = '/bank-holiday',

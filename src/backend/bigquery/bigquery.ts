@@ -1,4 +1,4 @@
-//todo: split into models
+// todo: split into models
 
 import {
   Transaction,

@@ -58,6 +58,9 @@ class App {
     });
   }
 
+  public getServer(): express.Application {
+    return this.app;
+  }
 
   private initializeMiddlewares() {
     this.app.use(cors())

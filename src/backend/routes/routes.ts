@@ -1,11 +1,17 @@
 import { Router } from 'express';
 import SearchController from '../features/search/controller';
+import SearchAPIController from '../features/searchAPI/controller';
+import InfoBoxController from '../features/infoBox/controller';
+import DownloadCSVController from '../features/downloadCSV/controller';
 import Routes, { Route } from '../interfaces/routes';
 import { auth } from '../../backend/middleware/auth';
 
 class IndexRoute implements Routes {
   public router = Router();
   public searchController = new SearchController();
+  public searchAPIController = new SearchAPIController();
+  public infoBoxController = new InfoBoxController();
+  public downloadCSVController = new DownloadCSVController();
 
   constructor() {
     this.initializeRoutes();
@@ -13,63 +19,63 @@ class IndexRoute implements Routes {
 
   private initializeRoutes() {
     this.router.get(
-      Route.index,
+      Route.search,
       auth(),
-      this.searchController.index,
+      this.searchController.search,
     );
 
     this.router.get(
       Route.getInitData,
       auth(),
-      this.searchController.getInitData,
+      this.searchAPIController.getInitData,
     );
 
     this.router.get(
       Route.searchApi,
       auth(),
-      this.searchController.searchApi,
+      this.searchAPIController.searchApi,
     );
 
     this.router.get(
       Route.searchTaxon,
       auth(),
-      this.searchController.searchTaxon,
+      this.searchAPIController.searchTaxon,
     );
 
     this.router.get(
-      Route.downladCSV,
+      Route.downloadCSV,
       auth(),
-      this.searchController.downladCSV,
+      this.downloadCSVController.downloadCSV,
     );
 
     this.router.get(
       Route.infoBoxOrganisation,
       auth(),
-      this.searchController.infoBoxOrganisation,
+      this.infoBoxController.infoBoxOrganisation,
     );
 
     this.router.get(
       Route.infoBoxRole,
       auth(),
-      this.searchController.infoBoxRole,
+      this.infoBoxController.infoBoxRole,
     );
 
     this.router.get(
       Route.infoBoxBankHoliday,
       auth(),
-      this.searchController.infoBoxBankHoliday,
+      this.infoBoxController.infoBoxBankHoliday,
     );
 
     this.router.get(
       Route.infoBoxTransaction,
       auth(),
-      this.searchController.infoBoxTransaction,
+      this.infoBoxController.infoBoxTransaction,
     );
 
     this.router.get(
       Route.infoBoxPerson,
       auth(),
-      this.searchController.infoBoxPerson,
+      this.infoBoxController.infoBoxPerson,
     );
 
   }
