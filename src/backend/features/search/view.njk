@@ -2,9 +2,19 @@
 
 {% block content %}
 
-<script>
-  window.NODE_ENV = '{{environment}}'
-</script>
+{% if isIntegrationEnv  %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% set html %}
+  <p class="govuk-notification-banner__heading">
+    This is the integration environment and may not be stable please use the <a class="govuk-notification-banner__link" href="https://gov-search.service.gov.uk/">live application</a>.
+  </p>
+{% endset %}
+
+{{ govukNotificationBanner({
+  html: html
+}) }}
+
+{% endif %}
 
 <div class="govuk-width-container" id="page-content">
   <main

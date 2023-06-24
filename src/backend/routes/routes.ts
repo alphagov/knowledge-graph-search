@@ -3,7 +3,7 @@ import SearchController from '../features/search/controller';
 import SearchAPIController from '../features/searchAPI/controller';
 import InfoBoxController from '../features/infoBox/controller';
 import DownloadCSVController from '../features/downloadCSV/controller';
-import Routes, { Route } from '../interfaces/routes';
+import Routes, { Route } from '../enums/routes';
 import { auth } from '../../backend/middleware/auth';
 
 class IndexRoute implements Routes {

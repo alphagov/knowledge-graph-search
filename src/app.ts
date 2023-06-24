@@ -3,7 +3,7 @@ import path from 'path'
 import * as http from 'http';
 import cors from 'cors';
 import express from 'express'
-import Routes from './backend/interfaces/routes';
+import Routes from './backend/enums/routes';
 import * as nunjucks from 'nunjucks'
 import bodyParser from 'body-parser'
 import Redis from 'ioredis'
