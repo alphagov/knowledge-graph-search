@@ -1,8 +1,8 @@
 import { RequestHandler } from 'express';
-import { sendSearchQuery } from '../../bigquery/bigquery';
-import { SearchParams } from '../../../frontend/types/search-api-types';
-import { getParams } from '../../../utils/getParams';
-import { csvStringify } from '../../../utils/csv';
+import { sendSearchQuery } from '../bigquery/bigquery';
+import { SearchParams } from '../../frontend/types/search-api-types';
+import { getParams } from '../../utils/getParams';
+import { csvStringify } from '../../utils/csv';
 
 class DownloadCSVController {
   public downloadCSV: RequestHandler = async (req, res, next) => {

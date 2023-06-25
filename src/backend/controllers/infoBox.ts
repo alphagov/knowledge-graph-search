@@ -6,7 +6,7 @@ import {
   getBankHolidayInfo,
   getTransactionInfo,
   getPersonInfo
-} from '../../bigquery/bigquery';
+} from '../bigquery/bigquery';
 
 class InfoBoxController {
 

@@ -3,10 +3,10 @@ import {
   sendInitQuery,
   sendSearchQuery,
   getTaxonInfo
-} from '../../bigquery/bigquery';
+} from '../bigquery/bigquery';
 
-import { SearchParams } from '../../../frontend/types/search-api-types';
-import { getParams } from '../../../utils/getParams';
+import { SearchParams } from '../../frontend/types/search-api-types';
+import { getParams } from '../../utils/getParams';
 
 
 class SearchAPIController {

@@ -1,9 +1,9 @@
-import supertest from 'supertest';
+import request from 'supertest';
 import e from 'express';
-import App from '../../../app';
-import { Route } from '../../enums/routes';
-import IndexRoute from '../../routes/routes';
-import SearchController from './controller';
+import App from '../../app';
+import { Route } from '../enums/routes';
+import IndexRoute from '../routes/routes';
+import SearchController from './search';
 
 const indexRoute = new IndexRoute();
 const app = new App([indexRoute]);
@@ -17,7 +17,7 @@ afterAll(async () => {
 });
 
 describe(`[GET] ${Route.search}`, () => {
-  it('Should respond with statusCode 200', () => supertest(app.getServer())
+  it('Should respond with statusCode 200', () => request(app.getServer())
     .get(`${Route.search}`)
     .set('user-agent', 'node-superagent')
     .expect(200));

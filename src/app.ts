@@ -24,9 +24,8 @@ const redisStore = new RedisStore({
 })
 
 const views = [
-  path.join(__dirname, '../node_modules/govuk-frontend/'),
-  path.join(__dirname, '../node_modules/govuk-frontend/components'),
-  path.join(__dirname, '../src/layouts'),
+  path.join(__dirname, '../node_modules/govuk-frontend'),
+  path.join(__dirname, '../src/backend/views/layouts'),
   path.join(__dirname, '../src'),
 ];
 
