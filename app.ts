@@ -128,7 +128,7 @@ if (process.env.ENABLE_AUTH === 'true') {
 }
 
 if (process.env.ENABLE_AUTH === 'true') {
-  app.post('/users/:userId/reauth', async (req, res) => {
+  app.post('/auth/gds/api/users/:userId/reauth', async (req, res) => {
     const { userId } = req.params
     try {
       await destroySessionForUserId(userId)
