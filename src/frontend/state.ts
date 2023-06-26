@@ -1,11 +1,11 @@
-import { languageName } from '../utils/lang';
+import { languageName } from '../utils/lang'
 import {
   SearchType,
   SearchParams,
   Combinator,
   SearchArea,
-} from './types/search-api-types';
-import { State } from './types/state-types';
+} from './types/search-api-types'
+import { State } from './types/state-types'
 
 // user inputs that are used to build the query.
 // (basically, everything whose value could be found in the URL)
@@ -28,7 +28,7 @@ const initialSearchParams: SearchParams = {
   combinator: Combinator.All,
   areaToSearch: SearchArea.Any,
   caseSensitive: false, // whether the keyword search is case sensitive
-};
+}
 
 const state: State = {
   searchParams: JSON.parse(JSON.stringify(initialSearchParams)), // deep copy
@@ -48,59 +48,59 @@ const state: State = {
   },
   waiting: false, // whether we're waiting for a request to return,
   disamboxExpanded: false, // if there's a resizeable disamb meta box, whether it's expanded or not
-};
+}
 
 const setQueryParamsFromQS = function (): void {
   const searchParams: URLSearchParams = new URLSearchParams(
     window.location.search
-  );
+  )
   const maybeReplace = (stateField: keyof SearchParams, qspName: string): any =>
     searchParams.get(qspName) !== null
       ? searchParams.get(qspName)
-      : initialSearchParams[stateField];
+      : initialSearchParams[stateField]
 
-  state.searchParams.searchType = maybeReplace('searchType', 'search-type');
+  state.searchParams.searchType = maybeReplace('searchType', 'search-type')
   state.searchParams.selectedWords = maybeReplace(
     'selectedWords',
     'selected-words'
-  );
+  )
   state.searchParams.excludedWords = maybeReplace(
     'excludedWords',
     'excluded-words'
-  );
+  )
   state.searchParams.linkSearchUrl = maybeReplace(
     'linkSearchUrl',
     'link-search-url'
-  );
+  )
   state.searchParams.selectedTaxon = maybeReplace(
     'selectedTaxon',
     'selected-taxon'
-  );
+  )
   state.searchParams.selectedOrganisation = maybeReplace(
     'selectedOrganisation',
     'selected-organisation'
-  );
+  )
 
-  const lang: string | null = searchParams.get('lang');
+  const lang: string | null = searchParams.get('lang')
   state.searchParams.selectedLocale = lang
     ? languageName(lang)
-    : initialSearchParams.selectedLocale;
+    : initialSearchParams.selectedLocale
   state.searchParams.caseSensitive = maybeReplace(
     'caseSensitive',
     'case-sensitive'
-  );
-  state.searchParams.areaToSearch = maybeReplace('areaToSearch', 'area');
-  state.searchParams.combinator = maybeReplace('combinator', 'combinator');
+  )
+  state.searchParams.areaToSearch = maybeReplace('areaToSearch', 'area')
+  state.searchParams.combinator = maybeReplace('combinator', 'combinator')
 
   state.searchParams.whereToSearch.title =
     searchParams.get('search-in-title') === 'false'
       ? false
-      : initialSearchParams.whereToSearch.title;
+      : initialSearchParams.whereToSearch.title
   state.searchParams.whereToSearch.text =
     searchParams.get('search-in-text') === 'false'
       ? false
-      : initialSearchParams.whereToSearch.text;
-};
+      : initialSearchParams.whereToSearch.text
+}
 
 const searchState = function (): { code: string; errors: string[] } {
   // Find out what to display depending on state
@@ -112,9 +112,9 @@ const searchState = function (): { code: string; errors: string[] } {
   //   we add a "errors" field containing an array with values among:
   //   - "missingWhereToSearch": keywords were specified but not where to look for them on pages
   // "waiting": there's a query running
-  const errors: string[] = [];
+  const errors: string[] = []
 
-  if (state.waiting) return { code: 'waiting', errors };
+  if (state.waiting) return { code: 'waiting', errors }
 
   if (
     state.searchParams.selectedWords === '' &&
@@ -126,7 +126,7 @@ const searchState = function (): { code: string; errors: string[] } {
     state.searchParams.whereToSearch.title === false &&
     state.searchParams.whereToSearch.text === false
   ) {
-    return { code: 'initial', errors };
+    return { code: 'initial', errors }
   }
 
   if (state.searchParams.selectedWords !== '') {
@@ -134,32 +134,32 @@ const searchState = function (): { code: string; errors: string[] } {
       !state.searchParams.whereToSearch.title &&
       !state.searchParams.whereToSearch.text
     ) {
-      errors.push('missingWhereToSearch');
+      errors.push('missingWhereToSearch')
     }
   }
-  if (errors.length > 0) return { code: 'error', errors };
+  if (errors.length > 0) return { code: 'error', errors }
   if (state.searchResults && state.searchResults.length > 0)
-    return { code: 'results', errors };
+    return { code: 'results', errors }
   if (state.searchResults && state.searchResults.length === 0)
-    return { code: 'no-results', errors };
-  return { code: 'ready-to-search', errors };
-};
+    return { code: 'no-results', errors }
+  return { code: 'ready-to-search', errors }
+}
 
 const resetSearch = function (): void {
-  state.searchParams.selectedWords = '';
-  state.searchParams.excludedWords = '';
-  state.searchParams.selectedTaxon = '';
-  state.searchParams.selectedOrganisation = '';
-  state.searchParams.selectedLocale = '';
-  state.searchParams.whereToSearch.title = true;
-  state.searchParams.whereToSearch.text = true;
-  state.searchParams.caseSensitive = false;
-  state.searchParams.linkSearchUrl = '';
-  state.skip = 0; // reset to first page
-  state.searchParams.areaToSearch = SearchArea.Any;
-  state.searchResults = null;
-  state.waiting = false;
-  state.searchParams.combinator = Combinator.All;
-};
+  state.searchParams.selectedWords = ''
+  state.searchParams.excludedWords = ''
+  state.searchParams.selectedTaxon = ''
+  state.searchParams.selectedOrganisation = ''
+  state.searchParams.selectedLocale = ''
+  state.searchParams.whereToSearch.title = true
+  state.searchParams.whereToSearch.text = true
+  state.searchParams.caseSensitive = false
+  state.searchParams.linkSearchUrl = ''
+  state.skip = 0 // reset to first page
+  state.searchParams.areaToSearch = SearchArea.Any
+  state.searchResults = null
+  state.waiting = false
+  state.searchParams.combinator = Combinator.All
+}
 
-export { state, setQueryParamsFromQS, searchState, resetSearch };
+export { state, setQueryParamsFromQS, searchState, resetSearch }

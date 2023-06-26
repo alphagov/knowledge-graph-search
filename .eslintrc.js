@@ -25,7 +25,6 @@ module.exports = {
     'no-callback-literal': 'off',
     '@typescript-eslint/no-namespace': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
-    semi: [2, 'always'],
     'jest/expect-expect': [
       'error',
       {

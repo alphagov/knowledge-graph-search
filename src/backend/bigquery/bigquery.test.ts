@@ -3,9 +3,9 @@ import {
   Combinator,
   SearchArea,
   SearchType,
-} from '../../frontend/types/search-api-types';
-import { buildSqlQuery } from './bigquery';
-import { expect } from '@jest/globals';
+} from '../../frontend/types/search-api-types'
+import { buildSqlQuery } from './bigquery'
+import { expect } from '@jest/globals'
 
 const makeParams = (opts = {}) =>
   ({
@@ -21,17 +21,17 @@ const makeParams = (opts = {}) =>
     selectedWords: '',
     excludedWords: '',
     ...opts,
-  } as SearchParams);
+  } as SearchParams)
 
 describe('buildSqlQuery', () => {
   test('includes linkClause when searchParams.linkSearchUrl is not an empty string', () => {
     const searchParams: SearchParams = makeParams({
       linkSearchUrl: 'test-url',
-    });
-    const keywords: string[] = [];
-    const excludedKeywords: string[] = [];
+    })
+    const keywords: string[] = []
+    const excludedKeywords: string[] = []
 
-    const query = buildSqlQuery(searchParams, keywords, excludedKeywords);
+    const query = buildSqlQuery(searchParams, keywords, excludedKeywords)
 
     expect(query).toContain(
       `AND EXISTS
@@ -39,15 +39,15 @@ describe('buildSqlQuery', () => {
           SELECT 1 FROM UNNEST (hyperlinks) AS link
           WHERE CONTAINS_SUBSTR(link, @link)
         )`
-    );
-  });
+    )
+  })
 
   test("doesn't include linkClause when searchParams.linkSearchUrl is an empty string", () => {
-    const searchParams: SearchParams = makeParams();
-    const keywords: string[] = [];
-    const excludedKeywords: string[] = [];
+    const searchParams: SearchParams = makeParams()
+    const keywords: string[] = []
+    const excludedKeywords: string[] = []
 
-    const query = buildSqlQuery(searchParams, keywords, excludedKeywords);
+    const query = buildSqlQuery(searchParams, keywords, excludedKeywords)
 
     expect(query).not.toContain(
       `AND EXISTS
@@ -55,6 +55,6 @@ describe('buildSqlQuery', () => {
           SELECT 1 FROM UNNEST (hyperlinks) AS link
           WHERE CONTAINS_SUBSTR(link, @link)
         )`
-    );
-  });
-});
+    )
+  })
+})

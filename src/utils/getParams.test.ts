@@ -1,10 +1,10 @@
-import { Request } from 'express';
-import { getParams } from './getParams';
-import { expect } from '@jest/globals';
+import { Request } from 'express'
+import { getParams } from './getParams'
+import { expect } from '@jest/globals'
 
 beforeEach(() => {
-  jest.clearAllMocks();
-});
+  jest.clearAllMocks()
+})
 
 describe('getParams', () => {
   it('Should return the parameters', () => {
@@ -23,7 +23,7 @@ describe('getParams', () => {
         area: 'some area',
         'link-search-url': 'some link-search-url',
       },
-    } as unknown as Request;
+    } as unknown as Request
 
     expect(getParams(req)).toStrictEqual({
       areaToSearch: 'some area',
@@ -40,8 +40,8 @@ describe('getParams', () => {
         text: true,
         title: true,
       },
-    });
-  });
+    })
+  })
 
   it('Should return the parameters with empty values', () => {
     const req = {
@@ -59,7 +59,7 @@ describe('getParams', () => {
         area: '',
         'link-search-url': '',
       },
-    } as unknown as Request;
+    } as unknown as Request
 
     expect(getParams(req)).toStrictEqual({
       areaToSearch: 'any',
@@ -76,6 +76,6 @@ describe('getParams', () => {
         text: true,
         title: true,
       },
-    });
-  });
-});
+    })
+  })
+})

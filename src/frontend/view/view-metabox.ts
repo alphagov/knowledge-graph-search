@@ -1,18 +1,18 @@
-import { state } from '../state';
-import { viewMetaLink } from './view-components';
+import { state } from '../state'
+import { viewMetaLink } from './view-components'
 import {
   Taxon,
   Organisation,
   Transaction,
   BankHoliday,
-} from '../types/search-api-types';
+} from '../types/search-api-types'
 
 const viewDetails = (
   title: string,
   list: any[],
   itemFormatFn: (item: any) => string
 ): string => {
-  if (list.length === 0) return '';
+  if (list.length === 0) return ''
   return `
     <details class="govuk-details">
       <summary class="govuk-details__summary">
@@ -26,8 +26,8 @@ const viewDetails = (
         </ul>
       </div>
     </details>
-  `;
-};
+  `
+}
 
 const viewOrgPersonRoles = (personRoles: Record<string, any>[]): string =>
   viewDetails(
@@ -37,17 +37,17 @@ const viewOrgPersonRoles = (personRoles: Record<string, any>[]): string =>
       `${viewMetaLink(personRole.personName)} (${viewMetaLink(
         personRole.roleName
       )})`
-  );
+  )
 
 const viewOrgChildren = (childOrgNames: string[]): string =>
   viewDetails(
     `${childOrgNames.length} sub-organisations`,
     childOrgNames.sort(),
     viewMetaLink
-  );
+  )
 
 const viewPersonRoles = function (roles: any[]): string {
-  const title: string = roles.length === 1 ? 'Role' : 'Roles';
+  const title: string = roles.length === 1 ? 'Role' : 'Roles'
   const roleFormatter: (role: any) => string = (role) => `
     ${viewMetaLink(role.title)} ${
     role.orgs ? ' at ' + viewMetaLink(role.orgs[0].orgName) : ''
@@ -55,10 +55,10 @@ const viewPersonRoles = function (roles: any[]): string {
     (${role.startDate ? new Date(role.startDate.value).getFullYear() : ''}
     to ${
       role.endDate ? new Date(role.endDate.value).getFullYear() : 'present'
-    })`;
-  const rolesInDateOrder = sortedBy(roles, 'startDate').reverse();
-  return viewDetails(title, rolesInDateOrder, roleFormatter);
-};
+    })`
+  const rolesInDateOrder = sortedBy(roles, 'startDate').reverse()
+  return viewDetails(title, rolesInDateOrder, roleFormatter)
+}
 
 const viewRolePersons = (persons: any[]): string => {
   const formatPerson = (person: any): string => {
@@ -67,15 +67,15 @@ const viewRolePersons = (persons: any[]): string => {
     (${person.startDate ? new Date(person.startDate.value).getFullYear() : ''}
     to
     ${person.endDate ? new Date(person.endDate.value).getFullYear() : 'now'})
-  `;
-  };
-  const currents = persons.filter((person: any) => person.endDate === null);
-  const previous = persons.filter((person: any) => person.endDate !== null);
-  let currentsHtml: string;
+  `
+  }
+  const currents = persons.filter((person: any) => person.endDate === null)
+  const previous = persons.filter((person: any) => person.endDate !== null)
+  let currentsHtml: string
   switch (currents.length) {
     case 0:
-      currentsHtml = '';
-      break;
+      currentsHtml = ''
+      break
     case 1:
       currentsHtml = `
       <p class="govuk-body">Current holder:</p>
@@ -85,8 +85,8 @@ const viewRolePersons = (persons: any[]): string => {
       <p class="govuk-body">(since ${new Date(
         currents[0].startDate.value
       ).getFullYear()})</p>
-    `;
-      break;
+    `
+      break
     default:
       currentsHtml = `
       <p class="govuk-body">Current holders:</p>
@@ -100,18 +100,18 @@ const viewRolePersons = (persons: any[]): string => {
           .map((person) => `<li>${formatPerson(person)}</li>`)
           .join('')}
       </ul>
-    `;
+    `
   }
 
-  let previousHtml: string;
+  let previousHtml: string
   switch (previous.length) {
     case 0:
-      previousHtml = '';
-      break;
+      previousHtml = ''
+      break
     case 1:
       return `
       <p class="govuk-body">Previous holder: ${formatPerson(previous[0])}</p>
-    `;
+    `
     default:
       return `
       <details class="govuk-details">
@@ -131,25 +131,25 @@ const viewRolePersons = (persons: any[]): string => {
           </ul>
         </div>
       </details>
-    `;
+    `
   }
 
-  return `${currentsHtml} ${previousHtml}`;
-};
+  return `${currentsHtml} ${previousHtml}`
+}
 
 const viewBankHolidayDetails = function (holiday: BankHoliday): string {
   const datesDetails: string = viewDetails(
     'dates',
     holiday.dates.sort().reverse(),
     (date) => date
-  );
+  )
   const divisionDetails: string = viewDetails(
     'Observed in',
     holiday.divisions.sort(),
     (division) => division
-  );
-  return `${datesDetails}${divisionDetails}`;
-};
+  )
+  return `${datesDetails}${divisionDetails}`
+}
 
 const viewBankHoliday = (record: BankHoliday): string => `
   <div class="meta-results-panel">
@@ -159,7 +159,7 @@ const viewBankHoliday = (record: BankHoliday): string => `
     <p class="govuk-body">Bank holiday</p>
     ${viewBankHolidayDetails(record)}
   </div>
-`;
+`
 
 const viewPerson = (record: any): string => `
   <div class="meta-results-panel">
@@ -173,7 +173,7 @@ const viewPerson = (record: any): string => `
         : ''
     }
   </div>
-`;
+`
 
 const viewRoleOrgs = (orgs: any[]): string =>
   viewDetails(
@@ -182,14 +182,14 @@ const viewRoleOrgs = (orgs: any[]): string =>
     }`,
     orgs.sort(),
     viewMetaLink
-  );
+  )
 
 const viewRole = function (record: any): string {
   const nameHtml = record.homePage
     ? `
     <a class="govuk-link" href="${record.homepage}">${record.name}</a>
   `
-    : record.name;
+    : record.name
 
   return `
     <div class="meta-results-panel">
@@ -202,8 +202,8 @@ const viewRole = function (record: any): string {
       }
       ${viewRoleOrgs(record.orgNames)}
       ${viewRolePersons(record.personNames)}
-    </div>`;
-};
+    </div>`
+}
 
 const viewOrg = (record: Organisation): string => `
   <div class="meta-results-panel">
@@ -250,7 +250,7 @@ const viewOrg = (record: Organisation): string => `
         : ''
     }
   </div>
-`;
+`
 
 const viewMetaLinkList = (
   names: string[],
@@ -258,21 +258,21 @@ const viewMetaLinkList = (
   noneTitle?: string
 ): string => {
   if (names.length === 0 && noneTitle) {
-    return noneTitle;
+    return noneTitle
   } else if (names.length === 1) {
     return `
       ${title?.length > 0 ? title : ''}
       ${viewMetaLink(names[0])}
-    `;
+    `
   } else {
     return `
       ${title?.length > 0 ? title : ''}
       <ul class="govuk-list govuk-list--bullet">
         ${names.map((name) => `<li>${viewMetaLink(name)}</li>`).join('')}
       </ul>
-    `;
+    `
   }
-};
+}
 
 const viewTransaction = (record: Transaction): string =>
   `<div class="meta-results-panel">
@@ -286,7 +286,7 @@ const viewTransaction = (record: Transaction): string =>
          : ''
      }
    </div>
-  `;
+  `
 
 const viewTaxon = (record: Taxon): string =>
   `<div class="meta-results-panel">
@@ -302,7 +302,7 @@ const viewTaxon = (record: Taxon): string =>
      }
      ${record.childTaxons?.length ? viewTaxonChildren(record.childTaxons) : ''}
    </div>
-  `;
+  `
 
 const viewTaxonAncestors = (ancestors: any[]): string =>
   ancestors?.length > 0
@@ -319,22 +319,22 @@ const viewTaxonAncestors = (ancestors: any[]): string =>
       </ol>
     </div>
   `
-    : '';
+    : ''
 
 const viewTaxonChildren = (records: any[]): string => {
   return viewDetails('Subtaxons', sortedBy(records, 'name'), (taxon) =>
     viewMetaLink(taxon.name)
-  );
-};
+  )
+}
 
 // Sorts a list of object using a specific field to sort by
 const sortedBy = function (
   arrayOfObjects: Record<string, any>[],
   field: string
 ): Record<string, any>[] {
-  const deepCopy = JSON.parse(JSON.stringify(arrayOfObjects));
-  return deepCopy.sort((a: any, b: any) => (a[field] < b[field] ? -1 : 1));
-};
+  const deepCopy = JSON.parse(JSON.stringify(arrayOfObjects))
+  return deepCopy.sort((a: any, b: any) => (a[field] < b[field] ? -1 : 1))
+}
 
 /*
 const viewMetaResultsExpandToggle = () =>
@@ -347,7 +347,7 @@ const viewMetaResultsExpandToggle = () =>
 
 const viewMetaResults = function (): string {
   if (!state.metaSearchResults || state.metaSearchResults.length !== 1)
-    return '';
+    return ''
   //  if (state.metaSearchResults.length > 1) {
   //    const expandedClass = state.metaSearchResults.length > 5 && !state.disamboxExpanded ? 'meta-results-panel--collapsed' : '';
   //    return `
@@ -363,25 +363,25 @@ const viewMetaResults = function (): string {
   //    `;
   //  } else {
 
-  const record = state.metaSearchResults[0];
+  const record = state.metaSearchResults[0]
   switch (record.type) {
     case 'BankHoliday':
-      return viewBankHoliday(record);
+      return viewBankHoliday(record)
     case 'Organisation':
-      return viewOrg(record);
+      return viewOrg(record)
     case 'Person':
-      return viewPerson(record);
+      return viewPerson(record)
     case 'Role':
-      return viewRole(record);
+      return viewRole(record)
     case 'Transaction':
-      return viewTransaction(record);
+      return viewTransaction(record)
     case 'Taxon':
-      return viewTaxon(record);
+      return viewTaxon(record)
     default:
-      console.log(`unknown record type: ${record.type}`);
-      return ``;
+      console.log(`unknown record type: ${record.type}`)
+      return ``
   }
   // }
-};
+}
 
-export { viewMetaResults };
+export { viewMetaResults }

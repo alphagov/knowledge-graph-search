@@ -1,17 +1,17 @@
-import { id, queryDescription } from '../../utils/utils';
-import { state, searchState } from '../state';
-import { handleEvent } from '../events';
-import { languageName } from '../../utils/lang';
-import { viewMetaResults } from './view-metabox';
-import { viewSearchPanel } from './view-search-panel';
-import { EventType } from '../types/event-types';
+import { id, queryDescription } from '../../utils/utils'
+import { state, searchState } from '../state'
+import { handleEvent } from '../events'
+import { languageName } from '../../utils/lang'
+import { viewMetaResults } from './view-metabox'
+import { viewSearchPanel } from './view-search-panel'
+import { EventType } from '../types/event-types'
 
-declare const window: any;
+declare const window: any
 
 const view = () => {
-  console.log('view');
-  document.title = 'Gov Search';
-  const pageContent: HTMLElement | null = id('page-content');
+  console.log('view')
+  document.title = 'Gov Search'
+  const pageContent: HTMLElement | null = id('page-content')
   if (pageContent) {
     pageContent.innerHTML = `
       <main class="govuk-main-wrapper" id="main-content" role="main">
@@ -23,7 +23,7 @@ const view = () => {
           Page views depend on cookie consent.
         </p>
       </main>
-    `;
+    `
   }
 
   // Add event handlers
@@ -36,28 +36,28 @@ const view = () => {
           id: (event.target as HTMLElement).getAttribute('id') || undefined,
         })
       )
-    );
+    )
 
   // Not sure this is even fired, since browser blocks submit because "the form is not connected"
   id('search-form')?.addEventListener('submit', (event) => {
-    event.preventDefault();
+    event.preventDefault()
     // Tell GTM the form was submitted
-    window.dataLayer = window.dataLayer || [];
+    window.dataLayer = window.dataLayer || []
     window.dataLayer.push({
       event: 'formSubmission',
       formType: 'Search',
       formPosition: 'Page',
-    });
-    handleEvent({ type: EventType.Dom, id: 'search' });
-  });
+    })
+    handleEvent({ type: EventType.Dom, id: 'search' })
+  })
 
   id('meta-results-expand')?.addEventListener('click', () =>
     handleEvent({ type: EventType.Dom, id: 'toggleDisamBox' })
-  );
+  )
 
   // focus on the results heading if present
-  id('results-heading')?.focus();
-};
+  id('results-heading')?.focus()
+}
 
 const viewSearchTypeSelector = () => `
     <p class="govuk-body search-selector">
@@ -83,10 +83,10 @@ const viewSearchTypeSelector = () => `
         state.searchParams.searchType === 'advanced' ? 'active' : ''
       }" id="search-advanced">Advanced</button>
     </p>
-  `;
+  `
 
 const viewMainLayout = () => {
-  const result = [];
+  const result = []
   if (state.searchParams.searchType === 'advanced') {
     if (!state.searchResults) {
       result.push(`
@@ -95,7 +95,7 @@ const viewMainLayout = () => {
             ${viewSearchPanel()}
           </div>
         </div>
-      `);
+      `)
     } else {
       result.push(`
         <div class="govuk-grid-row advanced-layout">
@@ -106,7 +106,7 @@ const viewMainLayout = () => {
             ${viewSearchResults()}
           </div>
         </div>
-      `);
+      `)
     }
   } else {
     result.push(`
@@ -116,31 +116,31 @@ const viewMainLayout = () => {
         </div>
       </div>
       ${viewSearchResults()}
-    `);
+    `)
   }
-  return result.join('');
-};
+  return result.join('')
+}
 
 const viewErrorBanner = () => {
-  const html = [];
+  const html = []
   if (state.systemErrorText || state.userErrors.length > 0) {
     html.push(`
-        <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">`);
+        <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">`)
     if (state.systemErrorText) {
-      let errorText = '';
+      let errorText = ''
       switch (state.systemErrorText) {
         case 'TIMEOUT':
           errorText =
-            'The databse took too long to respond. This is usually due to too many query results. Please try a more precise query.';
-          break;
+            'The databse took too long to respond. This is usually due to too many query results. Please try a more precise query.'
+          break
         default:
-          errorText = 'A problem has occurred with the database.';
+          errorText = 'A problem has occurred with the database.'
       }
       html.push(`
           <h1 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h1>
           <p class="govuk-body">${errorText}</p>
           <p>Please <a class="govuk-link" href="mailto:data-products-research@digital.cabinet-office.gov.uk">contact the Data Products team</a> if the problem persists.</p>
-      `);
+      `)
     } else {
       if (state.userErrors.length > 0) {
         html.push(`
@@ -148,46 +148,46 @@ const viewErrorBanner = () => {
               There is a problem
             </h1>
             <ul class="govuk-error-summary__list">
-          `);
+          `)
         state.userErrors.forEach((userError) => {
           switch (userError) {
             case 'missingWhereToSearch':
               html.push(`
-              <li><a href="#search-locations-wrapper">You need to select a keyword location</a></li>`);
-              break;
+              <li><a href="#search-locations-wrapper">You need to select a keyword location</a></li>`)
+              break
             case 'missingArea':
               html.push(`
-              <li><a href="#search-scope-wrapper">You need to select a publishing application</a></li>`);
-              break;
+              <li><a href="#search-scope-wrapper">You need to select a publishing application</a></li>`)
+              break
             default:
-              console.log('unknown user error code:', userError);
+              console.log('unknown user error code:', userError)
           }
-        });
+        })
         html.push(`
-            </ul>`);
+            </ul>`)
       }
     }
     html.push(`
         </div>
-      `);
+      `)
   }
-  return html.join('');
-};
+  return html.join('')
+}
 
 const viewSearchResultsTable = () => {
-  const html = [];
+  const html = []
   if (state.searchResults && state.searchResults?.length > 0) {
     const recordsToShow = state.searchResults?.slice(
       state.skip,
       state.skip + state.resultsPerPage
-    );
+    )
     html.push(`
       <div class="govuk-body">
         <fieldset class="govuk-fieldset" ${
           state.waiting && 'disabled="disabled"'
         }>
           <legend class="govuk-fieldset__legend">For each result, display:</legend>
-          <ul class="kg-checkboxes" id="show-fields">`);
+          <ul class="kg-checkboxes" id="show-fields">`)
     html.push(
       Object.keys(state.searchResults[0])
         .map(
@@ -203,26 +203,26 @@ const viewSearchResultsTable = () => {
             </li>`
         )
         .join('')
-    );
+    )
     html.push(`
           </ul>
         </fieldset>
         <table id="results-table" class="govuk-table">
           <tbody class="govuk-table__body">
           <tr class="govuk-table__row">
-            <th scope="col" class="a11y-hidden">Page</th>`);
+            <th scope="col" class="a11y-hidden">Page</th>`)
     Object.keys(state.showFields).forEach((key) => {
       if (state.showFields[key]) {
         html.push(
           `<th scope="col" class="govuk-table__header">${fieldName(key)}</th>`
-        );
+        )
       }
-    });
+    })
 
     recordsToShow.forEach((record, recordIndex) => {
       html.push(`
         <tr class="govuk-table__row">
-          <th class="a11y-hidden">${recordIndex}</th>`);
+          <th class="a11y-hidden">${recordIndex}</th>`)
       Object.keys(state.showFields).forEach((key) => {
         if (state.showFields[key]) {
           html.push(
@@ -230,20 +230,20 @@ const viewSearchResultsTable = () => {
               key,
               record[key]
             )}</td>`
-          );
+          )
         }
-      });
-      html.push(`</tr>`);
-    });
+      })
+      html.push(`</tr>`)
+    })
     html.push(`
           </tbody>
         </table>
-      </div>`);
-    return html.join('');
+      </div>`)
+    return html.join('')
   } else {
-    return '';
+    return ''
   }
-};
+}
 
 const viewWaiting = () => `
   <div aria-live="polite" role="region">
@@ -252,18 +252,18 @@ const viewWaiting = () => `
     )}</div>
     <p class="govuk-body-s">Some queries may take up to a minute</p>
   </div>
-`;
+`
 
 const viewResults = function () {
   if (state.searchResults) {
-    const html = [];
-    const nbRecords = state.searchResults.length;
+    const html = []
+    const nbRecords = state.searchResults.length
 
     if (nbRecords < 10000) {
       html.push(`
         <h1 tabindex="0" id="results-heading" class="govuk-heading-l">${nbRecords} result${
         nbRecords !== 0 ? 's' : ''
-      }</h1>`);
+      }</h1>`)
     } else {
       html.push(`
         <div class="govuk-warning-text">
@@ -273,14 +273,14 @@ const viewResults = function () {
             There are more than 10000 results. Try to narrow down your search.
           </strong>
         </div>
-      `);
+      `)
     }
 
     html.push(
       `<div class="govuk-body">for ${queryDescription(
         state.searchParams
       )}</div>`
-    );
+    )
 
     if (nbRecords > state.resultsPerPage) {
       html.push(`
@@ -290,10 +290,10 @@ const viewResults = function () {
       )}, in descending popularity</p>
         <a class="govuk-skip-link" href="#results-table">Skip to results</a>
         <a class="govuk-skip-link" href="#search-form">Back to search filters</a>
-     `);
+     `)
     }
 
-    html.push(viewSearchResultsTable());
+    html.push(viewSearchResultsTable())
 
     html.push(`
       <p class="govuk-body">
@@ -303,22 +303,22 @@ const viewResults = function () {
         <button type="button" class="govuk-button" id="button-next-page" ${
           state.skip + state.resultsPerPage >= nbRecords ? 'disabled' : ''
         }>Next</button>
-      </p>`);
+      </p>`)
 
     html.push(`
-      <p class="govuk-body"><a class="govuk-link" href="/csv${window.location.search}" download="export.csv">Download all ${state.searchResults.length} records in CSV</a></p>`);
-    return html.join('');
+      <p class="govuk-body"><a class="govuk-link" href="/csv${window.location.search}" download="export.csv">Download all ${state.searchResults.length} records in CSV</a></p>`)
+    return html.join('')
   } else {
-    return '';
+    return ''
   }
-};
+}
 
 const viewNoResults = () => {
   return `
     <h1 tabindex="0" id="results-heading" class="govuk-heading-l">No results</h1>
     <div class="govuk-body">for ${queryDescription(state.searchParams)} </div>
-  `;
-};
+  `
+}
 
 const viewSearchResults = () => {
   switch (searchState().code) {
@@ -326,41 +326,41 @@ const viewSearchResults = () => {
       document.title = `GOV.UK ${queryDescription(
         state.searchParams,
         false
-      )} - Gov Search`;
-      return viewWaiting();
+      )} - Gov Search`
+      return viewWaiting()
     case 'results':
       document.title = `GOV.UK ${queryDescription(
         state.searchParams,
         false
-      )} - Gov Search`;
+      )} - Gov Search`
       if (window.ga)
         window.ga('send', 'search', {
           search: document.title,
           resultsFound: true,
-        });
-      return `${viewMetaResults() || ''} ${viewResults()}`; // FIXME - avoid || ''
+        })
+      return `${viewMetaResults() || ''} ${viewResults()}` // FIXME - avoid || ''
     case 'no-results':
       document.title = `GOV.UK ${queryDescription(
         state.searchParams,
         false
-      )} - Gov Search`;
+      )} - Gov Search`
       if (window.ga)
         window.ga('send', 'search', {
           search: document.title,
           resultsFound: false,
-        });
-      return `${viewMetaResults() || ''} ${viewNoResults()}`; // FIXME - avoid || ''
+        })
+      return `${viewMetaResults() || ''} ${viewNoResults()}` // FIXME - avoid || ''
     default:
-      document.title = 'Gov Search';
-      return '';
+      document.title = 'Gov Search'
+      return ''
   }
-};
+}
 
 const formatNames = (array: []) =>
-  [...new Set(array)].map((x) => `“${x}”`).join(', ');
+  [...new Set(array)].map((x) => `“${x}”`).join(', ')
 
 const formatDateTime = (date: any) =>
-  `${date.value.slice(0, 10)} at ${date.value.slice(11, 16)}`;
+  `${date.value.slice(0, 10)} at ${date.value.slice(11, 16)}`
 
 const fieldFormatters: Record<string, any> = {
   url: {
@@ -403,16 +403,16 @@ const fieldFormatters: Record<string, any> = {
     name: 'Withdrawn reason',
     format: (text: string) => text || 'n/a',
   },
-};
+}
 
 const fieldName = function (key: string) {
-  const f = fieldFormatters[key];
-  return f ? f.name : key;
-};
+  const f = fieldFormatters[key]
+  return f ? f.name : key
+}
 
 const fieldFormat = function (key: string, val: string | number): string {
-  const f = fieldFormatters[key];
-  return f && f.format ? f.format(val) : val;
-};
+  const f = fieldFormatters[key]
+  return f && f.format ? f.format(val) : val
+}
 
-export { view };
+export { view }

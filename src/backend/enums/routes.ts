@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router } from 'express'
 
 interface Routes {
   path?: string
@@ -18,4 +18,4 @@ export enum Route {
   infoBoxPerson = '/person',
 }
 
-export default Routes;
+export default Routes
