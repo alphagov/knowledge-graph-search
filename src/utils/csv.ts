@@ -1,18 +1,18 @@
-import { stringify } from 'csv-stringify/sync'
-import { languageName } from './lang'
+import { stringify } from 'csv-stringify/sync';
+import { languageName } from './lang';
 
 // turn an array of strings (from db results) into a string (for human-friendly
 // display)
 const formatNames = (array: string[]): string =>
   array.length === 1
     ? array[0] // if there's only one element just output it
-    : [...new Set(array)].map((x) => `“${x}”`).join(', ') // otherwise dedupe
+    : [...new Set(array)].map((x) => `“${x}”`).join(', '); // otherwise dedupe
 
 const formatDateTime = (date: any) =>
-  `${date.value.slice(0, 10)} at ${date.value.slice(11, 16)}`
+  `${date.value.slice(0, 10)} at ${date.value.slice(11, 16)}`;
 
 // Used when the value doesn't need to be modified
-const identity = (val: string): string => val
+const identity = (val: string): string => val;
 
 // This is almost like the function that formats the HTML table, except
 // for the url field, which doesn't need an HTML link
@@ -57,14 +57,14 @@ const csvFieldFormatters: Record<string, any> = {
     name: 'Withdrawn reason',
     format: (text: string) => text || 'n/a',
   },
-}
+};
 
 // generate a human-readable string depending on the type of field
 // (url, title, publishing app, etc)
 const fieldFormat = function (key: string, val: any): string {
-  const f = csvFieldFormatters[key]
-  return f && f.format ? f.format(val) : val
-}
+  const f = csvFieldFormatters[key];
+  return f && f.format ? f.format(val) : val;
+};
 
 // generates a copy of the passed array of results with all fields modified to
 // be human-readable
@@ -72,19 +72,19 @@ const formatForCsv = function (lines: any) {
   const body = lines
     .sort((a: any, b: any) => parseInt(b.page_views) - parseInt(a.page_views))
     .map((record: any) => {
-      const formattedRowObj: any = {}
+      const formattedRowObj: any = {};
       for (const [key, value] of Object.entries(record)) {
-        formattedRowObj[key] = value ? fieldFormat(key, value) : ''
+        formattedRowObj[key] = value ? fieldFormat(key, value) : '';
       }
-      return formattedRowObj
-    })
-  return body
-}
+      return formattedRowObj;
+    });
+  return body;
+};
 
 // top-level function - make a CSV from a results oject
 const csvStringify = function (object: any) {
-  const formattedObject: any = formatForCsv(object)
-  return stringify(formattedObject, { header: true })
-}
+  const formattedObject: any = formatForCsv(object);
+  return stringify(formattedObject, { header: true });
+};
 
-export { csvStringify }
+export { csvStringify };

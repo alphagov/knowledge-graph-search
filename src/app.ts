@@ -1,13 +1,13 @@
-import fs from 'fs'
-import path from 'path'
+/* eslint-disable @typescript-eslint/no-var-requires */
+import path from 'path';
 import * as http from 'http';
 import cors from 'cors';
-import express from 'express'
+import express from 'express';
 import Routes from './backend/enums/routes';
-import * as nunjucks from 'nunjucks'
-import bodyParser from 'body-parser'
-import Redis from 'ioredis'
-import RedisStore from 'connect-redis'
+import * as nunjucks from 'nunjucks';
+import bodyParser from 'body-parser';
+import Redis from 'ioredis';
+import RedisStore from 'connect-redis';
 
 const OAuth2Strategy = require('passport-oauth2');
 const passport = require('passport');
@@ -16,12 +16,12 @@ const session = require('express-session');
 const redisInstance = new Redis(
   Number(process.env.REDIS_PORT) || 6379,
   process.env.REDIS_HOST || 'localhost'
-)
+);
 
 const redisStore = new RedisStore({
   client: redisInstance,
   prefix: 'GovSearch::',
-})
+});
 
 const views = [
   path.join(__dirname, '../node_modules/govuk-frontend'),
@@ -62,8 +62,8 @@ class App {
   }
 
   private initializeMiddlewares() {
-    this.app.use(cors())
-    this.app.use(express.static('public'))
+    this.app.use(cors());
+    this.app.use(express.static('public'));
     this.app.use(bodyParser.urlencoded({ extended: true }));
     this.app.use(bodyParser.json());
   }
@@ -86,8 +86,8 @@ class App {
 
   private initializeLogin() {
 
-    passport.serializeUser((user: any, done: any) => done(null, user))
-    passport.deserializeUser((user: any, done: any) => done(null, user))
+    passport.serializeUser((user: any, done: any) => done(null, user));
+    passport.deserializeUser((user: any, done: any) => done(null, user));
 
     this.app.use(
       session({
@@ -97,11 +97,11 @@ class App {
         cookie: { secure: true },
         store: redisStore,
       })
-    )
+    );
 
-    this.app.set('trust proxy', 1) // trust first proxy
-    this.app.use(passport.initialize())
-    this.app.use(passport.session())
+    this.app.set('trust proxy', 1); // trust first proxy
+    this.app.use(passport.initialize());
+    this.app.use(passport.session());
 
     passport.use(
       new OAuth2Strategy(
@@ -123,18 +123,18 @@ class App {
             accessToken,
             refreshToken,
             profile
-          )
-          cb(null, profile)
+          );
+          cb(null, profile);
         }
       )
-    )
+    );
 
-    this.app.get('/login', passport.authenticate('oauth2'))
+    this.app.get('/login', passport.authenticate('oauth2'));
     this.app.get(
       '/auth/gds/callback',
       passport.authenticate('oauth2', '/error-callback'),
       async (req, res) => res.redirect('/')
-    )
+    );
   }
 
 }

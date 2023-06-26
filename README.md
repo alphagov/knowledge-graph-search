@@ -41,14 +41,16 @@ Docs](https://docs.data-community.publishing.service.gov.uk).
 
 - `app.ts`: the main server file. All the `.ts` files in the same folder are server-side code.
 
-- `src/ts/*.ts`: the main browser-side files (some type definitions and
+- `src/backend`: the server-side files
+
+- `src/frontend`: the main browser-side files (some type definitions and
   utilities are also used server-side). `webpack` compiles everything to `/public/main.js`.
 
 - `src/scss/main.scss`: the Sass file that `sass` compiles to `/public/main.css`
 
-- `public/assets`: fonts and images
+- `public/assets`: publicly served fonts and images
 
-- `views/index.html`: the HTML source file sent to the browser
+- `src/utils`: utility/helper files (some are used in both browser-side and server-side files)
 
 ## Software architecture
 
@@ -70,6 +72,11 @@ The browser-side code uses the [Elm Architecture](https://elmprogramming.com/elm
   etc.
 
 ## Running tests
+
+# unit tests
+
+We use [Jest](https://jestjs.io)
+`npm run test`
 
 # end-to-end tests
 

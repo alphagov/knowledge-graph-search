@@ -9,9 +9,6 @@
   },
   "include": ["./**/*.ts"],
   "exclude": [
-    "./cypress.config.ts",
-    "cypress",
-    "**/*.cy.tsx",
     "node_modules",
     "coverage"
   ]

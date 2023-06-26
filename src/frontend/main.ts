@@ -1,46 +1,46 @@
-import { view } from './view/view'
-import { state, setQueryParamsFromQS, resetSearch } from './state'
-import { searchButtonClicked, handleEvent } from './events'
-import { fetchWithTimeout, queryBackend } from './search-api'
+import { view } from './view/view';
+import { state, setQueryParamsFromQS, resetSearch } from './state';
+import { searchButtonClicked, handleEvent } from './events';
+import { fetchWithTimeout, queryBackend } from './search-api';
 
 //= =================================================
 // INIT
 //= =================================================
 
 const initDatabase = async function () {
-  console.log('retrieving taxons, locales and organisations')
-  const apiResponse = await fetchWithTimeout('/get-init-data')
+  console.log('retrieving taxons, locales and organisations');
+  const apiResponse = await fetchWithTimeout('/get-init-data');
   if (
     apiResponse.taxons.length === 0 ||
     apiResponse.locales.length === 3 ||
     apiResponse.organisations.length === 0
   ) {
-    throw new Error('Received no or incomplete data from the backend.')
+    throw new Error('Received no or incomplete data from the backend.');
   }
-  return apiResponse
-}
+  return apiResponse;
+};
 
 const init = async function () {
-  state.systemErrorText = null
+  state.systemErrorText = null;
   try {
-    const dbInitResults = await initDatabase()
-    state.taxons = dbInitResults.taxons
-    state.organisations = dbInitResults.organisations
-    state.locales = dbInitResults.locales
+    const dbInitResults = await initDatabase();
+    state.taxons = dbInitResults.taxons;
+    state.organisations = dbInitResults.organisations;
+    state.locales = dbInitResults.locales;
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') {
-      state.systemErrorText = 'It looks like the backend is not responding.'
+      state.systemErrorText = 'It looks like the backend is not responding.';
     } else {
-      state.systemErrorText = error
+      state.systemErrorText = error;
     }
-    resetSearch()
-    return
+    resetSearch();
+    return;
   }
 
   window.addEventListener('popstate', () => {
-    setQueryParamsFromQS()
-    state.searchResults = null
-    view()
+    setQueryParamsFromQS();
+    state.searchResults = null;
+    view();
     // Find if we need to run a search
     if (
       state.searchParams.selectedWords !== '' ||
@@ -49,10 +49,10 @@ const init = async function () {
       state.searchParams.selectedOrganisation !== '' ||
       state.searchParams.linkSearchUrl !== ''
     ) {
-      state.waiting = true
-      queryBackend(state.searchParams, handleEvent)
+      state.waiting = true;
+      queryBackend(state.searchParams, handleEvent);
     }
-  })
+  });
 }
 
 //= =================================================
@@ -60,13 +60,13 @@ const init = async function () {
 //= =================================================
 
 ;(async () => {
-  await init()
+  await init();
   if (!state.systemErrorText) {
-    setQueryParamsFromQS()
-    view()
+    setQueryParamsFromQS();
+    view();
     // the above is needed to set the form input values from the state in case it
     // was modified by the query string
-    searchButtonClicked()
+    searchButtonClicked();
   }
-  view()
-})()
+  view();
+})();

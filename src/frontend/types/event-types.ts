@@ -1,4 +1,4 @@
-import { SearchResults } from './search-api-types'
+import { SearchResults } from './search-api-types';
 
 export enum EventType {
   Dom,

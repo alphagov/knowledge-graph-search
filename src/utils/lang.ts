@@ -2,11 +2,11 @@
 
 const languageCode = (name: string): string =>
   // returns the language code from the language's full name
-  Object.keys(languageNames).find((key) => languageNames[key] === name) || name
+  Object.keys(languageNames).find((key) => languageNames[key] === name) || name;
 
 const languageName = (code: string) =>
   // returns the language name from the language's code
-  languageNames[code] || code
+  languageNames[code] || code;
 
 // IETF language codes https://en.wikipedia.org/wiki/IETF_language_tag
 // with additions
@@ -144,6 +144,6 @@ const languageNames: { [index: string]: any } = {
   'zh-hk': 'Chinese (Hong-Kong)',
   'zh-tw': 'Chinese (Taiwan)',
   zu: 'isiZulu',
-}
+};
 
-export { languageCode, languageName }
+export { languageCode, languageName };

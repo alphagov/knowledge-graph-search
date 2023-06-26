@@ -1,4 +1,5 @@
 import request from 'supertest';
+import { expect } from '@jest/globals';
 import e from 'express';
 import App from '../../app';
 import { Route } from '../enums/routes';

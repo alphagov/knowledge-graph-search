@@ -34,7 +34,7 @@ export const getParams = (req: express.Request): SearchParams  => {
     whereToSearch,
     areaToSearch,
     linkSearchUrl,
-  }
-}
+  };
+};
 
 export default getParams;
