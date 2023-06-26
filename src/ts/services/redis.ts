@@ -6,6 +6,15 @@ const createRedisInstance = () => {
     process.env.REDIS_HOST || 'localhost'
   )
 
+  redis.on('error', (error: Error) => {
+    console.error('Redis Error')
+    console.error(error)
+  })
+
+  redis.on('end', () => {
+    console.warn('shutting down service due to lost Redis connection')
+  })
+
   return redis
 }
 

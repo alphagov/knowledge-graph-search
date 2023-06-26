@@ -56,7 +56,7 @@ if (process.env.ENABLE_AUTH === 'true') {
   app.use(
     session({
       secret: 'keyboard cat',
-      resave: true,
+      resave: false,
       saveUninitialized: false,
       cookie: { secure: true },
       store: getStore(),
@@ -138,11 +138,13 @@ if (process.env.ENABLE_AUTH === 'true') {
       }
       return res.status(500).send('Server error')
     }
+    return res.send(
+      `User logged out of GovSearch successfully. UserId = ${userId}`
+    )
   })
 }
 
 app.get('/', auth(), async (req, res) => {
-  console.log(JSON.stringify({ session: req.session }))
   const fileName = path.join(__dirname, 'views', 'index.html')
   const content = fs.readFileSync(fileName, 'utf-8')
   const processedContent = content.replace(
