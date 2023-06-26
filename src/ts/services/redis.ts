@@ -9,8 +9,12 @@ const createRedisInstance = () => {
   return redis
 }
 
-const redisInstance = createRedisInstance()
+let redisInstance: Redis
 
 export const getClient = () => {
+  if (!redisInstance) {
+    redisInstance = createRedisInstance()
+  }
+
   return redisInstance
 }

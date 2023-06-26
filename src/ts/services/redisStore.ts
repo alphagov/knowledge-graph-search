@@ -12,9 +12,13 @@ const createRedisStore = () => {
   return store
 }
 
-const redisStoreInstance = createRedisStore()
+let redisStoreInstance: RedisStore
 
 export const getStore = () => {
+  if (!redisStoreInstance) {
+    redisStoreInstance = createRedisStore()
+  }
+
   return redisStoreInstance
 }
 
