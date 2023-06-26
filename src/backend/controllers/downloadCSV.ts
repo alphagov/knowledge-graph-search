@@ -17,6 +17,6 @@ class DownloadCSVController {
       res.status(500).send(e);
     }
   };
-};
+}
 
 export default DownloadCSVController;

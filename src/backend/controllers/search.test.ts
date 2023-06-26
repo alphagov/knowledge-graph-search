@@ -18,17 +18,20 @@ afterAll(async () => {
 });
 
 describe(`[GET] ${Route.search}`, () => {
-  it('Should respond with statusCode 200', () => request(app.getServer())
-    .get(`${Route.search}`)
-    .set('user-agent', 'node-superagent')
-    .expect(200));
+  it('Should respond with statusCode 200', () =>
+    request(app.getServer())
+      .get(`${Route.search}`)
+      .set('user-agent', 'node-superagent')
+      .expect(200));
 
   it('Should throw an error and call next', async () => {
     const mockRequest = {} as e.Request;
     const mockResponse = {} as e.Response;
     const mockNext = jest.fn();
     const mockError = Error();
-    mockResponse.render = () => { throw mockError; };
+    mockResponse.render = () => {
+      throw mockError;
+    };
     const controller = new SearchController();
     await controller.search(mockRequest, mockResponse, mockNext);
     expect(mockNext).toHaveBeenCalledWith(mockError);

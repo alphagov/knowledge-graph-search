@@ -5,11 +5,10 @@ import {
   getRoleInfo,
   getBankHolidayInfo,
   getTransactionInfo,
-  getPersonInfo
+  getPersonInfo,
 } from '../bigquery/bigquery';
 
 class InfoBoxController {
-
   public infoBoxOrganisation: RequestHandler = async (req, res) => {
     try {
       const data = await getOrganisationInfo(req.query.name as string);
@@ -49,9 +48,9 @@ class InfoBoxController {
     try {
       const data = await getTransactionInfo(req.query.name as string);
       res.send(data);
-      } catch (e: any) {
-        res.status(500).send(e);
-      }
+    } catch (e: any) {
+      res.status(500).send(e);
+    }
   };
 
   public infoBoxPerson: RequestHandler = async (req, res) => {
@@ -62,7 +61,6 @@ class InfoBoxController {
       res.status(500).send(e);
     }
   };
-
-};
+}
 
 export default InfoBoxController;

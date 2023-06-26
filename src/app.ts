@@ -30,9 +30,8 @@ const views = [
 ];
 
 class App {
-
   public app: express.Express = express();
-  public port: (string | number);
+  public port: string | number;
 
   constructor(routes: Routes[]) {
     this.app = express();
@@ -40,10 +39,14 @@ class App {
 
     this.initializeMiddlewares();
     if (process.env.ENABLE_AUTH === 'true') {
-      console.log('OAuth via PassportJS is enabled because ENABLE_AUTH is set to "true"');
+      console.log(
+        'OAuth via PassportJS is enabled because ENABLE_AUTH is set to "true"'
+      );
       this.initializeLogin();
     } else {
-      console.log('OAuth via PassportJS is disabled because ENABLE_AUTH is not set to "true"');
+      console.log(
+        'OAuth via PassportJS is disabled because ENABLE_AUTH is not set to "true"'
+      );
     }
     this.initializeRoutes(routes);
     this.initializeRenderEngine();
@@ -85,7 +88,6 @@ class App {
   }
 
   private initializeLogin() {
-
     passport.serializeUser((user: any, done: any) => done(null, user));
     passport.deserializeUser((user: any, done: any) => done(null, user));
 
@@ -136,7 +138,6 @@ class App {
       async (req, res) => res.redirect('/')
     );
   }
-
 }
 
 export default App;

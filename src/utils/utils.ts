@@ -1,9 +1,7 @@
 // todo: split into separate files
 
 import { languageName } from './lang';
-import {
-  SearchParams,
-} from '../frontend/types/search-api-types';
+import { SearchParams } from '../frontend/types/search-api-types';
 
 const id = (x: string): HTMLElement | null => document.getElementById(x);
 
@@ -139,5 +137,5 @@ export {
   sanitiseOutput,
   getFormInputValue,
   splitKeywords,
-  queryDescription
+  queryDescription,
 };

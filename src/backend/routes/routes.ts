@@ -18,66 +18,57 @@ class IndexRoute implements Routes {
   }
 
   private initializeRoutes() {
-    this.router.get(
-      Route.search,
-      auth(),
-      this.searchController.search,
-    );
+    this.router.get(Route.search, auth(), this.searchController.search);
 
     this.router.get(
       Route.getInitData,
       auth(),
-      this.searchAPIController.getInitData,
+      this.searchAPIController.getInitData
     );
 
-    this.router.get(
-      Route.searchApi,
-      auth(),
-      this.searchAPIController.searchApi,
-    );
+    this.router.get(Route.searchApi, auth(), this.searchAPIController.searchApi);
 
     this.router.get(
       Route.searchTaxon,
       auth(),
-      this.searchAPIController.searchTaxon,
+      this.searchAPIController.searchTaxon
     );
 
     this.router.get(
       Route.downloadCSV,
       auth(),
-      this.downloadCSVController.downloadCSV,
+      this.downloadCSVController.downloadCSV
     );
 
     this.router.get(
       Route.infoBoxOrganisation,
       auth(),
-      this.infoBoxController.infoBoxOrganisation,
+      this.infoBoxController.infoBoxOrganisation
     );
 
     this.router.get(
       Route.infoBoxRole,
       auth(),
-      this.infoBoxController.infoBoxRole,
+      this.infoBoxController.infoBoxRole
     );
 
     this.router.get(
       Route.infoBoxBankHoliday,
       auth(),
-      this.infoBoxController.infoBoxBankHoliday,
+      this.infoBoxController.infoBoxBankHoliday
     );
 
     this.router.get(
       Route.infoBoxTransaction,
       auth(),
-      this.infoBoxController.infoBoxTransaction,
+      this.infoBoxController.infoBoxTransaction
     );
 
     this.router.get(
       Route.infoBoxPerson,
       auth(),
-      this.infoBoxController.infoBoxPerson,
+      this.infoBoxController.infoBoxPerson
     );
-
   }
 }
 

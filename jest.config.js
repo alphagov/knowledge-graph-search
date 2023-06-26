@@ -9,10 +9,7 @@ module.exports = {
   },
   moduleFileExtensions: ['js', 'ts', 'json', 'node'],
   collectCoverage: true,
-  collectCoverageFrom: [
-    './src/backend/**/*.ts',
-    './src/utils/*.ts'
-  ],
+  collectCoverageFrom: ['./src/backend/**/*.ts', './src/utils/*.ts'],
   /* uncomment when we want to enforce these thresholds
   coverageThreshold: {
   "global": {

@@ -2,12 +2,11 @@ import { RequestHandler } from 'express';
 import {
   sendInitQuery,
   sendSearchQuery,
-  getTaxonInfo
+  getTaxonInfo,
 } from '../bigquery/bigquery';
 
 import { SearchParams } from '../../frontend/types/search-api-types';
 import { getParams } from '../../utils/getParams';
-
 
 class SearchAPIController {
   public getInitData: RequestHandler = async (req, res) => {
@@ -41,6 +40,6 @@ class SearchAPIController {
       }
     }
   };
-};
+}
 
 export default SearchAPIController;

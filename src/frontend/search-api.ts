@@ -46,8 +46,6 @@ const fetchWithTimeout = async function (url: string, timeoutSeconds = 60) {
 
   const responseBody = await fetchResult.json();
 
-
-
   if (!fetchResult.ok) {
     if (/^timeout of \d+ms exceeded/.test(responseBody.message)) {
       throw new Error('TIMEOUT');
@@ -74,7 +72,6 @@ const queryBackend: (
   let apiResults: SearchResults;
   try {
     apiResults = await fetchWithTimeout(url, 300);
-
   } catch (error: any) {
     console.log('error running main+meta queries', error);
     // TODO: find another way than using a callback function to get rid of the eslint error

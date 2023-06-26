@@ -1,8 +1,8 @@
 import { Router } from 'express';
 
 interface Routes {
-  path?: string;
-  router: Router;
+  path?: string
+  router: Router
 }
 
 export enum Route {
