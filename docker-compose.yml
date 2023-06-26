@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  redis:
+    image: redis:7.0.11-alpine
+    ports:
+      - 6379:6379
+
+  signon:
+    build:
+      context: signon-mock
+      dockerfile: dockerfile
+    ports:
+      - 3005:3005
+
+  govsearch:
+    build:
+      context: .
+    ports:
+      - 8080:8080
+    depends_on:
+      - redis
+      - signon
