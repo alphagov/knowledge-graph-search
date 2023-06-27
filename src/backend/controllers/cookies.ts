@@ -3,8 +3,13 @@ import { Route } from '../enums/routes'
 
 class CookiesController {
   public cookies: RequestHandler = (req, res, next) => {
+
+    const acceptGoogleAnalytics = false;
+
     try {
-      res.render('cookies.njk')
+      res.render('cookies.njk', {
+        acceptGoogleAnalytics
+      })
     } catch (e) {
       next(e)
     }
