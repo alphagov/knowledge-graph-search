@@ -19,6 +19,8 @@ export enum Route {
   login = '/login',
   loginCallback = '/auth/gds/callback',
   reauth = '/auth/gds/api/users/:userId/reauth',
+  cookies = '/cookies',
+  saveCookieSettings = '/save-cookie-settings',
 }
 
 export default Routes
