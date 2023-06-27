@@ -8,7 +8,7 @@ const viewSearchBox = () => {
   return `<form id="search-form" class="search-panel govuk-form">
     <div class="search-mode-panel">
       <a class="govuk-skip-link" href="#results-table">Skip to results</a>
-      <h1 class="govuk-heading-l">Search on GovSearch</h1>
+      <h1 class="govuk-heading-l">Search GOV.UK Content</h1>
       ${viewKeywordsInput()}
     </div>
   </form>`;
@@ -181,8 +181,8 @@ const viewKeywordsCombinator = () =>
           <label for="combinator-notset" class="govuk-label govuk-radios__label">
             Links
           </label>
-          <div id="pages-with-links-hint" class="govuk-hint govuk-radios__hint">
-            For example, youtube or /maternity-pay-leave
+          <div id="pages-with-links-hint" class="govuk-hint govuk-radios__hint govuk-!-font-size-16">
+            Use slug or full URL, for example /tax-help or https://www.youtube.com
           </div>
         </div>
       </div>
@@ -299,7 +299,7 @@ const viewPagesSelector = () => `
        id="pages-wrapper"
        ${state.waiting && 'disabled="disabled"'}>
      <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-       Pages
+       Publishing status
      </legend>
      <div class="govuk-radios govuk-radios--small" id="include-pages">
        <div class="govuk-radios__item">
@@ -307,14 +307,14 @@ const viewPagesSelector = () => `
                 type="radio" id="pages-all"
                 name="pages"
            ${state.searchParams.pages === 'all' ? 'checked' : ''}/>
-         <label for="pages-all" class="govuk-label govuk-radios__label">All pages</label>
+         <label for="pages-all" class="govuk-label govuk-radios__label">All</label>
        </div>
        <div class="govuk-radios__item">
          <input class="govuk-radios__input"
                 type="radio" id="pages-withdrawn"
                 name="pages"
            ${state.searchParams.pages === 'withdrawn' ? 'checked' : ''}/>
-         <label for="pages-withdrawn" class="govuk-label govuk-radios__label">Only withdrawn pages</label>
+         <label for="pages-withdrawn" class="govuk-label govuk-radios__label">Withdrawn</label>
        </div>
        <div class="govuk-radios__item">
          <input class="govuk-radios__input"
@@ -322,7 +322,7 @@ const viewPagesSelector = () => `
                 name="pages"
            ${state.searchParams.pages === 'notWithdrawn' ? 'checked' : ''}/>
          <label for="pages-notWithdrawn" class="govuk-label govuk-radios__label">
-           Hide withdrawn pages
+           Non-withdrawn
          </label>
        </div>
      </div>
