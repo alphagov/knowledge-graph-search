@@ -32,16 +32,6 @@ class App {
     this.port = process.env.port ? parseInt(process.env.port) : 8080
 
     this.initializeMiddlewares()
-    if (process.env.ENABLE_AUTH === 'true') {
-      console.log(
-        'OAuth via PassportJS is enabled because ENABLE_AUTH is set to "true"'
-      )
-      this.initializeLogin()
-    } else {
-      console.log(
-        'OAuth via PassportJS is disabled because ENABLE_AUTH is not set to "true"'
-      )
-    }
     this.initializeRoutes(routes)
     this.initializeRenderEngine()
   }
@@ -63,6 +53,7 @@ class App {
     this.app.use(express.static('./src/public'))
     this.app.use(bodyParser.urlencoded({ extended: true }))
     this.app.use(bodyParser.json())
+    this.initializeLogin()
   }
 
   private initializeRoutes(routes: Routes[]) {
@@ -72,11 +63,10 @@ class App {
   }
 
   private initializeRenderEngine() {
-
     const views = [
       path.join(__dirname, '../../node_modules/govuk-frontend'),
       path.join(__dirname, './views'),
-    ];
+    ]
 
     nunjucks.configure(views, {
       autoescape: true,
@@ -88,6 +78,12 @@ class App {
   }
 
   private initializeLogin() {
+    if (!process.env.ENABLE_AUTH) {
+      console.log('Auth is disabled')
+      return
+    }
+    console.log('Auth is enabled')
+
     passport.serializeUser((user: any, done: any) => done(null, user))
     passport.deserializeUser((user: any, done: any) => done(null, user))
 
