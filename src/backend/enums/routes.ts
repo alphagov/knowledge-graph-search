@@ -16,6 +16,8 @@ export enum Route {
   infoBoxBankHoliday = '/bank-holiday',
   infoBoxTransaction = '/transaction',
   infoBoxPerson = '/person',
+  cookies = '/cookies',
+  saveCookieSettings = '/save-cookie-settings',
 }
 
 export default Routes

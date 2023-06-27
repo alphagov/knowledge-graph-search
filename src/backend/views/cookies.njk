@@ -1,0 +1,191 @@
+{% extends "./layouts/main.njk" %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-xl">Cookies</h1>
+
+    <p class="govuk-body">Small files (known as ’cookies’) are put onto your computer to collect information about how you browse the site.</p>
+
+    <p class="govuk-body">Cookies are used to:</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>measure how you use the website so it can be updated and improved based on your needs</li>
+      <li>remember the notifications you’ve seen so that you’re not shown them again</li>
+    </ul>
+
+    {{ govukInsetText({
+      text: "GOV.UK cookies aren’t used to identify you personally"
+    }) }}
+
+    <p class="govuk-body">You’ll normally see a message on the site before a cookie is stored on your computer.</p>
+
+    <p class="govuk-body">Find out more about <a href"http://www.aboutcookies.org/" target="_blank" >how to manage cookies (opens in a new tab)</a>.</p>
+
+    <h2 class="govuk-heading-l">Your Gov Search cookie preferences</h2>
+
+    <form action="/save-cookie-settings" method="post" novalidate class="govuk-!-margin-bottom-7">
+
+      {{ govukRadios({
+        idPrefix: "acceptGoogleAnalytics",
+        name: "acceptGoogleAnalytics",
+        fieldset: {
+          legend: {
+            text: "Do you want to accept analytics cookies?",
+            classes: "govuk-fieldset__legend--m"
+          }
+        },
+        items: [
+          {
+            value: "true",
+            text:  "Yes",
+            checked: (cookieGoogleAnalytics == true)
+          },
+          {
+            value: "false",
+            text: "No",
+            checked: (cookieGoogleAnalytics == false)
+          }
+        ]
+      }) }}
+
+      {{ govukButton({
+          text: "Save cookie preferences",
+          type: "submit"
+      }) }}
+
+    </form>
+
+    <h2 class="govuk-heading-l">How our cookies are used</h2>
+
+    <h3 class="govuk-heading-m">Measuring website usage (Google Analytics)</h3>
+
+    <p class="govuk-body">Google Analytics software collects information about how you use the site. This is done to help make sure the site is
+      meeting the needs of its users and to help make improvements.</p>
+
+    <p class="govuk-body">Google Analytics stores information about:</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      <li>the pages you visit - how long you spend on each page</li>
+      <li>how you got to the site</li>
+      <li>what you click on while you’re visiting the site</li>
+    </ul>
+
+    <p class="govuk-body">We don’t collect or store your personal information (e.g. your name or address) so this information can’t be used to identify who you are.</p>
+
+    <p class="govuk-body">Google isn’t allowed to use or share our analytics data.</p>
+
+    <p class="govuk-body">The following cookies are used:</p>
+
+    {{ govukTable({
+        caption: "Cookies used for measuring website usage with Google Analytics.",
+        captionClasses: "govuk-visually-hidden",
+        classes: "overflow-x",
+        head: [
+          {
+            text:  "Name"
+          },
+          {
+            text: "Purpose"
+          },
+          {
+            text: "Expires"
+          }
+        ],
+        rows: [
+          [
+            {
+              text: "to add"
+            },
+            {
+              text: "This helps us identify how you use Gov Search so we can make the service better"
+            },
+            {
+              text: "to add"
+            }
+          ]
+        ]
+      })
+    }}
+
+    <h3 class="govuk-heading-m">Sessions</h3>
+
+    {{ govukTable({
+        caption: "Cookies used for recording your session activity.",
+        captionClasses: "govuk-table__caption--s govuk-!-font-weight-regular govuk-!-margin-bottom-4",
+        classes: "overflow-x",
+        head: [
+          {
+            text:  "Name"
+          },
+          {
+            text: "Purpose"
+          },
+          {
+            text: "Expires"
+          }
+        ],
+        rows: [
+          [
+            {
+              text: "to add"
+            },
+            {
+              text: "Stores session data"
+            },
+            {
+              text: "to add"
+            }
+          ]
+        ]
+      })
+    }}
+
+    <h3 class="govuk-heading-m">Cookie consent</h3>
+
+    {{ govukTable({
+        caption: "You will see a cookie consent banner when you first visit. A cookie is stored so that your computer knows you’ve answered it and knows not to ask again.",
+        captionClasses: "govuk-table__caption--s govuk-!-font-weight-regular govuk-!-margin-bottom-4",
+        classes: "overflow-x",
+        head: [
+          {
+            text:  "Name"
+          },
+          {
+            text: "Purpose"
+          },
+          {
+            text: "Expires"
+          }
+        ],
+        rows: [
+          [
+            {
+              text: "to add"
+            },
+            {
+              text: "Saves your cookie consent preferences"
+            },
+            {
+              text: "to add"
+            }
+          ]
+        ]
+      })
+    }}
+
+    <h3 class="govuk-heading-m">Government services</h3>
+
+    <p class="govuk-body">
+      Most services we link to are run by different government departments,
+      for example HM Revenue and Customs (HMRC) or the Home Office.
+      These services may set additional cookies and, if so, will have their own cookies policy.
+    </p>
+
+  </div>
+</div>
+
+{% block pageScripts %}
+  <script type="module" src="/main.js"></script>
+{% endblock %}
+{% endblock %}
