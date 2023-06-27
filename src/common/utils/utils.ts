@@ -1,8 +1,5 @@
 // todo: split into separate files and add tests
 
-import { languageName } from './lang'
-import { SearchParams } from '../types/search-api-types'
-
 const id = (x: string): HTMLElement | null => document.getElementById(x)
 
 const tagBody = '(?:[^"\'>]|"[^"]*"|\'[^\']*\')*'
@@ -59,10 +56,4 @@ const splitKeywords = function (keywords: string): string[] {
   return output.filter((d) => d.length > 0 && !wordsToIgnore.includes(d))
 }
 
-export {
-  id,
-  sanitiseInput,
-  sanitiseOutput,
-  getFormInputValue,
-  splitKeywords
-}
+export { id, sanitiseInput, sanitiseOutput, getFormInputValue, splitKeywords }

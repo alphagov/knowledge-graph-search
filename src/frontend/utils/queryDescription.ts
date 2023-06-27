@@ -3,7 +3,10 @@ import { languageName } from '../../common/utils/lang'
 import { splitKeywords } from '../../common/utils/utils'
 import { makeBold } from './makeBold'
 
-export const queryDescription = (search: SearchParams, includeMarkup = true) => {
+export const queryDescription = (
+  search: SearchParams,
+  includeMarkup = true
+) => {
   const clauses = []
   if (search.selectedWords !== '') {
     let keywords = `contain ${containDescription(search, includeMarkup)}`
