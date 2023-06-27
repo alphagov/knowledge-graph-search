@@ -23,11 +23,6 @@ const redisStore = new RedisStore({
   prefix: 'GovSearch::',
 })
 
-const views = [
-  path.join(__dirname, '../../node_modules/govuk-frontend'),
-  path.join(__dirname, './views'),
-]
-
 class App {
   public app: express.Express = express()
   public port: string | number
@@ -77,6 +72,12 @@ class App {
   }
 
   private initializeRenderEngine() {
+
+    const views = [
+      path.join(__dirname, '../../node_modules/govuk-frontend'),
+      path.join(__dirname, './views'),
+    ];
+
     nunjucks.configure(views, {
       autoescape: true,
       express: this.app,
