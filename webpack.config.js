@@ -1,7 +1,7 @@
 const path = require('path')
 
 module.exports = {
-  entry: './src/ts/main.ts',
+  entry: './src/frontend/main.ts',
   mode: 'development',
   module: {
     rules: [
@@ -17,6 +17,6 @@ module.exports = {
   },
   output: {
     filename: 'main.js',
-    path: path.resolve(__dirname, 'public'),
+    path: path.resolve(__dirname, 'src/public'),
   },
 }

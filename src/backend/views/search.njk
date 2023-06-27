@@ -1,0 +1,34 @@
+{% extends "./layouts/main.njk" %}
+
+{% block content %}
+
+{% if isIntegrationEnv  %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% set html %}
+  <p class="govuk-notification-banner__heading">
+    This is the integration environment and may not be stable please use the <a class="govuk-notification-banner__link" href="https://gov-search.service.gov.uk/">live application</a>.
+  </p>
+{% endset %}
+
+{{ govukNotificationBanner({
+  html: html
+}) }}
+
+{% endif %}
+
+<div class="govuk-width-container" id="page-content">
+  <main
+    class="govuk-main-wrapper"
+    id="main-content"
+    role="main"
+    aria-busy="true"
+  >
+    <h1 aria-live="assertive" class="govuk-heading-xl loading initial">
+      Loading, please wait
+    </h1>
+  </main>
+</div>
+{% block pageScripts %}
+  <script type="module" src="/main.js"></script>
+{% endblock %}
+{% endblock %}

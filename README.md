@@ -18,7 +18,7 @@ Docs](https://docs.data-community.publishing.service.gov.uk).
 - Install [Sass](https://sass-lang.com/install) and compile the Sass sources to CSS with
 
   cd src/scss
-  sass main.scss > ../../public/main.css
+  `sass ./src/frontend/scss/main.scss > ./src/public/main.css`
 
 - Install [webpack](https://webpack.js.org/) and compile the browser-side Typescript code to JavaScript by just running `webpack`
 
@@ -39,16 +39,15 @@ Docs](https://docs.data-community.publishing.service.gov.uk).
 
 ## Files
 
-- `app.ts`: the main server file. All the `.ts` files in the same folder are server-side code.
+- `src/backend/app.ts`: the main server file. All the `.ts` files in the same folder are server-side code.
 
-- `src/ts/*.ts`: the main browser-side files (some type definitions and
-  utilities are also used server-side). `webpack` compiles everything to `/public/main.js`.
+- `src/backend`: the server-side files.
 
-- `src/scss/main.scss`: the Sass file that `sass` compiles to `/public/main.css`
+- `src/frontend`: the main browser-side files. `webpack` compiles everything to `src/public/main.js`.
 
-- `public/assets`: fonts and images
+- `src/scss/main.scss`: the Sass file that `sass` compiles to `src/public/main.css`
 
-- `views/index.html`: the HTML source file sent to the browser
+- `src/public/assets`: publicly served fonts and images
 
 ## Software architecture
 
@@ -71,13 +70,18 @@ The browser-side code uses the [Elm Architecture](https://elmprogramming.com/elm
 
 ## Running tests
 
+# unit tests
+
+We use [Jest](https://jestjs.io)
+`npm run test`
+
 # end-to-end tests
 
 We use [Cypress](https://docs.cypress.io), which is installed automatically on installing the `dev` npm packages. If Chrome is installed on your system it should be as simple as running `npx cypress open` for the interactive version and `npx cypress run` for the command-line version.
 
 To run a single test file , use `--spec`. For instance:
 
-    cypress run --spec cypress/e2e/url.cy.ts
+`cypress run --spec cypress/e2e/url.cy.ts`
 
 ## Deployment Steps
 

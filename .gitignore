@@ -1,7 +1,9 @@
 params.json
 node_modules
-public/main.js
-public/main.css
+src/public/main.js
+src/public/main.css
 cypress/videos
 cypress/screenshots
 .vscode
+coverage
+.sass-cache

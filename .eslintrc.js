@@ -24,6 +24,13 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': 'error',
     'no-callback-literal': 'off',
     '@typescript-eslint/no-namespace': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    'jest/expect-expect': [
+      'error',
+      {
+        assertFunctionNames: ['expect', 'request'],
+      },
+    ],
   },
   overrides: [
     // Exclude the 'jest' plugin for .cy.ts files
@@ -33,6 +40,8 @@ module.exports = {
       plugins: ['cypress'],
       rules: {
         'jest/valid-expect': 'off',
+        'jest/expect-expect': 'off',
+        'jest/no-commented-out-tests': 'off',
       },
     },
   ],
