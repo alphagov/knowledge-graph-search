@@ -1,4 +1,4 @@
-import { SearchParams } from './search-api-types'
+import { SearchParams } from '../../common/types/search-api-types'
 
 export interface State {
   searchParams: SearchParams

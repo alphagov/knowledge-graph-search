@@ -1,5 +1,5 @@
 import { stringify } from 'csv-stringify/sync'
-import { languageName } from './lang'
+import { languageName } from '../../common/utils/lang'
 
 // turn an array of strings (from db results) into a string (for human-friendly
 // display)

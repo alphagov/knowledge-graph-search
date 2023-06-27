@@ -4,8 +4,8 @@ import {
   SearchArea,
   Combinator,
   SearchResults,
-} from './types/search-api-types'
-import { languageCode } from '../utils/lang'
+} from '../common/types/search-api-types'
+import { languageCode } from '../common/utils/lang'
 import { EventType, SearchApiCallback } from './types/event-types'
 
 const makeQueryString = function (sp: SearchParams): string {

@@ -1,5 +1,5 @@
 import App from './app'
-import IndexRoute from './backend/routes/routes'
+import IndexRoute from './routes/routes'
 
 const app = new App([new IndexRoute()])
 

@@ -5,8 +5,8 @@ import {
   getTaxonInfo,
 } from '../bigquery/bigquery'
 
-import { SearchParams } from '../../frontend/types/search-api-types'
-import { getParams } from '../../utils/getParams'
+import { SearchParams } from '../../common/types/search-api-types'
+import { getParams } from '../utils/getParams'
 
 class SearchAPIController {
   public getInitData: RequestHandler = async (req, res) => {

@@ -18,7 +18,7 @@ Docs](https://docs.data-community.publishing.service.gov.uk).
 - Install [Sass](https://sass-lang.com/install) and compile the Sass sources to CSS with
 
   cd src/scss
-  sass main.scss > ../../public/main.css
+  `sass ./src/frontend/scss/main.scss > ./src/public/main.css`
 
 - Install [webpack](https://webpack.js.org/) and compile the browser-side Typescript code to JavaScript by just running `webpack`
 
@@ -39,18 +39,15 @@ Docs](https://docs.data-community.publishing.service.gov.uk).
 
 ## Files
 
-- `app.ts`: the main server file. All the `.ts` files in the same folder are server-side code.
+- `src/backend/app.ts`: the main server file. All the `.ts` files in the same folder are server-side code.
 
-- `src/backend`: the server-side files
+- `src/backend`: the server-side files.
 
-- `src/frontend`: the main browser-side files (some type definitions and
-  utilities are also used server-side). `webpack` compiles everything to `/public/main.js`.
+- `src/frontend`: the main browser-side files. `webpack` compiles everything to `src/public/main.js`.
 
-- `src/scss/main.scss`: the Sass file that `sass` compiles to `/public/main.css`
+- `src/scss/main.scss`: the Sass file that `sass` compiles to `src/public/main.css`
 
-- `public/assets`: publicly served fonts and images
-
-- `src/utils`: utility/helper files (some are used in both browser-side and server-side files)
+- `src/public/assets`: publicly served fonts and images
 
 ## Software architecture
 
@@ -84,7 +81,7 @@ We use [Cypress](https://docs.cypress.io), which is installed automatically on i
 
 To run a single test file , use `--spec`. For instance:
 
-    cypress run --spec cypress/e2e/url.cy.ts
+`cypress run --spec cypress/e2e/url.cy.ts`
 
 ## Deployment Steps
 

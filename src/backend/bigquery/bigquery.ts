@@ -15,9 +15,9 @@ import {
   SearchType,
   InitResults,
   BankHoliday,
-} from '../../frontend/types/search-api-types'
-import { splitKeywords } from '../../utils/utils'
-import { languageCode } from '../../utils/lang'
+} from '../../common/types/search-api-types'
+import { splitKeywords } from '../../common/utils/utils'
+import { languageCode } from '../../common/utils/lang'
 import { BigQuery } from '@google-cloud/bigquery'
 
 //= ===== private ======

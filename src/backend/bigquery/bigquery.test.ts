@@ -3,7 +3,7 @@ import {
   Combinator,
   SearchArea,
   SearchType,
-} from '../../frontend/types/search-api-types'
+} from '../../common/types/search-api-types'
 import { buildSqlQuery } from './bigquery'
 import { expect } from '@jest/globals'
 

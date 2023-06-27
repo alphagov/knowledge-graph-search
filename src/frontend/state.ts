@@ -1,10 +1,10 @@
-import { languageName } from '../utils/lang'
+import { languageName } from '../common/utils/lang'
 import {
   SearchType,
   SearchParams,
   Combinator,
   SearchArea,
-} from './types/search-api-types'
+} from '../common/types/search-api-types'
 import { State } from './types/state-types'
 
 // user inputs that are used to build the query.

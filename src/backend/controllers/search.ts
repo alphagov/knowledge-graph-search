@@ -6,7 +6,7 @@ class SearchController {
     const isIntegrationEnv = process.env.NODE_ENV === ENV.DEVELOPMENT
 
     try {
-      res.render('backend/views/search.njk', {
+      res.render('search.njk', {
         isIntegrationEnv,
       })
     } catch (e) {

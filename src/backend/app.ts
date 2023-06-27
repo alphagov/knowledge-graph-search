@@ -3,7 +3,7 @@ import path from 'path'
 import * as http from 'http'
 import cors from 'cors'
 import express from 'express'
-import Routes from './backend/enums/routes'
+import Routes from './enums/routes'
 import * as nunjucks from 'nunjucks'
 import bodyParser from 'body-parser'
 import Redis from 'ioredis'
@@ -24,9 +24,8 @@ const redisStore = new RedisStore({
 })
 
 const views = [
-  path.join(__dirname, '../node_modules/govuk-frontend'),
-  path.join(__dirname, '../src/backend/views/layouts'),
-  path.join(__dirname, '../src'),
+  path.join(__dirname, '../../node_modules/govuk-frontend'),
+  path.join(__dirname, './views')
 ]
 
 class App {
@@ -66,7 +65,7 @@ class App {
 
   private initializeMiddlewares() {
     this.app.use(cors())
-    this.app.use(express.static('public'))
+    this.app.use(express.static('./src/public'))
     this.app.use(bodyParser.urlencoded({ extended: true }))
     this.app.use(bodyParser.json())
   }

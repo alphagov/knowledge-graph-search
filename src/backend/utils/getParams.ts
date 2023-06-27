@@ -4,8 +4,8 @@ import {
   Combinator,
   SearchArea,
   SearchType,
-} from '../frontend/types/search-api-types'
-import { sanitiseInput } from '../utils/utils'
+} from '../../common/types/search-api-types'
+import { sanitiseInput } from '../../common/utils/utils'
 
 export const getParams = (req: express.Request): SearchParams => {
   const searchType = <SearchType>(

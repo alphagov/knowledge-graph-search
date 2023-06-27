@@ -1,5 +1,5 @@
 import * as express from 'express'
-import { isReqAJAX } from '../../utils/isReqAJAX'
+import { isReqAJAX } from '../utils/isReqAJAX'
 
 declare global {
   namespace Express {
