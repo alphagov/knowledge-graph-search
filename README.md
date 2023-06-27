@@ -17,8 +17,7 @@ Docs](https://docs.data-community.publishing.service.gov.uk).
 - run `npm install` to install all dependencies
 - Install [Sass](https://sass-lang.com/install) and compile the Sass sources to CSS with
 
-  cd src/scss
-  `sass ./src/frontend/scss/main.scss > ./src/public/main.css`
+`sass ./src/frontend/scss/main.scss > ./src/public/main.css`
 
 - Install [webpack](https://webpack.js.org/) and compile the browser-side Typescript code to JavaScript by just running `webpack`
 
