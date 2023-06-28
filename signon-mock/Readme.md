@@ -20,7 +20,8 @@ $ docker-compose up redis
 2. In another tab:
 
 ```shell
-$ npm run local
+npm install local
+npm run local
 ```
 
 3. In another tab:
