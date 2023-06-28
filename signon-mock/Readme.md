@@ -69,3 +69,9 @@ KEYS *
 ```shell
 GET <session-key>
 ```
+
+5. To delete all the entries in the store:
+
+```shell
+$ flushall
+```
