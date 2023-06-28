@@ -65,7 +65,7 @@ class App {
     this.app.use(bodyParser.json())
     this.app.use(allowGoogleAnalytics)
     this.app.use(showCookieMessage)
-    this.initializeLogin();
+    this.initializeLogin()
   }
 
   private initializeRoutes(routes: Routes[]) {

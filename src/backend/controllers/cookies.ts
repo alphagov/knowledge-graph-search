@@ -1,15 +1,15 @@
 import { RequestHandler } from 'express'
 import { Route } from '../enums/routes'
-import { setCookie } from  '../utils/setCookie'
+import { setCookie } from '../utils/setCookie'
 
 class CookiesController {
   public cookies: RequestHandler = (req, res, next) => {
-    const acceptAnalytics = req.cookies.acceptAnalytics === 'true';
-    const savedCookies = req.query.saved;
+    const acceptAnalytics = req.cookies.acceptAnalytics === 'true'
+    const savedCookies = req.query.saved
     try {
       res.render('cookies.njk', {
         acceptAnalytics,
-        savedCookies
+        savedCookies,
       })
     } catch (e) {
       next(e)
@@ -17,13 +17,12 @@ class CookiesController {
   }
 
   public saveCookieSettings: RequestHandler = (req, res, next) => {
-    const { acceptAnalytics } = req.body;
-    const saved = '?saved=true';
+    const { acceptAnalytics } = req.body
+    const saved = '?saved=true'
     const referer = `${req.headers.referer}`.replace(saved, '')
     const isSaved = referer.includes(Route.cookies) ? saved : ''
-
     try {
-      if(isSaved) {
+      if (isSaved) {
         setCookie(res, 'cookieMessage', 'false')
       }
       setCookie(res, 'acceptAnalytics', acceptAnalytics)
@@ -35,7 +34,7 @@ class CookiesController {
 
   public hideCookieSuccessBanner: RequestHandler = (req, res, next) => {
     try {
-      if(req.body.hideCookieSuccessBanner) {
+      if (req.body.hideCookieSuccessBanner) {
         setCookie(res, 'cookieMessage', 'false')
       }
       res.redirect(`${req.headers.referer}`)
@@ -43,7 +42,6 @@ class CookiesController {
       next(e)
     }
   }
-
 }
 
 export default CookiesController
