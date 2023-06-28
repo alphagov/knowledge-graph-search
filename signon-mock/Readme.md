@@ -49,7 +49,7 @@ http://localhost:3005/reauth/<userId>
 1. Install Redis using Homebrew (if not already installed):
 
 ```shell
-$ brew install redis
+brew install redis
 ```
 
 2. Connect to the Redis server (ensure Redis is runnin in Docker, see "usage" section above)
