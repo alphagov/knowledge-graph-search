@@ -14,6 +14,7 @@ import session from 'express-session'
 import { generateSessionId } from './utils/auth'
 import config from './config'
 import { allowGoogleAnalytics } from './middleware/allowGoogleAnalytics'
+import { showCookieMessage } from './middleware/showCookieMessage'
 
 const cookieParser = require('cookie-parser')
 
@@ -63,6 +64,7 @@ class App {
     this.app.use(bodyParser.urlencoded({ extended: true }))
     this.app.use(bodyParser.json())
     this.app.use(allowGoogleAnalytics)
+    this.app.use(showCookieMessage)
     this.initializeLogin();
   }
 

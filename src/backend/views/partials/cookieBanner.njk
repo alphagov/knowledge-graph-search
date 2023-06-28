@@ -1,0 +1,62 @@
+{% from "govuk/components/cookie-banner/macro.njk" import govukCookieBanner %}
+
+{% if showCookieMessage %}
+{% set html %}
+  <p class="govuk-body">We use some essential cookies to make this service work.</p>
+  <p class="govuk-body">We’d also like to use analytics cookies so we can understand how you use the service and make improvements.</p>
+{% endset %}
+<form action="/save-cookie-settings"  method="post" novalidate>
+{{ govukCookieBanner({
+  ariaLabel: "Cookies on Gov Search",
+  messages: [
+    {
+      headingText: "Cookies on Gov Search",
+      html: html,
+      actions: [
+        {
+          text: "Accept analytics cookies",
+          type: "submit",
+          name: "acceptAnalytics",
+          value: "true"
+        },
+        {
+          text: "Reject analytics cookies",
+          type: "submit",
+          name: "acceptAnalytics",
+          value: "false"
+        },
+        {
+          text: "View cookies",
+          href: "/cookies"
+        }
+      ]
+    }
+  ]
+}) }}
+</form>
+{% endif %}
+
+{% if showCookieSuccessBanner %}
+{% set acceptHtml %}
+  <p class="govuk-body">You’ve accepted additional cookies. You can <a class="govuk-link" href="/cookies">change your cookie settings</a> at any time.</p>
+{% endset %}
+
+<form action="/hide-cookie-success-banner"  method="post" novalidate>
+  {{ govukCookieBanner({
+    ariaLabel: "Cookies on Gov Search",
+    messages: [
+      {
+        html: acceptHtml,
+        actions: [
+        {
+          text: "Hide cookie message",
+          name: "hideCookieSuccessBanner",
+          type: "submit",
+          value: "true"
+        }
+        ]
+      }
+    ]
+  }) }}
+</form>
+{% endif %}

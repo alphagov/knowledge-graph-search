@@ -21,6 +21,7 @@ export enum Route {
   reauth = '/auth/gds/api/users/:userId/reauth',
   cookies = '/cookies',
   saveCookieSettings = '/save-cookie-settings',
+  hideCookieSuccessBanner = '/hide-cookie-success-banner',
 }
 
 export default Routes
