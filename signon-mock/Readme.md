@@ -61,7 +61,7 @@ redis-cli -h localhost
 3. Retrieve all keys:
 
 ```shell
-$ KEYS *
+KEYS *
 ```
 
 4. Retrieve the value for a key:
