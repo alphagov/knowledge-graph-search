@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express'
 import { Route } from '../enums/routes'
-import { ENV } from '../enums/environments'
+import { setCookie } from  '../utils/setCookie'
 
 class CookiesController {
   public cookies: RequestHandler = (req, res, next) => {
@@ -17,20 +17,28 @@ class CookiesController {
   }
 
   public saveCookieSettings: RequestHandler = (req, res, next) => {
-    const { acceptAnalytics} = req.body;
+    const { acceptAnalytics } = req.body;
+    const saved = '?saved=true';
+    const referer = `${req.headers.referer}`.replace(saved, '')
+    const isSaved = referer.includes(Route.cookies) ? saved : ''
+
     try {
-      if(acceptAnalytics === 'true') {
-        res.cookie('acceptAnalytics', acceptAnalytics, {
-          maxAge: parseInt(process.env.COOKIE_SETTINGS_MAX_AGE || '31556952000', 10), //defaults 1 year
-          sameSite: 'lax',
-          httpOnly: true,
-          encode: String,
-          secure: process.env.NODE_ENV === ENV.PRODUCTION,
-        });
-      } else {
-        res.setHeader('set-cookie', 'acceptAnalytics=; max-age=0');
+      if(isSaved) {
+        setCookie(res, 'cookieMessage', 'false')
       }
-      res.redirect(`${Route.cookies}?saved=true`)
+      setCookie(res, 'acceptAnalytics', acceptAnalytics)
+      res.redirect(`${referer}${isSaved}`)
+    } catch (e) {
+      next(e)
+    }
+  }
+
+  public hideCookieSuccessBanner: RequestHandler = (req, res, next) => {
+    try {
+      if(req.body.hideCookieSuccessBanner) {
+        setCookie(res, 'cookieMessage', 'false')
+      }
+      res.redirect(`${req.headers.referer}`)
     } catch (e) {
       next(e)
     }
