@@ -13,6 +13,9 @@ import passport from 'passport'
 import session from 'express-session'
 import { generateSessionId } from './utils/auth'
 import config from './config'
+import { allowGoogleAnalytics } from './middleware/allowGoogleAnalytics'
+
+const cookieParser = require('cookie-parser')
 
 class App {
   public app: express.Express = express()
@@ -54,11 +57,13 @@ class App {
   }
 
   private initializeMiddlewares() {
+    this.app.use(cookieParser())
     this.app.use(cors())
     this.app.use(express.static('./src/public'))
     this.app.use(bodyParser.urlencoded({ extended: true }))
     this.app.use(bodyParser.json())
-    this.initializeLogin()
+    this.app.use(allowGoogleAnalytics)
+    this.initializeLogin();
   }
 
   private initializeRoutes(routes: Routes[]) {
