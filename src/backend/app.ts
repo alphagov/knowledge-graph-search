@@ -8,10 +8,12 @@ import * as nunjucks from 'nunjucks'
 import bodyParser from 'body-parser'
 import Redis from 'ioredis'
 import RedisStore from 'connect-redis'
+import { allowGoogleAnalytics } from './middleware/allowGoogleAnalytics'
 
 const OAuth2Strategy = require('passport-oauth2')
 const passport = require('passport')
 const session = require('express-session')
+const cookieParser = require('cookie-parser')
 
 const redisInstance = new Redis(
   Number(process.env.REDIS_PORT) || 6379,
@@ -49,11 +51,13 @@ class App {
   }
 
   private initializeMiddlewares() {
+    this.app.use(cookieParser())
     this.app.use(cors())
     this.app.use(express.static('./src/public'))
     this.app.use(bodyParser.urlencoded({ extended: true }))
     this.app.use(bodyParser.json())
-    this.initializeLogin()
+    this.app.use(allowGoogleAnalytics)
+    this.initializeLogin();
   }
 
   private initializeRoutes(routes: Routes[]) {
