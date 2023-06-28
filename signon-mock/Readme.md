@@ -67,5 +67,5 @@ KEYS *
 4. Retrieve the value for a key:
 
 ```shell
-$ GET <session-key>
+GET <session-key>
 ```
