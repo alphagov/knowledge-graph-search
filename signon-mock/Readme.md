@@ -30,7 +30,7 @@ $ cd signon-mock
 $ npm run dev
 ```
 
-4. Open your browser and navigate to `localhost:8080` to initiate the OAuth2 authorisation process. Make sure to check if a cookie was created in the browser.
+4. Open your browser and navigate to `localhost:8080` to initiate the OAuth2 authorisation process. Check that a cookie called `connect.sid` was created in the browser.
 
 ## Logging out with `/reauth`
 
