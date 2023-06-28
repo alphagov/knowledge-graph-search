@@ -10,7 +10,6 @@ import { EventType } from '../types/event-types'
 declare const window: any
 
 const view = () => {
-  console.log('view')
   document.title = 'Gov Search'
   const pageContent: HTMLElement | null = id('page-content')
   if (pageContent) {
