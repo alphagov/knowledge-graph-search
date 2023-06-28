@@ -55,7 +55,7 @@ brew install redis
 2. Connect to the Redis server (ensure Redis is runnin in Docker, see "usage" section above)
 
 ```shell
-$ redis-cli -h localhost
+redis-cli -h localhost
 ```
 
 3. Retrieve all keys:
