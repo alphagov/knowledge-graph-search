@@ -2,8 +2,25 @@
 
 {% block content %}
 
+{% set html %}
+  <p class="govuk-notification-banner__heading">
+    You’ve set your cookie preferences.
+  </p>
+  <p class="govuk-notification-banner__heading">
+    <a class="govuk-notification-banner__link" href="/">Go back to Gov Search</a>
+  </p>
+{% endset %}
+
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
+
+    {% if savedCookies %}
+      {{ govukNotificationBanner({
+        html: html,
+        type: 'success'
+      }) }}
+    {% endif %}
+
     <h1 class="govuk-heading-xl">Cookies</h1>
 
     <p class="govuk-body">Small files (known as ’cookies’) are put onto your computer to collect information about how you browse the site.</p>
@@ -27,8 +44,9 @@
     <form action="/save-cookie-settings" method="post" novalidate class="govuk-!-margin-bottom-7">
 
       {{ govukRadios({
-        idPrefix: "acceptGoogleAnalytics",
-        name: "acceptGoogleAnalytics",
+        idPrefix: "acceptAnalytics",
+        name: "acceptAnalytics",
+        classes: "govuk-radios--inline",
         fieldset: {
           legend: {
             text: "Do you want to accept analytics cookies?",
@@ -39,12 +57,12 @@
           {
             value: "true",
             text:  "Yes",
-            checked: (acceptGoogleAnalytics == true)
+            checked: (acceptAnalytics == true)
           },
           {
             value: "false",
             text: "No",
-            checked: (acceptGoogleAnalytics == false)
+            checked: (acceptAnalytics == false)
           }
         ]
       }) }}
@@ -95,13 +113,35 @@
         rows: [
           [
             {
-              text: "to add"
+              text: "_ga_13WL4SFLP7"
             },
             {
-              text: "This helps us identify how you use Gov Search so we can make the service better"
+              text: "Used by Google Analytics to find and track an individual session with your device"
             },
             {
-              text: "to add"
+              text: "1 year"
+            }
+          ],
+          [
+            {
+              text: "_ga"
+            },
+            {
+              text: "These help us count how many people visit Gov Search by tracking if you’ve visited before"
+            },
+            {
+              text: "1 year"
+            }
+          ],
+          [
+            {
+              text: "acceptAnalytics"
+            },
+            {
+              text: "Saves your preference for accepting analytics cookies"
+            },
+            {
+              text: "1 year"
             }
           ]
         ]
@@ -141,7 +181,7 @@
       })
     }}
 
-    <h3 class="govuk-heading-m">Cookie consent</h3>
+    <h3 class="govuk-heading-m">Cookie consent banner</h3>
 
     {{ govukTable({
         caption: "You will see a cookie consent banner when you first visit. A cookie is stored so that your computer knows you’ve answered it and knows not to ask again.",
@@ -161,13 +201,13 @@
         rows: [
           [
             {
-              text: "to add"
+              text: "cookieConsentBanner"
             },
             {
-              text: "Saves your cookie consent preferences"
+              text: "Saves a cookie to let us know that you've seen our cookie message"
             },
             {
-              text: "to add"
+              text: "1 year"
             }
           ]
         ]
@@ -182,10 +222,8 @@
       These services may set additional cookies and, if so, will have their own cookies policy.
     </p>
 
+    <p class="govuk-body"><a href="/" class="govuk-link">Go back to Gov Search</a></p>
+
   </div>
 </div>
-
-{% block pageScripts %}
-  <script type="module" src="/main.js"></script>
-{% endblock %}
 {% endblock %}
