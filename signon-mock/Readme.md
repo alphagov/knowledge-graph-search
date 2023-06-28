@@ -14,7 +14,7 @@ signon-mock is a local mock server that simulates the behavior of a resource ser
 1. In a shell:
 
 ```shell
-$ docker-compose up redis
+docker-compose up redis
 ```
 
 2. In another tab:
