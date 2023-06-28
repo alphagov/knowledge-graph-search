@@ -16,6 +16,9 @@ export enum Route {
   infoBoxBankHoliday = '/bank-holiday',
   infoBoxTransaction = '/transaction',
   infoBoxPerson = '/person',
+  login = '/login',
+  loginCallback = '/auth/gds/callback',
+  reauth = '/auth/gds/api/users/:userId/reauth',
 }
 
 export default Routes

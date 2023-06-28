@@ -24,6 +24,7 @@ export const auth: (s?: string) => express.Handler =
 
     // Store the requested URL in session to enable post-login redirection.
     if (req.session) {
+      // eslint-disable-next-line
       // @ts-ignore
       req.session.returnTo = req.originalUrl || req.url
     }
