@@ -72,11 +72,7 @@ class IndexRoute implements Routes {
       this.infoBoxController.infoBoxPerson
     )
 
-    this.router.get(
-      Route.cookies,
-      auth(),
-      this.cookiesController.cookies
-    )
+    this.router.get(Route.cookies, auth(), this.cookiesController.cookies)
 
     this.router.post(
       Route.saveCookieSettings,
