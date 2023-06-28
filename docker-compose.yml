@@ -13,6 +13,8 @@ services:
       - 3005:3005
 
   govsearch:
+    env_file:
+      - .env
     build:
       context: .
     ports:
