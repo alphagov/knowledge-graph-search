@@ -18,6 +18,7 @@ export enum Route {
   infoBoxPerson = '/person',
   cookies = '/cookies',
   saveCookieSettings = '/save-cookie-settings',
+  hideCookieSuccessBanner = '/hide-cookie-success-banner',
 }
 
 export default Routes

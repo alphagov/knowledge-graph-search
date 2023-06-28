@@ -83,6 +83,12 @@ class IndexRoute implements Routes {
       auth(),
       this.cookiesController.saveCookieSettings
     )
+
+    this.router.post(
+      Route.hideCookieSuccessBanner,
+      auth(),
+      this.cookiesController.hideCookieSuccessBanner
+    )
   }
 }
 

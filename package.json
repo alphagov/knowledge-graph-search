@@ -12,7 +12,7 @@
     "check-lint": "eslint './**/*.{ts,tsx}'",
     "format": "prettier --write '.'",
     "check-format": "prettier --check '.'",
-    "copy-assets": "node -e \"require('fs').copyFileSync('./node_modules/govuk-frontend/govuk/all.js', './src/public/assets/js/all.js', 0);require('fs').cpSync('./node_modules/govuk-frontend/govuk/assets', './src/public/assets', {recursive: true});\""
+    "copy-assets": "node -e \"require('fs').cpSync('./node_modules/govuk-frontend/govuk/assets', './src/public/assets', {recursive: true});require('fs').copyFileSync('./node_modules/govuk-frontend/govuk/all.js', './src/public/assets/all.js', 0);\""
   },
   "repository": {
     "type": "git",

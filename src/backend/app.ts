@@ -9,6 +9,7 @@ import bodyParser from 'body-parser'
 import Redis from 'ioredis'
 import RedisStore from 'connect-redis'
 import { allowGoogleAnalytics } from './middleware/allowGoogleAnalytics'
+import { showCookieMessage } from './middleware/showCookieMessage'
 
 const OAuth2Strategy = require('passport-oauth2')
 const passport = require('passport')
@@ -57,6 +58,7 @@ class App {
     this.app.use(bodyParser.urlencoded({ extended: true }))
     this.app.use(bodyParser.json())
     this.app.use(allowGoogleAnalytics)
+    this.app.use(showCookieMessage)
     this.initializeLogin();
   }
 
