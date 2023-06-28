@@ -1,5 +1,6 @@
 import * as express from 'express'
 import { isReqAJAX } from '../utils/isReqAJAX'
+import config from '../config'
 
 /*
  * Express middleware enforcing user authentication. Redirects unauthenticated users to login page,
@@ -8,7 +9,7 @@ import { isReqAJAX } from '../utils/isReqAJAX'
 export const auth: (s?: string) => express.Handler =
   (redirectUrl = '/login') =>
   (req, res, next) => {
-    if (process.env.ENABLE_AUTH !== 'true') {
+    if (!config.authEnabled) {
       return next()
     }
 

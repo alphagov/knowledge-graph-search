@@ -1,10 +1,8 @@
 import Redis from 'ioredis'
+import config from '../config'
 
 const createRedisInstance = () => {
-  const redis = new Redis(
-    Number(process.env.REDIS_PORT) || 6379,
-    process.env.REDIS_HOST || 'localhost'
-  )
+  const redis = new Redis(config.redisPort, config.redisHost)
 
   redis.on('error', (error: Error) => {
     console.error('Redis Error')

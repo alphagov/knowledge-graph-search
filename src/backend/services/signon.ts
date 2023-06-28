@@ -1,9 +1,8 @@
 import axios from 'axios'
-
-const { SIGNON_URL } = process.env
+import config from '../config'
 
 export const getUserProfile = async (accessToken: string) => {
-  const url = `${SIGNON_URL}/user.json`
+  const url = `${config.signonUrl}/user.json`
   const { data: profile } = await axios.get(url, {
     headers: {
       Authorization: `Bearer ${accessToken}`,

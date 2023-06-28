@@ -1,9 +1,10 @@
 import { RequestHandler } from 'express'
 import { ENV } from '../enums/environments'
+import config from '../config'
 
 class SearchController {
   public search: RequestHandler = (req, res, next) => {
-    const isIntegrationEnv = process.env.NODE_ENV === ENV.DEVELOPMENT
+    const isIntegrationEnv = config.environment === ENV.DEVELOPMENT
 
     try {
       res.render('search.njk', {
