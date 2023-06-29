@@ -11,6 +11,7 @@ export function generateSessionId(req: express.Request) {
   // against the sessionId for lookup when destroying sessions through the
   // /reauth endpoint.
   if (req.user) {
+    log.debug('User found on request')
     const { uid: userId } = (req.user as any)?.profileData?.user || {}
     log.debug(`Creating session ${sessionId} for user ${userId}`)
     addSessionToUserSet(userId, sessionId)
