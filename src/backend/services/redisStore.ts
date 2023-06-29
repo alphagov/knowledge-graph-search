@@ -1,14 +1,11 @@
 import { getClient } from './redis'
 import RedisStore from 'connect-redis'
-import {
-  USER_SESSION_PREFIX,
-  USER_SESSIONS_SET_PREFIX,
-} from '../enums/environments'
+import { REDIS_PREFIX } from '../enums/environments'
 
 const createRedisStore = () => {
   const store = new RedisStore({
     client: getClient(),
-    prefix: USER_SESSION_PREFIX,
+    prefix: REDIS_PREFIX.SESSION,
   })
 
   return store
@@ -40,7 +37,7 @@ export const addSessionToUserSet = async (
   sessionId: string
 ) => {
   const redis = getClient()
-  const key = `${USER_SESSIONS_SET_PREFIX}${userId}`
+  const key = `${REDIS_PREFIX.SESSIONS_SET}${userId}`
   try {
     await redis.sadd(key, sessionId)
   } catch (error) {
@@ -66,7 +63,7 @@ export const destroySession = async (sessionId: string) => {
 export const destroySessionsForUserId = async (userId: string) => {
   console.log(`Destroying sessions for user ${userId}`)
   const redis = getClient()
-  const key = `${USER_SESSIONS_SET_PREFIX}${userId}`
+  const key = `${REDIS_PREFIX.SESSIONS_SET}${userId}`
   try {
     let sessionId: string | null
     while ((sessionId = await redis.spop(key))) {

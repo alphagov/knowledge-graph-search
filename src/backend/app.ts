@@ -34,7 +34,6 @@ class App {
     })
 
     const handleShutdown = () => {
-      console.log('NO')
       if (process.env.ENABLE_AUTH === 'true') {
         const { getClient } = require('.services/redis')
         getClient().disconnect()

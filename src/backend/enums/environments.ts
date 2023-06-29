@@ -5,5 +5,7 @@ export enum ENV {
   PRODUCTION = 'production',
 }
 
-export const USER_SESSION_PREFIX = 'GovSearchSession__'
-export const USER_SESSIONS_SET_PREFIX = 'SessionsForUserId__'
+export enum REDIS_PREFIX {
+  SESSION = 'GovSession__',
+  SESSIONS_SET = 'UserSessionsSet__',
+}
