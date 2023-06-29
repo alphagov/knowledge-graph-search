@@ -1,5 +1,9 @@
 {% extends "./layouts/main.njk" %}
 
+{% block pageTitle %}
+  {{serviceName}}
+{% endblock %}
+
 {% block content %}
 
 {% if isIntegrationEnv  %}
