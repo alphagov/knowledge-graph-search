@@ -64,14 +64,16 @@ export const destroySessionsForUserId = async (userId: string) => {
   console.log(`Destroying sessions for user ${userId}`)
   const redis = getClient()
   const key = `${REDIS_PREFIX.SESSIONS_SET}${userId}`
+  let count = 0
   try {
     let sessionId: string | null
     while ((sessionId = await redis.spop(key))) {
       await destroySession(sessionId)
+      count++
     }
   } catch (error) {
     console.error(`ERROR - could not destroy sessions for user ${userId}`)
     throw error
   }
-  console.log(`Sessions destroyed for user ${userId}`)
+  console.log(`${count} sessions destroyed for user ${userId}`)
 }
