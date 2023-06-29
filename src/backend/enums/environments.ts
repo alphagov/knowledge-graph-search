@@ -6,3 +6,4 @@ export enum ENV {
 }
 
 export const USER_SESSION_PREFIX = 'GovSearchSession__'
+export const USER_SESSIONS_SET_PREFIX = 'SessionsForUserId__'
