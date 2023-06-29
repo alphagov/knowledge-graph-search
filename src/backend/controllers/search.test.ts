@@ -4,7 +4,7 @@ import e from 'express'
 import App from '../app'
 import { Route } from '../enums/routes'
 import IndexRoute from '../routes/IndexRoutes'
-import SearchController from './search'
+import SearchController from './SearchController'
 
 const indexRoute = new IndexRoute()
 const app = new App([indexRoute])

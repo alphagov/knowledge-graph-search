@@ -19,6 +19,7 @@ export enum Route {
   login = '/login',
   loginCallback = '/auth/gds/callback',
   reauth = '/auth/gds/api/users/:userId/reauth',
+  pageNotFound = '/404',
 }
 
 export default Routes

@@ -3,7 +3,7 @@ import path from 'path'
 import * as http from 'http'
 import cors from 'cors'
 import express from 'express'
-import Routes from './enums/routes'
+import Routes, { Route } from './enums/routes'
 import * as nunjucks from 'nunjucks'
 import bodyParser from 'body-parser'
 import { getStore } from './services/redisStore'
@@ -25,6 +25,7 @@ class App {
     this.initializeMiddlewares()
     this.initializeRoutes(routes)
     this.initializeRenderEngine()
+    this.initializeFinalMiddlewares()
   }
 
   public listen(): void {
@@ -59,6 +60,13 @@ class App {
     this.app.use(bodyParser.urlencoded({ extended: true }))
     this.app.use(bodyParser.json())
     this.initializeLogin()
+  }
+
+  // To be executed at the end of the setup
+  private initializeFinalMiddlewares() {
+    this.app.use((req, res) => {
+      res.redirect(Route.pageNotFound)
+    })
   }
 
   private initializeRoutes(routes: Routes[]) {

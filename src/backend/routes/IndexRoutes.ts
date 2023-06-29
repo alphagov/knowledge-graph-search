@@ -1,8 +1,8 @@
 import { Router } from 'express'
-import SearchController from '../controllers/search'
-import SearchAPIController from '../controllers/searchAPI'
-import InfoBoxController from '../controllers/infoBox'
-import DownloadCSVController from '../controllers/downloadCSV'
+import SearchController from '../controllers/SearchController'
+import SearchAPIController from '../controllers/SearchAPIController'
+import InfoBoxController from '../controllers/InfoBoxController'
+import DownloadCSVController from '../controllers/DownloadCSVController'
 import Routes, { Route } from '../enums/routes'
 import { auth } from '../middleware/auth'
 
