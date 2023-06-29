@@ -18,6 +18,9 @@ interface AppConfig extends FeatureFlags {
   clientSecret: string
   signonUrl: string
   projectId: string
+  gtmId: string
+  gtmAuth: string
+  cookieSettingsMaxAge: string
 }
 const config: AppConfig = {
   port: process.env.port ? parseInt(process.env.port) : 8080,
@@ -34,6 +37,9 @@ const config: AppConfig = {
   clientSecret: process.env.OAUTH_SECRET || 'not set',
   signonUrl: process.env.SIGNON_URL || 'not set',
   projectId: process.env.PROJECT_ID || 'not set',
+  gtmId: process.env.GTM_ID || 'not set',
+  gtmAuth: process.env.GTM_AUTH || 'not set',
+  cookieSettingsMaxAge: process.env.COOKIE_SETTINGS_MAX_AGE || '31556952000', // defaults 1 year
 
   ...featureFlags,
 }

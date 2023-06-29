@@ -1,5 +1,6 @@
 import { Response } from 'express'
 import { ENV } from '../enums/environments'
+import config from '../config'
 
 export const setCookie = (
   res: Response,
@@ -10,10 +11,10 @@ export const setCookie = (
   res.cookie(cookieName, cookieValue, {
     maxAge:
       maxAge ||
-      parseInt(process.env.COOKIE_SETTINGS_MAX_AGE || '31556952000', 10), // defaults 1 year
+      parseInt(config.cookieSettingsMaxAge, 10),
     sameSite: 'lax',
     httpOnly: true,
     encode: String,
-    secure: process.env.NODE_ENV === ENV.PRODUCTION,
+    secure: config.environment === ENV.PRODUCTION,
   })
 }

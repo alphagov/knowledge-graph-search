@@ -1,9 +1,6 @@
 import { allowGoogleAnalytics } from './allowGoogleAnalytics'
 import { expect } from '@jest/globals'
 
-process.env.GTM_ID = 'SOME_GTM_ID'
-process.env.GTM_AUTH = 'GTM_AUTH'
-
 const req: any = {
   cookies: {
     acceptAnalytics: 'true',

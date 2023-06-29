@@ -3,7 +3,7 @@ import { expect } from '@jest/globals'
 import e from 'express'
 import App from '../app'
 import { Route } from '../enums/routes'
-import IndexRoute from '../routes/routes'
+import IndexRoute from '../routes/indexRoutes'
 import CookiesController from './cookies'
 
 const indexRoute = new IndexRoute()
