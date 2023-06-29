@@ -75,3 +75,11 @@ GET <session-key>
 ```shell
 $ flushall
 ```
+
+## Reuse the same user / have multiple sessions for one user
+
+You can tell signon-mock to always return the same user from the `user.json` endpoint using the following environment variable:
+
+```shell
+$ SINGLE_USER=true npm run dev
+```

@@ -1,12 +1,13 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import axios from 'axios'
-import { v4 as uuidv4 } from 'uuid'
+import crypto from 'crypto'
 import { logReq } from './middlewares.js'
 import nunjucks from 'nunjucks'
 
 const app = express()
 const PORT = 3005
+const constantUserId = '129eaae9-2d72-42ea-b012-f2f4aaa84abb'
 
 nunjucks.configure('views', {
   autoescape: true,
@@ -27,7 +28,7 @@ app.get('/oauth/authorize', (req, res) => {
   const { client_id, redirect_uri } = req.query
 
   const callback_uri = new URL(redirect_uri)
-  callback_uri.searchParams.append('code', uuidv4())
+  callback_uri.searchParams.append('code', crypto.randomUUID())
 
   console.log({ URL: callback_uri.href })
 
@@ -35,12 +36,14 @@ app.get('/oauth/authorize', (req, res) => {
 })
 
 app.get('/user.json', (req, res) => {
-  res.json({ name: 'John Doe', uid: uuidv4() })
+  const uid =
+    process.env.SINGLE_USER === 'true' ? constantUserId : crypto.randomUUID()
+  res.json({ name: 'John Doe', uid })
 })
 
 app.post('/oauth/access_token', (req, res) => {
-  const accessToken = uuidv4()
-  const refreshToken = uuidv4()
+  const accessToken = crypto.randomUUID()
+  const refreshToken = crypto.randomUUID()
 
   console.log('Token generated')
   console.log({ accessToken, refreshToken })
