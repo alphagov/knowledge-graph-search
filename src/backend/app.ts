@@ -6,22 +6,12 @@ import express from 'express'
 import Routes from './enums/routes'
 import * as nunjucks from 'nunjucks'
 import bodyParser from 'body-parser'
-import Redis from 'ioredis'
-import RedisStore from 'connect-redis'
-
-const OAuth2Strategy = require('passport-oauth2')
-const passport = require('passport')
-const session = require('express-session')
-
-const redisInstance = new Redis(
-  Number(process.env.REDIS_PORT) || 6379,
-  process.env.REDIS_HOST || 'localhost'
-)
-
-const redisStore = new RedisStore({
-  client: redisInstance,
-  prefix: 'GovSearch::',
-})
+import { getStore } from './services/redisStore'
+import { getUserProfile } from './services/signon'
+import OAuth2Strategy, { VerifyFunctionWithRequest } from 'passport-oauth2'
+import passport from 'passport'
+import session from 'express-session'
+import { generateSessionId } from './utils/auth'
 
 class App {
   public app: express.Express = express()
@@ -42,6 +32,20 @@ class App {
     server.listen(this.port, () => {
       console.log(`🚀 App listening on the port ${this.port}`)
     })
+
+    const handleShutdown = () => {
+      if (process.env.ENABLE_AUTH === 'true') {
+        const { getClient } = require('.services/redis')
+        getClient().disconnect()
+      }
+      server.close(() => {
+        console.log('Server gracefully shut down')
+        process.exit(0)
+      })
+    }
+
+    process.on('SIGINT', handleShutdown)
+    process.on('SIGTERM', handleShutdown)
   }
 
   public getServer(): express.Application {
@@ -93,7 +97,8 @@ class App {
         resave: false,
         saveUninitialized: false,
         cookie: { secure: true },
-        store: redisStore,
+        store: getStore(),
+        genid: generateSessionId,
       })
     )
 
@@ -109,29 +114,33 @@ class App {
           clientID: process.env.OAUTH_ID || 'not set',
           clientSecret: process.env.OAUTH_SECRET || 'not set',
           callbackURL: process.env.OAUTH_CALLBACK_URL || 'not set',
+          passReqToCallback: true,
         },
-        function (
+        async function (
+          req: Parameters<VerifyFunctionWithRequest>[0],
           accessToken: string,
           refreshToken: string,
           profile: any,
-          cb: any
+          doneCallback: any
         ) {
-          console.log(
-            'OAuth2Strategy callback',
-            accessToken,
+          let profileData
+          try {
+            profileData = await getUserProfile(accessToken)
+          } catch (error) {
+            console.error('ERROR fetching user data')
+            console.error({ error })
+            return doneCallback(error)
+          }
+
+          const userSessionData = {
+            profileData,
             refreshToken,
-            profile
-          )
-          cb(null, profile)
+            accessToken,
+          }
+          console.log('User data fetched successfully', { userSessionData })
+          doneCallback(null, userSessionData)
         }
       )
-    )
-
-    this.app.get('/login', passport.authenticate('oauth2'))
-    this.app.get(
-      '/auth/gds/callback',
-      passport.authenticate('oauth2', '/error-callback'),
-      async (req, res) => res.redirect('/')
     )
   }
 }
