@@ -9,9 +9,7 @@ export const setCookie = (
   maxAge?: number
 ): void => {
   res.cookie(cookieName, cookieValue, {
-    maxAge:
-      maxAge ||
-      parseInt(config.cookieSettingsMaxAge, 10),
+    maxAge: maxAge || parseInt(config.cookieSettingsMaxAge, 10),
     sameSite: 'lax',
     httpOnly: true,
     encode: String,
