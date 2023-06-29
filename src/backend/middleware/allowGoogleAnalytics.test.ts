@@ -19,7 +19,7 @@ const res: any = {
 }
 
 describe('allowGoogleAnalytics', () => {
-  it('Should retuem the correct object', () => {
+  it('Should return the correct object', () => {
     allowGoogleAnalytics(req, res, next)
     expect(res.locals).toEqual({
       allowGoogleAnalytics: true,
