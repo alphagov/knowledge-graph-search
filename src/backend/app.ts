@@ -8,6 +8,7 @@ import * as nunjucks from 'nunjucks'
 import bodyParser from 'body-parser'
 import Redis from 'ioredis'
 import RedisStore from 'connect-redis'
+import { error404 } from './middleware/error404'
 
 const OAuth2Strategy = require('passport-oauth2')
 const passport = require('passport')
@@ -34,6 +35,7 @@ class App {
     this.initializeMiddlewares()
     this.initializeRoutes(routes)
     this.initializeRenderEngine()
+    this.initializeErrorHandling()
   }
 
   public listen(): void {
@@ -133,6 +135,11 @@ class App {
       passport.authenticate('oauth2', '/error-callback'),
       async (req, res) => res.redirect('/')
     )
+  }
+
+  private initializeErrorHandling() {
+    //this.app.use(errorMiddleware);
+    this.app.use(error404);
   }
 }
 
