@@ -1,6 +1,7 @@
 import { getClient } from './redis'
 import RedisStore from 'connect-redis'
 import { REDIS_PREFIX } from '../enums/environments'
+import log from '../utils/logging'
 
 const createRedisStore = () => {
   const store = new RedisStore({
@@ -41,12 +42,10 @@ export const addSessionToUserSet = async (
   try {
     await redis.sadd(key, sessionId)
   } catch (error) {
-    console.error(
-      `ERROR - could not append session ${sessionId} to user ${userId}`
-    )
+    log.error(`ERROR - could not append session ${sessionId} to user ${userId}`)
     throw error
   }
-  console.log(`Session ${sessionId} appended to user ${userId}`)
+  log.debug(`Session ${sessionId} appended to user ${userId}`)
 }
 
 export const destroySession = async (sessionId: string) => {
@@ -54,14 +53,14 @@ export const destroySession = async (sessionId: string) => {
   try {
     await store.destroy(sessionId)
   } catch (error) {
-    console.error(`ERROR - could not destroy session ${sessionId}`)
+    log.error(`ERROR - could not destroy session ${sessionId}`)
     throw error
   }
-  console.log(`Session destroyed: ${sessionId}`)
+  log.debug(`Session destroyed: ${sessionId}`)
 }
 
 export const destroySessionsForUserId = async (userId: string) => {
-  console.log(`Destroying sessions for user ${userId}`)
+  log.debug(`Destroying sessions for user ${userId}`)
   const redis = getClient()
   const key = `${REDIS_PREFIX.SESSIONS_SET}${userId}`
   let count = 0
@@ -72,8 +71,8 @@ export const destroySessionsForUserId = async (userId: string) => {
       count++
     }
   } catch (error) {
-    console.error(`ERROR - could not destroy sessions for user ${userId}`)
+    log.error(`ERROR - could not destroy sessions for user ${userId}`)
     throw error
   }
-  console.log(`${count} sessions destroyed for user ${userId}`)
+  log.debug(`${count} sessions destroyed for user ${userId}`)
 }

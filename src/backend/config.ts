@@ -1,3 +1,5 @@
+import { ENV } from './enums/environments'
+
 interface FeatureFlags {
   authEnabled: boolean
 }
@@ -21,11 +23,12 @@ interface AppConfig extends FeatureFlags {
   gtmId: string
   gtmAuth: string
   cookieSettingsMaxAge: string
+  appVersion: string
 }
 const config: AppConfig = {
   port: process.env.port ? parseInt(process.env.port) : 8080,
-  environment: process.env.NODE_ENV || 'local',
-  isLocal: process.env.NODE_ENV === 'local' || !process.env.NODE_env,
+  environment: process.env.NODE_ENV || ENV.LOCAL,
+  isLocal: process.env.NODE_ENV === ENV.LOCAL,
   redisHost: process.env.REDIS_HOST || 'localhost',
   redisPort: process.env.REDIS_PORT
     ? parseInt(process.env.REDIS_PORT, 10)
@@ -40,6 +43,7 @@ const config: AppConfig = {
   gtmId: process.env.GTM_ID || 'not set',
   gtmAuth: process.env.GTM_AUTH || 'not set',
   cookieSettingsMaxAge: process.env.COOKIE_SETTINGS_MAX_AGE || '31556952000', // defaults 1 year
+  appVersion: process.env.npm_package_version || 'not set',
 
   ...featureFlags,
 }

@@ -3,6 +3,7 @@ export enum ENV {
   DEVELOPMENT = 'development',
   STAGING = 'staging',
   PRODUCTION = 'production',
+  LOCAL = 'local',
 }
 
 export enum REDIS_PREFIX {

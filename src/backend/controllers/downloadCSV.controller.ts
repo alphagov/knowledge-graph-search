@@ -3,6 +3,7 @@ import { sendSearchQuery } from '../bigquery/bigquery'
 import { SearchParams } from '../../common/types/search-api-types'
 import { getParams } from '../utils/getParams'
 import { csvStringify } from '../utils/csv'
+import log from '../utils/logging'
 
 class DownloadCSVController {
   public downloadCSV: RequestHandler = async (req, res) => {
@@ -12,9 +13,9 @@ class DownloadCSVController {
       const csvData = csvStringify(data.main)
       res.set('Content-Type', 'text/csv')
       res.send(csvData)
-    } catch (e: any) {
-      console.log('/csv fail:', JSON.stringify(e))
-      res.status(500).send(e)
+    } catch (error) {
+      log.error(error, '/CSV fail')
+      res.status(500).send(error)
     }
   }
 }

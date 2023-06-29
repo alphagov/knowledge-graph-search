@@ -27,6 +27,7 @@
   "homepage": "https://github.com/alphagov/knowledge-graph-search#readme",
   "dependencies": {
     "@google-cloud/bigquery": "^6.0.3",
+    "@relaycorp/pino-cloud": "^1.0.28",
     "@types/express": "^4.17.14",
     "@types/node": "^18.11.14",
     "axios": "^1.2.1",
@@ -40,7 +41,11 @@
     "govuk-frontend": "^4.6.0",
     "ioredis": "^5.3.2",
     "nunjucks": "^3.2.4",
-    "passport-oauth2": "^1.7.0"
+    "passport-oauth2": "^1.7.0",
+    "pino": "^8.14.1",
+    "pino-http": "^8.3.3",
+    "pino-http-print": "^3.1.0",
+    "pino-pretty": "^10.0.0"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.3",
