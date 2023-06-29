@@ -8,10 +8,11 @@ import * as nunjucks from 'nunjucks'
 import bodyParser from 'body-parser'
 import { getStore } from './services/redisStore'
 import { getUserProfile } from './services/signon'
-import OAuth2Strategy, { VerifyFunctionWithRequest } from 'passport-oauth2'
+import OAuth2Strategy from 'passport-oauth2'
 import passport from 'passport'
 import session from 'express-session'
 import { generateSessionId } from './utils/auth'
+import config from './config'
 
 class App {
   public app: express.Express = express()
@@ -19,7 +20,7 @@ class App {
 
   constructor(routes: Routes[]) {
     this.app = express()
-    this.port = process.env.port ? parseInt(process.env.port) : 8080
+    this.port = config.port
 
     this.initializeMiddlewares()
     this.initializeRoutes(routes)
@@ -34,7 +35,7 @@ class App {
     })
 
     const handleShutdown = () => {
-      if (process.env.ENABLE_AUTH === 'true') {
+      if (config.authEnabled) {
         const { getClient } = require('.services/redis')
         getClient().disconnect()
       }
@@ -82,7 +83,7 @@ class App {
   }
 
   private initializeLogin() {
-    if (!process.env.ENABLE_AUTH) {
+    if (!config.authEnabled) {
       console.log('Auth is disabled')
       return
     }
@@ -96,7 +97,7 @@ class App {
         secret: 'keyboard cat',
         resave: false,
         saveUninitialized: false,
-        cookie: { secure: !(process.env.NODE_ENV === 'local') },
+        cookie: { secure: !(config.environment === 'local') },
         store: getStore(),
         genid: generateSessionId,
       })
@@ -109,15 +110,13 @@ class App {
     passport.use(
       new OAuth2Strategy(
         {
-          authorizationURL: process.env.OAUTH_AUTH_URL || 'not set',
-          tokenURL: process.env.OAUTH_TOKEN_URL || 'not set',
-          clientID: process.env.OAUTH_ID || 'not set',
-          clientSecret: process.env.OAUTH_SECRET || 'not set',
-          callbackURL: process.env.OAUTH_CALLBACK_URL || 'not set',
-          passReqToCallback: true,
+          authorizationURL: config.oauthAuthUrl || 'not set',
+          tokenURL: config.oauthTokenUrl || 'not set',
+          clientID: config.clientId || 'not set',
+          clientSecret: config.clientSecret || 'not set',
+          callbackURL: config.oauthCallbackUrl || 'not set',
         },
         async function (
-          req: Parameters<VerifyFunctionWithRequest>[0],
           accessToken: string,
           refreshToken: string,
           profile: any,
