@@ -6,6 +6,6 @@ export enum ENV {
 }
 
 export enum REDIS_PREFIX {
-  SESSION = 'GovSession__',
+  SESSION = 'Session__',
   SESSIONS_SET = 'UserSessionsSet__',
 }
