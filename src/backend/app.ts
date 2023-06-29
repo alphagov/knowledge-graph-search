@@ -6,7 +6,7 @@ import express from 'express'
 import Routes from './enums/routes'
 import * as nunjucks from 'nunjucks'
 import bodyParser from 'body-parser'
-import { getStore, destroySessionForUserId } from './services/redisStore'
+import { getStore, appendsessionToUserId, destroySessionsForUserId } from './services/redisStore'
 import { getUserProfile } from './services/signon'
 import OAuth2Strategy, { VerifyFunctionWithRequest } from 'passport-oauth2'
 import passport from 'passport'
@@ -98,6 +98,22 @@ class App {
         saveUninitialized: false,
         cookie: { secure: true },
         store: getStore(),
+        genid: function(req) {
+          var sessionId: string = crypto.randomUUID();
+
+          // If the request has the user profile, then record the Signon userId
+          // against the sessionId for lookup when destroying sessions through the
+          // /reauth endpoint.
+          if (req.user) {
+            var userId: string;
+            // @ts-ignore
+            userId = req.user.profileData.uid;
+            appendSessionToUserId(userId, sessionId);
+          } else {
+          }
+
+          return sessionId;
+        }
       })
     )
 

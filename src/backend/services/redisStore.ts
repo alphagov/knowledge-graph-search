@@ -1,6 +1,6 @@
 import { getClient } from './redis'
 import RedisStore from 'connect-redis'
-import { USER_SESSION_PREFIX } from '../enums/environments'
+import { USER_SESSION_PREFIX, SIGNON_USER_PREFIX } from '../enums/environments'
 import type Redis from 'ioredis'
 
 const createRedisStore = () => {
@@ -33,16 +33,15 @@ export class SessionNotFoundError extends Error {
   }
 }
 
-export const findSessionIdForUserId = async (redis: Redis, userId: string) => {
-  const allKeys = await redis.keys('*')
-  const sessionKeys = allKeys.filter((k) => k.startsWith(USER_SESSION_PREFIX))
-  for (const key of sessionKeys) {
-    const sessionObj = (await redis.get(key)) || ''
-    if (sessionObj.includes(userId)) {
-      return key.split(USER_SESSION_PREFIX)[1]
-    }
+export const appendSessionToUserId = async (userId: string, sessionId: string) => {
+  const redis = getClient();
+  try {
+    await redis.sadd(`${SIGNON_USER_PREFIX }${userId}`, sessionId);
+  } catch (error) {
+    console.error(`ERROR - could not append session ${sessionId} to user ${userId}`)
+    throw error
   }
-  throw new SessionNotFoundError(`No sessionID found for user ID ${userId}`)
+  console.log(`Session ${sessionId} appended to user ${userId}`)
 }
 
 export const destroySession = async (sessionId: string) => {
@@ -56,17 +55,22 @@ export const destroySession = async (sessionId: string) => {
   console.log(`Session destroyed: ${sessionId}`)
 }
 
-export const destroySessionForUserId = async (userId: string) => {
-  let sessionId
+export const destroySessions = async (userId: string) => {
+  const redis = getClient()
   try {
-    sessionId = await findSessionIdForUserId(getClient(), userId)
+    let sessionId: string | null
+    while (sessionId = await redis.spop(userId)) {
+      console.log
+      destroySession(sessionId);
+    }
   } catch (error) {
-    console.error('ERROR - error looking for a session ID for user ID', {
-      userId,
-      error,
-    })
+    console.error(`ERROR - could not destroy sessions for user ${userId}`)
     throw error
   }
-  console.log(`Destroying session for user ID ${userId}`)
-  await destroySession(sessionId)
+  console.log(`Sessions destroyed for user ${userId}`)
+}
+
+export const destroySessionsForUserId = async (userId: string) => {
+  console.log(`Destroying sessions for user ${userId}`)
+  await destroySessions(`${SIGNON_USER_PREFIX }${userId}`)
 }
