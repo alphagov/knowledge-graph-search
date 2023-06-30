@@ -12,7 +12,8 @@
     "lint": "eslint './**/*.{ts,tsx}' --fix",
     "check-lint": "eslint './**/*.{ts,tsx}'",
     "format": "prettier --write '.'",
-    "check-format": "prettier --check '.'"
+    "check-format": "prettier --check '.'",
+    "copy-assets": "node -e \"require('fs').cpSync('./node_modules/govuk-frontend/govuk/assets', './src/public/assets', {recursive: true});require('fs').copyFileSync('./node_modules/govuk-frontend/govuk/all.js', './src/public/assets/all.js', 0);\""
   },
   "repository": {
     "type": "git",
@@ -30,6 +31,7 @@
     "@types/node": "^18.11.14",
     "axios": "^1.2.1",
     "connect-redis": "^7.1.0",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "csv-stringify": "^6.2.4",
     "express": "^4.18.1",
@@ -41,6 +43,7 @@
     "passport-oauth2": "^1.7.0"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.3",
     "@types/cors": "^2.8.13",
     "@types/express-session": "^1.17.7",
     "@types/jest": "^29.5.2",

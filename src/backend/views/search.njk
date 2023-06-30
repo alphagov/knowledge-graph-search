@@ -1,5 +1,9 @@
 {% extends "./layouts/main.njk" %}
 
+{% block pageTitle %}
+  {{serviceName}}
+{% endblock %}
+
 {% block content %}
 
 {% if isIntegrationEnv  %}
@@ -28,7 +32,8 @@
     </h1>
   </main>
 </div>
+{% endblock %}
+
 {% block pageScripts %}
   <script type="module" src="/main.js"></script>
-{% endblock %}
 {% endblock %}

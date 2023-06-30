@@ -1,4 +1,5 @@
 node_modules
 coverage
-public/main.js
-public/main.css
+src/public/main.js
+src/public/main.css
+src/public/assets/all.js
