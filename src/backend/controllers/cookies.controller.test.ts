@@ -4,7 +4,7 @@ import e from 'express'
 import App from '../app'
 import { Route } from '../enums/routes'
 import IndexRoute from '../routes/indexRoutes'
-import CookiesController from './cookies'
+import CookiesController from './cookies.controller'
 
 const indexRoute = new IndexRoute()
 const app = new App([indexRoute])

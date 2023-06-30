@@ -6,24 +6,31 @@ import { languageName } from '../../common/utils/lang'
 import { viewMetaResults } from './view-metabox'
 import { viewSearchPanel } from './view-search-panel'
 import { EventType } from '../types/event-types'
+import { USER_ERRORS } from '../enums/constants'
 
 declare const window: any
 
+const errorTitle = 'Sorry, there is a problem with the service'
+const serviceName = 'Gov Search'
+
 const view = () => {
-  document.title = 'Gov Search'
+  document.title = state.systemErrorText
+    ? `${errorTitle}: ${serviceName}`
+    : serviceName
   const pageContent: HTMLElement | null = id('page-content')
   if (pageContent) {
-    pageContent.innerHTML = `
+    state.systemErrorText
+      ? (pageContent.innerHTML = `${viewDataBaseError()}`)
+      : (pageContent.innerHTML = `
       <main class="govuk-main-wrapper" id="main-content" role="main">
-        ${viewErrorBanner()}
-        ${viewSearchTypeSelector()}
-        ${viewMainLayout()}
-        <p class="govuk-body-s">
-          Searches do not include history mode content, Publisher GitHub smart answers or service domains.
-          Page views depend on cookie consent.
-        </p>
-      </main>
-    `
+      ${viewErrorBanner()}
+      ${viewSearchTypeSelector()}
+      ${viewMainLayout()}
+      <p class="govuk-body-s">
+        Searches do not include history mode content, Publisher GitHub smart answers or service domains.
+        Page views depend on cookie consent.
+      </p>
+      </main>`)
   }
 
   // Add event handlers
@@ -121,55 +128,53 @@ const viewMainLayout = () => {
   return result.join('')
 }
 
+const viewDataBaseError = () => {
+  const html = []
+  let errorText = ''
+  switch (state.systemErrorText) {
+    case 'TIMEOUT':
+      errorText =
+        'The database took too long to respond. This is usually due to too many query results. Please try a more precise query.'
+      break
+    default:
+      errorText = 'A problem has occurred with the database.'
+  }
+  html.push(`
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">${errorTitle}</h1>
+        <p class="govuk-body">${errorText}</p>
+        <p class="govuk-body">Please <a class="govuk-link" href="mailto:data-products-research@digital.cabinet-office.gov.uk">contact the Data Products team</a> if the problem persists.</p>
+      </div>
+    </div>`)
+  return html.join('')
+}
+
 const viewErrorBanner = () => {
   const html = []
-  if (state.systemErrorText || state.userErrors.length > 0) {
-    html.push(`
-        <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">`)
-    if (state.systemErrorText) {
-      let errorText = ''
-      switch (state.systemErrorText) {
-        case 'TIMEOUT':
-          errorText =
-            'The databse took too long to respond. This is usually due to too many query results. Please try a more precise query.'
-          break
-        default:
-          errorText = 'A problem has occurred with the database.'
-      }
-      html.push(`
-          <h1 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h1>
-          <p class="govuk-body">${errorText}</p>
-          <p>Please <a class="govuk-link" href="mailto:data-products-research@digital.cabinet-office.gov.uk">contact the Data Products team</a> if the problem persists.</p>
-      `)
-    } else {
-      if (state.userErrors.length > 0) {
-        html.push(`
+
+  if (state.userErrors.length > 0) {
+    html.push(`<div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
             <h1 class="govuk-error-summary__title" id="error-summary-title">
               There is a problem
             </h1>
             <ul class="govuk-error-summary__list">
           `)
-        state.userErrors.forEach((userError) => {
-          switch (userError) {
-            case 'missingWhereToSearch':
-              html.push(`
+    state.userErrors.forEach((userError) => {
+      switch (userError) {
+        case USER_ERRORS.MISSING_WHERE_TO_SEARCH:
+          html.push(`
               <li><a href="#search-locations-wrapper">You need to select a keyword location</a></li>`)
-              break
-            case 'missingArea':
-              html.push(`
+          break
+        case USER_ERRORS.MISSING_AREA:
+          html.push(`
               <li><a href="#search-scope-wrapper">You need to select a publishing application</a></li>`)
-              break
-            default:
-              console.log('unknown user error code:', userError)
-          }
-        })
-        html.push(`
-            </ul>`)
+          break
+        default:
+          console.log('Unknown user error code:', userError)
       }
-    }
-    html.push(`
-        </div>
-      `)
+    })
+    html.push(`</ul></div>`)
   }
   return html.join('')
 }
@@ -326,13 +331,13 @@ const viewSearchResults = () => {
       document.title = `GOV.UK ${queryDescription(
         state.searchParams,
         false
-      )} - Gov Search`
+      )} - ${serviceName}`
       return viewWaiting()
     case 'results':
       document.title = `GOV.UK ${queryDescription(
         state.searchParams,
         false
-      )} - Gov Search`
+      )} - ${serviceName}`
       if (window.ga)
         window.ga('send', 'search', {
           search: document.title,
@@ -343,7 +348,7 @@ const viewSearchResults = () => {
       document.title = `GOV.UK ${queryDescription(
         state.searchParams,
         false
-      )} - Gov Search`
+      )} - ${serviceName}`
       if (window.ga)
         window.ga('send', 'search', {
           search: document.title,
@@ -351,7 +356,7 @@ const viewSearchResults = () => {
         })
       return `${viewMetaResults() || ''} ${viewNoResults()}` // FIXME - avoid || ''
     default:
-      document.title = 'Gov Search'
+      document.title = serviceName
       return ''
   }
 }

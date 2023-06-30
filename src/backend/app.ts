@@ -13,6 +13,8 @@ import passport from 'passport'
 import session from 'express-session'
 import { generateSessionId } from './utils/auth'
 import config from './config'
+import { pageNotFound } from './middleware/pageNotFound'
+import { errorMiddleware } from './middleware/errorMiddleware'
 import { allowGoogleAnalytics } from './middleware/allowGoogleAnalytics'
 import { showCookieMessage } from './middleware/showCookieMessage'
 
@@ -29,6 +31,7 @@ class App {
     this.initializeMiddlewares()
     this.initializeRoutes(routes)
     this.initializeRenderEngine()
+    this.initializeFinalMiddlewares()
   }
 
   public listen(): void {
@@ -148,6 +151,11 @@ class App {
         }
       )
     )
+  }
+
+  private initializeFinalMiddlewares() {
+    this.app.use(pageNotFound)
+    this.app.use(errorMiddleware)
   }
 }
 
