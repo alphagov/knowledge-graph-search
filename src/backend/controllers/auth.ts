@@ -5,6 +5,7 @@ import { Route } from '../enums/routes'
 class AuthController {
   public loginSuccessRedirect: RequestHandler = (req, res) =>
     res.redirect(Route.search)
+
   public reauth: RequestHandler = async (req, res) => {
     const { userId } = req.params
     try {
