@@ -13,7 +13,6 @@ const errorTitle = 'Sorry, there is a problem with the service'
 const serviceName = 'Gov Search'
 
 const view = () => {
-  console.log('view')
   document.title = state.systemErrorText
     ? `${errorTitle}: ${serviceName}`
     : serviceName

@@ -15,6 +15,10 @@ import { generateSessionId } from './utils/auth'
 import config from './config'
 import { pageNotFound } from './middleware/pageNotFound'
 import { errorMiddleware } from './middleware/errorMiddleware'
+import { allowGoogleAnalytics } from './middleware/allowGoogleAnalytics'
+import { showCookieMessage } from './middleware/showCookieMessage'
+
+const cookieParser = require('cookie-parser')
 
 class App {
   public app: express.Express = express()
@@ -57,10 +61,13 @@ class App {
   }
 
   private initializeMiddlewares() {
+    this.app.use(cookieParser())
     this.app.use(cors())
     this.app.use(express.static('./src/public'))
     this.app.use(bodyParser.urlencoded({ extended: true }))
     this.app.use(bodyParser.json())
+    this.app.use(allowGoogleAnalytics)
+    this.app.use(showCookieMessage)
     this.initializeLogin()
   }
 

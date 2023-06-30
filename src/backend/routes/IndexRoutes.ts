@@ -3,6 +3,7 @@ import SearchController from '../controllers/search.controller'
 import SearchAPIController from '../controllers/searchAPI.controller'
 import InfoBoxController from '../controllers/infoBox.controller'
 import DownloadCSVController from '../controllers/downloadCSV.controller'
+import CookiesController from '../controllers/cookies'
 import Routes, { Route } from '../enums/routes'
 import { auth } from '../middleware/auth'
 
@@ -12,6 +13,7 @@ class IndexRoute implements Routes {
   public searchAPIController = new SearchAPIController()
   public infoBoxController = new InfoBoxController()
   public downloadCSVController = new DownloadCSVController()
+  public cookiesController = new CookiesController()
 
   constructor() {
     this.initializeRoutes()
@@ -68,6 +70,20 @@ class IndexRoute implements Routes {
       Route.infoBoxPerson,
       auth(),
       this.infoBoxController.infoBoxPerson
+    )
+
+    this.router.get(Route.cookies, auth(), this.cookiesController.cookies)
+
+    this.router.post(
+      Route.saveCookieSettings,
+      auth(),
+      this.cookiesController.saveCookieSettings
+    )
+
+    this.router.post(
+      Route.hideCookieSuccessBanner,
+      auth(),
+      this.cookiesController.hideCookieSuccessBanner
     )
   }
 }
