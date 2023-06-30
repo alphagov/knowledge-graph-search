@@ -133,7 +133,7 @@ const viewDataBaseError = () => {
   switch (state.systemErrorText) {
     case 'TIMEOUT':
       errorText =
-        'The databse took too long to respond. This is usually due to too many query results. Please try a more precise query.'
+        'The database took too long to respond. This is usually due to too many query results. Please try a more precise query.'
       break
     default:
       errorText = 'A problem has occurred with the database.'
