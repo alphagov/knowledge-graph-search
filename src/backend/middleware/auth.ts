@@ -1,13 +1,14 @@
 import * as express from 'express'
 import { isReqAJAX } from '../utils/isReqAJAX'
 import config from '../config'
+import { Route } from '../enums/routes'
 
 /*
  * Express middleware enforcing user authentication. Redirects unauthenticated users to login page,
  * or returns 401 for AJAX requests. Can bypass authentication by setting the 'ENABLE_AUTH' environment variable.
  */
 export const auth: (s?: string) => express.Handler =
-  (redirectUrl = '/login') =>
+  (redirectUrl = Route.login) =>
   (req, res, next) => {
     if (!config.authEnabled) {
       return next()
