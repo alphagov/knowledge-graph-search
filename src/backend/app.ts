@@ -147,8 +147,8 @@ class App {
   }
 
   private initializeFinalMiddlewares() {
-    this.app.use(pageNotFound);
-    this.app.use(errorMiddleware);
+    this.app.use(pageNotFound)
+    this.app.use(errorMiddleware)
   }
 }
 

@@ -14,12 +14,14 @@ const serviceName = 'Gov Search'
 
 const view = () => {
   console.log('view')
-  document.title = state.systemErrorText ? `${errorTitle}: ${serviceName}` : serviceName
+  document.title = state.systemErrorText
+    ? `${errorTitle}: ${serviceName}`
+    : serviceName
   const pageContent: HTMLElement | null = id('page-content')
   if (pageContent) {
-    state.systemErrorText ?
-      pageContent.innerHTML = `${viewDataBaseError()}` :
-      pageContent.innerHTML = `
+    state.systemErrorText
+      ? (pageContent.innerHTML = `${viewDataBaseError()}`)
+      : (pageContent.innerHTML = `
       <main class="govuk-main-wrapper" id="main-content" role="main">
       ${viewErrorBanner()}
       ${viewSearchTypeSelector()}
@@ -28,7 +30,7 @@ const view = () => {
         Searches do not include history mode content, Publisher GitHub smart answers or service domains.
         Page views depend on cookie consent.
       </p>
-      </main>`
+      </main>`)
   }
 
   // Add event handlers
@@ -126,19 +128,18 @@ const viewMainLayout = () => {
   return result.join('')
 }
 
-
 const viewDataBaseError = () => {
   const html = []
-    let errorText = ''
-    switch (state.systemErrorText) {
-      case 'TIMEOUT':
-        errorText =
-          'The databse took too long to respond. This is usually due to too many query results. Please try a more precise query.'
-        break
-      default:
-        errorText = 'A problem has occurred with the database.'
-    }
-    html.push(`
+  let errorText = ''
+  switch (state.systemErrorText) {
+    case 'TIMEOUT':
+      errorText =
+        'The databse took too long to respond. This is usually due to too many query results. Please try a more precise query.'
+      break
+    default:
+      errorText = 'A problem has occurred with the database.'
+  }
+  html.push(`
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-xl">${errorTitle}</h1>
@@ -155,30 +156,30 @@ const viewErrorBanner = () => {
     html.push(`
         <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">`)
 
-      if (state.userErrors.length > 0) {
-        html.push(`
+    if (state.userErrors.length > 0) {
+      html.push(`
             <h1 class="govuk-error-summary__title" id="error-summary-title">
               There is a problem
             </h1>
             <ul class="govuk-error-summary__list">
           `)
-        state.userErrors.forEach((userError) => {
-          switch (userError) {
-            case 'missingWhereToSearch':
-              html.push(`
+      state.userErrors.forEach((userError) => {
+        switch (userError) {
+          case 'missingWhereToSearch':
+            html.push(`
               <li><a href="#search-locations-wrapper">You need to select a keyword location</a></li>`)
-              break
-            case 'missingArea':
-              html.push(`
+            break
+          case 'missingArea':
+            html.push(`
               <li><a href="#search-scope-wrapper">You need to select a publishing application</a></li>`)
-              break
-            default:
-              console.log('unknown user error code:', userError)
-          }
-        })
-        html.push(`
+            break
+          default:
+            console.log('unknown user error code:', userError)
+        }
+      })
+      html.push(`
             </ul>`)
-      }
+    }
 
     html.push(`
         </div>
