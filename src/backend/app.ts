@@ -17,8 +17,7 @@ import { pageNotFound } from './middleware/pageNotFound'
 import { errorMiddleware } from './middleware/errorMiddleware'
 import { allowGoogleAnalytics } from './middleware/allowGoogleAnalytics'
 import { showCookieMessage } from './middleware/showCookieMessage'
-
-const cookieParser = require('cookie-parser')
+import cookieParser from 'cookie-parser'
 
 class App {
   public app: express.Express = express()
