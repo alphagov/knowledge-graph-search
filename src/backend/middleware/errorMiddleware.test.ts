@@ -31,7 +31,7 @@ describe('errorMiddleware', () => {
       },
     };
     const { status } = error.response;
-    await errorMiddleware(error, req, res, next);
+    await errorMiddleware(error, req, res);
     expect(res.status).toHaveBeenCalledWith(error.response.status);
     expect(res.render).toHaveBeenCalledWith(
       'errors.njk', {
@@ -50,7 +50,7 @@ describe('errorMiddleware', () => {
       },
     };
 
-    await errorMiddleware(error, req, res, next);
+    await errorMiddleware(error, req, res);
     expect(res.render).toHaveBeenCalledWith(
       'errors.njk', {
         title,
