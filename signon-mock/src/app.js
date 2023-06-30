@@ -6,6 +6,7 @@ import nunjucks from 'nunjucks'
 import log, { httpLogger } from './logging.js'
 import users, { ADMIN_ACCESS_TOKEN } from './users.js'
 import { requireAuthorizationCode, requireAccessToken } from './middlewares.js'
+import { buildNewUserProfile } from './utils.js'
 
 const app = express()
 const PORT = 3005
@@ -76,6 +77,28 @@ app.get('/reauth/:userId', async (req, res) => {
           Authorization: `Bearer ${ADMIN_ACCESS_TOKEN}`,
         },
       }
+    )
+    res.json(response.data)
+  } catch (error) {
+    log.error({ error })
+    res
+      .status(error.response?.status || 500)
+      .send(error.response?.data || 'An error occurred')
+  }
+})
+
+app.get('/updatepermissions/:userId', async (req, res) => {
+  const { userId } = req.params
+  const { permission } = req.query
+
+  const newUserProfile = buildNewUserProfile({
+    uid: userId,
+    permisssions: { govsearch: [permission] },
+  })
+  try {
+    const response = await axios.put(
+      `http://localhost:8080/auth/gds/api/users/${userId}`,
+      newUserProfile
     )
     res.json(response.data)
   } catch (error) {

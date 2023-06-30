@@ -1,8 +1,8 @@
 import passport from 'passport'
 import { Router } from 'express'
 import AuthController from '../controllers/auth.controller'
-import Routes, { Route } from '../enums/routes'
 import hasSignonUpdatePermissions from '../middleware/hasSignonUpdatePermissions'
+import Routes, { Route } from '../constants/routes'
 
 class AuthRoutes implements Routes {
   public router = Router()
@@ -23,6 +23,10 @@ class AuthRoutes implements Routes {
       Route.reauth,
       hasSignonUpdatePermissions,
       this.authController.reauth
+    )
+    this.router.put(
+      Route.updateUserPermissions,
+      this.authController.updateUserPermissions
     )
   }
 }

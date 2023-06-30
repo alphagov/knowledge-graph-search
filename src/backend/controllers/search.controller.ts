@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express'
-import { ENV } from '../enums/environments'
+import { ENV } from '../constants/environments'
 import config from '../config'
 
 class SearchController {
