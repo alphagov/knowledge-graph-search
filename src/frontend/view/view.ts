@@ -6,6 +6,7 @@ import { languageName } from '../../common/utils/lang'
 import { viewMetaResults } from './view-metabox'
 import { viewSearchPanel } from './view-search-panel'
 import { EventType } from '../types/event-types'
+import { USER_ERRORS } from '../enums/constants'
 
 declare const window: any
 
@@ -151,38 +152,29 @@ const viewDataBaseError = () => {
 
 const viewErrorBanner = () => {
   const html = []
-  if (state.systemErrorText || state.userErrors.length > 0) {
-    html.push(`
-        <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">`)
 
-    if (state.userErrors.length > 0) {
-      html.push(`
+  if (state.userErrors.length > 0) {
+    html.push(`<div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
             <h1 class="govuk-error-summary__title" id="error-summary-title">
               There is a problem
             </h1>
             <ul class="govuk-error-summary__list">
           `)
-      state.userErrors.forEach((userError) => {
-        switch (userError) {
-          case 'missingWhereToSearch':
-            html.push(`
+    state.userErrors.forEach((userError) => {
+      switch (userError) {
+        case USER_ERRORS.MISSING_WHERE_TO_SEARCH:
+          html.push(`
               <li><a href="#search-locations-wrapper">You need to select a keyword location</a></li>`)
-            break
-          case 'missingArea':
-            html.push(`
+          break
+        case USER_ERRORS.MISSING_AREA:
+          html.push(`
               <li><a href="#search-scope-wrapper">You need to select a publishing application</a></li>`)
-            break
-          default:
-            console.log('Unknown user error code:', userError)
-        }
-      })
-      html.push(`
-            </ul>`)
-    }
-
-    html.push(`
-        </div>
-      `)
+          break
+        default:
+          console.log('Unknown user error code:', userError)
+      }
+    })
+    html.push(`</ul></div>`)
   }
   return html.join('')
 }

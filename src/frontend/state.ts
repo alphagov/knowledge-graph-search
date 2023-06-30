@@ -6,6 +6,7 @@ import {
   SearchArea,
 } from '../common/types/search-api-types'
 import { State } from './types/state-types'
+import { USER_ERRORS } from './enums/constants'
 
 // user inputs that are used to build the query.
 // (basically, everything whose value could be found in the URL)
@@ -134,7 +135,7 @@ const searchState = function (): { code: string; errors: string[] } {
       !state.searchParams.whereToSearch.title &&
       !state.searchParams.whereToSearch.text
     ) {
-      errors.push('missingWhereToSearch')
+      errors.push(USER_ERRORS.MISSING_WHERE_TO_SEARCH)
     }
   }
   if (errors.length > 0) return { code: 'error', errors }

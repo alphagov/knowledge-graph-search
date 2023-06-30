@@ -2,6 +2,7 @@ import { sanitiseOutput } from '../../common/utils/utils'
 import { state, searchState } from '../state'
 import { languageName } from '../../common/utils/lang'
 import { SearchType } from '../../common/types/search-api-types'
+import { USER_ERRORS } from '../enums/constants'
 
 const viewSearchPanel = () => {
   const result = []
@@ -153,7 +154,7 @@ const viewInlineError = (id: string, message: string): string => `
 
 const viewScopeSelector = (): string => {
   const errors = searchState()?.errors
-  const err = errors && errors.includes('missingWhereToSearch')
+  const err = errors && errors.includes(USER_ERRORS.MISSING_WHERE_TO_SEARCH)
   return `
   <div class="govuk-form-group ${err ? 'govuk-form-group--error' : ''}">
     <fieldset
