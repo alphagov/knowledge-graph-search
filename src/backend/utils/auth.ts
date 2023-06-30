@@ -9,7 +9,7 @@ export function generateSessionId(req: express.Request) {
   // against the sessionId for lookup when destroying sessions through the
   // /reauth endpoint.
   if (req.user) {
-    const { uid: userId } = (req.user as any).profileData
+    const { uid: userId } = (req.user as any)?.profileData?.user || {}
     addSessionToUserSet(userId, sessionId)
   }
 

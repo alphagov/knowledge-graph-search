@@ -38,7 +38,7 @@ app.get('/oauth/authorize', (req, res) => {
 app.get('/user.json', (req, res) => {
   const uid =
     process.env.SINGLE_USER === 'true' ? constantUserId : crypto.randomUUID()
-  res.json({ name: 'John Doe', uid })
+  res.json({ user: { name: 'John Doe', uid } })
 })
 
 app.post('/oauth/access_token', (req, res) => {
