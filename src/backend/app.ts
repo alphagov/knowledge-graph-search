@@ -27,7 +27,7 @@ class App {
     this.initializeMiddlewares()
     this.initializeRoutes(routes)
     this.initializeRenderEngine()
-    this.initializeErrorHandling()
+    this.initializeFinalMiddlewares()
   }
 
   public listen(): void {
@@ -146,7 +146,7 @@ class App {
     )
   }
 
-  private initializeErrorHandling() {
+  private initializeFinalMiddlewares() {
     this.app.use(pageNotFound);
     this.app.use(errorMiddleware);
   }

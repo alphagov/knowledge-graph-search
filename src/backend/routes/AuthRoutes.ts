@@ -1,6 +1,6 @@
 import passport from 'passport'
 import { Router } from 'express'
-import AuthController from '../controllers/auth'
+import AuthController from '../controllers/auth.controller'
 import Routes, { Route } from '../enums/routes'
 
 class AuthRoutes implements Routes {
