@@ -10,9 +10,6 @@ RUN npm ci # install from package-lock.json
 # Compile SCSS to CSS
 RUN sass ./src/frontend/scss/main.scss > ./src/public/main.css
 
-# Copy assets
-RUN npm run copy-assets
-
 # Compile TypeScript to JavaScript (browser)
 RUN npx webpack
 
