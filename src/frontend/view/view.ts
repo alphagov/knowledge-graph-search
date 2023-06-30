@@ -173,7 +173,7 @@ const viewErrorBanner = () => {
               <li><a href="#search-scope-wrapper">You need to select a publishing application</a></li>`)
             break
           default:
-            console.log('unknown user error code:', userError)
+            console.log('Unknown user error code:', userError)
         }
       })
       html.push(`
