@@ -14,17 +14,18 @@ const view = () => {
   document.title = 'Gov Search'
   const pageContent: HTMLElement | null = id('page-content')
   if (pageContent) {
-    pageContent.innerHTML = `
+    state.systemErrorText ?
+      pageContent.innerHTML = `${viewDataBaseError()}` :
+      pageContent.innerHTML = `
       <main class="govuk-main-wrapper" id="main-content" role="main">
-        ${viewErrorBanner()}
-        ${viewSearchTypeSelector()}
-        ${viewMainLayout()}
-        <p class="govuk-body-s">
-          Searches do not include history mode content, Publisher GitHub smart answers or service domains.
-          Page views depend on cookie consent.
-        </p>
-      </main>
-    `
+      ${viewErrorBanner()}
+      ${viewSearchTypeSelector()}
+      ${viewMainLayout()}
+      <p class="govuk-body-s">
+        Searches do not include history mode content, Publisher GitHub smart answers or service domains.
+        Page views depend on cookie consent.
+      </p>
+      </main>`
   }
 
   // Add event handlers
@@ -122,27 +123,35 @@ const viewMainLayout = () => {
   return result.join('')
 }
 
+
+const viewDataBaseError = () => {
+  const html = []
+    let errorText = ''
+    switch (state.systemErrorText) {
+      case 'TIMEOUT':
+        errorText =
+          'The databse took too long to respond. This is usually due to too many query results. Please try a more precise query.'
+        break
+      default:
+        errorText = 'A problem has occurred with the database.'
+    }
+    html.push(`
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">Sorry, there is a problem with the service</h1>
+        <p class="govuk-body">${errorText}</p>
+        <p class="govuk-body">Please <a class="govuk-link" href="mailto:data-products-research@digital.cabinet-office.gov.uk">contact the Data Products team</a> if the problem persists.</p>
+      </div>
+    </div>`)
+  return html.join('')
+}
+
 const viewErrorBanner = () => {
   const html = []
   if (state.systemErrorText || state.userErrors.length > 0) {
     html.push(`
         <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">`)
-    if (state.systemErrorText) {
-      let errorText = ''
-      switch (state.systemErrorText) {
-        case 'TIMEOUT':
-          errorText =
-            'The databse took too long to respond. This is usually due to too many query results. Please try a more precise query.'
-          break
-        default:
-          errorText = 'A problem has occurred with the database.'
-      }
-      html.push(`
-          <h1 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h1>
-          <p class="govuk-body">${errorText}</p>
-          <p>Please <a class="govuk-link" href="mailto:data-products-research@digital.cabinet-office.gov.uk">contact the Data Products team</a> if the problem persists.</p>
-      `)
-    } else {
+
       if (state.userErrors.length > 0) {
         html.push(`
             <h1 class="govuk-error-summary__title" id="error-summary-title">
@@ -167,7 +176,7 @@ const viewErrorBanner = () => {
         html.push(`
             </ul>`)
       }
-    }
+
     html.push(`
         </div>
       `)

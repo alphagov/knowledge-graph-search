@@ -8,7 +8,8 @@ import * as nunjucks from 'nunjucks'
 import bodyParser from 'body-parser'
 import Redis from 'ioredis'
 import RedisStore from 'connect-redis'
-import { error404 } from './middleware/error404'
+import { pageNotFound } from './middleware/pageNotFound'
+import { errorMiddleware } from './middleware/errorMiddleware'
 
 const OAuth2Strategy = require('passport-oauth2')
 const passport = require('passport')
@@ -31,7 +32,6 @@ class App {
   constructor(routes: Routes[]) {
     this.app = express()
     this.port = process.env.port ? parseInt(process.env.port) : 8080
-
     this.initializeMiddlewares()
     this.initializeRoutes(routes)
     this.initializeRenderEngine()
@@ -138,8 +138,8 @@ class App {
   }
 
   private initializeErrorHandling() {
-    //this.app.use(errorMiddleware);
-    this.app.use(error404);
+    this.app.use(pageNotFound);
+    this.app.use(errorMiddleware);
   }
 }
 
