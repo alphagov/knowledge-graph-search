@@ -2,3 +2,4 @@ node_modules
 coverage
 public/main.js
 public/main.css
+public/assets/all.js
