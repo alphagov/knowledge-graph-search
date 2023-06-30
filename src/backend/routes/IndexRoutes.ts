@@ -3,7 +3,7 @@ import SearchController from '../controllers/search.controller'
 import SearchAPIController from '../controllers/searchAPI.controller'
 import InfoBoxController from '../controllers/infoBox.controller'
 import DownloadCSVController from '../controllers/downloadCSV.controller'
-import CookiesController from '../controllers/cookies'
+import CookiesController from '../controllers/cookies.controller'
 import Routes, { Route } from '../enums/routes'
 import { auth } from '../middleware/auth'
 
