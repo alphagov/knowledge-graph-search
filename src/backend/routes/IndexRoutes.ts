@@ -4,7 +4,7 @@ import SearchAPIController from '../controllers/searchAPI'
 import InfoBoxController from '../controllers/infoBox'
 import DownloadCSVController from '../controllers/downloadCSV'
 import Routes, { Route } from '../enums/routes'
-import { auth } from '../../backend/middleware/auth'
+import { auth } from '../middleware/auth'
 
 class IndexRoute implements Routes {
   public router = Router()

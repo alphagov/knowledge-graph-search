@@ -19,11 +19,12 @@ import {
 import { splitKeywords } from '../../common/utils/utils'
 import { languageCode } from '../../common/utils/lang'
 import { BigQuery } from '@google-cloud/bigquery'
+import config from '../config'
 
 //= ===== private ======
 
 const bigquery = new BigQuery({
-  projectId: process.env.PROJECT_ID,
+  projectId: config.projectId,
 })
 
 const bigQuery = async function (userQuery: string, options?: any) {

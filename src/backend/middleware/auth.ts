@@ -1,13 +1,6 @@
 import * as express from 'express'
 import { isReqAJAX } from '../utils/isReqAJAX'
-
-declare global {
-  namespace Express {
-    interface Request {
-      session: any
-    }
-  }
-}
+import config from '../config'
 
 /*
  * Express middleware enforcing user authentication. Redirects unauthenticated users to login page,
@@ -16,7 +9,7 @@ declare global {
 export const auth: (s?: string) => express.Handler =
   (redirectUrl = '/login') =>
   (req, res, next) => {
-    if (process.env.ENABLE_AUTH !== 'true') {
+    if (!config.authEnabled) {
       return next()
     }
 
@@ -32,6 +25,8 @@ export const auth: (s?: string) => express.Handler =
 
     // Store the requested URL in session to enable post-login redirection.
     if (req.session) {
+      // eslint-disable-next-line
+      // @ts-ignore
       req.session.returnTo = req.originalUrl || req.url
     }
 

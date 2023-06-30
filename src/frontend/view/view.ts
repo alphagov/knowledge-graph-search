@@ -9,9 +9,12 @@ import { EventType } from '../types/event-types'
 
 declare const window: any
 
+const errorTitle = 'Sorry, there is a problem with the service'
+const serviceName = 'Gov Search'
+
 const view = () => {
   console.log('view')
-  document.title = 'Gov Search'
+  document.title = state.systemErrorText ? `${errorTitle}: ${serviceName}` : serviceName
   const pageContent: HTMLElement | null = id('page-content')
   if (pageContent) {
     state.systemErrorText ?
@@ -138,7 +141,7 @@ const viewDataBaseError = () => {
     html.push(`
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
-        <h1 class="govuk-heading-xl">Sorry, there is a problem with the service</h1>
+        <h1 class="govuk-heading-xl">${errorTitle}</h1>
         <p class="govuk-body">${errorText}</p>
         <p class="govuk-body">Please <a class="govuk-link" href="mailto:data-products-research@digital.cabinet-office.gov.uk">contact the Data Products team</a> if the problem persists.</p>
       </div>
@@ -336,13 +339,13 @@ const viewSearchResults = () => {
       document.title = `GOV.UK ${queryDescription(
         state.searchParams,
         false
-      )} - Gov Search`
+      )} - ${serviceName}`
       return viewWaiting()
     case 'results':
       document.title = `GOV.UK ${queryDescription(
         state.searchParams,
         false
-      )} - Gov Search`
+      )} - ${serviceName}`
       if (window.ga)
         window.ga('send', 'search', {
           search: document.title,
@@ -353,7 +356,7 @@ const viewSearchResults = () => {
       document.title = `GOV.UK ${queryDescription(
         state.searchParams,
         false
-      )} - Gov Search`
+      )} - ${serviceName}`
       if (window.ga)
         window.ga('send', 'search', {
           search: document.title,
@@ -361,7 +364,7 @@ const viewSearchResults = () => {
         })
       return `${viewMetaResults() || ''} ${viewNoResults()}` // FIXME - avoid || ''
     default:
-      document.title = 'Gov Search'
+      document.title = serviceName
       return ''
   }
 }

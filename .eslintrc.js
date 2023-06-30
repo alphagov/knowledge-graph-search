@@ -31,6 +31,7 @@ module.exports = {
         assertFunctionNames: ['expect', 'request'],
       },
     ],
+    '@typescript-eslint/no-var-requires': 'off',
   },
   overrides: [
     // Exclude the 'jest' plugin for .cy.ts files

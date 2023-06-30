@@ -1,7 +1,7 @@
 import request from 'supertest'
 import { expect } from '@jest/globals'
 import App from '../app'
-import IndexRoute from '../routes/routes'
+import IndexRoute from '../routes/IndexRoutes'
 
 const indexRoute = new IndexRoute()
 const app = new App([indexRoute])

@@ -7,6 +7,7 @@
     "test": "jest --watchAll --coverage --verbose --detectOpenHandles",
     "start": "ts-node src/backend/server.ts",
     "dev": "nodemon src/backend/server.ts",
+    "local": "env $(cat .env|xargs) npm run dev",
     "build": "webpack",
     "lint": "eslint './**/*.{ts,tsx}' --fix",
     "check-lint": "eslint './**/*.{ts,tsx}'",
@@ -41,6 +42,7 @@
   },
   "devDependencies": {
     "@types/cors": "^2.8.13",
+    "@types/express-session": "^1.17.7",
     "@types/jest": "^29.5.2",
     "@types/nunjucks": "^3.2.2",
     "@types/passport-oauth2": "^1.4.12",
@@ -65,7 +67,7 @@
     "ts-jest": "^29.1.0",
     "ts-loader": "^9.4.1",
     "ts-node": "^10.9.1",
-    "typescript": "^4.9.4",
+    "typescript": "^4.9.5",
     "webpack": "^5.76.0",
     "webpack-cli": "^4.10.0"
   }

@@ -4,3 +4,8 @@ export enum ENV {
   STAGING = 'staging',
   PRODUCTION = 'production',
 }
+
+export enum REDIS_PREFIX {
+  SESSION = 'Session__',
+  SESSIONS_SET = 'UserSessionsSet__',
+}
