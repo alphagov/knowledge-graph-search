@@ -20,6 +20,7 @@ import { splitKeywords } from '../../common/utils/utils'
 import { languageCode } from '../../common/utils/lang'
 import { BigQuery } from '@google-cloud/bigquery'
 import config from '../config'
+import log from '../utils/logging'
 
 //= ===== private ======
 
@@ -93,8 +94,8 @@ const sendInitQuery = async function (): Promise<InitResults> {
         FROM \`graph.organisation\`
         `),
     ])
-  } catch (e) {
-    console.log('sendInitQueryError', e)
+  } catch (error) {
+    log.error(error, 'Error in sendInitQueryError')
   }
 
   return {

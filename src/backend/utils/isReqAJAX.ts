@@ -1,4 +1,5 @@
 import * as express from 'express'
+import log from '../utils/logging'
 
 export const isReqAJAX = (req: express.Request) => {
   // This header has to be manually set in the frontend
@@ -10,7 +11,7 @@ export const isReqAJAX = (req: express.Request) => {
     return false
   }
   if (Array.isArray(headerValue)) {
-    console.log(
+    log.warn(
       'Having multiple values is not supported for header "X-Requested-With"'
     )
     return false

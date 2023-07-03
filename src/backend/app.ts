@@ -17,6 +17,7 @@ import { pageNotFound } from './middleware/pageNotFound'
 import { errorMiddleware } from './middleware/errorMiddleware'
 import { allowGoogleAnalytics } from './middleware/allowGoogleAnalytics'
 import { showCookieMessage } from './middleware/showCookieMessage'
+import log, { httpLogger } from './utils/logging'
 import cookieParser from 'cookie-parser'
 
 class App {
@@ -37,7 +38,7 @@ class App {
     const server = http.createServer(this.app)
     server.keepAliveTimeout = 1000 * (60 * 6) // 6 minutes
     server.listen(this.port, () => {
-      console.log(`🚀 App listening on the port ${this.port}`)
+      log.info(`🚀 App listening on the port ${this.port}`)
     })
 
     const handleShutdown = () => {
@@ -46,7 +47,7 @@ class App {
         getClient().disconnect()
       }
       server.close(() => {
-        console.log('Server gracefully shut down')
+        log.info('Server gracefully shut down')
         process.exit(0)
       })
     }
@@ -68,6 +69,7 @@ class App {
     this.app.use(allowGoogleAnalytics)
     this.app.use(showCookieMessage)
     this.initializeLogin()
+    this.app.use(httpLogger)
   }
 
   private initializeRoutes(routes: Routes[]) {
@@ -93,10 +95,10 @@ class App {
 
   private initializeLogin() {
     if (!config.authEnabled) {
-      console.log('Auth is disabled')
+      log.debug('Auth is disabled')
       return
     }
-    console.log('Auth is enabled')
+    log.debug('Auth is enabled')
 
     passport.serializeUser((user: any, done: any) => done(null, user))
     passport.deserializeUser((user: any, done: any) => done(null, user))
@@ -133,6 +135,7 @@ class App {
         ) {
           let profileData
           try {
+            log.debug('Fetching user profile')
             profileData = await getUserProfile(accessToken)
           } catch (error) {
             console.error('ERROR fetching user data')
@@ -145,7 +148,7 @@ class App {
             refreshToken,
             accessToken,
           }
-          console.log('User data fetched successfully', { userSessionData })
+          log.debug('User data fetched successfully', { userSessionData })
           doneCallback(null, userSessionData)
         }
       )

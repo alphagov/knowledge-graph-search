@@ -92,3 +92,58 @@ To run a single test file , use `--spec`. For instance:
 6. You may be prompted to authenticate with `gcloud run login`, in which case do so and start again.
 7. Choose the GCP region `europe-west2`
 8. Continue. Check in the [web console](https://console.cloud.google.com/run/detail/europe-west2/govuk-knowledge-graph-search/revisions?project=govuk-knowledge-graph) that a revision was deployed, and try using it at https://govgraphsearch.dev.
+
+## Logging
+
+We use Pino for logging.
+Pino enables structured logging, human-readable formatting, top-notch performance.
+
+⚠️⚠️ Pino doesn't behave the same as `console.log`. ⚠️⚠️
+
+You can't pass it infinite arguments. Instead, it's one string at a time.
+If you want to log an object alongside your log, then pass the _object as the first argument, then the string_.
+
+e.g
+
+```javascript
+console.log('this', 'is', 'a', 'test')
+// =
+log.info('this is a test')
+
+console.log('Look at this object', { ...anObject })
+// =
+log.info({ ...anObject }, 'Look at this object')
+
+console.log('A few objects', { ...obj1 }, { ...obj2 })
+// Separate your logs instead
+log.info('A few objects')
+log.info({ ...obj1 }, 'Object 1')
+log.info({ ...obj2 }, 'Object 2')
+
+// This WONT WORK
+// Second object will be swallowed as objects go to the first argument only.
+log.info(obj1, obj2)
+```
+
+If you want the request object logged alongside:
+
+```javascript
+function middeware(req, res, next) {
+  req.log.info('A log')
+  // logs: {...req} A log
+}
+```
+
+To use the logger otherwise:
+
+```javascript
+import log from './utils/logging'
+
+log.info('in msg')
+log.debug('debug msg')
+log.error('error')
+log.error(error, 'error')
+
+// If you want to log an object:
+log.info({ a: 123, b: 456 }, 'This is a log')
+```
