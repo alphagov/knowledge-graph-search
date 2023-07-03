@@ -43,7 +43,7 @@ describe('errorMiddleware', () => {
     res.status = jest.fn().mockReturnThis()
     const error: any = {
       response: {
-        satus: null,
+        status: null,
       },
     }
     await errorMiddleware(error, req, res)
