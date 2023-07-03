@@ -39,14 +39,24 @@ describe('errorMiddleware', () => {
     })
   })
 
-  test('It should return error message and default to 500 when no status', async () => {
+  test('It should return error message and default to 500 when no error.response.status', async () => {
     res.status = jest.fn().mockReturnThis()
     const error: any = {
       response: {
-        satus: null,
+        status: null,
       },
     }
+    await errorMiddleware(error, req, res)
+    expect(res.render).toHaveBeenCalledWith('errors.njk', {
+      title,
+      message,
+      status: 500,
+    })
+  })
 
+  test('It should return error message and default to 500 when no error.response', async () => {
+    res.status = jest.fn().mockReturnThis()
+    const error: any = {}
     await errorMiddleware(error, req, res)
     expect(res.render).toHaveBeenCalledWith('errors.njk', {
       title,

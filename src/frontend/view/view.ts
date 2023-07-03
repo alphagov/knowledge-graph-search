@@ -22,7 +22,7 @@ const view = () => {
     state.systemErrorText
       ? (pageContent.innerHTML = `${viewDataBaseError()}`)
       : (pageContent.innerHTML = `
-      <main class="govuk-main-wrapper" id="main-content" role="main">
+      <div class="govuk-main-wrapper" id="main-content">
       ${viewErrorBanner()}
       ${viewSearchTypeSelector()}
       ${viewMainLayout()}
@@ -30,7 +30,7 @@ const view = () => {
         Searches do not include history mode content, Publisher GitHub smart answers or service domains.
         Page views depend on cookie consent.
       </p>
-      </main>`)
+      </div>`)
   }
 
   // Add event handlers
