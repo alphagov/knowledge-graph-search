@@ -6,7 +6,7 @@ import express from 'express'
 import Routes from './constants/routes'
 import * as nunjucks from 'nunjucks'
 import bodyParser from 'body-parser'
-import { getStore } from './services/redisStore'
+import sessionStore from './services/sessionStore'
 import { getUserProfile } from './services/signon'
 import OAuth2Strategy from 'passport-oauth2'
 import passport from 'passport'
@@ -111,7 +111,7 @@ class App {
         resave: false,
         saveUninitialized: false,
         cookie: { secure: !(config.environment === 'local') },
-        store: getStore(),
+        store: sessionStore.getStore(),
         genid: generateSessionId,
       })
     )

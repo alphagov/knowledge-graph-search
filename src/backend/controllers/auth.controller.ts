@@ -1,11 +1,8 @@
 import { RequestHandler } from 'express'
-import {
-  destroySessionsForUserId,
-  updatePermissionsForUser,
-} from '../services/redisStore'
 import { Route } from '../constants/routes'
 import log from '../utils/logging'
 import { SignonProfileData } from '../constants/types'
+import sessionStore from '../services/sessionStore'
 
 class AuthController {
   public loginSuccessRedirect: RequestHandler = (req, res) =>
@@ -14,7 +11,7 @@ class AuthController {
   public reauth: RequestHandler = async (req, res) => {
     const { userId } = req.params
     try {
-      await destroySessionsForUserId(userId)
+      await sessionStore.destroySessionsForUserId(userId)
     } catch (error) {
       console.error('ERROR in /reauth endpoint')
       console.error({ error })
@@ -38,7 +35,10 @@ class AuthController {
     )
 
     try {
-      await updatePermissionsForUser(userId, body as SignonProfileData)
+      await sessionStore.updatePermissionsForUser(
+        userId,
+        body as SignonProfileData
+      )
       log.debug(`Updated permissions for user ${userId}`)
     } catch (error) {
       log.error('Failed updating user permissions')
