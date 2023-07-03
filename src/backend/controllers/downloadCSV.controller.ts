@@ -14,7 +14,7 @@ class DownloadCSVController {
       res.set('Content-Type', 'text/csv')
       res.send(csvData)
     } catch (error) {
-      log.error(error, '/CSV fail')
+      log.error(error, '/csv fail')
       res.status(500).send(error)
     }
   }
