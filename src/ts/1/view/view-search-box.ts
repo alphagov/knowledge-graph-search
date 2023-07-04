@@ -247,7 +247,7 @@ const viewPublishingAppSelector = () =>
                  name="area"
             ${state.searchParams.areaToSearch === 'whitehall' ? 'checked' : ''}/>
           <label for="area-whitehall" class="govuk-label govuk-radios__label">
-            Whithall (specialist)
+            Whitehall (specialist)
           </label>
         </div>
       </div>
