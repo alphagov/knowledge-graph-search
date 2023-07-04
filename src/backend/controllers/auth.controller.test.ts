@@ -5,7 +5,7 @@ import App from '../app'
 import { Route } from '../enums/routes'
 import AuthRoutes from '../routes/AuthRoutes'
 import AuthController from './auth.controller'
-import * as redisStore from '../services/redisStore'
+import * as redisStore from '../services/sessionStore'
 
 beforeEach(() => {
   jest.clearAllMocks()
