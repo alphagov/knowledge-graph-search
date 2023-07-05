@@ -272,6 +272,7 @@ const viewSearchResultsData = () => {
               </h2>
               <div class="govuk-accordion__section-summary govuk-body" id="accordion-with-summary-sections-summary-${recordIndex}">
               ${ record.text && state.searchParams.selectedWords && state.searchParams.whereToSearch !== 'title' ? highlight(state.searchParams.selectedWords, record.text) : ''}
+              ${ record.text && record.description && state.searchParams.selectedWords && state.searchParams.whereToSearch !== 'title' ? highlight(state.searchParams.selectedWords, record.description) : ''}
               ${ !record.text && record.description && state.searchParams.selectedWords && state.searchParams.whereToSearch !== 'title' ? highlight(state.searchParams.selectedWords, record.description) : ''}
               ${ state.searchParams.searchType === SearchType.Link && record.hyperlinks && state.searchParams.linkSearchUrl ? highlightLinks(state.searchParams.linkSearchUrl, record.hyperlinks) : ''}
             </div>

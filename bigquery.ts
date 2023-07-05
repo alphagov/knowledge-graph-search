@@ -215,33 +215,17 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
 
   const padding = 50;
 
+
+
   //Currently only truncates on the first keyword
   const truncatedContent = searchParams.searchType !== SearchType.Link &&
   searchParams.searchType !==  SearchType.Advanced &&
   !searchParams.selectedTaxon &&
   !searchParams.selectedOrganisation &&
   !searchParams.selectedLocale ? `(
-    SELECT
-      LEFT(
-        RIGHT(
-          text,
-          CHAR_LENGTH(text) - (
-            STRPOS(text, "${keywords[0]}")- ${keywords[0].length} - ${padding}
-          )
-        ),
-        (
-          STRPOS(
-            RIGHT(
-              text,
-              CHAR_LENGTH(text) - (
-                STRPOS(text, "${keywords[0]}") - ${keywords[0].length} - ${padding}
-              )
-            ),
-            "${keywords[0]}"
-          ) + CASE WHEN REGEXP_CONTAINS(text, r"${keywords[0]}") THEN ${keywords[0].length} + ${padding} ELSE 0 END
-        )
-      )
-  ) AS text`: '';
+    SELECT RIGHT(
+      LEFT(text,(STRPOS(LOWER(text), LOWER("${keywords[0]}")))+ ${padding} + ${keywords[0].length}),  ${padding*2} + ${keywords[0].length})
+    ) AS text`: '';
 
   const includeClause = keywords.length === 0
     ? ''

@@ -121,17 +121,28 @@ const makeBold = (text: string, includeMarkup: boolean) =>
 const highlight = (searchTerm: string, text: string): string =>  {
   text = text.replace(/\u00a0/g, ' ');
   let term = searchTerm.replace(/"/g, '');
-  const mark = `<mark class='highlight-bold'>${term}</mark>`;
+
+  let stringToAdd = "<mark class='highlight-bold'>";
+  let stringToAddEnd = "</mark>";
+
   if (term) {
   	let regex = new RegExp(term, 'gi');
     const padding = 50;
-    const i = text.indexOf(term);
-    if(i>padding){
+    const i = text.toLowerCase().indexOf(term.toLowerCase());
+    const iEnd = (i + searchTerm.length)-1
+
+    let origString: any = text;
+     origString = origString.split('');
+     origString.splice(i, 0, stringToAdd);
+     origString.splice(iEnd, 0, stringToAddEnd);
+     let  newString = origString.join('');
+
+    if((i+1) >= padding){
       // Add elipse front to end
-      return `<p>&hellip;${text.replace(regex, mark)}&hellip;</p>`;
+      return  `<p>&hellip;${newString}&hellip;</p>`;
     } else if( i > -1 && i<padding){
       // Add elipse to end if found at the start of copy
-      return `<p>${text.replace(regex, mark)}&hellip;</p>`;
+      return `<p>${newString}&hellip;</p>`;
     } else {
       return '';
     }
