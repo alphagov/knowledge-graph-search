@@ -28,7 +28,7 @@ const bigquery = new BigQuery({
   projectId: config.projectId,
 })
 
-const bigQuery = async function (userQuery: string, options?: any) {
+export const bigQuery = async function (userQuery: string, options?: any) {
   const params: Record<string, string> = {}
 
   if (options) {
