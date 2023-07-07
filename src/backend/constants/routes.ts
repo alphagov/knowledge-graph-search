@@ -22,7 +22,7 @@ export enum Route {
   cookies = '/cookies',
   saveCookieSettings = '/save-cookie-settings',
   hideCookieSuccessBanner = '/hide-cookie-success-banner',
-  updateUserPermissions = 'auth/gds/api/users/:userId',
+  updateUserPermissions = '/auth/gds/api/users/:userId',
 }
 
 export default Routes

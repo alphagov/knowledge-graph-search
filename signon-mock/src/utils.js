@@ -3,9 +3,7 @@ import crypto from 'crypto'
 const defaultUserProfile = {
   name: 'John Doe',
   email: 'john.doe@gmail.com',
-  permissions: {
-    govsearch: ['signin'],
-  },
+  permissions: ['signin'],
 }
 
 export const buildNewUserProfile = (options) => {

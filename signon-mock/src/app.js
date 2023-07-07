@@ -42,7 +42,14 @@ app.get('/oauth/authorize', (req, res) => {
 
 app.get('/user.json', requireAccessToken, (req, res) => {
   const { user } = req
+  const uid =
+    process.env.SINGLE_USER === 'true' ? constantUserId : crypto.randomUUID()
   log.debug({ user }, 'User authenticated with access token')
+  const profile = buildNewUserProfile({
+    name: 'John Doe',
+    uid,
+    permissions: ['signin'],
+  })
   res.json({ user })
 })
 
@@ -89,11 +96,13 @@ app.get('/reauth/:userId', async (req, res) => {
 
 app.get('/updatepermissions/:userId', async (req, res) => {
   const { userId } = req.params
-  const { permission } = req.query
+  const { permissions } = req.query
+
+  log.debug({ userId, permissions }, 'Updating permissions')
 
   const newUserProfile = buildNewUserProfile({
     uid: userId,
-    permisssions: { govsearch: [permission] },
+    permissions,
   })
   try {
     const response = await axios.put(

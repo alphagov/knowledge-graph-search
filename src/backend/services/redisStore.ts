@@ -3,7 +3,7 @@ import RedisStore from 'connect-redis'
 import { REDIS_PREFIX } from '../constants/environments'
 import log from '../utils/logging'
 import { SignonProfileData } from '../constants/types'
-import { makeSessionSetKey } from '../utils/auth'
+import { makeSessionKey, makeSessionSetKey } from '../utils/auth'
 
 const createRedisStore = () => {
   const store = new RedisStore({
@@ -53,6 +53,7 @@ export const addSessionToUserSet = async (
 export const destroySession = async (sessionId: string) => {
   const store = getStore()
   try {
+    // Store will add the Session prefix to the sessionId automatically
     await store.destroy(sessionId)
   } catch (error) {
     log.error(`ERROR - could not destroy session ${sessionId}`)
@@ -84,7 +85,8 @@ export const updateSessionPermissions = async (
   newPermissions: SignonProfileData['user']['permissions']
 ) => {
   const redis = getClient()
-  const sessionJSON = await redis.get(sessionId)
+  const sessionKey = makeSessionKey(sessionId)
+  const sessionJSON = await redis.get(sessionKey)
   if (!sessionJSON) {
     log.error(
       `Unexpected: no session for session ID ${sessionId} in updateSessionPermissions`
@@ -92,14 +94,10 @@ export const updateSessionPermissions = async (
     return
   }
   const sessionObj = JSON.parse(sessionJSON)
-  const newSessionObj: SignonProfileData = {
-    ...sessionObj,
-    user: {
-      ...sessionObj.user,
-      permissions: newPermissions,
-    },
-  }
-  await redis.set(sessionId, JSON.stringify(newSessionObj))
+  const newSessionObj = { ...sessionObj }
+  newSessionObj.passport.user.profileData.user.permissions = newPermissions
+  log.debug({ newSessionObj }, 'Updating session permissions with new object')
+  await redis.set(sessionKey, JSON.stringify(newSessionObj))
 }
 
 export const updatePermissionsForUser = async (
@@ -110,14 +108,21 @@ export const updatePermissionsForUser = async (
   const redis = getClient()
   const newPermissions = profile.user.permissions
   const key = makeSessionSetKey(userId)
-  let sessionId: string | null = null
+  let currentSessionId = ''
   try {
-    while ((sessionId = await redis.spop(key))) {
+    const sessionIDs = await redis.smembers(key)
+    log.debug({ sessionIDs, key })
+    for (const sessionId of sessionIDs) {
+      currentSessionId = sessionId
+      log.debug(
+        { newPermissions },
+        `Updating permissions for session ${sessionId}`
+      )
       await updateSessionPermissions(sessionId, newPermissions)
     }
   } catch (error) {
     log.error(
-      { userId, newPermissions, sessionId },
+      { userId, newPermissions, currentSessionId },
       `ERROR updating sessions permissions`
     )
     throw error

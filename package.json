@@ -7,7 +7,7 @@
     "test": "jest --watchAll --coverage --verbose --detectOpenHandles",
     "start": "ts-node src/backend/server.ts",
     "dev": "nodemon src/backend/server.ts",
-    "local": "env $(cat .env-signon|xargs) npm run dev",
+    "local": "env $(cat .env|xargs) npm run dev",
     "build": "webpack",
     "lint": "eslint './**/*.{ts,tsx}' --fix",
     "check-lint": "eslint './**/*.{ts,tsx}'",
