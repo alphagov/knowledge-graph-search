@@ -1,6 +1,14 @@
 import { expect } from '@jest/globals'
 import { SessionStore } from './sessionStore'
 
+jest.mock('../config', () => ({
+  __esModule: true,
+  default: {
+    ...jest.requireActual('../config').default,
+    authEnabled: true,
+  },
+}))
+
 jest.mock('ioredis', () => {
   class RedisMock {
     private port: number

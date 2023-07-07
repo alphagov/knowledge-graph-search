@@ -142,6 +142,6 @@ export class SessionStore {
   }
 }
 
-const sessionStore = new SessionStore()
+const sessionStore = config.authEnabled ? new SessionStore() : null
 
 export default sessionStore

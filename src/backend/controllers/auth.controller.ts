@@ -2,7 +2,7 @@ import { RequestHandler } from 'express'
 import { Route } from '../constants/routes'
 import log from '../utils/logging'
 import { SignonProfileData } from '../constants/types'
-import sessionStore from '../services/sessionStore'
+import sessionStore, { SessionStore } from '../services/sessionStore'
 
 class AuthController {
   public loginSuccessRedirect: RequestHandler = (req, res) =>
@@ -11,7 +11,7 @@ class AuthController {
   public reauth: RequestHandler = async (req, res) => {
     const { userId } = req.params
     try {
-      await sessionStore.destroySessionsForUserId(userId)
+      await (sessionStore as SessionStore).destroySessionsForUserId(userId)
     } catch (error) {
       console.error('ERROR in /reauth endpoint')
       console.error({ error })
@@ -35,7 +35,7 @@ class AuthController {
     )
 
     try {
-      await sessionStore.updatePermissionsForUser(
+      await (sessionStore as SessionStore).updatePermissionsForUser(
         userId,
         body as SignonProfileData
       )

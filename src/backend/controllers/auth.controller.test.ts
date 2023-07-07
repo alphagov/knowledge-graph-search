@@ -4,6 +4,14 @@ import { Route } from '../enums/routes'
 import AuthController from './auth.controller'
 import { SessionStore } from '../services/sessionStore'
 
+jest.mock('../config', () => ({
+  __esModule: true,
+  default: {
+    ...jest.requireActual('../config').default,
+    authEnabled: true,
+  },
+}))
+
 jest.mock('ioredis', () => {
   class RedisMock {
     private port: number

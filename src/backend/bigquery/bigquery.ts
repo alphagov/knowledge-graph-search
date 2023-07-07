@@ -180,7 +180,6 @@ const sendSearchQuery = async function (
     /"/g,
     ''
   )
-  console.log({ query })
   const link = searchParams.linkSearchUrl
   const queries = [
     bigQuery(query, {
