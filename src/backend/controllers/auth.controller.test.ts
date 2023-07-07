@@ -1,11 +1,27 @@
-import request from 'supertest'
 import { expect } from '@jest/globals'
 import e from 'express'
-import App from '../app'
 import { Route } from '../enums/routes'
-import AuthRoutes from '../routes/AuthRoutes'
 import AuthController from './auth.controller'
-import * as redisStore from '../services/sessionStore'
+import { SessionStore } from '../services/sessionStore'
+
+jest.mock('ioredis', () => {
+  class RedisMock {
+    private port: number
+    private host: string
+    constructor(port: number, host: string) {
+      this.port = port
+      this.host = host
+    }
+
+    on() {
+      return 'void'
+    }
+  }
+  return {
+    __esModule: true,
+    default: RedisMock,
+  }
+})
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -26,12 +42,14 @@ describe('Auth Controller', () => {
       mockResponse.send = jest.fn()
       const mockNext = {} as e.NextFunction
       jest
-        .spyOn(redisStore, 'destroySessionsForUserId')
+        .spyOn(SessionStore.prototype, 'destroySessionsForUserId')
         .mockImplementation(jest.fn())
 
       const controller = new AuthController()
       await controller.reauth(mockRequest, mockResponse, mockNext)
-      expect(redisStore.destroySessionsForUserId).toHaveBeenCalledWith('testId')
+      expect(
+        SessionStore.prototype.destroySessionsForUserId
+      ).toHaveBeenCalledWith('testId')
     })
     it('Returns 200 with message if reauth successful', async () => {
       const mockRequest = {} as e.Request
@@ -42,7 +60,7 @@ describe('Auth Controller', () => {
       mockResponse.send = jest.fn()
       const mockNext = {} as e.NextFunction
       jest
-        .spyOn(redisStore, 'destroySessionsForUserId')
+        .spyOn(SessionStore.prototype, 'destroySessionsForUserId')
         .mockImplementation(jest.fn())
 
       const controller = new AuthController()
@@ -60,7 +78,7 @@ describe('Auth Controller', () => {
       mockResponse.status = jest.fn()
       const mockNext = {} as e.NextFunction
       jest
-        .spyOn(redisStore, 'destroySessionsForUserId')
+        .spyOn(SessionStore.prototype, 'destroySessionsForUserId')
         .mockRejectedValue(new Error('Test error'))
 
       const controller = new AuthController()
