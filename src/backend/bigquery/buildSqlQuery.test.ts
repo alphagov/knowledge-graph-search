@@ -4,32 +4,32 @@ import {
   SearchArea,
   SearchType,
 } from '../../common/types/search-api-types'
-import { buildSqlQuery } from './bigquery'
+import { buildSqlQuery } from './buildSqlQuery'
 import { expect } from '@jest/globals'
 
 const PREFIX = `
-SELECT
-  url,
-  title,
-  documentType,
-  contentId,
-  locale,
-  publishing_app,
-  first_published_at,
-  public_updated_at,
-  withdrawn_at,
-  withdrawn_explanation,
-  page_views,
-  taxons,
-  primary_organisation,
-  organisations AS all_organisations
-FROM search.page
-
-WHERE TRUE`
+  SELECT
+    url,
+    title,
+    documentType,
+    contentId,
+    locale,
+    publishing_app,
+    first_published_at,
+    public_updated_at,
+    withdrawn_at,
+    withdrawn_explanation,
+    page_views,
+    taxons,
+    primary_organisation,
+    organisations AS all_organisations
+  FROM search.page
+  
+  WHERE TRUE`
 
 const SUFFIX = `
-ORDER BY page_views DESC
-LIMIT 10000`
+  ORDER BY page_views DESC
+  LIMIT 10000`
 
 const expectedQuery = (clauses: string) => `${PREFIX}${clauses}${SUFFIX}`
 
@@ -145,12 +145,12 @@ describe('buildSqlQuery', () => {
 
     const query = buildSqlQuery(searchParams, keywords, excludedKeywords)
     const expectedClauses = `\n
-AND EXISTS
-  (
-    SELECT 1 FROM UNNEST (taxons) AS taxon
-    WHERE taxon = @taxon
-  )
-`
+  AND EXISTS
+    (
+      SELECT 1 FROM UNNEST (taxons) AS taxon
+      WHERE taxon = @taxon
+    )
+  `
 
     expect(query).toEqual(expectedQuery(expectedClauses))
   })
@@ -164,12 +164,12 @@ AND EXISTS
 
     const query = buildSqlQuery(searchParams, keywords, excludedKeywords)
     const expectedClauses = `\n
-AND EXISTS
-  (
-    SELECT 1 FROM UNNEST (organisations) AS link
-    WHERE link = @organisation
-  )
-`
+  AND EXISTS
+    (
+      SELECT 1 FROM UNNEST (organisations) AS link
+      WHERE link = @organisation
+    )
+  `
 
     expect(query).toEqual(expectedQuery(expectedClauses))
   })
@@ -183,12 +183,12 @@ AND EXISTS
 
     const query = buildSqlQuery(searchParams, keywords, excludedKeywords)
     const expectedClauses = `\n
-AND EXISTS
-  (
-    SELECT 1 FROM UNNEST (hyperlinks) AS link
-    WHERE CONTAINS_SUBSTR(link, @link)
-  )
-`
+  AND EXISTS
+    (
+      SELECT 1 FROM UNNEST (hyperlinks) AS link
+      WHERE CONTAINS_SUBSTR(link, @link)
+    )
+  `
 
     expect(query).toEqual(expectedQuery(expectedClauses))
   })
@@ -213,26 +213,26 @@ AND NOT (STRPOS(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " ||
 AND publishing_app = "whitehall"
 AND locale = @locale
 
-AND EXISTS
-  (
-    SELECT 1 FROM UNNEST (taxons) AS taxon
-    WHERE taxon = @taxon
-  )
+  AND EXISTS
+    (
+      SELECT 1 FROM UNNEST (taxons) AS taxon
+      WHERE taxon = @taxon
+    )
+  
 
+  AND EXISTS
+    (
+      SELECT 1 FROM UNNEST (organisations) AS link
+      WHERE link = @organisation
+    )
+  
 
-AND EXISTS
-  (
-    SELECT 1 FROM UNNEST (organisations) AS link
-    WHERE link = @organisation
-  )
-
-
-AND EXISTS
-  (
-    SELECT 1 FROM UNNEST (hyperlinks) AS link
-    WHERE CONTAINS_SUBSTR(link, @link)
-  )
-`
+  AND EXISTS
+    (
+      SELECT 1 FROM UNNEST (hyperlinks) AS link
+      WHERE CONTAINS_SUBSTR(link, @link)
+    )
+  `
     expect(query).toEqual(expectedQuery(expectedClauses))
   })
 })
