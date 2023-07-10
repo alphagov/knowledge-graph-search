@@ -21,7 +21,7 @@ docker-compose up redis
 
 ```shell
 npm install local
-npm run local
+PROJECT_ID=<gcp-project-id> npm run local
 ```
 
 3. In another tab:

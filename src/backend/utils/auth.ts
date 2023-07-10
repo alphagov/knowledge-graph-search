@@ -1,9 +1,9 @@
-import type express from 'express'
+import type e from 'express'
 import crypto from 'crypto'
 import { addSessionToUserSet } from '../services/redisStore'
 import log from '../utils/logging'
 
-export function generateSessionId(req: express.Request) {
+export function generateSessionId(req: e.Request) {
   const sessionId = crypto.randomUUID()
   log.debug(`Create session ${sessionId}`)
 
@@ -18,4 +18,14 @@ export function generateSessionId(req: express.Request) {
   }
 
   return sessionId
+}
+
+export function getBearerToken(req: e.Request) {
+  const authHeader = req.headers.authorization
+  const prefix = 'Bearer '
+  if (authHeader && authHeader.startsWith(prefix)) {
+    const token = authHeader.substring(prefix.length)
+    return token
+  }
+  return null
 }

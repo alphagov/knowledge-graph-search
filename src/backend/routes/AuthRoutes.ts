@@ -2,6 +2,7 @@ import passport from 'passport'
 import { Router } from 'express'
 import AuthController from '../controllers/auth.controller'
 import Routes, { Route } from '../enums/routes'
+import hasSignonUpdatePermissions from '../middleware/hasSignonUpdatePermissions'
 
 class AuthRoutes implements Routes {
   public router = Router()
@@ -18,7 +19,11 @@ class AuthRoutes implements Routes {
       passport.authenticate('oauth2', { failureRedirect: '/error-callback' }),
       this.authController.loginSuccessRedirect
     )
-    this.router.post(Route.reauth, this.authController.reauth)
+    this.router.post(
+      Route.reauth,
+      hasSignonUpdatePermissions,
+      this.authController.reauth
+    )
   }
 }
 
