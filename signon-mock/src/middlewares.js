@@ -6,7 +6,7 @@ export const requireAccessToken = (req, res, next) => {
   const isTokenCorrectFormat =
     authorization?.startsWith('Bearer ') && authorization.length > 7
   if (!authorization || !isTokenCorrectFormat) {
-    log.warn('Unauthorizaed - no token or incorrect format')
+    log.warn('Unauthorized - no token or incorrect format')
     return res.status(401).send('Unauthorized')
   }
   const token = authorization.split(' ')[1]
