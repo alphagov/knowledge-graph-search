@@ -2,7 +2,7 @@ import pino from 'pino'
 import pinoHttp from 'pino-http'
 import config from '../config'
 import { getPinoOptions } from '@relaycorp/pino-cloud'
-import { ENV } from '../enums/environments'
+import { ENV } from '../constants/environments'
 
 const localOptions: pino.LoggerOptions = {
   // Disable debug logs in production

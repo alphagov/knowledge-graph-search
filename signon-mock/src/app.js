@@ -6,6 +6,7 @@ import nunjucks from 'nunjucks'
 import log, { httpLogger } from './logging.js'
 import users, { ADMIN_ACCESS_TOKEN } from './users.js'
 import { requireAuthorizationCode, requireAccessToken } from './middlewares.js'
+import { buildNewUserProfile } from './utils.js'
 
 const app = express()
 const PORT = 3005
@@ -41,7 +42,14 @@ app.get('/oauth/authorize', (req, res) => {
 
 app.get('/user.json', requireAccessToken, (req, res) => {
   const { user } = req
+  const uid =
+    process.env.SINGLE_USER === 'true' ? constantUserId : crypto.randomUUID()
   log.debug({ user }, 'User authenticated with access token')
+  const profile = buildNewUserProfile({
+    name: 'John Doe',
+    uid,
+    permissions: ['signin'],
+  })
   res.json({ user })
 })
 
@@ -76,6 +84,30 @@ app.get('/reauth/:userId', async (req, res) => {
           Authorization: `Bearer ${ADMIN_ACCESS_TOKEN}`,
         },
       }
+    )
+    res.json(response.data)
+  } catch (error) {
+    log.error({ error })
+    res
+      .status(error.response?.status || 500)
+      .send(error.response?.data || 'An error occurred')
+  }
+})
+
+app.get('/updatepermissions/:userId', async (req, res) => {
+  const { userId } = req.params
+  const { permissions } = req.query
+
+  log.debug({ userId, permissions }, 'Updating permissions')
+
+  const newUserProfile = buildNewUserProfile({
+    uid: userId,
+    permissions,
+  })
+  try {
+    const response = await axios.put(
+      `http://localhost:8080/auth/gds/api/users/${userId}`,
+      newUserProfile
     )
     res.json(response.data)
   } catch (error) {

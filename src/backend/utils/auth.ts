@@ -2,6 +2,7 @@ import type e from 'express'
 import crypto from 'crypto'
 import { addSessionToUserSet } from '../services/redisStore'
 import log from '../utils/logging'
+import { REDIS_PREFIX } from '../constants/environments'
 
 export function generateSessionId(req: e.Request) {
   const sessionId = crypto.randomUUID()
@@ -29,3 +30,7 @@ export function getBearerToken(req: e.Request) {
   }
   return null
 }
+export const makeSessionSetKey = (userId: string) =>
+  `${REDIS_PREFIX.SESSIONS_SET}${userId}`
+export const makeSessionKey = (userId: string) =>
+  `${REDIS_PREFIX.SESSION}${userId}`

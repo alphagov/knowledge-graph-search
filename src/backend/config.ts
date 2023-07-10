@@ -1,4 +1,4 @@
-import { ENV } from './enums/environments'
+import { ENV } from './constants/environments'
 
 interface FeatureFlags {
   authEnabled: boolean
