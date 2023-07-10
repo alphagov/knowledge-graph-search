@@ -69,7 +69,7 @@ export type Organisation = {
   name: string
   homepage: string
   description: string
-  parentName: string
+  parentOrgNames: string[]
   childOrgNames: string[]
   personRoleNames: {
     personName: string
