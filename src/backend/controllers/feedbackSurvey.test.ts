@@ -2,7 +2,7 @@ import request from 'supertest'
 import { expect } from '@jest/globals'
 import e from 'express'
 import App from '../app'
-import { Route } from '../enums/routes'
+import { Route } from '../constants/routes'
 import IndexRoute from '../routes/indexRoutes'
 import FeedbackSurveyController from './feedbackSurvey.controller'
 
