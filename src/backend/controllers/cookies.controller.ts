@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express'
-import { Route } from '../enums/routes'
+import { Route } from '../constants/routes'
 import { setCookie } from '../utils/setCookie'
 
 class CookiesController {

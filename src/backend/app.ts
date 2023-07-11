@@ -3,7 +3,7 @@ import path from 'path'
 import * as http from 'http'
 import cors from 'cors'
 import express from 'express'
-import Routes from './enums/routes'
+import Routes from './constants/routes'
 import * as nunjucks from 'nunjucks'
 import bodyParser from 'body-parser'
 import { getStore } from './services/redisStore'
@@ -150,7 +150,7 @@ class App {
             refreshToken,
             accessToken,
           }
-          log.debug('User data fetched successfully', { userSessionData })
+          log.debug({ userSessionData }, 'User data fetched successfully')
           doneCallback(null, userSessionData)
         }
       )

@@ -4,10 +4,12 @@ import axios from 'axios'
 import crypto from 'crypto'
 import nunjucks from 'nunjucks'
 import log, { httpLogger } from './logging.js'
+import users, { ADMIN_ACCESS_TOKEN } from './users.js'
+import { requireAuthorizationCode, requireAccessToken } from './middlewares.js'
+import { buildNewUserProfile } from './utils.js'
 
 const app = express()
 const PORT = 3005
-const constantUserId = '129eaae9-2d72-42ea-b012-f2f4aaa84abb'
 
 nunjucks.configure('views', {
   autoescape: true,
@@ -27,24 +29,43 @@ app.get('/', (req, res) => {
 app.get('/oauth/authorize', (req, res) => {
   const { client_id, redirect_uri } = req.query
 
+  const newUser = users.createUser()
+  log.debug({ newUser }, 'New user created')
+
   const callback_uri = new URL(redirect_uri)
-  callback_uri.searchParams.append('code', crypto.randomUUID())
+  callback_uri.searchParams.append('code', newUser.authorizationCode)
 
   log.info({ URL: callback_uri.href })
 
   res.render('authorize', { callback_uri: callback_uri.href })
 })
 
-app.get('/user.json', (req, res) => {
+app.get('/user.json', requireAccessToken, (req, res) => {
+  const { user } = req
   const uid =
     process.env.SINGLE_USER === 'true' ? constantUserId : crypto.randomUUID()
-  log.info(`Sending profile for user ${uid}`)
-  res.json({ user: { name: 'John Doe', uid } })
+  log.debug({ user }, 'User authenticated with access token')
+  const profile = buildNewUserProfile({
+    name: 'John Doe',
+    uid,
+    permissions: ['signin'],
+  })
+  res.json({ user })
 })
 
-app.post('/oauth/access_token', (req, res) => {
+app.post('/oauth/access_token', requireAuthorizationCode, (req, res) => {
+  const { user } = req
+
   const accessToken = crypto.randomUUID()
   const refreshToken = crypto.randomUUID()
+  const newPermissions = [...new Set([...user.permissions, 'signin'])]
+
+  const updatedUser = users.updateUser(user.id, {
+    accessToken,
+    refreshToken,
+    permissions: newPermissions,
+  })
+  log.debug({ updatedUser }, 'User updated')
 
   log.info({ accessToken, refreshToken }, 'Tokens generated')
 
@@ -53,9 +74,40 @@ app.post('/oauth/access_token', (req, res) => {
 
 app.get('/reauth/:userId', async (req, res) => {
   const { userId } = req.params
+  log.debug('reauth')
   try {
     const response = await axios.post(
-      `http://localhost:8080/auth/gds/api/users/${userId}/reauth`
+      `http://localhost:8080/auth/gds/api/users/${userId}/reauth`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${ADMIN_ACCESS_TOKEN}`,
+        },
+      }
+    )
+    res.json(response.data)
+  } catch (error) {
+    log.error({ error })
+    res
+      .status(error.response?.status || 500)
+      .send(error.response?.data || 'An error occurred')
+  }
+})
+
+app.get('/updatepermissions/:userId', async (req, res) => {
+  const { userId } = req.params
+  const { permissions } = req.query
+
+  log.debug({ userId, permissions }, 'Updating permissions')
+
+  const newUserProfile = buildNewUserProfile({
+    uid: userId,
+    permissions,
+  })
+  try {
+    const response = await axios.put(
+      `http://localhost:8080/auth/gds/api/users/${userId}`,
+      newUserProfile
     )
     res.json(response.data)
   } catch (error) {

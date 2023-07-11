@@ -1,7 +1,8 @@
 import * as express from 'express'
 import { isReqAJAX } from '../utils/isReqAJAX'
 import config from '../config'
-import { Route } from '../enums/routes'
+import { Route } from '../constants/routes'
+import log from '../utils/logging'
 
 /*
  * Express middleware enforcing user authentication. Redirects unauthenticated users to login page,
@@ -15,7 +16,11 @@ export const auth: (s?: string) => express.Handler =
     }
 
     // eslint-disable-next-line
-    const isAuthenticated = req.isAuthenticated && req.isAuthenticated()
+    log.info({ user: req.user }, 'USER')
+    const isAuthenticated =
+      req.isAuthenticated &&
+      req.isAuthenticated() &&
+      (req.user as any)?.profileData?.user?.permissions?.includes('signin')
     if (isAuthenticated) {
       return next()
     }
