@@ -22,6 +22,8 @@ export enum Route {
   cookies = '/cookies',
   saveCookieSettings = '/save-cookie-settings',
   hideCookieSuccessBanner = '/hide-cookie-success-banner',
+  feedbackSurvey = '/feedback-survey',
+  hideFeedbackSurvey = '/hide-feedback-survey',
 }
 
 export default Routes

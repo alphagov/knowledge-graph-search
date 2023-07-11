@@ -67,7 +67,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="govuk-width-container {{ containerClasses }}">
     {% block beforeContent %}{% endblock %}
     <main class="govuk-main-wrapper {{ mainClasses }}" id="main-content" role="main"{% if mainLang %} lang="{{ mainLang }}"{% endif %}>
+      {% if seenFeedbackSurvey === true %}
       {% include "../partials/phaseBanner.njk" %}
+      {% else %}
+      {% include "../partials/feedbackMasthead.njk" %}
+      {% endif %}
       {% block content %}{% endblock %}
     </main>
   </div>
@@ -81,7 +85,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           text: "Cookies"
         },
         {
-          href: "https://surveys.publishing.service.gov.uk/s/2KQY5W/",
+          href: "/feedback-survey",
           text: "Feedback"
         }]
       }

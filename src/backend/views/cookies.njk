@@ -220,6 +220,39 @@
       })
     }}
 
+    <h3 class="govuk-heading-m">Feedback survey message</h3>
+
+    {{ govukTable({
+        caption: "You will see a feedback survey message when you first visit. A cookie is stored so that your computer knows you’ve visited the survey and knows not to ask again.",
+        captionClasses: "govuk-table__caption--s govuk-!-font-weight-regular govuk-!-margin-bottom-4",
+        classes: "overflow-x",
+        head: [
+          {
+            text:  "Name"
+          },
+          {
+            text: "Purpose"
+          },
+          {
+            text: "Expires"
+          }
+        ],
+        rows: [
+          [
+            {
+              text: "seenFeedbackSurvey"
+            },
+            {
+              text: "Saves a cookie to let us know that you've visited our feedback survey"
+            },
+            {
+              text: "1 year"
+            }
+          ]
+        ]
+      })
+    }}
+
     <h3 class="govuk-heading-m">Government services</h3>
 
     <p class="govuk-body">

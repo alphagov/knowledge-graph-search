@@ -17,6 +17,7 @@ import { pageNotFound } from './middleware/pageNotFound'
 import { errorMiddleware } from './middleware/errorMiddleware'
 import { allowGoogleAnalytics } from './middleware/allowGoogleAnalytics'
 import { showCookieMessage } from './middleware/showCookieMessage'
+import { hideFeedbackSurvey } from './middleware/hideFeedbackSurvey'
 import log, { httpLogger } from './utils/logging'
 import cookieParser from 'cookie-parser'
 
@@ -68,6 +69,7 @@ class App {
     this.app.use(bodyParser.json())
     this.app.use(allowGoogleAnalytics)
     this.app.use(showCookieMessage)
+    this.app.use(hideFeedbackSurvey)
     this.initializeLogin()
     this.app.use(httpLogger)
   }

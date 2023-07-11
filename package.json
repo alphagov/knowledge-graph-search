@@ -19,6 +19,9 @@
     "type": "git",
     "url": "git+https://github.com/alphagov/knowledge-graph-search.git"
   },
+  "nodemonConfig": {
+    "ext": "ts,js,json,njk,html"
+  },
   "author": "",
   "license": "ISC",
   "bugs": {

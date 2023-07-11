@@ -4,6 +4,7 @@ import SearchAPIController from '../controllers/searchAPI.controller'
 import InfoBoxController from '../controllers/infoBox.controller'
 import DownloadCSVController from '../controllers/downloadCSV.controller'
 import CookiesController from '../controllers/cookies.controller'
+import FeedbackSurveyController from '../controllers/feedbackSurvey.controller'
 import Routes, { Route } from '../enums/routes'
 import { auth } from '../middleware/auth'
 
@@ -14,6 +15,7 @@ class IndexRoute implements Routes {
   public infoBoxController = new InfoBoxController()
   public downloadCSVController = new DownloadCSVController()
   public cookiesController = new CookiesController()
+  public feedbackSurveyController = new FeedbackSurveyController()
 
   constructor() {
     this.initializeRoutes()
@@ -84,6 +86,18 @@ class IndexRoute implements Routes {
       Route.hideCookieSuccessBanner,
       auth(),
       this.cookiesController.hideCookieSuccessBanner
+    )
+
+    this.router.get(
+      Route.feedbackSurvey,
+      auth(),
+      this.feedbackSurveyController.feedbackSurvey
+    )
+
+    this.router.get(
+      Route.hideFeedbackSurvey,
+      auth(),
+      this.feedbackSurveyController.hideFeedbackSurvey
     )
   }
 }
