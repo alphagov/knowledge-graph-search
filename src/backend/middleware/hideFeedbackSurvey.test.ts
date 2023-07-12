@@ -3,7 +3,7 @@ import { expect } from '@jest/globals'
 
 const req: any = {
   cookies: {
-    feedbackSurvey: 'true',
+    hideFeedbackSurvey: 'true',
   },
 }
 const next: any = jest.fn()
@@ -19,7 +19,7 @@ describe('hideFeedbackSurvey', () => {
   it('Should return the correct object', () => {
     hideFeedbackSurvey(req, res, next)
     expect(res.locals).toEqual({
-      seenFeedbackSurvey: true,
+      hideFeedbackSurvey: true,
     })
   })
 })

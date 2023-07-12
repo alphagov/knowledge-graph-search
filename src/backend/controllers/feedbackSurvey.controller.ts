@@ -4,7 +4,7 @@ import { setCookie } from '../utils/setCookie'
 class FeedbackSurveyController {
   public feedbackSurvey: RequestHandler = (req, res, next) => {
     try {
-      setCookie(res, 'feedbackSurvey', 'true')
+      setCookie(res, 'hideFeedbackSurvey', 'true')
       res.redirect('https://surveys.publishing.service.gov.uk/s/2KQY5W/')
     } catch (e) {
       next(e)
@@ -13,7 +13,7 @@ class FeedbackSurveyController {
 
   public hideFeedbackSurvey: RequestHandler = (req, res, next) => {
     try {
-      setCookie(res, 'feedbackSurvey', 'true')
+      setCookie(res, 'hideFeedbackSurvey', 'true')
       res.redirect(`${req.headers.referer}`)
     } catch (e) {
       next(e)
