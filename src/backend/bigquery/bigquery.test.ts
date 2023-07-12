@@ -202,7 +202,7 @@ describe('[Function] sendSearchQuery', () => {
         [{ locale: 'fr' }, { locale: 'en' }, { locale: 'de' }],
       ])
       .mockResolvedValueOnce([
-        [{ name: 'taxon1' }, { name: 'taxon2' }, { name: 'taxon3' }],
+        [{ name: 'org1' }, { name: 'org2' }, { name: 'org3' }],
       ])
     await sendSearchQuery(
       makeSearchParams({ searchType: SearchType.Organisation })
