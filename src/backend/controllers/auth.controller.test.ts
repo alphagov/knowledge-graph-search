@@ -77,7 +77,7 @@ describe('Auth Controller', () => {
         'User logged out of GovSearch successfully. UserId = testId'
       )
     })
-    it('Returns 200 witn no message even if ther is an error', async () => {
+    it('Returns 200 with no message even if there is an error', async () => {
       const mockRequest = {} as e.Request
       mockRequest.params = {
         userId: 'testId',
