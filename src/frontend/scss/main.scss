@@ -1,4 +1,21 @@
 @import '../../../node_modules/govuk-frontend/govuk/all';
+@import './app-masthead';
+
+// Inverse button variables
+$govuk-inverse-button-colour: govuk-colour('white');
+$govuk-inverse-button-text-colour: govuk-colour('blue');
+$govuk-inverse-button-hover-colour: govuk-tint(
+  $govuk-inverse-button-text-colour,
+  90%
+);
+$govuk-inverse-button-shadow-colour: govuk-shade(
+  $govuk-inverse-button-text-colour,
+  30%
+);
+// Because the shadow (s0) is visually 'part of' the button, we need to reduce
+// the height of the button to compensate by adjusting its padding (s1) and
+// increase the bottom margin to include it (s2).
+$button-shadow-size: $govuk-border-width-form-element;
 
 .govuk-phase-banner__content__tag {
   vertical-align: 30%;
@@ -219,4 +236,36 @@ h2:focus-visible {
 
 .hidden {
   display: none;
+}
+
+.govuk-button--inverse {
+  background-color: $govuk-inverse-button-colour;
+  box-shadow: 0 $button-shadow-size 0 $govuk-inverse-button-shadow-colour;
+
+  &,
+  &:link,
+  &:visited,
+  &:active,
+  &:hover {
+    color: $govuk-inverse-button-text-colour;
+  }
+
+  // alphagov/govuk_template includes a specific a:link:focus selector
+  // designed to make unvisited links a slightly darker blue when focussed, so
+  // we need to override the text colour for that combination of selectors so
+  // so that unvisited links styled as buttons do not end up with dark blue
+  // text when focussed.
+  @include _govuk-compatibility(govuk_template) {
+    &:link:focus {
+      color: $govuk-inverse-button-text-colour;
+    }
+  }
+
+  &:hover {
+    background-color: $govuk-inverse-button-hover-colour;
+
+    &[disabled] {
+      background-color: $govuk-inverse-button-colour;
+    }
+  }
 }
