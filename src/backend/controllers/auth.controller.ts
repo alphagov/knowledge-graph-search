@@ -15,7 +15,7 @@ class AuthController {
     } catch (error) {
       console.error('ERROR in /reauth endpoint')
       console.error({ error })
-      return res.status(200).send('OK')
+      return res.status(200).send("Couldn't log out user")
     }
     return res.send(
       `User logged out of GovSearch successfully. UserId = ${userId}`

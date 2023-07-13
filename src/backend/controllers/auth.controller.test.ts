@@ -77,13 +77,13 @@ describe('Auth Controller', () => {
         'User logged out of GovSearch successfully. UserId = testId'
       )
     })
-    it('Returns 200 with no message even if there is an error', async () => {
+    it('Returns 200 even if there is an error', async () => {
       const mockRequest = {} as e.Request
       mockRequest.params = {
         userId: 'testId',
       }
       const mockResponse = {} as e.Response
-      mockResponse.status = jest.fn()
+      mockResponse.status = jest.fn().mockReturnValue({ send: jest.fn() })
       const mockNext = {} as e.NextFunction
       jest
         .spyOn(SessionStore.prototype, 'destroySessionsForUserId')
