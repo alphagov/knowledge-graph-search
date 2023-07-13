@@ -19,7 +19,7 @@ export const buildSqlQuery = function (
 
   const includeClause =
     keywords.length === 0
-      ? null
+      ? ''
       : 'AND (' +
         [...Array(keywords.length).keys()]
           .map((index) =>
@@ -32,7 +32,7 @@ export const buildSqlQuery = function (
 
   const excludeClause =
     excludedKeywords.length === 0
-      ? null
+      ? ''
       : 'AND NOT (' +
         [...Array(excludedKeywords.length).keys()]
           .map((index) =>
@@ -42,95 +42,78 @@ export const buildSqlQuery = function (
           )
           .join(' OR ') +
         ')'
-
-  let areaClause = null
+  let areaClause = ''
   if (searchParams.areaToSearch === 'publisher') {
     areaClause = 'AND publishing_app = "publisher"'
   } else if (searchParams.areaToSearch === 'whitehall') {
     areaClause = 'AND publishing_app = "whitehall"'
   }
 
-  let localeClause = null
+  let localeClause = ''
   if (searchParams.selectedLocale !== '') {
     localeClause = `AND locale = @locale`
   }
 
-  let taxonClause = null
+  let taxonClause = ''
   if (searchParams.selectedTaxon !== '') {
     taxonClause = `
-  AND EXISTS
-    (
-      SELECT 1 FROM UNNEST (taxons) AS taxon
-      WHERE taxon = @taxon
-    )
-  `
+      AND EXISTS
+        (
+          SELECT 1 FROM UNNEST (taxons) AS taxon
+          WHERE taxon = @taxon
+        )
+    `
   }
 
-  let organisationClause = null
+  let organisationClause = ''
   if (searchParams.selectedOrganisation !== '') {
     organisationClause = `
-  AND EXISTS
-    (
-      SELECT 1 FROM UNNEST (organisations) AS link
-      WHERE link = @organisation
-    )
-  `
+      AND EXISTS
+        (
+          SELECT 1 FROM UNNEST (organisations) AS link
+          WHERE link = @organisation
+        )
+    `
   }
 
-  let linkClause = null
+  let linkClause = ''
   if (searchParams.linkSearchUrl !== '') {
     // Link search: look for url as substring
     linkClause = `
-  AND EXISTS
-    (
-      SELECT 1 FROM UNNEST (hyperlinks) AS link
-      WHERE CONTAINS_SUBSTR(link, @link)
-    )
-  `
+      AND EXISTS
+        (
+          SELECT 1 FROM UNNEST (hyperlinks) AS link
+          WHERE CONTAINS_SUBSTR(link, @link)
+        )
+    `
   }
 
-  const prefix = `
-  SELECT
-    url,
-    title,
-    documentType,
-    contentId,
-    locale,
-    publishing_app,
-    first_published_at,
-    public_updated_at,
-    withdrawn_at,
-    withdrawn_explanation,
-    page_views,
-    taxons,
-    primary_organisation,
-    organisations AS all_organisations
-  FROM search.page
-  
-  WHERE TRUE`
-
-  const suffix = `
-  ORDER BY page_views DESC
-  LIMIT 10000`
-
-  const clauses = [
-    includeClause,
-    excludeClause,
-    areaClause,
-    localeClause,
-    taxonClause,
-    organisationClause,
-    linkClause,
-  ]
-
-  let clausesPart = ''
-  clauses.forEach((clause) => {
-    if (clause) {
-      clausesPart += `\n${clause}`
-    }
-  })
-
-  const finalQuery = `${prefix}${clausesPart}${suffix}`
-
-  return finalQuery
+  return `
+    SELECT
+      url,
+      title,
+      documentType,
+      contentId,
+      locale,
+      publishing_app,
+      first_published_at,
+      public_updated_at,
+      withdrawn_at,
+      withdrawn_explanation,
+      page_views,
+      taxons,
+      primary_organisation,
+      organisations AS all_organisations
+    FROM search.page
+    WHERE TRUE
+    ${includeClause}
+    ${excludeClause}
+    ${areaClause}
+    ${localeClause}
+    ${taxonClause}
+    ${organisationClause}
+    ${linkClause}
+    ORDER BY page_views DESC
+    LIMIT 10000
+  `
 }

@@ -33,6 +33,16 @@ const SUFFIX = `
 
 const expectedQuery = (clauses: string) => `${PREFIX}${clauses}${SUFFIX}`
 
+// This test util is used to remove from a string:
+// - leading and trailing whitespace
+// - multiple newlines
+// - tab indentations
+const queryFmt = (query: string) =>
+  query
+    .replace(/^\s+|\s+$/gm, '')
+    .replace(/\n+/g, '\n')
+    .trim()
+
 const makeParams = (opts = {}) =>
   ({
     linkSearchUrl: '',
@@ -56,8 +66,9 @@ describe('buildSqlQuery', () => {
     const excludedKeywords: string[] = []
 
     const query = buildSqlQuery(searchParams, keywords, excludedKeywords)
+    const expected = expectedQuery('')
 
-    expect(query).toEqual(expectedQuery(''))
+    expect(queryFmt(query)).toEqual(queryFmt(expected))
   })
 
   it('has include clause if keywords are provided', () => {
@@ -68,8 +79,9 @@ describe('buildSqlQuery', () => {
     const query = buildSqlQuery(searchParams, keywords, excludedKeywords)
 
     const expectedClauses = `\nAND (CONTAINS_SUBSTR(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @keyword0) OR CONTAINS_SUBSTR(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @keyword1))`
+    const expected = expectedQuery(expectedClauses)
 
-    expect(query).toEqual(expectedQuery(expectedClauses))
+    expect(queryFmt(query)).toEqual(queryFmt(expected))
   })
 
   it('deals with case sensitive keywords', () => {
@@ -80,8 +92,9 @@ describe('buildSqlQuery', () => {
     const query = buildSqlQuery(searchParams, keywords, excludedKeywords)
 
     const expectedClauses = `\nAND (STRPOS(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @keyword0) <> 0 OR STRPOS(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @keyword1) <> 0)`
+    const expected = expectedQuery(expectedClauses)
 
-    expect(query).toEqual(expectedQuery(expectedClauses))
+    expect(queryFmt(query)).toEqual(queryFmt(expected))
   })
 
   it('has exclude clause if exclude keywords are provided', () => {
@@ -91,8 +104,9 @@ describe('buildSqlQuery', () => {
 
     const query = buildSqlQuery(searchParams, keywords, excludedKeywords)
     const expectedClauses = `\nAND NOT (CONTAINS_SUBSTR(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @excluded_keyword0) OR CONTAINS_SUBSTR(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @excluded_keyword1))`
+    const expected = expectedQuery(expectedClauses)
 
-    expect(query).toEqual(expectedQuery(expectedClauses))
+    expect(queryFmt(query)).toEqual(queryFmt(expected))
   })
 
   it('deals with case sensitive excluded keywords', () => {
@@ -102,8 +116,9 @@ describe('buildSqlQuery', () => {
 
     const query = buildSqlQuery(searchParams, keywords, excludedKeywords)
     const expectedClauses = `\nAND NOT (STRPOS(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @excluded_keyword0) <> 0 OR STRPOS(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @excluded_keyword1) <> 0)`
+    const expected = expectedQuery(expectedClauses)
 
-    expect(query).toEqual(expectedQuery(expectedClauses))
+    expect(queryFmt(query)).toEqual(queryFmt(expected))
   })
 
   it('can filter by publishing app', () => {
@@ -113,14 +128,16 @@ describe('buildSqlQuery', () => {
 
     let query = buildSqlQuery(searchParams, keywords, excludedKeywords)
     let expectedClauses = `\nAND publishing_app = "publisher"`
+    let expected = expectedQuery(expectedClauses)
 
-    expect(query).toEqual(expectedQuery(expectedClauses))
+    expect(queryFmt(query)).toEqual(queryFmt(expected))
 
     searchParams = makeParams({ areaToSearch: 'whitehall' })
     query = buildSqlQuery(searchParams, keywords, excludedKeywords)
     expectedClauses = `\nAND publishing_app = "whitehall"`
+    expected = expectedQuery(expectedClauses)
 
-    expect(query).toEqual(expectedQuery(expectedClauses))
+    expect(queryFmt(query)).toEqual(queryFmt(expected))
   })
 
   it('can filter by any locale', () => {
@@ -132,8 +149,9 @@ describe('buildSqlQuery', () => {
 
     const query = buildSqlQuery(searchParams, keywords, excludedKeywords)
     const expectedClauses = `\nAND locale = @locale`
+    const expected = expectedQuery(expectedClauses)
 
-    expect(query).toEqual(expectedQuery(expectedClauses))
+    expect(queryFmt(query)).toEqual(queryFmt(expected))
   })
 
   it('can filter by any taxon', () => {
@@ -144,15 +162,16 @@ describe('buildSqlQuery', () => {
     const excludedKeywords: string[] = []
 
     const query = buildSqlQuery(searchParams, keywords, excludedKeywords)
-    const expectedClauses = `\n
-  AND EXISTS
+    const expectedClauses = `
+    AND EXISTS
     (
       SELECT 1 FROM UNNEST (taxons) AS taxon
       WHERE taxon = @taxon
     )
-  `
+    `
+    const expected = expectedQuery(expectedClauses)
 
-    expect(query).toEqual(expectedQuery(expectedClauses))
+    expect(queryFmt(query)).toEqual(queryFmt(expected))
   })
 
   it('can filter by any organisation', () => {
@@ -163,15 +182,16 @@ describe('buildSqlQuery', () => {
     const excludedKeywords: string[] = []
 
     const query = buildSqlQuery(searchParams, keywords, excludedKeywords)
-    const expectedClauses = `\n
-  AND EXISTS
+    const expectedClauses = `
+    AND EXISTS
     (
       SELECT 1 FROM UNNEST (organisations) AS link
       WHERE link = @organisation
     )
-  `
+    `
+    const expected = expectedQuery(expectedClauses)
 
-    expect(query).toEqual(expectedQuery(expectedClauses))
+    expect(queryFmt(query)).toEqual(queryFmt(expected))
   })
 
   it('can filter by any hyperlink', () => {
@@ -182,15 +202,16 @@ describe('buildSqlQuery', () => {
     const excludedKeywords: string[] = []
 
     const query = buildSqlQuery(searchParams, keywords, excludedKeywords)
-    const expectedClauses = `\n
-  AND EXISTS
+    const expectedClauses = `
+    AND EXISTS
     (
       SELECT 1 FROM UNNEST (hyperlinks) AS link
       WHERE CONTAINS_SUBSTR(link, @link)
     )
-  `
+    `
+    const expected = expectedQuery(expectedClauses)
 
-    expect(query).toEqual(expectedQuery(expectedClauses))
+    expect(queryFmt(query)).toEqual(queryFmt(expected))
   })
 
   it('can mix all the clauses togetuer', () => {
@@ -208,31 +229,28 @@ describe('buildSqlQuery', () => {
     const query = buildSqlQuery(searchParams, keywords, excludedKeywords)
 
     const expectedClauses = `
-AND (STRPOS(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @keyword0) <> 0 OR STRPOS(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @keyword1) <> 0)
-AND NOT (STRPOS(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @excluded_keyword0) <> 0 OR STRPOS(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @excluded_keyword1) <> 0)
-AND publishing_app = "whitehall"
-AND locale = @locale
-
+  AND (STRPOS(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @keyword0) <> 0 OR STRPOS(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @keyword1) <> 0)
+  AND NOT (STRPOS(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @excluded_keyword0) <> 0 OR STRPOS(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @excluded_keyword1) <> 0)
+  AND publishing_app = "whitehall"
+  AND locale = @locale
   AND EXISTS
     (
       SELECT 1 FROM UNNEST (taxons) AS taxon
       WHERE taxon = @taxon
     )
-  
-
   AND EXISTS
     (
       SELECT 1 FROM UNNEST (organisations) AS link
       WHERE link = @organisation
     )
-  
-
   AND EXISTS
     (
       SELECT 1 FROM UNNEST (hyperlinks) AS link
       WHERE CONTAINS_SUBSTR(link, @link)
     )
   `
-    expect(query).toEqual(expectedQuery(expectedClauses))
+    const expected = expectedQuery(expectedClauses)
+
+    expect(queryFmt(query)).toEqual(queryFmt(expected))
   })
 })

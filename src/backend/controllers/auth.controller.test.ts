@@ -1,8 +1,8 @@
 import { expect } from '@jest/globals'
 import e from 'express'
-import { Route } from '../enums/routes'
 import AuthController from './auth.controller'
 import { SessionStore } from '../services/sessionStore'
+import { Route } from '../constants/routes'
 
 jest.mock('../config', () => ({
   __esModule: true,

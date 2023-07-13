@@ -131,12 +131,8 @@ describe('[Function] sendSearchQuery', () => {
   it('Calls the appropriate queries with default search type', async () => {
     jest.spyOn(buildSqlQuery, 'buildSqlQuery').mockReturnValue('query')
     ;(BigQuery.prototype.query as jest.Mock)
-      .mockResolvedValueOnce([
-        [{ locale: 'fr' }, { locale: 'en' }, { locale: 'de' }],
-      ])
-      .mockResolvedValueOnce([
-        [{ name: 'taxon1' }, { name: 'taxon2' }, { name: 'taxon3' }],
-      ])
+      .mockResolvedValueOnce(['Some result'])
+      .mockResolvedValueOnce(['Some result'])
     await sendSearchQuery(makeSearchParams())
     expect(BigQuery.prototype.query).toHaveBeenCalledTimes(2)
     expect(BigQuery.prototype.query).toHaveBeenNthCalledWith(1, {
@@ -167,12 +163,8 @@ describe('[Function] sendSearchQuery', () => {
   it('Calls the appropriate queries with Taxon search type', async () => {
     jest.spyOn(buildSqlQuery, 'buildSqlQuery').mockReturnValue('query')
     ;(BigQuery.prototype.query as jest.Mock)
-      .mockResolvedValueOnce([
-        [{ locale: 'fr' }, { locale: 'en' }, { locale: 'de' }],
-      ])
-      .mockResolvedValueOnce([
-        [{ name: 'taxon1' }, { name: 'taxon2' }, { name: 'taxon3' }],
-      ])
+      .mockResolvedValueOnce(['Some result'])
+      .mockResolvedValueOnce(['Some result'])
     await sendSearchQuery(makeSearchParams({ searchType: SearchType.Taxon }))
     expect(BigQuery.prototype.query).toHaveBeenCalledTimes(2)
     expect(BigQuery.prototype.query).toHaveBeenNthCalledWith(1, {
@@ -198,12 +190,8 @@ describe('[Function] sendSearchQuery', () => {
   it('Calls the appropriate queries with Organisation search type', async () => {
     jest.spyOn(buildSqlQuery, 'buildSqlQuery').mockReturnValue('query')
     ;(BigQuery.prototype.query as jest.Mock)
-      .mockResolvedValueOnce([
-        [{ locale: 'fr' }, { locale: 'en' }, { locale: 'de' }],
-      ])
-      .mockResolvedValueOnce([
-        [{ name: 'org1' }, { name: 'org2' }, { name: 'org3' }],
-      ])
+      .mockResolvedValueOnce(['Some result'])
+      .mockResolvedValueOnce(['Some result'])
     await sendSearchQuery(
       makeSearchParams({ searchType: SearchType.Organisation })
     )
