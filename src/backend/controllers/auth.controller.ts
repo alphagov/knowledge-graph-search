@@ -1,11 +1,8 @@
 import { RequestHandler } from 'express'
-import {
-  destroySessionsForUserId,
-  updatePermissionsForUser,
-} from '../services/redisStore'
 import { Route } from '../constants/routes'
 import log from '../utils/logging'
 import { SignonProfileData } from '../constants/types'
+import sessionStore, { SessionStore } from '../services/sessionStore'
 
 class AuthController {
   public loginSuccessRedirect: RequestHandler = (req, res) =>
@@ -14,11 +11,11 @@ class AuthController {
   public reauth: RequestHandler = async (req, res) => {
     const { userId } = req.params
     try {
-      await destroySessionsForUserId(userId)
+      await (sessionStore as SessionStore).destroySessionsForUserId(userId)
     } catch (error) {
       console.error('ERROR in /reauth endpoint')
       console.error({ error })
-      return res.status(200).send('OK')
+      return res.status(200).send("Couldn't log out user")
     }
     return res.send(
       `User logged out of GovSearch successfully. UserId = ${userId}`
@@ -38,7 +35,10 @@ class AuthController {
     )
 
     try {
-      await updatePermissionsForUser(userId, body as SignonProfileData)
+      await (sessionStore as SessionStore).updatePermissionsForUser(
+        userId,
+        body as SignonProfileData
+      )
       log.debug(`Updated permissions for user ${userId}`)
     } catch (error) {
       log.error('Failed updating user permissions')

@@ -1,6 +1,6 @@
 import type e from 'express'
 import crypto from 'crypto'
-import { addSessionToUserSet } from '../services/redisStore'
+import sessionStore, { SessionStore } from '../services/sessionStore'
 import log from '../utils/logging'
 import { REDIS_PREFIX } from '../constants/environments'
 
@@ -15,7 +15,7 @@ export function generateSessionId(req: e.Request) {
     log.debug('User found on request')
     const { uid: userId } = (req.user as any)?.profileData?.user || {}
     log.debug(`Creating session ${sessionId} for user ${userId}`)
-    addSessionToUserSet(userId, sessionId)
+    ;(sessionStore as SessionStore).addSessionToUserSet(userId, sessionId)
   }
 
   return sessionId

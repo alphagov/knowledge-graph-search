@@ -11,13 +11,7 @@ module.exports = {
   collectCoverage: true,
   collectCoverageFrom: ['./src/backend/**/*.ts', './src/utils/*.ts'],
   setupFiles: ['<rootDir>/jest.setup.ts'],
-  /* uncomment when we want to enforce these thresholds
   coverageThreshold: {
-  "global": {
-    "branches": 95,
-    "functions": 95,
-    "lines": 95,
-    "statements": 95
-    }
-  },*/
+    global: 70,
+  },
 }
