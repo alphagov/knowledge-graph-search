@@ -9,8 +9,9 @@ const featureFlags: FeatureFlags = {
 
 interface AppConfig extends FeatureFlags {
   port: number
-  environment: string
+  environment: ENV
   isLocal: boolean
+  isTest: boolean
   redisHost: string
   redisPort: number
   oauthAuthUrl: string
@@ -27,8 +28,9 @@ interface AppConfig extends FeatureFlags {
 }
 const config: AppConfig = {
   port: process.env.port ? parseInt(process.env.port) : 8080,
-  environment: process.env.NODE_ENV || ENV.LOCAL,
+  environment: (process.env.NODE_ENV as ENV) || ENV.LOCAL,
   isLocal: process.env.NODE_ENV === ENV.LOCAL,
+  isTest: process.env.NODE_ENV === ENV.TEST,
   redisHost: process.env.REDIS_HOST || 'localhost',
   redisPort: process.env.REDIS_PORT
     ? parseInt(process.env.REDIS_PORT, 10)

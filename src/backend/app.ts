@@ -140,8 +140,7 @@ class App {
             log.debug('Fetching user profile')
             profileData = await getUserProfile(accessToken)
           } catch (error) {
-            console.error('ERROR fetching user data')
-            console.error({ error })
+            log.error({ error }, 'ERROR fetching user data')
             return doneCallback(error)
           }
 
