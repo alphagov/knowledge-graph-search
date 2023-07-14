@@ -28,7 +28,7 @@ jobs:
         run: npm ci
 
       - name: Run Jest with Coverage
-        run: NODE_ENV=test-ci npm run test -- --coverage --coverageReporters=json
+        run: npm run test-ci
 
       - name: Upload coverage to GitHub
         uses: actions/upload-artifact@v2

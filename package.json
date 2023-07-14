@@ -5,6 +5,7 @@
   "main": "src/backend/server.ts",
   "scripts": {
     "test": "jest --watchAll --coverage --verbose --detectOpenHandles",
+    "test-ci": "jest --coverage --coverageReporters=json --verbose --detectOpenHandles",
     "start": "ts-node src/backend/server.ts",
     "dev": "nodemon src/backend/server.ts",
     "local": "env $(cat .env|xargs) npm run dev",
