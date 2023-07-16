@@ -7,3 +7,4 @@ cypress/screenshots
 .vscode
 coverage
 .sass-cache
+dist
