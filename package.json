@@ -7,7 +7,7 @@
     "start": "node dist/backend/server.js",
     "dev": "nodemon src/backend/server.ts",
     "local": "env $(cat .env-signon-mock|xargs) npm run start",
-    "build-backend": "tsc",
+    "build": "tsc",
     "postbuild": "mv dist/src/* dist/ && cp -r src/backend/views dist/backend/views",
     "test": "jest --watchAll --coverage --verbose --detectOpenHandles",
     "test-ci": "jest --coverage --coverageReporters=json --verbose --detectOpenHandles --colors",

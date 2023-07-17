@@ -15,6 +15,6 @@ RUN npm run build-frontend
 RUN npm run copy-assets
 
 # Compile backend code
-RUN npm run build-backend
+RUN npm run build
 
 CMD ["npm", "start"]
