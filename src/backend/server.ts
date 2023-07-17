@@ -1,3 +1,7 @@
+// Enables source mapping of the compiled code
+// Must be the first statement of the application
+import 'source-map-support/register'
+
 import App from './app'
 import AuthRoutes from './routes/AuthRoutes'
 import IndexRoutes from './routes/IndexRoutes'
