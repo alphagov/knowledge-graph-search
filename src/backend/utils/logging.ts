@@ -4,9 +4,18 @@ import config from '../config'
 import { getPinoOptions } from '@relaycorp/pino-cloud'
 import { ENV } from '../constants/environments'
 
+const envToLogLevelMapping = {
+  [ENV.TEST]: 'silent',
+  [ENV.LOCAL]: 'debug',
+  [ENV.DEVELOPMENT]: 'debug',
+  [ENV.STAGING]: 'debug',
+  [ENV.PRODUCTION]: 'info',
+}
+
 const localOptions: pino.LoggerOptions = {
   // Disable debug logs in production
-  level: config.environment === ENV.PRODUCTION ? 'info' : 'debug',
+  level: envToLogLevelMapping[config.environment] || 'debug',
+  // level: 'silent',
   timestamp: pino.stdTimeFunctions.isoTime,
   formatters: {
     bindings: (bindings) => {
@@ -45,13 +54,12 @@ const GCPOptions = {
     version: config.appVersion,
   }),
   timestamp: pino.stdTimeFunctions.isoTime,
-  level: config.environment === ENV.PRODUCTION ? 'info' : 'debug',
 }
 
-const logger = pino(config.isLocal ? localOptions : GCPOptions)
+const logger = pino(config.isLocal || config.isTest ? localOptions : GCPOptions)
 
 export const httpLogger = pinoHttp(
-  config.isLocal ? localHttpOptions : GCPOptions
+  config.isLocal || config.isTest ? localHttpOptions : GCPOptions
 )
 
 export default logger

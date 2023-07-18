@@ -10,7 +10,8 @@ module.exports = {
   moduleFileExtensions: ['js', 'ts', 'json', 'node'],
   collectCoverage: true,
   collectCoverageFrom: ['./src/backend/**/*.ts', './src/utils/*.ts'],
-  setupFiles: ['<rootDir>/jest.setup.ts'],
+  setupFiles: ['<rootDir>/jest.setup.js'],
+  setupFilesAfterEnv: ['./jest.setup.js'],
   coverageThreshold: {
     global: 70,
   },

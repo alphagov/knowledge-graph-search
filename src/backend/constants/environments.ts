@@ -1,5 +1,6 @@
 export enum ENV {
   // Values should reflect the terraform variables
+  TEST = 'test',
   DEVELOPMENT = 'development',
   STAGING = 'staging',
   PRODUCTION = 'production',

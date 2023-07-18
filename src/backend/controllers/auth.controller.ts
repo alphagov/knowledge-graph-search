@@ -13,8 +13,7 @@ class AuthController {
     try {
       await (sessionStore as SessionStore).destroySessionsForUserId(userId)
     } catch (error) {
-      console.error('ERROR in /reauth endpoint')
-      console.error({ error })
+      log.error({ error }, 'ERROR in /reauth endpoint')
       return res.status(200).send("Couldn't log out user")
     }
     return res.send(
