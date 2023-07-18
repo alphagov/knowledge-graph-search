@@ -2,7 +2,7 @@ import App from './app'
 import AuthRoutes from './routes/AuthRoutes'
 import IndexRoutes from './routes/IndexRoutes'
 import config from './config'
-import Routes from './enums/routes'
+import Routes from './constants/routes'
 
 const routesList: Routes[] = [new IndexRoutes()]
 if (config.authEnabled) {

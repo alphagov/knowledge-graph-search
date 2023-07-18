@@ -17,9 +17,10 @@ module.exports = {
     sourceType: 'module',
     project: './tsconfig.json',
   },
-  plugins: ['@typescript-eslint', 'cypress', 'jest'],
+  plugins: ['@typescript-eslint', 'import', 'cypress', 'jest'],
   rules: {
     // Add custom rules here
+    'import/no-unresolved': 'error',
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': 'error',
     'no-callback-literal': 'off',
@@ -46,4 +47,14 @@ module.exports = {
       },
     },
   ],
+  settings: {
+    'import/parsers': {
+      '@typescript-eslint/parser': ['.ts', '.tsx'],
+    },
+    'import/resolver': {
+      typescript: {
+        alwaysTryTypes: true, // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
+      },
+    },
+  },
 }
