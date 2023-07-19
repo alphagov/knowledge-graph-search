@@ -1,20 +1,13 @@
-FROM node:16
+FROM node:16-alpine
 
 ENV PORT=8080
 
-RUN npm install -g sass
+# Set working directory
+WORKDIR /home/govsearch
 
-COPY . .
-RUN npm ci # install from package-lock.json
+COPY package*.json ./
+COPY dist ./dist
 
-# Compile SCSS to CSS
-RUN sass ./src/frontend/scss/main.scss > ./src/public/main.css
-
-# Compile frontend code
-RUN npm run build-frontend
-RUN npm run copy-assets
-
-# Compile backend code
-RUN npm run build
+RUN npm ci --omit=dev
 
 CMD ["npm", "start"]

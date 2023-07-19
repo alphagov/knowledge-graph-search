@@ -40,6 +40,9 @@ else
     fi
 fi
 
+echo "Building project from source"
+npm run clean-build
+
 echo "Pushing app"
 
 echo "PROJECT_ID is '${PROJECT_ID}'"
