@@ -39,6 +39,13 @@ const viewOrgPersonRoles = (personRoles: Record<string, any>[]): string =>
       )})`
   )
 
+const viewOrgParents = (parentOrgNames: string[]): string =>
+  viewDetails(
+    `${parentOrgNames.length} parent organisations`,
+    parentOrgNames.sort(),
+    viewMetaLink
+  )
+
 const viewOrgChildren = (childOrgNames: string[]): string =>
   viewDetails(
     `${childOrgNames.length} sub-organisations`,
@@ -211,10 +218,13 @@ const viewOrg = (record: Organisation): string => `
       <a class="govuk-link" href="${record.homepage}">${record.name}</a>
     </h2>
     <p class="govuk-body">
-      Government organisation${
-        record.parentName ? `, part of ${viewMetaLink(record.parentName)}` : ''
-      }
+      Government organisation
     </p>
+    ${
+      record.parentOrgNames && record.parentOrgNames.length > 0
+        ? viewOrgParents(record.parentOrgNames)
+        : ''
+    }
     ${
       record.supersededBy.length > 0
         ? `
