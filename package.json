@@ -4,16 +4,18 @@
   "description": "Search engine for GOV.UK content",
   "main": "src/backend/server.ts",
   "scripts": {
+    "start": "node dist/backend/server.js",
+    "dev": "nodemon src/backend/server.ts",
+    "local": "env $(cat .env-signon-mock|xargs) npm run start",
+    "build": "tsc",
+    "postbuild": "mv dist/src/* dist/ && cp -r src/backend/views dist/backend/views",
     "test": "jest --watchAll --coverage --verbose --detectOpenHandles",
     "test-ci": "jest --coverage --coverageReporters=json --verbose --detectOpenHandles --colors",
-    "start": "ts-node src/backend/server.ts",
-    "dev": "nodemon src/backend/server.ts",
-    "local": "env $(cat .env|xargs) npm run dev",
-    "build": "webpack",
     "lint": "eslint './**/*.{ts,tsx}' --fix",
     "check-lint": "eslint './**/*.{ts,tsx}'",
     "format": "prettier --write '.'",
     "check-format": "prettier --check '.'",
+    "build-frontend": "webpack",
     "copy-assets": "node -e \"require('fs').cpSync('./node_modules/govuk-frontend/govuk/assets', './src/public/assets', {recursive: true});require('fs').copyFileSync('./node_modules/govuk-frontend/govuk/all.js', './src/public/assets/all.js', 0);\""
   },
   "repository": {
@@ -49,7 +51,8 @@
     "pino": "^8.14.1",
     "pino-http": "^8.3.3",
     "pino-http-print": "^3.1.0",
-    "pino-pretty": "^10.0.0"
+    "pino-pretty": "^10.0.0",
+    "source-map-support": "^0.5.21"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.3",

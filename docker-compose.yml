@@ -5,20 +5,27 @@ services:
     ports:
       - 6379:6379
 
-  signon:
+  signon-mock:
     build:
       context: signon-mock
-      dockerfile: dockerfile
+      dockerfile: Dockerfile
     ports:
       - 3005:3005
 
   govsearch:
     env_file:
-      - .env
+      - .env-signon-mock
+    environment:
+      - REDIS_HOST=redis
+      - OAUTH_AUTH_URL=http://localhost:3005/oauth/authorize
+      - OAUTH_TOKEN_URL=http://signon-mock:3005/oauth/access_token
+      - SIGNON_URL=http://signon-mock:3005
+      - OAUTH_CALLBACK_URL=http://localhost:8080/auth/gds/callback
+      - PROJECT_ID=govuk-knowledge-graph-dev
     build:
       context: .
     ports:
       - 8080:8080
     depends_on:
       - redis
-      - signon
+      - signon-mock
