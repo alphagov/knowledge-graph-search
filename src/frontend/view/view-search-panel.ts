@@ -267,7 +267,6 @@ const viewSearchButton = () => `
           : 'Search'
       }
     </button>
-
   </p>
 `
 
