@@ -24,6 +24,7 @@ const csvFieldFormatters: Record<string, any> = {
   title: { name: 'Title' },
   locale: { name: 'Language', format: languageName },
   documentType: { name: 'Document type' },
+  contentId: { name: 'Content ID' },
   publishing_app: { name: 'Publishing app' },
   first_published_at: {
     name: 'First published',
