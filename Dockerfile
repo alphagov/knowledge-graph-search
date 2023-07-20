@@ -7,6 +7,7 @@ WORKDIR /home/govsearch
 
 COPY package*.json ./
 COPY dist ./dist
+COPY public ./public
 
 RUN npm ci --omit=dev
 

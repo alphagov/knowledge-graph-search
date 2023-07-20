@@ -1,4 +1,4 @@
-# This file specifies files that are _not_ uploaded to Google Cloud
+# This file specifies files that are *not* uploaded to Google Cloud
 
 # using gcloud. It follows the same syntax as .gitignore, with the addition of
 

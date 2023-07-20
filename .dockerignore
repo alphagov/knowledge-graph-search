@@ -2,8 +2,6 @@
 node_modules
 signon-mock
 params.json
-public/main.js
-public/main.css
 cypress
 .vscode
 coverage
