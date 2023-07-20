@@ -2,8 +2,7 @@
 node_modules
 signon-mock
 params.json
-public/main.js
-public/main.css
-cypress/videos
-cypress/screenshots
+cypress
 .vscode
+coverage
+.github

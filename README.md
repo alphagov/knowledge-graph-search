@@ -15,7 +15,7 @@ Docs](https://docs.data-community.publishing.service.gov.uk).
 
 - Clone this repository
 - Run `npm install` to install all dependencies
-- Install [Sass](https://sass-lang.com/install) and compile the Sass sources to CSS with `sass ./src/frontend/scss/main.scss > ./src/public/main.css`
+- Install [Sass](https://sass-lang.com/install) and compile the Sass sources to CSS with `sass ./src/frontend/scss/main.scss > ./public/main.css`
 
 - Install [webpack](https://webpack.js.org/) and compile the browser-side Typescript code to JavaScript by just running `webpack`
 
@@ -42,11 +42,11 @@ Docs](https://docs.data-community.publishing.service.gov.uk).
 
 - `src/backend`: the server-side files.
 
-- `src/frontend`: the main browser-side files. `webpack` compiles everything to `src/public/main.js`.
+- `src/frontend`: the main browser-side files. `webpack` compiles everything to `public/main.js`.
 
-- `src/scss/main.scss`: the Sass file that `sass` compiles to `src/public/main.css`
+- `src/scss/main.scss`: the Sass file that `sass` compiles to `public/main.css`
 
-- `src/public/assets`: publicly served fonts and images
+- `./public/assets`: publicly served fonts and images
 
 ## Software architecture
 
