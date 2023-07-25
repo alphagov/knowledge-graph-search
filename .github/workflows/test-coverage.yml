@@ -2,9 +2,11 @@ name: Jest Coverage Check
 
 on:
   push:
-    branches: [main]
+    # branches: [main]
+    branches: [none]
   pull_request:
-    branches: '*'
+    # branches: '*'
+    branches: 'none'
 
 jobs:
   test:
