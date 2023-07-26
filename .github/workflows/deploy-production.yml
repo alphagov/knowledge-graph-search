@@ -1,22 +1,14 @@
 name: Deploy to Cloud Run
 
 on:
-  push:
+  workflow_dispatch:
     branches:
-      - main
-    paths-ignore:
-      - 'signon-mock/**'
-      - 'cypress/**'
-      - 'cypress*'
-      - 'jest*'
-      - '.prettier*'
-      - '.eslint*'
-      - '.gitignore'
+      - production
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: staging
+    environment: production
 
     steps:
       - name: Print environment variable
