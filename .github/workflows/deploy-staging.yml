@@ -4,6 +4,14 @@ on:
   push:
     branches:
       - main
+  paths-ignore:
+    - 'signon-mock/**'
+    - 'cypress/**'
+    - 'cypress*'
+    - 'jest*'
+    - '.prettier*'
+    - '.eslint*'
+    - '.gitignore'
 
 jobs:
   deploy:
@@ -33,7 +41,7 @@ jobs:
       - name: Generate Tag
         id: generate_tag
         run: |
-          echo "TAG=cd-commit-$(git rev-parse --short HEAD)" >> "$GITHUB_ENV"
+          echo "TAG=main-$(git rev-parse --short HEAD)" >> "$GITHUB_ENV"
 
       - name: Deploy to Cloud Run
         id: deploy
