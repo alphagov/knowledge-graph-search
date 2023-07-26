@@ -83,7 +83,7 @@ export const buildSqlQuery = function (
       AND EXISTS
         (
           SELECT 1 FROM UNNEST (hyperlinks) AS link
-          WHERE CONTAINS_SUBSTR(link, @link)
+          WHERE CONTAINS_SUBSTR(link.link_url, @link)
         )
     `
   }
