@@ -1,9 +1,11 @@
 name: Create Release Tag
 
 on:
-  push:
+  pull_request:
     branches:
       - production
+    types:
+      - closed
 
 jobs:
   create-tag:
