@@ -31,8 +31,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ env.GIT_TAG }}
-          release_name: 'Release ${{ env.GIT_TAG }}'
-          body: ${{ env.COMMIT_MESSAGE }}}
+          release_name: Release ${{ env.GIT_TAG }}
+          body: ${{ env.COMMIT_MESSAGE }}
           draft: false
           prerelease: false
 
