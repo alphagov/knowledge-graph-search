@@ -1,9 +1,18 @@
-name: Deploy to Cloud Run
+name: Deploy Production
 
 on:
   workflow_dispatch:
+  push:
     branches:
       - production
+    paths-ignore:
+      - 'signon-mock/**'
+      - 'cypress/**'
+      - 'cypress*'
+      - 'jest*'
+      - '.prettier*'
+      - '.eslint*'
+      - '.gitignore'
 
 jobs:
   deploy:
@@ -11,18 +20,8 @@ jobs:
     environment: production
 
     steps:
-      - name: Print environment variable
-        run: echo "Value of GCP_PROJECT_ID is ${{ vars.GCP_PROJECT_ID }}"
-
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Setup Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0.2.1
-        with:
-          project_id: ${{ vars.GCP_PROJECT_ID }}
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
-          export_default_credentials: true
 
       - name: Install Dependencies
         run: npm ci
@@ -34,6 +33,13 @@ jobs:
         id: generate_tag
         run: |
           echo "TAG=main-$(git rev-parse --short HEAD)" >> "$GITHUB_ENV"
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.2.1
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
 
       - name: Deploy to Cloud Run
         id: deploy
