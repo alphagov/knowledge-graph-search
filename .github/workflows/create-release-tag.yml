@@ -1,0 +1,26 @@
+name: Create Release Tag
+
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Create Tag
+        id: create_tag
+        run: |
+          GIT_TAG=$(date +v%Y.%m.%d)-$(git log --format=%h -1)
+          echo "GIT_TAG=$GIT_TAG" >> $GITHUB_ENV
+
+      - name: Push Tag
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tags: ${{ env.GIT_TAG }}
