@@ -24,7 +24,7 @@ jobs:
       - name: Get commit message
         id: commit
         run: |
-          COMMIT_MESSAGE=$(git log --format=%B -n 1)
+          COMMIT_MESSAGE=$(git log --format=%B -n 1 | base64)
           echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
 
       - name: Create Release
@@ -35,7 +35,7 @@ jobs:
         with:
           tag_name: ${{ env.GIT_TAG }}
           release_name: Release ${{ env.GIT_TAG }}
-          body: ${{ env.COMMIT_MESSAGE }}
+          body: ${{ env.COMMIT_MESSAGE | base64decode }}
           draft: false
           prerelease: false
 
