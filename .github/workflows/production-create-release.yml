@@ -1,0 +1,44 @@
+name: Create Release Tag
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - production
+    types:
+      - closed
+
+jobs:
+  create-tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      commitmsg: ${{ github.event.head_commit.message }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Create Tag Name
+        run: |
+          GIT_TAG=$(date +v%Y.%m.%d)-$(git log --format=%h -1)
+          echo "GIT_TAG=$GIT_TAG" >> $GITHUB_ENV
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.GIT_TAG }}
+          release_name: Release ${{ env.GIT_TAG }}
+          draft: false
+          prerelease: false
+
+      # Create latest release tag
+      - uses: rickstaa/action-create-tag@v1
+        name: Create Latest Tag
+        id: 'tag_create_latest'
+        with:
+          tag: 'latest'
+          force_push_tag: true
+          message: 'Latest release'
