@@ -2,18 +2,11 @@ name: Deploy Production
 
 on:
   workflow_dispatch:
-  pull_request:
-    branches:
-      - production
-    types: [closed]
-    paths-ignore:
-      - 'signon-mock/**'
-      - 'cypress/**'
-      - 'cypress*'
-      - 'jest*'
-      - '.prettier*'
-      - '.eslint*'
-      - '.gitignore'
+    inputs:
+      tag:
+        description: 'Tag to deploy'
+        required: true
+        default: 'latest'
 
 jobs:
   deploy:
@@ -24,6 +17,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.tag }}
 
       - name: Install Dependencies
         run: npm ci
@@ -34,7 +29,7 @@ jobs:
       - name: Generate Tag
         id: generate_tag
         run: |
-          echo "TAG=main-$(git rev-parse --short HEAD)" >> "$GITHUB_ENV"
+          echo "REV_TAG=prod-$(git rev-parse --short HEAD)" >> "$GITHUB_ENV"
 
       - name: Setup Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v0.2.1
@@ -49,13 +44,13 @@ jobs:
           gcloud run deploy govuk-knowledge-graph-search \
             --source . \
             --region "europe-west2" \
-            --tag ${{ env.TAG }} \
+            --tag ${{ env.REV_TAG }} \
             --no-traffic \
             --project ${{ vars.GCP_PROJECT_ID }}
 
       - name: Route Traffic to New Revision
         run: |
           gcloud run services update-traffic govuk-knowledge-graph-search \
-            --to-tags ${{ env.TAG }}=100 \
+            --to-tags ${{ env.REV_TAG }}=100 \
             --region "europe-west2" \
             --project ${{ vars.GCP_PROJECT_ID }}
