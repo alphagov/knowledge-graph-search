@@ -206,7 +206,7 @@ describe('buildSqlQuery', () => {
     AND EXISTS
     (
       SELECT 1 FROM UNNEST (hyperlinks) AS link
-      WHERE CONTAINS_SUBSTR(link, @link)
+      WHERE CONTAINS_SUBSTR(link.link_url, @link)
     )
     `
     const expected = expectedQuery(expectedClauses)
@@ -246,7 +246,7 @@ describe('buildSqlQuery', () => {
   AND EXISTS
     (
       SELECT 1 FROM UNNEST (hyperlinks) AS link
-      WHERE CONTAINS_SUBSTR(link, @link)
+      WHERE CONTAINS_SUBSTR(link.link_url, @link)
     )
   `
     const expected = expectedQuery(expectedClauses)
