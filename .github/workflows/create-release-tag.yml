@@ -8,6 +8,18 @@ on:
 jobs:
   create-tag:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      checks: write
+      contents: write
+      deployments: write
+      issues: write
+      packages: write
+      pages: write
+      pull-requests: write
+      repository-projects: write
+      security-events: write
+      statuses: write
     steps:
       - uses: actions/checkout@v3
 
@@ -18,15 +30,19 @@ jobs:
 
       # Create unique release tag
       - uses: rickstaa/action-create-tag@v1
+        name: Create Unique Tag
         id: 'tag_create_unique'
         with:
+          #   github_token: ${{ secrets.GH_PAT }}
           tag: ${{ env.GIT_TAG }}
           tag_exists_error: true
 
       # Create latest release tag
       - uses: rickstaa/action-create-tag@v1
+        name: Create Latest Tag
         id: 'tag_create_latest'
         with:
+          #   github_token: ${{ secrets.GH_PAT }}
           tag: 'latest'
           tag_exists_error: false
           message: 'Latest release'
