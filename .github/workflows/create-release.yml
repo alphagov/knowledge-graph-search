@@ -1,9 +1,12 @@
 name: Create Release Tag
 
 on:
-  push:
+  workflow_dispatch:
+  pull_request:
     branches:
       - production
+    types:
+      - closed
 
 jobs:
   create-tag:
@@ -36,7 +39,7 @@ jobs:
           draft: false
           prerelease: false
 
-      # # Create latest release tag
+      # Create latest release tag
       - uses: rickstaa/action-create-tag@v1
         name: Create Latest Tag
         id: 'tag_create_latest'
