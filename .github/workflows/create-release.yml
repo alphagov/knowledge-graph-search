@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      commitmsg: ${{ github.event.head_commit.message }}
     steps:
       - uses: actions/checkout@v3
 
@@ -20,12 +22,6 @@ jobs:
         run: |
           GIT_TAG=$(date +v%Y.%m.%d)-$(git log --format=%h -1)
           echo "GIT_TAG=$GIT_TAG" >> $GITHUB_ENV
-
-      - name: Get commit message
-        id: commit
-        run: |
-          COMMIT_MESSAGE=$(git log --format=%B -n 1 | base64)
-          echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
 
       - name: Create Release
         id: create_release
@@ -35,7 +31,6 @@ jobs:
         with:
           tag_name: ${{ env.GIT_TAG }}
           release_name: Release ${{ env.GIT_TAG }}
-          body: ${{ env.COMMIT_MESSAGE | base64decode }}
           draft: false
           prerelease: false
 
