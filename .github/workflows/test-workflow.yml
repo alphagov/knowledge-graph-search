@@ -1,0 +1,26 @@
+name: Test push
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  checkIfPR:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if push was due to a PR merge
+        id: check
+        run: |
+          PR_URL=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/commits/${{ github.sha }}/pulls" | \
+            jq -r ".[0].url")
+          echo "::set-output name=isPr::$([[ -z "$PR_URL" ]] && echo 'false' || echo 'true')"
+        shell: bash
+
+      - name: Only for PR merge
+        if: steps.check.outputs.isPr == 'true'
+        run: echo "This is a PR merge commit"
+
+      - name: Only for direct push or other than PR merge
+        if: steps.check.outputs.isPr == 'false'
+        run: echo "This is not a PR merge commit"
