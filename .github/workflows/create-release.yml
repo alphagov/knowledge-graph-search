@@ -18,6 +18,12 @@ jobs:
           GIT_TAG=$(date +v%Y.%m.%d-%H.%M.%S)-$(git log --format=%h -1)
           echo "GIT_TAG=$GIT_TAG" >> $GITHUB_ENV
 
+      - name: Get commit message
+        id: commit
+        run: |
+          COMMIT_MESSAGE=$(git log --format=%B -n 1)
+          echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -25,11 +31,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ env.GIT_TAG }}
-          release_name: Release ${{ github.ref }}
-          body: |
-            Changes in this Release
-            - First Change
-            - Second Change
+          release_name: Release 123
+          body: ${{ env.COMMIT_MESSAGE }}}
           draft: false
           prerelease: false
 
