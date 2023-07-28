@@ -8,6 +8,7 @@ import { fetchWithTimeout, queryBackend } from './search-api'
 //= =================================================
 
 console.log('TEST MESSAGE FOR PRODUCTION')
+// dummy comment
 
 const initDatabase = async function () {
   console.log('retrieving taxons, locales and organisations')
