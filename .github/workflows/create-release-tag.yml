@@ -23,7 +23,6 @@ jobs:
         name: Create Unique Tag
         id: 'tag_create_unique'
         with:
-          #   github_token: ${{ secrets.GH_PAT }}
           tag: ${{ env.GIT_TAG }}
           tag_exists_error: true
 
@@ -32,7 +31,6 @@ jobs:
         name: Create Latest Tag
         id: 'tag_create_latest'
         with:
-          #   github_token: ${{ secrets.GH_PAT }}
           tag: 'latest'
-          tag_exists_error: false
+          force_push_tag: true
           message: 'Latest release'
