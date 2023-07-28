@@ -1,0 +1,15 @@
+// This configuration extends the main tsconfig to include files for ESLint that are not part of the regular TypeScript build process
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "rootDir": "./",
+    "outDir": "dist",
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "sourceMap": true
+  },
+  "include": ["./**/*.ts", "jest.setup.js"],
+  "exclude": ["node_modules", "coverage"]
+}
