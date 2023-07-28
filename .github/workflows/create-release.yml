@@ -15,7 +15,7 @@ jobs:
 
       - name: Create Tag Name
         run: |
-          GIT_TAG=$(date +v%Y.%m.%d-%H.%M.%S)-$(git log --format=%h -1)
+          GIT_TAG=$(date +v%Y.%m.%d)-$(git log --format=%h -1)
           echo "GIT_TAG=$GIT_TAG" >> $GITHUB_ENV
 
       - name: Get commit message
@@ -31,25 +31,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ env.GIT_TAG }}
-          release_name: Release 123
+          release_name: Release ${{ env.GIT_TAG }}
           body: ${{ env.COMMIT_MESSAGE }}}
           draft: false
           prerelease: false
 
-          ###
-      # # Create unique release tag
-      # - uses: rickstaa/action-create-tag@v1
-      #   name: Create Unique Tag
-      #   id: 'tag_create_unique'
-      #   with:
-      #     tag: ${{ env.GIT_TAG }}
-      #     tag_exists_error: true
-
       # # Create latest release tag
-      # - uses: rickstaa/action-create-tag@v1
-      #   name: Create Latest Tag
-      #   id: 'tag_create_latest'
-      #   with:
-      #     tag: 'latest'
-      #     force_push_tag: true
-      #     message: 'Latest release'
+      - uses: rickstaa/action-create-tag@v1
+        name: Create Latest Tag
+        id: 'tag_create_latest'
+        with:
+          tag: 'latest'
+          force_push_tag: true
+          message: 'Latest release'
