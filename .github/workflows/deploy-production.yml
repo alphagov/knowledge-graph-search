@@ -2,9 +2,10 @@ name: Deploy Production
 
 on:
   workflow_dispatch:
-  push:
+  pull_request:
     branches:
       - production
+    types: [closed]
     paths-ignore:
       - 'signon-mock/**'
       - 'cypress/**'
@@ -16,6 +17,7 @@ on:
 
 jobs:
   deploy:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     environment: production
 
