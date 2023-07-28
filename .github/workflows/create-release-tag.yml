@@ -15,7 +15,7 @@ jobs:
 
       - name: Create Tag Name
         run: |
-          GIT_TAG=$(date +v%Y.%m.%d.%H%M%S)-$(git log --format=%h -1)
+          GIT_TAG=$(date +v%Y.%m.%d-%H.%M.%S)-$(git log --format=%h -1)
           echo "GIT_TAG=$GIT_TAG" >> $GITHUB_ENV
 
       # Create unique release tag
