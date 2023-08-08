@@ -24,6 +24,7 @@
     "@types/express": "^4.17.14",
     "@types/node": "^18.11.14",
     "accessible-autocomplete": "^2.0.4",
+    "ag-grid-community": "^30.0.6",
     "axios": "^1.2.1",
     "connect-ensure-login": "^0.1.1",
     "copy-webpack-plugin": "^11.0.0",

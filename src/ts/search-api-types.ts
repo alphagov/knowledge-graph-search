@@ -2,6 +2,7 @@ export enum SearchType {
   Keyword = 'keyword',
   Link = 'link',
   Organisation = 'organisation',
+  DocumentType = 'documentType',
   Taxon = 'taxon',
   Language = 'language',
   Advanced = 'advanced',
@@ -23,6 +24,7 @@ export enum SearchArea {
 export enum WhereToSearch {
   Title = 'title',
   Text = 'text',
+  Description = 'description',
   All = 'all'
 }
 
@@ -45,6 +47,7 @@ export type SearchParams = {
   excludedWords: string, // list of words to exclude
   selectedTaxon: string, // taxon to search in
   selectedOrganisation: string, // organisation to search in
+  selectedDocumentType: string, // organisation to search in
   selectedLocale: string, // the language to search for
   linkSearchUrl: string, // URL to find all pages linking to
   whereToSearch: WhereToSearch,
@@ -155,5 +158,7 @@ export type SearchResults = {
 export type InitResults = {
   taxons: string[],
   locales: string[],
-  organisations: string[]
+  organisations: string[],
+  documentTypes: string[],
+  publishingApps: string[]
 }

@@ -9,7 +9,7 @@ const fs = require('fs');
 // OAuth is enabled
 let OAuth2Strategy, passport, session;
 
-import { sendSearchQuery, sendInitQuery, getOrganisationInfo, getPersonInfo, getRoleInfo, getTaxonInfo, getBankHolidayInfo, getTransactionInfo } from './bigquery';
+import { sendSearchQuery, sendInitQuery, getOrganisationInfo, getDocumentTypeInfo, getPersonInfo, getRoleInfo, getTaxonInfo, getBankHolidayInfo, getTransactionInfo } from './bigquery';
 import { SearchArea, Combinator, SearchType, SearchParams, WhereToSearch, Sorting, Pages } from './src/ts/search-api-types';
 import { csvStringify } from './csv';
 import { sanitiseInput } from './src/ts/utils';
@@ -121,6 +121,7 @@ app.get('/search', auth('/'), async (req: any, res) => {
     excludedWords: sanitiseInput(req.query['excluded-words']) || '',
     selectedTaxon: sanitiseInput(req.query['selected-taxon']) || '',
     selectedOrganisation: sanitiseInput(req.query['selected-organisation']) || '',
+    selectedDocumentType: sanitiseInput(req.query['selected-documentType']) || '',
     selectedLocale: sanitiseInput(req.query['lang']) || '',
     caseSensitive: req.query['case-sensitive'] === 'true',
     combinator: <Combinator>sanitiseInput(req.query['combinator']) || Combinator.All,
@@ -143,22 +144,24 @@ app.get('/csv', async (req: any, res) => {
   console.log('API call to /csv', req.query);
   // retrieve qsp params
   const params: SearchParams = {
-    searchType: req.query['search-type'] || SearchType.Keyword,
-    selectedWords: req.query['selected-words'] || '',
-    excludedWords: req.query['excluded-words'] || '',
-    selectedTaxon: req.query['selected-taxon'] || '',
-    selectedOrganisation: req.query['selected-organisation'] || '',
-    selectedLocale: req.query['lang'] || '',
-    caseSensitive: req.query['case-sensitive'] || false,
-    combinator: req.query['combinator'] || Combinator.All,
-    whereToSearch: req.query['where-to-search'] || WhereToSearch.All,
-    areaToSearch: req.query['area'] || SearchArea.Any,
-    linkSearchUrl: req.query['link-search-url'] || '',
-    sorting: req.query['sorting'] || Sorting.PageViewsDesc,
+    searchType: <SearchType>sanitiseInput(req.query['search-type']) || SearchType.Keyword,
+    selectedWords: sanitiseInput(req.query['selected-words']) || '',
+    excludedWords: sanitiseInput(req.query['excluded-words']) || '',
+    selectedTaxon: sanitiseInput(req.query['selected-taxon']) || '',
+    selectedOrganisation: sanitiseInput(req.query['selected-organisation']) || '',
+    selectedDocumentType: sanitiseInput(req.query['selected-documentType']) || '',
+    selectedLocale: sanitiseInput(req.query['lang']) || '',
+    caseSensitive: req.query['case-sensitive'] === 'true',
+    combinator: <Combinator>sanitiseInput(req.query['combinator']) || Combinator.All,
+    whereToSearch: <WhereToSearch>sanitiseInput(req.query['where-to-search']) || WhereToSearch.All,
+    areaToSearch: <SearchArea>sanitiseInput(req.query['area']) || SearchArea.Any,
+    linkSearchUrl: sanitiseInput(req.query['link-search-url']) || '',
+    sorting: <Sorting>sanitiseInput(req.query['sorting']) || Sorting.PageViewsDesc,
     pages: <Pages>sanitiseInput(req.query['pages']) || Pages.All,
   };
   try {
     const data = await sendSearchQuery(params);
+    console.log(data)
     const csvData = csvStringify(data.main);
     res.set('Content-Type', 'text/csv');
     res.send(csvData);
@@ -188,6 +191,21 @@ app.get('/organisation', auth('/'), async (req: any, res) => {
   console.log('API call to /organisation', req.query);
   try {
     const data = await getOrganisationInfo(req.query['name']);
+    res.send(data);
+  } catch (e: any) {
+    if (e.status === 404) {
+      res.status(e.status).send(e.message);
+    } else {
+      res.status(500).send(e.message);
+    }
+  }
+});
+
+
+app.get('/document-type', auth('/'), async (req: any, res) => {
+  console.log('API call to /document-type', req.query);
+  try {
+    const data = await getDocumentTypeInfo(req.query['name']);
     res.send(data);
   } catch (e: any) {
     if (e.status === 404) {

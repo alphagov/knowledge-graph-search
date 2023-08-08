@@ -66,6 +66,24 @@ const splitKeywords = function(keywords: string): string[] {
   return output.filter(d => d.length > 0 && !wordsToIgnore.includes(d));
 };
 
+const formatSorting = {
+  pageViewsDesc: 'page views (descending)',
+  pageViewsAsc: 'page views (ascending)',
+  UpdatedDesc: 'last updated date (descending)',
+  UpdatedAsc: 'last updated date (ascending)',
+  PublishedDesc: 'published date (descending)',
+  PublishedAsc: 'published date (ascending)',
+  WithdrawnAtDesc: 'withdrawn date (descending)',
+  WithdrawnAtAsc: 'withdrawn date (ascending)',
+  TitleAsc: 'page title (alphabetically ascending)',
+  TitleDesc: 'page title (alphabetically descending)',
+  UrlAsc: 'page url (alphabetically ascending)',
+  UrlDesc: 'page url (alphabetically descending)',
+  DocumentTypeAsc: 'document type (alphabetically ascending)',
+  DocumentTypeDesc: 'document type (alphabetically descending)',
+  OccurrencesAsc: 'total occurrences (ascending)',
+  OccurrencesDesc: 'total occurrences (descending)'
+}
 
 const queryDescription = (search: SearchParams, includeMarkup = true) => {
   const clauses = [];
@@ -80,10 +98,12 @@ const queryDescription = (search: SearchParams, includeMarkup = true) => {
     clauses.push(`belong to the ${makeBold(search.selectedTaxon, includeMarkup)} taxon (or its sub-taxons)`);
   if (search.selectedOrganisation !== '')
     clauses.push(`are published by the ${makeBold(search.selectedOrganisation, includeMarkup)}`);
+  if (search.selectedDocumentType !== '')
+    clauses.push(`are of type ${makeBold(search.selectedDocumentType, includeMarkup)}`);
   if (search.selectedLocale !== '')
     clauses.push(`are in ${makeBold(languageName(search.selectedLocale), includeMarkup)}`);
   if (search.linkSearchUrl !== '')
-    clauses.push(`link to ${makeBold(search.linkSearchUrl, includeMarkup)}`);
+    clauses.push(`contain links to ${makeBold(search.linkSearchUrl, includeMarkup)}`);
   if (search.areaToSearch === 'whitehall' || search.areaToSearch === 'publisher')
     clauses.push(`are published using ${makeBold(search.areaToSearch, includeMarkup)}`);
 
@@ -97,14 +117,14 @@ const queryDescription = (search: SearchParams, includeMarkup = true) => {
 
 const containDescription = (search: SearchParams, includeMarkup: boolean) => {
   let where: string;
-  //if (search.whereToSearch.title && search.whereToSearch.text) {
   if (search.whereToSearch === WhereToSearch.All) {
     where = '';
-  //} else if (search.whereToSearch.title) {
   } else if (search.whereToSearch === WhereToSearch.Title) {
-    where = 'in their title';
+    where = 'in their <strong>title</strong>';
+  } else if (search.whereToSearch === WhereToSearch.Description) {
+    where = 'in their <strong>description</strong>';
   } else {
-    where = 'in their body content';
+    where = 'in their <strong>body content</strong>';
   }
   let combineOp = search.combinator === 'all' ? 'and' : 'or';
   let combinedWords = splitKeywords(search.selectedWords)
@@ -119,46 +139,81 @@ const makeBold = (text: string, includeMarkup: boolean) =>
     `<span class="govuk-!-font-weight-bold">${text}</span>` :
     `"${text}"`;
 
-//TODO: handle ignored case matching and multiple keywords
-const highlight = (searchTerm: string, text: string): string =>  {
-  text = text.replace(/\u00a0/g, ' ');
-  let term = searchTerm.replace(/"/g, '');
+    const highlight = (searchTerm: string, text: any): string =>  {
 
-  let stringToAdd = "<mark class='highlight-bold'>";
-  let stringToAddEnd = "</mark>";
+      text = text.replace(/\u00a0/g, ' ');
+      let term = searchTerm.replace(/"/g, '');
 
-  if (term) {
-  	let regex = new RegExp(term, 'gi');
-    const padding = 50;
-    const i = text.toLowerCase().indexOf(term.toLowerCase());
-    const iEnd = (i + searchTerm.length)-1
+      let stringToAdd = "<mark class='highlight-bold'>";
+      let stringToAddEnd = "</mark>";
 
-    let origString: any = text;
-     origString = origString.split('');
-     origString.splice(i, 0, stringToAdd);
-     origString.splice(iEnd, 0, stringToAddEnd);
-     let  newString = origString.join('');
+      if (term) {
+      	let regex = new RegExp(term, 'gi');
+        const padding = 50;
+        const i = text.toLowerCase().indexOf(term.toLowerCase());
+        const iEnd = (i + searchTerm.length)+1
 
-    if((i+1) >= padding){
-      // Add elipse front to end
-      return  `<p>&hellip;${newString}&hellip;</p>`;
-    } else if( i > -1 && i<padding){
-      // Add elipse to end if found at the start of copy
-      return `<p>${newString}&hellip;</p>`;
-    } else {
-      return '';
+        let origString: any = text;
+         origString = origString.split('');
+         origString.splice(i, 0, stringToAdd);
+         origString.splice(iEnd, 0, stringToAddEnd);
+         let  newString = origString.join('');
+
+        if((i+1) >= padding){
+          // Add elipse front to end
+          return  `&hellip;${newString}&hellip;`;
+        } else if( i > -1 && i<padding){
+          // Add elipse to end if found at the start of copy
+          return `${newString}&hellip;`;
+        } else {
+          return '';
+        }
+      }
     }
-  }
-}
 
 const highlightLinks = (searchTerm: string, links: string[]): string =>  {
   let term = searchTerm.replace(/"/g, '');
   const mark = `<mark class='highlight-bold'>${term}</mark>`;
   let regex = new RegExp(term, 'gi');
-  const result: any = links.find((link: any) => link.link_url.includes(term))
-  return result ? `<p>${`${result.link_url}`.replace(regex, mark)}</p>` : '';
+  const result = links.find((link: string) => link.includes(term))
+  return result ? `<p>${result?.toString().replace(regex, mark)}</p>` : '';
 }
 
 const getAnyKeywordSearchUrl = (searchParams: SearchParams) => `${makeQueryString(searchParams)}&combinator=any`;
 
-export { id, sanitiseInput, sanitiseOutput, getFormInputValue, splitKeywords, queryDescription, getFormSelectValue, getSortingSelectValue, highlight, highlightLinks, getAnyKeywordSearchUrl };
+const paginate = (current: number, max: number) => {
+if (!current || !max) return null
+
+let prev = current === 1 ? null : current - 1,
+    next = current === max ? null : current + 1,
+    items = [1] as any[]
+
+if (current === 1 && max === 1) return {current, prev, next, items}
+if (current > 3) items.push('…')
+
+let r = 1, r1 = current - r, r2 = current + r
+
+for (let i = r1 > 2 ? r1 : 2; i <= Math.min(max, r2); i++) items.push(i)
+
+if (r2 + 1 < max) items.push('…')
+if (r2 < max) items.push(max)
+
+return {current, prev, next, items}
+}
+
+
+export {
+  id,
+  sanitiseInput,
+  sanitiseOutput,
+  getFormInputValue,
+  splitKeywords,
+  queryDescription,
+  getFormSelectValue,
+  getSortingSelectValue,
+  highlight,
+  highlightLinks,
+  getAnyKeywordSearchUrl,
+  formatSorting,
+  paginate
+};

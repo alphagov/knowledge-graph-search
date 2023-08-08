@@ -417,7 +417,7 @@ const formatTitle = (title: string) => `<a class="govuk-link" target="_blank" hr
 ${ getDataByTitle(title).text && state.searchParams.selectedWords && state.searchParams.whereToSearch !== 'title' ? `${highlight(state.searchParams.selectedWords, getDataByTitle(title).text)}` : ''}
 ${ getDataByTitle(title).text && getDataByTitle(title).description && state.searchParams.selectedWords && state.searchParams.whereToSearch !== 'title' ? highlight(state.searchParams.selectedWords, getDataByTitle(title).description) : ''}
 ${ !getDataByTitle(title).text && getDataByTitle(title).description && state.searchParams.selectedWords && state.searchParams.whereToSearch !== 'title' ? highlight(state.searchParams.selectedWords, getDataByTitle(title).description) : ''}
-${ state.searchParams.searchType === SearchType.Link && state.searchParams.linkSearchUrl ? highlightLinks(state.searchParams.linkSearchUrl, getDataByTitle(title).hyperlinks) : ''}
+${ state.searchParams.searchType === SearchType.Link && state.searchParams.linkSearchUrl ? highlightLinks(state.searchParams.linkSearchUrl, getDataByTitle(title)?.hyperlinks) : ''}
 `;
 
 

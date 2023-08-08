@@ -31,6 +31,7 @@
 
   <meta property="og:image" content="/assets/images/govuk-opengraph-image.png">
 
+
   <!-- INSERT GTM HEAD SNIPPET -->
 
 </head>
@@ -46,7 +47,7 @@
   <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
 
   <header class="govuk-header " role="banner" data-module="govuk-header">
-    <div class="govuk-header__container govuk-width-container">
+    <div class="govuk-header__container govuk-width-container" style="max-width: unset;margin-left: 20px;margin-right: 20px;">
       <div class="govuk-header__logo">
         <a href="/" class="govuk-header__link govuk-header__link--homepage">
           <span class="govuk-header__logotype">
@@ -59,63 +60,35 @@
           <img src="/assets/images/govuk-logotype-crown.png" class="govuk-header__logotype-crown-fallback-image" width="36" height="32">
           <![endif]-->
             <span class="govuk-header__logotype-text">
-              GOV.UK
+              GovSearch
             </span>
             <strong class="govuk-tag govuk-phase-banner__content__tag">PROTOTYPE</strong>
           </span>
         </a>
       </div>
       <div class="govuk-header__content">
-        <a href="/" class="govuk-header__link govuk-header__link--service-name">
-          GovSearch
-        </a>
+        <a href="/3" class="govuk-header__link govuk-header__link--service-name">
+          Search GOV.UK Content
+        </a> <span id="version"></span>
       </div>
     </div>
   </header>
 
-  <div class="govuk-width-container" id="page-content">
+  <div id="page-content" style="padding: 0 20px;">
     <main class="govuk-main-wrapper " id="main-content" role="main" aria-busy="true">
-      <h1 class="govuk-heading-l">GovSearch Prototypes</h1>
-
-        <table class="govuk-table">
-          <thead class="govuk-table__head">
-            <tr class="govuk-table__row">
-              <th scope="col" class="govuk-table__header">Version</th>
-              <th scope="col" class="govuk-table__header">Description</th>
-              <th scope="col" class="govuk-table__header">Start journey from</th>
-            </tr>
-          </thead>
-          <tbody class="govuk-table__body">
-            <tr class="govuk-table__row">
-              <th scope="row" class="govuk-table__header"><a href="/3" class="govuk-link">v3</a></th>
-              <td class="govuk-table__cell">Latest design</td>
-              <td class="govuk-table__cell"><a href="/3/signon" class="govuk-link">Signon</a></td>
-            </tr>
-            <tr class="govuk-table__row">
-              <th scope="row" class="govuk-table__header"><a href="/2" class="govuk-link">v2</a></th>
-              <td class="govuk-table__cell">Table view design</td>
-              <td class="govuk-table__cell"><a href="/2/signon" class="govuk-link">Signon</a></td>
-            </tr>
-            <tr class="govuk-table__row">
-              <th scope="row" class="govuk-table__header"><a href="/1" class="govuk-link">v1</a></th>
-              <td class="govuk-table__cell">Accordion list view design</td>
-              <td class="govuk-table__cell"><a href="/1/signon" class="govuk-link">Signon</a></td>
-            </tr>
-            <tr class="govuk-table__row">
-              <th scope="row" class="govuk-table__header"><a href="/0" class="govuk-link">v0</a></th>
-              <td class="govuk-table__cell">Initial design</td>
-              <td class="govuk-table__cell"><a href="/0/signon" class="govuk-link">Signon</a></td>
-            </tr>
-          </tbody>
-        </table>
-
+      <h1 aria-live="assertive" class="govuk-heading-m loading initial">Loading, please wait</h1>
     </main>
   </div>
 
+
+
   <footer class="govuk-footer " role="contentinfo">
-    <div class="govuk-width-container ">
+    <div class="govuk-main-wrapper" style="padding: 0 20px;">
       <div class="govuk-footer__meta">
         <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
+          <div class="govuk-footer__meta-custom">
+
+          </div>
           <svg aria-hidden="true" focusable="false" class="govuk-footer__licence-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 483.2 195.7" height="17" width="41">
             <path fill="currentColor" d="M421.5 142.8V.1l-50.7 32.3v161.1h112.4v-50.7zm-122.3-9.6A47.12 47.12 0 0 1 221 97.8c0-26 21.1-47.1 47.1-47.1 16.7 0 31.4 8.7 39.7 21.8l42.7-27.2A97.63 97.63 0 0 0 268.1 0c-36.5 0-68.3 20.1-85.1 49.7A98 98 0 0 0 97.8 0C43.9 0 0 43.9 0 97.8s43.9 97.8 97.8 97.8c36.5 0 68.3-20.1 85.1-49.7a97.76 97.76 0 0 0 149.6 25.4l19.4 22.2h3v-87.8h-80l24.3 27.5zM97.8 145c-26 0-47.1-21.1-47.1-47.1s21.1-47.1 47.1-47.1 47.2 21 47.2 47S123.8 145 97.8 145" />
           </svg>
@@ -132,6 +105,10 @@
   </footer>
 
   <script src="/assets/all.js"></script>
+  <script type="module" src="/main3.js" id="mainjs"></script>
+  <script src="/assets/accessible-autocomplete.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/table-dragger@1.0.3/dist/table-dragger.js"></script>
+
 
 </body>
 

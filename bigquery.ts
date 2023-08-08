@@ -38,6 +38,10 @@ const bigQuery = async function(userQuery: string, options?: any) {
     if (options.organisation) {
       params.organisation = options.organisation;
     }
+
+    if (options.documentType) {
+      params.documentType = options.documentType;
+    }
     if (options.link) {
       params.link = options.link;
     }
@@ -63,9 +67,9 @@ const bigQuery = async function(userQuery: string, options?: any) {
 //====== public ======
 
 const sendInitQuery = async function(): Promise<InitResults> {
-  let bqLocales: any, bqTaxons: any, bqOrganisations: any;
+  let bqLocales: any, bqTaxons: any, bqOrganisations: any, bqDocumentTypes: any, bqPublishingApps: any;
   try {
-    [ bqLocales, bqTaxons, bqOrganisations ] = await Promise.all([
+    [ bqLocales, bqTaxons, bqOrganisations, bqDocumentTypes, bqPublishingApps ] = await Promise.all([
       bigQuery(`
         SELECT DISTINCT locale
         FROM \`content.locale\`
@@ -77,6 +81,14 @@ const sendInitQuery = async function(): Promise<InitResults> {
       bigQuery(`
         SELECT DISTINCT title
         FROM \`graph.organisation\`
+        `),
+      bigQuery(`
+        SELECT DISTINCT document_type
+        FROM \`content.document_type\`
+        `),
+      bigQuery(`
+        SELECT DISTINCT publishing_app
+        FROM \`content.publishing_app\`
         `)
     ]);
   } catch(e) {
@@ -90,7 +102,9 @@ const sendInitQuery = async function(): Promise<InitResults> {
         .filter((locale: string) => locale !== 'en' && locale !== 'cy')
       ),
     taxons: bqTaxons.map((taxon: any) => taxon.title),
-    organisations: bqOrganisations.map((organisation: any) => organisation.title)
+    organisations: bqOrganisations.map((organisation: any) => organisation.title),
+    documentTypes: bqDocumentTypes.map((documentType: any) => documentType.document_type),
+    publishingApps: bqPublishingApps.map((publishingApp: any) => publishingApp.publishing_app)
   };
 };
 
@@ -105,6 +119,13 @@ const getTaxonInfo = async function(name: string): Promise<Taxon[]> {
 const getOrganisationInfo = async function(name: string): Promise<Organisation[]> {
   return await bigQuery(
     `SELECT "Organisation" as type, * FROM search.organisation WHERE lower(name) = lower(@name);`, { name }
+  );
+};
+
+
+const getDocumentTypeInfo = async function(name: string): Promise<any[]> {
+  return await bigQuery(
+    `SELECT "DocumentType" as type, * FROM search.document_type WHERE lower(name) = lower(@name);`, { name }
   );
 };
 
@@ -152,10 +173,11 @@ const sendSearchQuery = async function(searchParams: SearchParams): Promise<Sear
   const locale = languageCode(searchParams.selectedLocale);
   const taxon = searchParams.selectedTaxon;
   const organisation = searchParams.selectedOrganisation;
+  const documentType = searchParams.selectedDocumentType;
   const selectedWordsWithoutQuotes = searchParams.selectedWords.replace(/"/g, '');
   const link = searchParams.linkSearchUrl;
   const queries = [
-    bigQuery(query, { keywords, excludedKeywords, locale, taxon, organisation, link })
+    bigQuery(query, { keywords, excludedKeywords, locale, taxon, organisation, link, documentType })
   ];
 
   let bqMetaResults: MetaResult[] = [];
@@ -199,33 +221,70 @@ const sendSearchQuery = async function(searchParams: SearchParams): Promise<Sear
 
 const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], excludedKeywords: string[]): string {
   const contentToSearch = [];
-  //if (searchParams.whereToSearch.title) {
+
   if (searchParams.whereToSearch === WhereToSearch.Title) {
     contentToSearch.push('IFNULL(page.title, "")');
   }
-  //if (searchParams.whereToSearch.text) {
+
   if (searchParams.whereToSearch === WhereToSearch.Text) {
-    contentToSearch.push('IFNULL(page.text, "")', 'IFNULL(page.description, "")');
+    contentToSearch.push('IFNULL(NORMALIZE(page.text, NFKC), "")');
+  }
+
+  if (searchParams.whereToSearch === WhereToSearch.Description) {
+    contentToSearch.push('IFNULL(NORMALIZE(page.description, NFKC), "")');
   }
 
   if (searchParams.whereToSearch === WhereToSearch.All) {
-    contentToSearch.push('IFNULL(page.title, "")', 'IFNULL(page.text, "")', 'IFNULL(page.description, "")');
+    contentToSearch.push('IFNULL(page.title, "")', 'IFNULL(NORMALIZE(page.text, NFKC), "")', 'IFNULL(NORMALIZE(page.description, NFKC), "")');
   }
   const contentToSearchString = contentToSearch.join(' || " " || ');
 
   const padding = 50;
 
 
-
-  //Currently only truncates on the first keyword
   const truncatedContent = searchParams.searchType !== SearchType.Link &&
   searchParams.searchType !==  SearchType.Advanced &&
   !searchParams.selectedTaxon &&
   !searchParams.selectedOrganisation &&
-  !searchParams.selectedLocale ? `(
-    SELECT RIGHT(
-      LEFT(text,(STRPOS(LOWER(text), LOWER("${keywords[0]}")))+ ${padding} + ${keywords[0].length}),  ${padding*2} + ${keywords[0].length})
-    ) AS text`: '';
+  !searchParams.selectedDocumentType &&
+  !searchParams.selectedLocale ?  `
+
+    ${
+      keywords.map(value =>
+        `(
+          SELECT RIGHT(
+            LEFT(text,(STRPOS(LOWER(NORMALIZE(text, NFKC)), LOWER("${value}")))+ ${padding} + ${value.length}),  ${padding*2} + ${value.length})
+          ) as keyword_${value.replace(/ /g, '_')}`
+      )
+    }
+  ,`: '';
+
+  const textOccurrences = searchParams.searchType !== SearchType.Link &&
+  searchParams.searchType !==  SearchType.Advanced &&
+  !searchParams.selectedTaxon &&
+  !searchParams.selectedOrganisation &&
+  !searchParams.selectedDocumentType &&
+  searchParams.whereToSearch !== 'title' &&
+  !searchParams.selectedLocale ?  keywords.length === 1 ? `(
+    SELECT
+    ARRAY_LENGTH(REGEXP_EXTRACT_ALL(LOWER(${contentToSearchString}), LOWER(r'(${keywords[0]})')))
+  ) AS occurrences,` : `
+  (
+    ${
+      keywords.map(value =>
+        `(
+          SELECT
+        ARRAY_LENGTH(REGEXP_EXTRACT_ALL(LOWER(${contentToSearchString}), LOWER(r'(${value})')))
+        ) `
+      )
+    }
+  ) AS occurrences,`: '';
+
+  const linkOccurrences = searchParams.searchType === SearchType.Link ? `(
+    SELECT
+    COUNT(1) FROM UNNEST(hyperlinks) as hyperlink WHERE CONTAINS_SUBSTR(hyperlink.link_url, @link)
+  ) AS occurrences,`: '';
+
 
   const includeClause = keywords.length === 0
     ? ''
@@ -287,6 +346,13 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
     `;
   }
 
+  let documentTypeClause = '';
+  if (searchParams.selectedDocumentType !== '') {
+    documentTypeClause = `
+      AND documentType = @documentType
+    `;
+  }
+
 
   let sorting = '';
   if(searchParams.sorting === Sorting.PageViewsAsc){
@@ -306,10 +372,11 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
       AND EXISTS
         (
           SELECT 1 FROM UNNEST (hyperlinks) AS link
-          WHERE CONTAINS_SUBSTR(link, @link)
+          WHERE CONTAINS_SUBSTR(link.link_url, @link)
         )
     `;
   }
+
 
   return `
     SELECT
@@ -330,6 +397,8 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
       hyperlinks,
       description,
       ${truncatedContent}
+      ${textOccurrences}
+      ${linkOccurrences}
 
     FROM search.page
 
@@ -340,6 +409,7 @@ const buildSqlQuery = function(searchParams: SearchParams, keywords: string[], e
     ${localeClause}
     ${taxonClause}
     ${organisationClause}
+    ${documentTypeClause}
     ${linkClause}
     ${sorting}
 
@@ -352,6 +422,7 @@ export {
   getBankHolidayInfo,
   getTransactionInfo,
   getOrganisationInfo,
+  getDocumentTypeInfo,
   getPersonInfo,
   getRoleInfo,
   getTaxonInfo,

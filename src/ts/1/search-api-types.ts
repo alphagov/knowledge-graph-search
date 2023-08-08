@@ -23,6 +23,7 @@ export enum SearchArea {
 export enum WhereToSearch {
   Title = 'title',
   Text = 'text',
+  Description = 'description',
   All = 'all'
 }
 
