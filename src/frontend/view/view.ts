@@ -346,6 +346,15 @@ const viewPagination = (gridOptions) => {
     )
   }
 
+  const bindResultsPerPageSelectEvents = () => {
+    id('resultsPerPage-select')?.addEventListener('change', function(event) {
+        const selectedValue = (<HTMLSelectElement>event.target).value;
+        const toInt = parseInt(selectedValue, 10)
+        state.resultsPerPage = toInt;
+        gridOptions.api.paginationSetPageSize(toInt)
+      })
+  }
+
   const buildListItems = (description) => {
     let html = ''
 
@@ -377,6 +386,11 @@ const viewPagination = (gridOptions) => {
     })
 
     return html
+  }
+
+  const bindEvents = () => {
+    bindPaginationEvents()
+    bindResultsPerPageSelectEvents()
   }
 
   const viewConditionalPaginationHtml = () => {
@@ -431,8 +445,24 @@ const viewPagination = (gridOptions) => {
   </div>`:""}
 </nav>`
 
-  id('pagination-container').innerHTML = paginationHtml
-  bindPaginationEvents()
+  const pageSizeSelectHtml = viewPageSizeSelector()
+  id('pagination-container').innerHTML = `${pageSizeSelectHtml}${paginationHtml}`
+  bindEvents()
+}
+
+const viewPageSizeSelector = () => {
+  return `
+<div class="govuk-form-group">
+  <label class="govuk-label" for="resultsPerPageSelect">
+    Results per page
+  </label>
+  <select class="govuk-select" id="resultsPerPage-select" name="resultsPerPageSelect">
+    ${
+      [10,150,100,500].filter(s => s<state.searchResults.length).map(s => `<option value="${s}" ${s === state.resultsPerPage ? "selected" : ""}>${s}</option>`)
+    }
+  </select>
+</div>
+`
 }
 
 const viewWaiting = () => `
