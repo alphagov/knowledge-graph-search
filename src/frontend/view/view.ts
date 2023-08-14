@@ -34,15 +34,17 @@ const view = () => {
   }
 
   createAgGrid()
-  // const { grid, updateRowData } = createAgGrid()
+  // const { grid, gridOptions } = createAgGrid()
   // setTimeout(() => {
-  //   if (!grid || !updateRowData) {
+  //   if (!grid || !gridOptions) {
   //     return
   //   }
   //   const oldData = grid.gridOptions.rowData
   //   const newData = oldData.filter((d) => d.locale !== 'en')
   //   console.log({ oldData })
-  //   updateRowData(newData)
+  //   //@ts-ignore
+  //   gridOptions.api.setRowData(newData)
+  //   // updateRowData(newData)
   // }, 2000)
 
   // Add event handlers
@@ -225,7 +227,7 @@ const viewSearchResultsTable = () => {
           </ul>
         </fieldset>`)
     html.push(
-      '<div id="results-grid-container" style="height: 200px; width:500px;" class="ag-theme-alpine"></div>'
+      '<div id="results-grid-container" style="height: 500px;" class="ag-theme-alpine"></div>'
     )
     html.push(`
       </div>`)
@@ -243,6 +245,7 @@ const createAgGrid = () => {
     state.skip,
     state.skip + state.resultsPerPage
   )
+  // const currentPageRecords = state.searchResults
   const enabledFields = Object.entries(state.showFields)
     .filter(([, v]) => v)
     .map(([key]) => key)
@@ -253,17 +256,11 @@ const createAgGrid = () => {
   }
 
   const gridDiv = id('results-grid-container')
-  console.log({ gridOptions })
   // const grid = new Grid(gridDiv, gridOptions)
   /* eslint-disable */ // @ts-ignore
   const grid = new agGrid.Grid(gridDiv, gridOptions)
 
-  const updateRowData = (newRowData) => {
-    //@ts-ignore
-    return grid.gridOptions.api.setRowData(newRowData)
-  }
-
-  return { grid, updateRowData }
+  return { grid, gridOptions }
 }
 
 const viewWaiting = () => `
