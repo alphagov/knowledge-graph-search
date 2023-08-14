@@ -250,9 +250,23 @@ const createAgGrid = () => {
     .filter(([, v]) => v)
     .map(([key]) => key)
 
+  const rowData = currentPageRecords.map((record) =>
+    Object.entries(record).reduce(
+      (acc, [k, v]) => ({ ...acc, [k]: fieldFormat(k, v as string) }),
+      {}
+    )
+  )
+
+  const linkCellRenderer = (params) => params.value
+  const columnDefs = enabledFields.map((field) => ({
+    field,
+    headerName: fieldName(field),
+    cellRenderer: field === 'url' ? linkCellRenderer : null,
+  }))
+
   const gridOptions = {
-    columnDefs: enabledFields.map((field) => ({ field })),
-    rowData: currentPageRecords,
+    rowData,
+    columnDefs,
     onFirstDataRendered: function (params) {
       params.api.sizeColumnsToFit()
     },
@@ -262,6 +276,7 @@ const createAgGrid = () => {
     onColumnVisible: function (params) {
       params.api.sizeColumnsToFit()
     },
+    suppressDragLeaveHidesColumns: true,
   }
 
   const gridDiv = id('results-grid-container')
