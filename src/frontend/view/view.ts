@@ -33,16 +33,17 @@ const view = () => {
       </div>`)
   }
 
-  const { grid, updateRowData } = createAgGrid()
-  setTimeout(() => {
-    if (!grid || !updateRowData) {
-      return
-    }
-    const oldData = grid.gridOptions.rowData
-    const newData = oldData.filter((d) => d.locale !== 'en')
-    console.log({ oldData })
-    updateRowData(newData)
-  }, 2000)
+  createAgGrid()
+  // const { grid, updateRowData } = createAgGrid()
+  // setTimeout(() => {
+  //   if (!grid || !updateRowData) {
+  //     return
+  //   }
+  //   const oldData = grid.gridOptions.rowData
+  //   const newData = oldData.filter((d) => d.locale !== 'en')
+  //   console.log({ oldData })
+  //   updateRowData(newData)
+  // }, 2000)
 
   // Add event handlers
   document
@@ -238,11 +239,10 @@ const createAgGrid = () => {
   if (!state.searchResults || state.searchResults?.length <= 0) {
     return {}
   }
-  // const currentPageRecords = state.searchResults?.slice(
-  //   state.skip,
-  //   state.skip + state.resultsPerPage
-  // )
-  const currentPageRecords = state.searchResults
+  const currentPageRecords = state.searchResults?.slice(
+    state.skip,
+    state.skip + state.resultsPerPage
+  )
   const enabledFields = Object.entries(state.showFields)
     .filter(([, v]) => v)
     .map(([key]) => key)
