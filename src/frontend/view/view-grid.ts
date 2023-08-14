@@ -46,7 +46,6 @@ const createAgGrid = () => {
   }
 
   const gridDiv = id('results-grid-container')
-  // const grid = new Grid(gridDiv, gridOptions)
   /* eslint-disable */ // @ts-ignore
   const grid = new agGrid.Grid(gridDiv, gridOptions)
   window.addEventListener('resize', function () {
