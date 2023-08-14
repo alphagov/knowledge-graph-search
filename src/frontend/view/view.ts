@@ -2,11 +2,12 @@ import { queryDescription } from '../utils/queryDescription'
 import { id } from '../../common/utils/utils'
 import { state, searchState } from '../state'
 import { handleEvent } from '../events'
-import { languageName } from '../../common/utils/lang'
 import { viewMetaResults } from './view-metabox'
 import { viewSearchPanel } from './view-search-panel'
 import { EventType } from '../types/event-types'
 import { USER_ERRORS } from '../enums/constants'
+import { fieldName } from './utils'
+import { createAgGrid } from './view-grid'
 
 declare const window: any
 
@@ -34,18 +35,6 @@ const view = () => {
   }
 
   createAgGrid()
-  // const { grid, gridOptions } = createAgGrid()
-  // setTimeout(() => {
-  //   if (!grid || !gridOptions) {
-  //     return
-  //   }
-  //   const oldData = grid.gridOptions.rowData
-  //   const newData = oldData.filter((d) => d.locale !== 'en')
-  //   console.log({ oldData })
-  //   //@ts-ignore
-  //   gridOptions.api.setRowData(newData)
-  //   // updateRowData(newData)
-  // }, 2000)
 
   // Add event handlers
   document
@@ -195,274 +184,42 @@ const viewErrorBanner = () => {
 
 const viewSearchResultsTable = () => {
   const html = []
-  if (state.searchResults && state.searchResults?.length > 0) {
-    const recordsToShow = state.searchResults?.slice(
-      state.skip,
-      state.skip + state.resultsPerPage
-    )
-    html.push(`
-      <div class="govuk-body">
-        <fieldset class="govuk-fieldset" ${
-          state.waiting && 'disabled="disabled"'
-        }>
-          <legend class="govuk-fieldset__legend">For each result, display:</legend>
-          <ul class="kg-checkboxes" id="show-fields">`)
-    html.push(
-      Object.keys(state.searchResults[0])
-        .map(
-          (key) => `
-            <li class="kg-checkboxes__item">
-              <input class="kg-checkboxes__input"
-                     data-interactive="true"
-                     type="checkbox" id="show-field-${key}"
-                ${state.showFields[key] ? 'checked' : ''}/>
-              <label for="show-field-${key}" class="kg-label kg-checkboxes__label">${fieldName(
-            key
-          )}</label>
-            </li>`
-        )
-        .join('')
-    )
-    html.push(`
-          </ul>
-        </fieldset>`)
-    html.push(
-      '<div id="results-grid-container" style="height: 500px; margin-top: 10px;" class="ag-theme-alpine"></div>'
-    )
-    html.push('<div id="pagination-container"></div>')
-    html.push(`
-      </div>`)
-    return html.join('')
-  } else {
+  if (!state.searchResults || state.searchResults?.length <= 0) {
     return ''
   }
-}
-
-const createAgGrid = () => {
-  if (!state.searchResults || state.searchResults?.length <= 0) {
-    return {}
-  }
-  const currentPageRecords = state.searchResults
-  // const currentPageRecords = state.searchResults?.slice(
-  //   state.skip,
-  //   state.skip + state.resultsPerPage
-  // )
-  // const currentPageRecords = state.searchResults
-  const enabledFields = Object.entries(state.showFields)
-    .filter(([, v]) => v)
-    .map(([key]) => key)
-
-  const rowData = currentPageRecords.map((record) =>
-    Object.entries(record).reduce(
-      (acc, [k, v]) => ({ ...acc, [k]: fieldFormat(k, v as string) }),
-      {}
-    )
+  html.push(`
+    <div class="govuk-body">
+      <fieldset class="govuk-fieldset" ${
+        state.waiting && 'disabled="disabled"'
+      }>
+        <legend class="govuk-fieldset__legend">For each result, display:</legend>
+        <ul class="kg-checkboxes" id="show-fields">`)
+  html.push(
+    Object.keys(state.searchResults[0])
+      .map(
+        (key) => `
+          <li class="kg-checkboxes__item">
+            <input class="kg-checkboxes__input"
+                    data-interactive="true"
+                    type="checkbox" id="show-field-${key}"
+              ${state.showFields[key] ? 'checked' : ''}/>
+            <label for="show-field-${key}" class="kg-label kg-checkboxes__label">${fieldName(
+          key
+        )}</label>
+          </li>`
+      )
+      .join('')
   )
-
-  const linkCellRenderer = (params) => params.value
-  const columnDefs = enabledFields.map((field) => ({
-    field,
-    headerName: fieldName(field),
-    cellRenderer: field === 'url' ? linkCellRenderer : null,
-  }))
-
-  const gridOptions = {
-    rowData,
-    columnDefs,
-    onFirstDataRendered: function (params) {
-      params.api.sizeColumnsToFit()
-    },
-    onRowDataChanged: function (params) {
-      params.api.sizeColumnsToFit()
-    },
-    onColumnVisible: function (params) {
-      params.api.sizeColumnsToFit()
-    },
-    suppressDragLeaveHidesColumns: true,
-
-    pagination: true,
-    paginationPageSize: 10,
-    suppressPaginationPanel: true,
-  }
-
-  const gridDiv = id('results-grid-container')
-  // const grid = new Grid(gridDiv, gridOptions)
-  /* eslint-disable */ // @ts-ignore
-  const grid = new agGrid.Grid(gridDiv, gridOptions)
-  window.addEventListener('resize', function () {
-    // @ts-ignore
-    gridOptions.api.sizeColumnsToFit()
-  })
-
-  viewPagination(gridOptions)
-  // @ts-ignore
-  gridOptions.api.addEventListener('paginationChanged', function () {
-    viewPagination(gridOptions)
-  })
-
-  return { grid, gridOptions }
-}
-
-const viewPagination = (gridOptions) => {
-  // This component aims at following GOV.UK's design system for pagination
-  // But with support for dynamic JS
-  // https://design-system.service.gov.uk/components/pagination/
-  const totalPages = gridOptions.api.paginationGetTotalPages()
-  const currentPage = gridOptions.api.paginationGetCurrentPage()
-
-  const bindPaginationEvents = () => {
-    const createPaginationBinding = (selector: string, func) =>
-      document.querySelector(selector)?.addEventListener('click', function (e) {
-        e.preventDefault()
-        func()
-      })
-
-    createPaginationBinding('.govuk-pagination__prev a', () =>
-      gridOptions.api.paginationGoToPreviousPage()
-    )
-    createPaginationBinding('.govuk-pagination__next a', () =>
-      gridOptions.api.paginationGoToNextPage()
-    )
-    createPaginationBinding('.govuk-pagination__item.first-item a', () =>
-      gridOptions.api.paginationGoToFirstPage()
-    )
-    createPaginationBinding('.govuk-pagination__item.last-item a', () =>
-      gridOptions.api.paginationGoToLastPage()
-    )
-    createPaginationBinding('.govuk-pagination__item.n-minus-1-item a', () =>
-      gridOptions.api.paginationGoToPage(currentPage - 1)
-    )
-    createPaginationBinding('.govuk-pagination__item.n-minus-2-item a', () =>
-      gridOptions.api.paginationGoToPage(currentPage - 2)
-    )
-    createPaginationBinding('.govuk-pagination__item.n-plus-1-item a', () =>
-      gridOptions.api.paginationGoToPage(currentPage + 1)
-    )
-    createPaginationBinding('.govuk-pagination__item.n-plus-2-item a', () =>
-      gridOptions.api.paginationGoToPage(currentPage + 2)
-    )
-    createPaginationBinding('.govuk-pagination__item.n-plus-3-item a', () =>
-      gridOptions.api.paginationGoToPage(currentPage + 3)
-    )
-  }
-
-  const bindResultsPerPageSelectEvents = () => {
-    id('resultsPerPage-select')?.addEventListener('change', function(event) {
-        const selectedValue = (<HTMLSelectElement>event.target).value;
-        const toInt = parseInt(selectedValue, 10)
-        state.resultsPerPage = toInt;
-        gridOptions.api.paginationSetPageSize(toInt)
-      })
-  }
-
-  const buildListItems = (description) => {
-    let html = ''
-
-    description.forEach((item) => {
-      if (item === 'ellipsis') {
-        html += `<li class="govuk-pagination__item govuk-pagination__item--ellipses">&ctdot;</li>`
-      } else {
-        const extraItemClasses = [
-          item === currentPage + 1 ? 'govuk-pagination__item--current' : '',
-          item === 1 ? 'first-item' : '',
-          item === totalPages ? 'last-item' : '',
-          item === currentPage - 1 ? 'n-minus-2-item' : '',
-          item === currentPage ? 'n-minus-1-item' : '',
-          item === currentPage + 2 ? 'n-plus-1-item' : '',
-          item === currentPage + 3 ? 'n-plus-2-item' : '',
-          item === currentPage + 4 ? 'n-plus-3-item' : '',
-        ]
-        const toAppend = `
-        <li class="govuk-pagination__item ${extraItemClasses.join(' ')}">
-        <a class="govuk-link govuk-pagination__link" href="#" aria-label="Page ${item}" ${
-          item === currentPage ? 'aria-current="page"' : ''
-        }>
-          ${item}
-        </a>
-      </li>
-        `
-        html += toAppend
-      }
-    })
-
-    return html
-  }
-
-  const bindEvents = () => {
-    bindPaginationEvents()
-    bindResultsPerPageSelectEvents()
-  }
-
-  const viewConditionalPaginationHtml = () => {
-    if (totalPages <= 9) {
-      // Display all the pages with no ellipsis
-      return buildListItems(Array.from({ length: totalPages }, (_, i) => i + 1))
-    } else if ([0, 1, 2].includes(currentPage)) {
-      return buildListItems([1, 2, 3, 4, 'ellipsis', totalPages])
-    } else if (currentPage > 2 && currentPage < totalPages - 3) {
-      let pagesToShow = [1, 'ellipsis']
-      pagesToShow.push(currentPage, currentPage + 1, currentPage + 2)
-      pagesToShow.push('ellipsis', totalPages)
-      return buildListItems(pagesToShow)
-    } else if (currentPage === totalPages - 3) {
-      return buildListItems([
-        1,
-        'ellipsis',
-        totalPages - 3,
-        totalPages - 2,
-        totalPages - 1,
-        totalPages,
-      ])
-    } else if ([totalPages-2, totalPages-1].includes(currentPage) {
-      return buildListItems([
-        1,
-        'ellipsis',
-        totalPages - 2,
-        totalPages - 1,
-        totalPages,
-      ])
-    }
-  }
-
-  const paginationHtml = `
-  <nav class="govuk-pagination" role="navigation" aria-label="results">
-  ${
-    currentPage > 0 ? `<div class="govuk-pagination__prev">
-    <a class="govuk-link govuk-pagination__link" href="#" rel="prev">
-      <svg class="govuk-pagination__icon govuk-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
-        <path d="m6.5938-0.0078125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
-      </svg>
-      <span class="govuk-pagination__link-title">Previous</span></a>
-  </div>` : ""
-  }
-  <ul class="govuk-pagination__list">
-    ${viewConditionalPaginationHtml()}
-  </ul>
-  ${currentPage<totalPages-1?`<div class="govuk-pagination__next">
-    <a class="govuk-link govuk-pagination__link" href="#" rel="next"> <span class="govuk-pagination__link-title">Next</span> <svg class="govuk-pagination__icon govuk-pagination__icon--next" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
-        <path d="m8.107-0.0078125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z"></path>
-      </svg></a>
-  </div>`:""}
-</nav>`
-
-  const pageSizeSelectHtml = viewPageSizeSelector()
-  id('pagination-container').innerHTML = `${pageSizeSelectHtml}${paginationHtml}`
-  bindEvents()
-}
-
-const viewPageSizeSelector = () => {
-  return `
-<div class="govuk-form-group">
-  <label class="govuk-label" for="resultsPerPageSelect">
-    Results per page
-  </label>
-  <select class="govuk-select" id="resultsPerPage-select" name="resultsPerPageSelect">
-    ${
-      [10,150,100,500].filter(s => s<state.searchResults.length).map(s => `<option value="${s}" ${s === state.resultsPerPage ? "selected" : ""}>${s}</option>`)
-    }
-  </select>
-</div>
-`
+  html.push(`
+        </ul>
+      </fieldset>`)
+  html.push(
+    '<div id="results-grid-container" style="height: 500px; margin-top: 10px;" class="ag-theme-alpine"></div>'
+  )
+  html.push('<div id="pagination-container"></div>')
+  html.push(`
+    </div>`)
+  return html.join('')
 }
 
 const viewWaiting = () => `
@@ -564,66 +321,6 @@ const viewSearchResults = () => {
       document.title = serviceName
       return ''
   }
-}
-
-const formatNames = (array: []) =>
-  [...new Set(array)].map((x) => `“${x}”`).join(', ')
-
-const formatDateTime = (date: any) =>
-  `${date.value.slice(0, 10)} at ${date.value.slice(11, 16)}`
-
-const fieldFormatters: Record<string, any> = {
-  url: {
-    name: 'URL',
-    format: (url: string) => `<a class="govuk-link" href="${url}">${url}</a>`,
-  },
-  title: { name: 'Title' },
-  locale: { name: 'Language', format: languageName },
-  documentType: { name: 'Document type' },
-  contentId: { name: 'Content ID' },
-  publishing_app: { name: 'Publishing app' },
-  first_published_at: {
-    name: 'First published',
-    format: formatDateTime,
-  },
-  public_updated_at: {
-    name: 'Last major update',
-    format: formatDateTime,
-  },
-  taxons: {
-    name: 'Taxons',
-    format: formatNames,
-  },
-  primary_organisation: {
-    name: 'Primary publishing organisation',
-    format: (x: string) => x,
-  },
-  all_organisations: {
-    name: 'All publishing organisations',
-    format: formatNames,
-  },
-  page_views: {
-    name: 'Page views',
-    format: (val: string) => (val ? parseInt(val).toString() : '<5'),
-  },
-  withdrawn_at: {
-    name: 'Withdrawn at',
-    format: (date: string) => (date ? formatDateTime(date) : 'not withdrawn'),
-  },
-  withdrawn_explanation: {
-    name: 'Withdrawn reason',
-    format: (text: string) => text || 'n/a',
-  },
-}
-
-const fieldName = function (key: string) {
-  const f = fieldFormatters[key]
-  return f ? f.name : key
-}
-
-const fieldFormat = function (key: string, val: string | number): string {
-  const f = fieldFormatters[key]
-  return f && f.format ? f.format(val) : val
 }
 
 export { view }
