@@ -33,6 +33,17 @@ const view = () => {
       </div>`)
   }
 
+  const { grid, updateRowData } = createAgGrid()
+  setTimeout(() => {
+    if (!grid || !updateRowData) {
+      return
+    }
+    const oldData = grid.gridOptions.rowData
+    const newData = oldData.filter((d) => d.locale !== 'en')
+    console.log({ oldData })
+    updateRowData(newData)
+  }, 2000)
+
   // Add event handlers
   document
     .querySelectorAll('button, input[type=checkbox][data-interactive=true]')
@@ -211,43 +222,48 @@ const viewSearchResultsTable = () => {
     )
     html.push(`
           </ul>
-        </fieldset>
-        <table id="results-table" class="govuk-table">
-          <tbody class="govuk-table__body">
-          <tr class="govuk-table__row">
-            <th scope="col" class="a11y-hidden">Page</th>`)
-    Object.keys(state.showFields).forEach((key) => {
-      if (state.showFields[key]) {
-        html.push(
-          `<th scope="col" class="govuk-table__header">${fieldName(key)}</th>`
-        )
-      }
-    })
-
-    recordsToShow.forEach((record, recordIndex) => {
-      html.push(`
-        <tr class="govuk-table__row">
-          <th class="a11y-hidden">${recordIndex}</th>`)
-      Object.keys(state.showFields).forEach((key) => {
-        if (state.showFields[key]) {
-          html.push(
-            `<td class="govuk-table__cell">${fieldFormat(
-              key,
-              record[key]
-            )}</td>`
-          )
-        }
-      })
-      html.push(`</tr>`)
-    })
+        </fieldset>`)
+    html.push(
+      '<div id="results-grid-container" style="height: 200px; width:500px;" class="ag-theme-alpine"></div>'
+    )
     html.push(`
-          </tbody>
-        </table>
       </div>`)
     return html.join('')
   } else {
     return ''
   }
+}
+
+const createAgGrid = () => {
+  if (!state.searchResults || state.searchResults?.length <= 0) {
+    return {}
+  }
+  // const currentPageRecords = state.searchResults?.slice(
+  //   state.skip,
+  //   state.skip + state.resultsPerPage
+  // )
+  const currentPageRecords = state.searchResults
+  const enabledFields = Object.entries(state.showFields)
+    .filter(([, v]) => v)
+    .map(([key]) => key)
+
+  const gridOptions = {
+    columnDefs: enabledFields.map((field) => ({ field })),
+    rowData: currentPageRecords,
+  }
+
+  const gridDiv = id('results-grid-container')
+  console.log({ gridOptions })
+  // const grid = new Grid(gridDiv, gridOptions)
+  /* eslint-disable */ // @ts-ignore
+  const grid = new agGrid.Grid(gridDiv, gridOptions)
+
+  const updateRowData = (newRowData) => {
+    //@ts-ignore
+    return grid.gridOptions.api.setRowData(newRowData)
+  }
+
+  return { grid, updateRowData }
 }
 
 const viewWaiting = () => `
