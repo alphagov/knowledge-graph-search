@@ -1,0 +1,11 @@
+.ag-theme-alpine {
+  @extend .govuk-table;
+  --ag-header-background-color: white !important;
+  --ag-borders: none;
+  --ag-cell-horizontal-padding: 0;
+
+  .ag-row {
+    @extend .govuk-table;
+    background-color: white !important;
+  }
+}

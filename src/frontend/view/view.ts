@@ -253,12 +253,25 @@ const createAgGrid = () => {
   const gridOptions = {
     columnDefs: enabledFields.map((field) => ({ field })),
     rowData: currentPageRecords,
+    onFirstDataRendered: function (params) {
+      params.api.sizeColumnsToFit()
+    },
+    onRowDataChanged: function (params) {
+      params.api.sizeColumnsToFit()
+    },
+    onColumnVisible: function (params) {
+      params.api.sizeColumnsToFit()
+    },
   }
 
   const gridDiv = id('results-grid-container')
   // const grid = new Grid(gridDiv, gridOptions)
   /* eslint-disable */ // @ts-ignore
   const grid = new agGrid.Grid(gridDiv, gridOptions)
+  window.addEventListener('resize', function () {
+    // @ts-ignore
+    gridOptions.api.sizeColumnsToFit()
+  })
 
   return { grid, gridOptions }
 }
