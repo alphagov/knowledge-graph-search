@@ -17,6 +17,12 @@ const bindPaginationEvents = (gridOptions, currentPage) => {
   createPaginationBinding('.govuk-pagination__item.first-item a', () =>
     gridOptions.api.paginationGoToFirstPage()
   )
+  createPaginationBinding(
+    '.govuk-pagination__item.govuk-pagination__item--current a',
+    () => {
+      // Do nothing, just disable the default link behaviour
+    }
+  )
   createPaginationBinding('.govuk-pagination__item.last-item a', () =>
     gridOptions.api.paginationGoToLastPage()
   )
