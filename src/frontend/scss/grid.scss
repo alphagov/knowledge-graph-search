@@ -1,8 +1,13 @@
 .ag-theme-alpine {
-  @extend .govuk-table;
   --ag-header-background-color: white !important;
   --ag-borders: none;
   --ag-cell-horizontal-padding: 0;
+
+  margin-bottom: 30px;
+
+  .ag-header-container {
+    @extend .govuk-table;
+  }
 
   .ag-row {
     @extend .govuk-table;
