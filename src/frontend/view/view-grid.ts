@@ -2,6 +2,22 @@ import { id } from '../../common/utils/utils'
 import { state } from '../state'
 import { fieldFormat, fieldName } from './utils'
 import { viewPagination } from './view-pagination'
+import config from '../config'
+
+const getGridContainer = () => id('results-grid-container')
+
+const adjustGridHeight = (params) => {
+  if (state.resultsPerPage > config.pagination.maxResultsBeforeScrolling) {
+    const cellHeight = (document.querySelector('.ag-row') as HTMLElement)
+      .offsetHeight
+    const newHeightPx = cellHeight * config.pagination.maxResultsBeforeScrolling
+    getGridContainer().style.height = `${newHeightPx}px`
+    params.api.setDomLayout(null)
+  } else {
+    getGridContainer().style.height = ''
+    params.api.setDomLayout('autoHeight')
+  }
+}
 
 const createAgGrid = () => {
   if (!state.searchResults || state.searchResults?.length <= 0) {
@@ -37,37 +53,31 @@ const createAgGrid = () => {
       // @ts-ignore
       // gridOptions.api.sizeColumnsToFit()
     },
-    // onRowDataChanged: function (params) {
-    // params.columnApi.autoSizeColumns(['url', 'title'])
-    // @ts-ignore
-    // gridOptions.api.sizeColumnsToFit()
-    // },
-    // onColumnVisible: function (params) {
-    // params.columnApi.autoSizeColumns(['url', 'title'])
-    // @ts-ignore
-    // gridOptions.api.sizeColumnsToFit()
-    // },
+    onRowDataChanged: function (params) {
+      params.columnApi.autoSizeColumns(['url', 'title'])
+      // @ts-ignore
+      // gridOptions.api.sizeColumnsToFit()
+    },
+    onPaginationChanged: function (params) {
+      viewPagination(gridOptions)
+      params.columnApi.autoSizeColumns(['url', 'title'])
+      adjustGridHeight(params)
+    },
     suppressDragLeaveHidesColumns: true,
-
     pagination: true,
     paginationPageSize: 10,
     suppressPaginationPanel: true,
     domLayout: 'autoHeight',
   }
 
-  const gridDiv = id('results-grid-container')
+  const gridDiv = getGridContainer()
   /* eslint-disable */ // @ts-ignore
   const grid = new agGrid.Grid(gridDiv, gridOptions)
-  window.addEventListener('resize', function () {
-    // @ts-ignore
-    // gridOptions.api.sizeColumnsToFit()
-  })
 
-  viewPagination(gridOptions)
-  // @ts-ignore
-  gridOptions.api.addEventListener('paginationChanged', function () {
-    viewPagination(gridOptions)
-  })
+  // window.addEventListener('resize', function () {
+  //   // @ts-ignore
+  //   gridOptions.api.sizeColumnsToFit()
+  // })
 
   return { grid, gridOptions }
 }

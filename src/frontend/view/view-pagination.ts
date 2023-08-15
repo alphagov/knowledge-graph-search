@@ -1,5 +1,6 @@
 import { id } from '../../common/utils/utils'
 import { state } from '../state'
+import config from '../config'
 
 const bindPaginationEvents = (gridOptions, currentPage) => {
   const createPaginationBinding = (selector: string, func) =>
@@ -171,7 +172,7 @@ const viewResultsPerPageSelector = () => {
       Results per page
     </label>
     <select class="govuk-select" id="resultsPerPage-select" name="resultsPerPageSelect">
-      ${[10, 150, 100, 500]
+      ${config.pagination.options
         .filter((s) => s < (state?.searchResults || []).length)
         .map(
           (s) =>
