@@ -59,9 +59,9 @@ const createAgGrid = () => {
       // gridOptions.api.sizeColumnsToFit()
     },
     onPaginationChanged: function (params) {
+      adjustGridHeight(params)
       viewPagination(gridOptions)
       params.columnApi.autoSizeColumns(['url', 'title'])
-      adjustGridHeight(params)
     },
     suppressDragLeaveHidesColumns: true,
     pagination: true,

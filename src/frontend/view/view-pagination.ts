@@ -58,7 +58,40 @@ const buildPaginationHtml = (totalPages, currentPage) => {
     if (totalPages <= 9) {
       // Display all the pages with no ellipsis
       return buildListItems(Array.from({ length: totalPages }, (_, i) => i + 1))
-    } else if ([0, 1, 2].includes(currentPage)) {
+    }
+
+    if ([0, 1, 2, 3].includes(currentPage)) {
+      const firstButtons = Array.from(
+        { length: currentPage + 2 },
+        (_, i) => i + 1
+      )
+      return buildListItems([...firstButtons, 'ellipsis', totalPages])
+    } else if (currentPage > 2 && currentPage < totalPages - 3) {
+      const pagesToShow = [1, 'ellipsis']
+      pagesToShow.push(currentPage, currentPage + 1, currentPage + 2)
+      pagesToShow.push('ellipsis', totalPages)
+      return buildListItems(pagesToShow)
+    } else if (currentPage === totalPages - 3) {
+      return buildListItems([
+        1,
+        'ellipsis',
+        totalPages - 3,
+        totalPages - 2,
+        totalPages - 1,
+        totalPages,
+      ])
+    } else if (
+      [totalPages - 3, totalPages - 2, totalPages - 1].includes(currentPage)
+    ) {
+      const distance = totalPages - (currentPage + 1)
+      const lastButtons = Array.from(
+        { length: distance + 2 },
+        (_, i) => totalPages - (distance + 1) + i
+      )
+      return buildListItems([1, 'ellipsis', ...lastButtons])
+    }
+
+    if ([0, 1, 2].includes(currentPage)) {
       return buildListItems([1, 2, 3, 4, 'ellipsis', totalPages])
     } else if (currentPage > 2 && currentPage < totalPages - 3) {
       const pagesToShow = [1, 'ellipsis']
@@ -148,23 +181,6 @@ const buildPaginationHtml = (totalPages, currentPage) => {
   return paginationHtml
 }
 
-export const viewPagination = (gridOptions) => {
-  // This component aims at following GOV.UK's design system for pagination
-  // But with support for dynamic JS
-  // https://design-system.service.gov.uk/components/pagination/
-  const totalPages = gridOptions.api.paginationGetTotalPages()
-  const currentPage = gridOptions.api.paginationGetCurrentPage()
-
-  const pageSizeSelectHtml = viewResultsPerPageSelector()
-  const paginationHtml = buildPaginationHtml(totalPages, currentPage)
-  const paginationContainer = id('pagination-container')
-  if (paginationContainer) {
-    paginationContainer.innerHTML = `${pageSizeSelectHtml}${paginationHtml}`
-  }
-  bindPaginationEvents(gridOptions, currentPage)
-  bindResultsPerPageSelectEvents(gridOptions)
-}
-
 const viewResultsPerPageSelector = () => {
   return `
   <div class="govuk-form-group">
@@ -183,4 +199,21 @@ const viewResultsPerPageSelector = () => {
     </select>
   </div>
   `
+}
+
+export const viewPagination = (gridOptions) => {
+  // This component aims at following GOV.UK's design system for pagination
+  // But with support for dynamic JS
+  // https://design-system.service.gov.uk/components/pagination/
+  const totalPages = gridOptions.api.paginationGetTotalPages()
+  const currentPage = gridOptions.api.paginationGetCurrentPage()
+
+  const pageSizeSelectHtml = viewResultsPerPageSelector()
+  const paginationHtml = buildPaginationHtml(totalPages, currentPage)
+  const paginationContainer = id('pagination-container')
+  if (paginationContainer) {
+    paginationContainer.innerHTML = `${pageSizeSelectHtml}${paginationHtml}`
+  }
+  bindPaginationEvents(gridOptions, currentPage)
+  bindResultsPerPageSelectEvents(gridOptions)
 }
