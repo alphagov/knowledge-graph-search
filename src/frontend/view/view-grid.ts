@@ -24,25 +24,35 @@ const createAgGrid = () => {
     field,
     headerName: fieldName(field),
     cellRenderer: field === 'url' ? linkCellRenderer : null,
+    resizable: true,
+    // suppressSizeToFit: ['url', 'title'].includes(field),
   }))
+  console.log({ columnDefs })
 
   const gridOptions = {
     rowData,
     columnDefs,
     onFirstDataRendered: function (params) {
-      params.api.sizeColumnsToFit()
+      params.columnApi.autoSizeColumns(['url', 'title'])
+      // @ts-ignore
+      // gridOptions.api.sizeColumnsToFit()
     },
-    onRowDataChanged: function (params) {
-      params.api.sizeColumnsToFit()
-    },
-    onColumnVisible: function (params) {
-      params.api.sizeColumnsToFit()
-    },
+    // onRowDataChanged: function (params) {
+    // params.columnApi.autoSizeColumns(['url', 'title'])
+    // @ts-ignore
+    // gridOptions.api.sizeColumnsToFit()
+    // },
+    // onColumnVisible: function (params) {
+    // params.columnApi.autoSizeColumns(['url', 'title'])
+    // @ts-ignore
+    // gridOptions.api.sizeColumnsToFit()
+    // },
     suppressDragLeaveHidesColumns: true,
 
     pagination: true,
     paginationPageSize: 10,
     suppressPaginationPanel: true,
+    domLayout: 'autoHeight',
   }
 
   const gridDiv = id('results-grid-container')
@@ -50,7 +60,7 @@ const createAgGrid = () => {
   const grid = new agGrid.Grid(gridDiv, gridOptions)
   window.addEventListener('resize', function () {
     // @ts-ignore
-    gridOptions.api.sizeColumnsToFit()
+    // gridOptions.api.sizeColumnsToFit()
   })
 
   viewPagination(gridOptions)

@@ -7,7 +7,6 @@ import { fetchWithTimeout, queryBackend } from './search-api'
 // INIT
 //= =================================================
 
-console.log('TEST MESSAGE FOR PRODUCTION')
 // dummy comment
 
 const getInitialData = async function () {
