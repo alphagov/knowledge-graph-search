@@ -41,31 +41,21 @@ const createAgGrid = () => {
     headerName: fieldName(field),
     cellRenderer: field === 'url' ? linkCellRenderer : null,
     resizable: true,
-    // suppressSizeToFit: ['url', 'title'].includes(field),
+    suppressSizeToFit: ['url', 'title'].includes(field),
+    width: ['url', 'title'].includes(field) ? 500 : null,
   }))
   console.log({ columnDefs })
 
   const gridOptions = {
     rowData,
     columnDefs,
-    onFirstDataRendered: function (params) {
-      params.columnApi.autoSizeColumns(['url', 'title'])
-      // @ts-ignore
-      // gridOptions.api.sizeColumnsToFit()
-    },
-    onRowDataChanged: function (params) {
-      params.columnApi.autoSizeColumns(['url', 'title'])
-      // @ts-ignore
-      // gridOptions.api.sizeColumnsToFit()
-    },
     onPaginationChanged: function (params) {
       adjustGridHeight(params)
       viewPagination(gridOptions)
-      params.columnApi.autoSizeColumns(['url', 'title'])
     },
     suppressDragLeaveHidesColumns: true,
     pagination: true,
-    paginationPageSize: 10,
+    paginationPageSize: state.resultsPerPage,
     suppressPaginationPanel: true,
     domLayout: 'autoHeight',
   }
