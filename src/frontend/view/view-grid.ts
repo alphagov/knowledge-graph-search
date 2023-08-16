@@ -4,21 +4,6 @@ import { fieldFormat, fieldName } from './utils'
 import { viewPagination } from './view-pagination'
 import config from '../config'
 
-const getGridContainer = () => id('results-grid-container')
-
-const adjustGridHeight = (params) => {
-  if (state.resultsPerPage > config.pagination.maxResultsBeforeScrolling) {
-    const cellHeight = (document.querySelector('.ag-row') as HTMLElement)
-      .offsetHeight
-    const newHeightPx = cellHeight * config.pagination.maxResultsBeforeScrolling
-    getGridContainer().style.height = `${newHeightPx}px`
-    params.api.setDomLayout(null)
-  } else {
-    getGridContainer().style.height = ''
-    params.api.setDomLayout('autoHeight')
-  }
-}
-
 const createAgGrid = () => {
   if (!state.searchResults || state.searchResults?.length <= 0) {
     return {}
@@ -50,7 +35,6 @@ const createAgGrid = () => {
     rowData,
     columnDefs,
     onPaginationChanged: function (params) {
-      adjustGridHeight(params)
       viewPagination(gridOptions)
     },
     suppressDragLeaveHidesColumns: true,
@@ -60,7 +44,7 @@ const createAgGrid = () => {
     domLayout: 'autoHeight',
   }
 
-  const gridDiv = getGridContainer()
+  const gridDiv = id('results-grid-container')
   /* eslint-disable */ // @ts-ignore
   const grid = new agGrid.Grid(gridDiv, gridOptions)
 

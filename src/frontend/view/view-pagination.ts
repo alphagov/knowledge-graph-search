@@ -2,6 +2,28 @@ import { id } from '../../common/utils/utils'
 import { state } from '../state'
 import config from '../config'
 
+// Prepare the grid height before updating its results per page
+const adjustGridHeight = (gridOptions, newResultsPerPage) => {
+  const oldResultsPerPage = state.resultsPerPage
+  const { maxResultsBeforeScrolling } = config.pagination
+  if (newResultsPerPage > maxResultsBeforeScrolling) {
+    let newGridHeight = 0
+    if (oldResultsPerPage === maxResultsBeforeScrolling) {
+      newGridHeight = (document.querySelector('.ag-root') as HTMLElement)
+        .offsetHeight
+    } else {
+      newGridHeight =
+        (document.querySelector('.ag-row') as HTMLElement).offsetHeight *
+        config.pagination.maxResultsBeforeScrolling
+    }
+    id('results-grid-container').style.height = `${newGridHeight}px`
+    gridOptions.api.setDomLayout(null)
+  } else {
+    id('results-grid-container').style.height = ''
+    gridOptions.api.setDomLayout('autoHeight')
+  }
+}
+
 const bindPaginationEvents = (gridOptions, currentPage) => {
   const createPaginationBinding = (selector: string, func) =>
     document.querySelector(selector)?.addEventListener('click', function (e) {
@@ -47,9 +69,10 @@ const bindPaginationEvents = (gridOptions, currentPage) => {
 const bindResultsPerPageSelectEvents = (gridOptions) => {
   id('resultsPerPage-select')?.addEventListener('change', function (event) {
     const selectedValue = (<HTMLSelectElement>event.target).value
-    const toInt = parseInt(selectedValue, 10)
-    state.resultsPerPage = toInt
-    gridOptions.api.paginationSetPageSize(toInt)
+    const newResultsPerPage = parseInt(selectedValue, 10)
+    adjustGridHeight(gridOptions, newResultsPerPage)
+    state.resultsPerPage = newResultsPerPage
+    gridOptions.api.paginationSetPageSize(newResultsPerPage)
   })
 }
 
