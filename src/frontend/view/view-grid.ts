@@ -2,7 +2,6 @@ import { id } from '../../common/utils/utils'
 import { state } from '../state'
 import { fieldFormat, fieldName } from './utils'
 import { viewPagination } from './view-pagination'
-import config from '../config'
 
 const createAgGrid = () => {
   if (!state.searchResults || state.searchResults?.length <= 0) {
@@ -34,7 +33,7 @@ const createAgGrid = () => {
   const gridOptions = {
     rowData,
     columnDefs,
-    onPaginationChanged: function (params) {
+    onPaginationChanged: function () {
       viewPagination(gridOptions)
     },
     suppressDragLeaveHidesColumns: true,
