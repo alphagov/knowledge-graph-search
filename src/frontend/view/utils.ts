@@ -37,7 +37,7 @@ export const fieldFormatters: Record<string, any> = {
     format: formatNames,
   },
   page_views: {
-    name: 'Page views',
+    name: 'Views (7days)',
     format: (val: string) => (val ? parseInt(val).toString() : '<5'),
   },
   withdrawn_at: {
