@@ -7,6 +7,7 @@ import {
 } from '../common/types/search-api-types'
 import { State } from './types/state-types'
 import { USER_ERRORS } from './enums/constants'
+import config from './config'
 
 // user inputs that are used to build the query.
 // (basically, everything whose value could be found in the URL)
@@ -41,7 +42,7 @@ const state: State = {
   searchResults: null,
   metaSearchResults: null,
   skip: 0, // where to start the pagination (number of results)
-  resultsPerPage: 10, // number of results per page
+  resultsPerPage: config.pagination.defaultResultsPerPage, // number of results per page
   showFields: {
     // what result fields to show by default
     url: true,
