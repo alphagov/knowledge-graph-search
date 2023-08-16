@@ -9,7 +9,7 @@ interface FrontendConfig {
 
 const config: FrontendConfig = {
   pagination: {
-    options: [10, 20, 100, 500],
+    options: [10, 20, 30, 50, 100],
     maxResultsBeforeScrolling: 20,
   },
 }
