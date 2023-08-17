@@ -63,8 +63,10 @@ class App {
   }
 
   private initializeMiddlewares() {
-    this.app.use(devMiddleware)
-    this.app.use(hotMiddleware)
+    if (config.isLocal) {
+      this.app.use(devMiddleware)
+      this.app.use(hotMiddleware)
+    }
     this.app.use(cookieParser())
     this.app.use(cors())
     this.app.use(express.static('./public'))
