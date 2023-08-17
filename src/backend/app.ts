@@ -20,6 +20,7 @@ import { showCookieMessage } from './middleware/showCookieMessage'
 import { hideFeedbackSurvey } from './middleware/hideFeedbackSurvey'
 import log, { httpLogger } from './utils/logging'
 import cookieParser from 'cookie-parser'
+import { devMiddleware, hotMiddleware } from './middleware/webpack-reloading'
 
 class App {
   public app: express.Express = express()
@@ -62,6 +63,8 @@ class App {
   }
 
   private initializeMiddlewares() {
+    this.app.use(devMiddleware)
+    this.app.use(hotMiddleware)
     this.app.use(cookieParser())
     this.app.use(cors())
     this.app.use(express.static('./public'))
