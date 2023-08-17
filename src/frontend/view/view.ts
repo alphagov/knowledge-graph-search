@@ -38,7 +38,9 @@ const view = () => {
 
   // Add event handlers
   document
-    .querySelectorAll('button, input[type=checkbox][data-interactive=true]')
+    .querySelectorAll(
+      'button, a.govuk-tabs__tab, input[type=checkbox][data-interactive=true]'
+    )
     .forEach((input) =>
       input.addEventListener('click', (event) =>
         handleEvent({
@@ -70,30 +72,64 @@ const view = () => {
 }
 
 const viewSearchTypeSelector = () => `
-    <p class="govuk-body search-selector">
-      Search for:
-      <button class="${
-        state.searchParams.searchType === 'keyword' ? 'active' : ''
-      }" id="search-keyword">Keywords</button>
-      <button class="${
-        state.searchParams.searchType === 'link' ? 'active' : ''
-      }" id="search-link">Links</button>
-      <!-- Org search is disabled until we have tested a new design with users
-        <button class="${
-          state.searchParams.searchType === 'organisation' ? 'active' : ''
-        }" id="search-organisation">Organisations</button>
-      -->
-      <button class="${
-        state.searchParams.searchType === 'taxon' ? 'active' : ''
-      }" id="search-taxon">Taxons</button>
-      <button class="${
-        state.searchParams.searchType === 'language' ? 'active' : ''
-      }" id="search-language">Languages</button>
-      <button class="${
-        state.searchParams.searchType === 'advanced' ? 'active' : ''
-      }" id="search-advanced">Advanced</button>
-    </p>
-  `
+  <div class="govuk-tabs" data-module="govuk-tabs">
+  <ul class="govuk-tabs__list">
+    <li class="govuk-tabs__list-item ${
+      state.searchParams.searchType === 'keyword'
+        ? 'govuk-tabs__list-item--selected'
+        : ''
+    }">
+      <a class="govuk-tabs__tab" href="#search-keywords" id="search-keyword">
+      Keywords
+      </a>
+    </li>
+    <li class="govuk-tabs__list-item ${
+      state.searchParams.searchType === 'link'
+        ? 'govuk-tabs__list-item--selected'
+        : ''
+    }">
+      <a class="govuk-tabs__tab" href="#search-links" id="search-link">
+      Links
+      </a>
+    </li>
+    <li class="govuk-tabs__list-item ${
+      state.searchParams.searchType === 'organisation'
+        ? 'govuk-tabs__list-item--selected'
+        : ''
+    }">
+      <a class="govuk-tabs__tab" href="#search-organisation" id="search-organisation">
+      Organisations
+      </a>
+    </li>
+    <li class="govuk-tabs__list-item ${
+      state.searchParams.searchType === 'taxon'
+        ? 'govuk-tabs__list-item--selected'
+        : ''
+    }">
+      <a class="govuk-tabs__tab" href="#search-taxon" id="search-taxon">
+      Taxons
+      </a>
+    </li>
+    <li class="govuk-tabs__list-item ${
+      state.searchParams.searchType === 'language'
+        ? 'govuk-tabs__list-item--selected'
+        : ''
+    }">
+      <a class="govuk-tabs__tab" href="#search-language" id="search-language">
+      Languages
+      </a>
+    </li>
+    <li class="govuk-tabs__list-item ${
+      state.searchParams.searchType === 'advanced'
+        ? 'govuk-tabs__list-item--selected'
+        : ''
+    }">
+      <a class="govuk-tabs__tab" href="#search-advanced" id="search-advanced">
+      Advanced
+      </a>
+    </li>
+  </ul>
+</div>`
 
 const viewMainLayout = () => {
   const result = []
