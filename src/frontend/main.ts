@@ -4,11 +4,6 @@ import { searchButtonClicked, handleEvent } from './events'
 import { fetchWithTimeout, queryBackend } from './search-api'
 import config from './config'
 
-// This import is only used in local development when using Hot Module Replacement
-if (config.enableHMR) {
-  require('./scss/main.scss')
-}
-
 //= =================================================
 // INIT
 //= =================================================
@@ -67,7 +62,7 @@ const fetchInitialData = async function () {
 // START
 //= =================================================
 
-;(async () => {
+const initWithoutHMR = async () => {
   await fetchInitialData()
   if (!state.systemErrorText) {
     setQueryParamsFromQS()
@@ -77,4 +72,17 @@ const fetchInitialData = async function () {
     searchButtonClicked()
   }
   view()
-})()
+}
+
+const initWithHMR = async () => {
+  const { hasStateInCache, setStateFromCache } = require('./utils/hmr')
+  const stateInCache = await hasStateInCache()
+  if (stateInCache) {
+    await setStateFromCache()
+    view()
+  } else {
+    await initWithoutHMR()
+  }
+}
+
+config.enableHMR ? initWithHMR() : initWithoutHMR()

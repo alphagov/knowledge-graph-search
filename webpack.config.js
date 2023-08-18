@@ -5,10 +5,9 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 module.exports = (env) => ({
   mode: 'development',
   entry: {
-    main: [
-      './src/frontend/main.ts',
-      env?.enableHMR ? 'webpack-hot-middleware/client?reload=true' : '',
-    ],
+    main: env?.enableHMR
+      ? ['./src/frontend/main.ts', 'webpack-hot-middleware/client?reload=true']
+      : './src/frontend/main.ts',
     styles: './src/frontend/scss/main.scss',
   },
   module: {
@@ -28,11 +27,6 @@ module.exports = (env) => ({
           },
           {
             loader: 'sass-loader',
-            options: {
-              sassOptions: {
-                quiet: true,
-              },
-            },
           },
         ],
       },

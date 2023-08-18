@@ -32,7 +32,7 @@ const initialSearchParams: SearchParams = {
   caseSensitive: false, // whether the keyword search is case sensitive
 }
 
-const state: State = {
+let state: State = {
   searchParams: JSON.parse(JSON.stringify(initialSearchParams)), // deep copy
   taxons: [], // list of names of all the taxons
   locales: [], // all the languages found in the content store
@@ -53,6 +53,10 @@ const state: State = {
   },
   waiting: false, // whether we're waiting for a request to return,
   disamboxExpanded: false, // if there's a resizeable disamb meta box, whether it's expanded or not
+}
+
+const setState = (newState) => {
+  state = newState
 }
 
 const setQueryParamsFromQS = function (): void {
@@ -167,4 +171,4 @@ const resetSearch = function (): void {
   state.searchParams.combinator = Combinator.All
 }
 
-export { state, setQueryParamsFromQS, searchState, resetSearch }
+export { state, setState, setQueryParamsFromQS, searchState, resetSearch }
