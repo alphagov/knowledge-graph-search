@@ -51,5 +51,10 @@ module.exports = (env) => ({
       : new MiniCssExtractPlugin({
           filename: '[name].css',
         }),
+    new webpack.DefinePlugin({
+      buildConfig: {
+        ENABLE_HMR: env?.enableHMR,
+      },
+    }),
   ],
 })

@@ -2,6 +2,12 @@ import { view } from './view/view'
 import { state, setQueryParamsFromQS, resetSearch } from './state'
 import { searchButtonClicked, handleEvent } from './events'
 import { fetchWithTimeout, queryBackend } from './search-api'
+import config from './config'
+
+// This import is only used in local development when using Hot Module Replacement
+if (config.enableHMR) {
+  require('./scss/main.scss')
+}
 
 //= =================================================
 // INIT

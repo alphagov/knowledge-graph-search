@@ -8,9 +8,6 @@ import { EventType } from '../types/event-types'
 import { USER_ERRORS } from '../enums/constants'
 import { fieldName } from './utils'
 import { createAgGrid } from './view-grid'
-// This import is only used in local development when using Hot Module Replacement
-// Harmless in prod
-import '../scss/main.scss'
 
 declare const window: any
 
