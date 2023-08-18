@@ -36,7 +36,7 @@ module.exports = (env) => ({
     extensions: ['.tsx', '.ts', '.js'],
   },
   output: {
-    filename: '[name].js', // Use [name] to output different filenames for different entry points
+    filename: '[name].js',
     path: path.resolve(__dirname, 'public'),
   },
   plugins: [
