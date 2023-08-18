@@ -1,9 +1,16 @@
 const path = require('path')
 const webpack = require('webpack')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
-module.exports = {
-  entry: './src/frontend/main.ts',
+module.exports = (env) => ({
   mode: 'development',
+  entry: {
+    main: [
+      './src/frontend/main.ts',
+      env?.enableHMR ? 'webpack-hot-middleware/client?reload=true' : '',
+    ],
+    styles: './src/frontend/scss/main.scss',
+  },
   module: {
     rules: [
       {
@@ -11,18 +18,38 @@ module.exports = {
         use: 'ts-loader',
         exclude: /node_modules/,
       },
+      {
+        test: /\.scss$/,
+        use: [
+          env?.enableHMR ? 'style-loader' : MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: { url: { filter: (url) => !url.startsWith('/assets') } },
+          },
+          {
+            loader: 'sass-loader',
+            options: {
+              sassOptions: {
+                quiet: true,
+              },
+            },
+          },
+        ],
+      },
     ],
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
   },
   output: {
-    filename: 'main.js',
+    filename: '[name].js', // Use [name] to output different filenames for different entry points
     path: path.resolve(__dirname, 'public'),
   },
-  entry: [
-    './src/frontend/main.ts',
-    'webpack-hot-middleware/client?reload=true', // This ensures the page fully reloads if HMR fails.
+  plugins: [
+    env?.enableHMR
+      ? new webpack.HotModuleReplacementPlugin()
+      : new MiniCssExtractPlugin({
+          filename: '[name].css',
+        }),
   ],
-  plugins: [new webpack.HotModuleReplacementPlugin()],
-}
+})

@@ -20,7 +20,10 @@ import { showCookieMessage } from './middleware/showCookieMessage'
 import { hideFeedbackSurvey } from './middleware/hideFeedbackSurvey'
 import log, { httpLogger } from './utils/logging'
 import cookieParser from 'cookie-parser'
-import { devMiddleware, hotMiddleware } from './middleware/webpack-reloading'
+import {
+  devMiddleware,
+  hotMiddleware,
+} from './middleware/webpack-hot-module-replacement'
 
 class App {
   public app: express.Express = express()
@@ -63,7 +66,7 @@ class App {
   }
 
   private initializeMiddlewares() {
-    if (config.isLocal) {
+    if (config.enableHMR) {
       this.app.use(devMiddleware)
       this.app.use(hotMiddleware)
     }

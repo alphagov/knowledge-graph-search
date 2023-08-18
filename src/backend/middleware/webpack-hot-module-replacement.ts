@@ -1,7 +1,11 @@
+// These middlewares should only be used during local development
+
 import webpack from 'webpack'
 import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpackHotMiddleware from 'webpack-hot-middleware'
-const webpackConfig: any = require('../../../webpack.config.js')
+import config from '../config'
+const { enableHMR } = config
+const webpackConfig: any = require('../../../webpack.config.js')({ enableHMR })
 
 const compiler = webpack(webpackConfig)
 
