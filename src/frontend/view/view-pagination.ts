@@ -205,14 +205,23 @@ const buildPaginationHtml = (totalPages, currentPage) => {
 }
 
 const viewResultsPerPageSelector = () => {
+  const { options: resultsPerPageOptions } = config.pagination
+  const minResultsPerPage = Math.min(...resultsPerPageOptions)
+
   return `
   <div class="govuk-form-group">
     <label class="govuk-label" for="resultsPerPageSelect">
       Results per page
     </label>
     <select class="govuk-select" id="resultsPerPage-select" name="resultsPerPageSelect">
-      ${config.pagination.options
-        .filter((s) => s < (state?.searchResults || []).length)
+    <option value="${minResultsPerPage}" ${
+    state.resultsPerPage === minResultsPerPage ? 'selected' : ''
+  }>${minResultsPerPage}</option>
+      ${resultsPerPageOptions
+        .filter(
+          (s) =>
+            s < (state?.searchResults || []).length && s !== minResultsPerPage
+        )
         .map(
           (s) =>
             `<option value="${s}" ${

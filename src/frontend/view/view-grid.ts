@@ -28,7 +28,6 @@ const createAgGrid = () => {
     suppressSizeToFit: ['url', 'title'].includes(field),
     width: ['url', 'title'].includes(field) ? 500 : null,
   }))
-  console.log({ columnDefs })
 
   const gridOptions = {
     rowData,

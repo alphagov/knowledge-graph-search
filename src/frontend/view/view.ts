@@ -213,9 +213,7 @@ const viewSearchResultsTable = () => {
   html.push(`
         </ul>
       </fieldset>`)
-  html.push(
-    '<div id="results-grid-container" style="margin-top: 10px;" class="ag-theme-alpine"></div>'
-  )
+  html.push('<div id="results-grid-container" class="ag-theme-alpine"></div>')
   html.push('<div id="pagination-container"></div>')
   html.push(`
     </div>`)

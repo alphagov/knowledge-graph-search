@@ -4,7 +4,9 @@ export const formatNames = (array: []) =>
   [...new Set(array)].map((x) => `“${x}”`).join(', ')
 
 export const formatDateTime = (date: any) =>
-  `${date.value.slice(0, 10)} at ${date.value.slice(11, 16)}`
+  date?.value
+    ? `${date.value.slice(0, 10)} at ${date.value.slice(11, 16)}`
+    : 'n/a'
 
 export const fieldFormatters: Record<string, any> = {
   url: {

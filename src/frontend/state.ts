@@ -45,8 +45,11 @@ const state: State = {
   resultsPerPage: config.pagination.defaultResultsPerPage, // number of results per page
   showFields: {
     // what result fields to show by default
+    page_views: true,
     url: true,
     title: true,
+    primary_organisation: true,
+    documentType: true,
   },
   waiting: false, // whether we're waiting for a request to return,
   disamboxExpanded: false, // if there's a resizeable disamb meta box, whether it's expanded or not
