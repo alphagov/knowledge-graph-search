@@ -116,7 +116,7 @@ const languageNames: { [index: string]: any } = {
   smj: 'Sami (Lule)',
   smn: 'Sami (Inari)',
   sms: 'Sami (Skolt)',
-  so: 'Somani',
+  so: 'Somali',
   sq: 'Albanian',
   sr: 'Serbian',
   sv: 'Swedish',
