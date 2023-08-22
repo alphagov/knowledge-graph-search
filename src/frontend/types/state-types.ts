@@ -11,7 +11,7 @@ export interface State {
   metaSearchResults: any[] | null
   skip: number
   resultsPerPage: number
-  showFields: any
   waiting: boolean
   disamboxExpanded: boolean
+  showFields: any
 }

@@ -7,10 +7,9 @@ import { fetchWithTimeout, queryBackend } from './search-api'
 // INIT
 //= =================================================
 
-console.log('TEST MESSAGE FOR PRODUCTION')
 // dummy comment
 
-const initDatabase = async function () {
+const getInitialData = async function () {
   console.log('retrieving taxons, locales and organisations')
   const apiResponse = await fetchWithTimeout('/get-init-data')
   if (
@@ -23,10 +22,10 @@ const initDatabase = async function () {
   return apiResponse
 }
 
-const init = async function () {
+const fetchInitialData = async function () {
   state.systemErrorText = null
   try {
-    const dbInitResults = await initDatabase()
+    const dbInitResults = await getInitialData()
     state.taxons = dbInitResults.taxons
     state.organisations = dbInitResults.organisations
     state.locales = dbInitResults.locales
@@ -63,7 +62,7 @@ const init = async function () {
 //= =================================================
 
 ;(async () => {
-  await init()
+  await fetchInitialData()
   if (!state.systemErrorText) {
     setQueryParamsFromQS()
     view()
