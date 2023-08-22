@@ -41,6 +41,8 @@ const createAgGrid = () => {
     paginationPageSize: state.resultsPerPage,
     suppressPaginationPanel: true,
     domLayout: 'autoHeight',
+    ensureDomOrder: true,
+    enableCellTextSelection: true,
   }
 
   const gridDiv = id('results-grid-container')
