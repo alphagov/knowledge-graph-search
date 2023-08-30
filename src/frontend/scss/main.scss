@@ -283,11 +283,12 @@ h2:focus-visible {
   $filters-pane-width: 400px;
 
   .results-container-row-1-headers {
-    background: pink;
     display: flex;
+    padding-bottom: 20px;
 
     .hide-filters-button-container {
       width: $filters-pane-width;
+      padding-right: 0;
     }
   }
 
@@ -311,6 +312,7 @@ h2:focus-visible {
   &.hide-filters {
     .hide-filters-button-container {
       width: unset;
+      padding-right: 16px;
     }
     .filters-pane {
       display: none;

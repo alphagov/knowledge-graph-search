@@ -315,11 +315,11 @@ const viewResults = function () {
     }">
       <div class='results-container-row-1-headers'>
         <div class="hide-filters-button-container">
-          <button id="hide-filters-btn">${
+          <button id="hide-filters-btn" class="govuk-button govuk-button--secondary">${
             state.hideFiltersPane ? 'Show Filters' : 'Hide Filters'
           }</button>
         </div>
-        <button>Select columns</button>
+        <button class="govuk-button govuk-button--secondary">Select columns</button>
       </div>
       <div class="results-container-row-2-results">
         ${viewFiltersPane()}
