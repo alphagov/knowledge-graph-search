@@ -1,4 +1,4 @@
-import { state, searchState, resetSearch } from './state'
+import { state, searchState, resetSearch, setState } from './state'
 import { id, getFormInputValue } from '../common/utils/utils'
 import { view } from './view/view'
 import { queryBackend } from './search-api'
@@ -18,6 +18,9 @@ const handleEvent: SearchApiCallback = async function (event) {
   switch (event.type) {
     case EventType.Dom:
       switch (event.id) {
+        case 'hide-filters-btn':
+          setState({ ...state, hideFiltersPane: !state.hideFiltersPane })
+          break
         case 'search':
           // Tell GTM a search is starting
           window.dataLayer?.push({

@@ -276,3 +276,44 @@ h2:focus-visible {
   float: right;
   margin-left: 8px;
 }
+
+.results-container {
+  border: 1px solid red;
+
+  $filters-pane-width: 400px;
+
+  .results-container-row-1-headers {
+    background: pink;
+    display: flex;
+
+    .hide-filters-button-container {
+      width: $filters-pane-width;
+    }
+  }
+
+  .results-container-row-2-results {
+    display: flex;
+    .filters-pane {
+      display: flex;
+      flex-direction: column;
+      flex-basis: $filters-pane-width;
+      flex-grow: 0;
+      flex-shrink: 0;
+      height: 1500px;
+      border: 1px solid green;
+
+      &.closed {
+        display: none;
+      }
+    }
+  }
+
+  &.hide-filters {
+    .hide-filters-button-container {
+      width: unset;
+    }
+    .filters-pane {
+      display: none;
+    }
+  }
+}

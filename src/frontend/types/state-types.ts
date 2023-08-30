@@ -14,4 +14,5 @@ export interface State {
   waiting: boolean
   disamboxExpanded: boolean
   showFields: any
+  hideFiltersPane: boolean
 }

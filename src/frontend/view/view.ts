@@ -257,6 +257,10 @@ const viewSearchResultsTable = () => {
   return html.join('')
 }
 
+const viewFiltersPane = () => {
+  return `<div class="filters-pane"></div>`
+}
+
 const viewWaiting = () => `
   <div aria-live="polite" role="region">
     <div class="govuk-body">Searching for ${queryDescription(
@@ -305,7 +309,25 @@ const viewResults = function () {
      `)
     }
 
-    html.push(viewSearchResultsTable())
+    const resultsContainer = `
+    <div class="results-container ${
+      state.hideFiltersPane ? 'hide-filters' : ''
+    }">
+      <div class='results-container-row-1-headers'>
+        <div class="hide-filters-button-container">
+          <button id="hide-filters-btn">${
+            state.hideFiltersPane ? 'Show Filters' : 'Hide Filters'
+          }</button>
+        </div>
+        <button>Select columns</button>
+      </div>
+      <div class="results-container-row-2-results">
+        ${viewFiltersPane()}
+        ${viewSearchResultsTable()}
+      </div>
+    </div>`
+
+    html.push(resultsContainer)
 
     html.push(`
       <p class="govuk-body"><a class="govuk-link" href="/csv${window.location.search}" download="export.csv">Download all ${state.searchResults.length} records in CSV</a></p>`)

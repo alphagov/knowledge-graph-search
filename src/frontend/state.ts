@@ -53,6 +53,7 @@ let state: State = {
   },
   waiting: false, // whether we're waiting for a request to return,
   disamboxExpanded: false, // if there's a resizeable disamb meta box, whether it's expanded or not
+  hideFiltersPane: false,
 }
 
 const setState = (newState) => {
