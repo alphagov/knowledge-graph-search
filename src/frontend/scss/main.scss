@@ -294,6 +294,10 @@ h2:focus-visible {
 
   .results-container-row-2-results {
     display: flex;
+    .govuk-body {
+      flex: 1;
+    }
+
     .filters-pane {
       display: flex;
       flex-direction: column;

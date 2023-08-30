@@ -224,36 +224,34 @@ const viewSearchResultsTable = () => {
   if (!state.searchResults || state.searchResults?.length <= 0) {
     return ''
   }
-  html.push(`
-    <div class="govuk-body">
+  const viewFieldSet = () => `
       <fieldset class="govuk-fieldset" ${
         state.waiting && 'disabled="disabled"'
       }>
         <legend class="govuk-fieldset__legend">For each result, display:</legend>
-        <ul class="kg-checkboxes" id="show-fields">`)
-  html.push(
-    Object.keys(state.searchResults[0])
-      .map(
-        (key) => `
-          <li class="kg-checkboxes__item">
-            <input class="kg-checkboxes__input"
-                    data-interactive="true"
-                    type="checkbox" id="show-field-${key}"
-              ${state.showFields[key] ? 'checked' : ''}/>
-            <label for="show-field-${key}" class="kg-label kg-checkboxes__label">${fieldName(
-          key
-        )}</label>
-          </li>`
-      )
-      .join('')
-  )
-  html.push(`
-        </ul>
-      </fieldset>`)
-  html.push('<div id="results-grid-container" class="ag-theme-alpine"></div>')
-  html.push('<div id="pagination-container"></div>')
-  html.push(`
-    </div>`)
+        <ul class="kg-checkboxes" id="show-fields">
+        ${Object.keys(state.searchResults[0])
+          .map(
+            (key) => `
+              <li class="kg-checkboxes__item">
+                <input class="kg-checkboxes__input"
+                        data-interactive="true"
+                        type="checkbox" id="show-field-${key}"
+                  ${state.showFields[key] ? 'checked' : ''}/>
+                <label for="show-field-${key}" class="kg-label kg-checkboxes__label">${fieldName(
+              key
+            )}</label>
+              </li>`
+          )
+          .join('')}
+          </ul>
+          </fieldset>
+  `
+  html.push(`<div class="govuk-body">
+  ${state.showFieldSet ? viewFieldSet() : ''}
+  <div id="results-grid-container" class="ag-theme-alpine"></div>
+  <div id="pagination-container"></div>
+  </div>`)
   return html.join('')
 }
 
@@ -311,15 +309,17 @@ const viewResults = function () {
 
     const resultsContainer = `
     <div class="results-container ${
-      state.hideFiltersPane ? 'hide-filters' : ''
+      state.showFiltersPane ? '' : 'hide-filters'
     }">
       <div class='results-container-row-1-headers'>
         <div class="hide-filters-button-container">
-          <button id="hide-filters-btn" class="govuk-button govuk-button--secondary">${
-            state.hideFiltersPane ? 'Show Filters' : 'Hide Filters'
+          <button id="toggle-filters-btn" class="govuk-button govuk-button--secondary">${
+            state.showFiltersPane ? 'Hide Filters' : 'Show Filters'
           }</button>
         </div>
-        <button class="govuk-button govuk-button--secondary">Select columns</button>
+        <button class="govuk-button govuk-button--secondary" id="toggle-header-options-btn">${
+          state.showFieldSet ? 'Hide header options' : 'Show header options'
+        }</button>
       </div>
       <div class="results-container-row-2-results">
         ${viewFiltersPane()}

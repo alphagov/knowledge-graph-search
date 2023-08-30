@@ -18,8 +18,11 @@ const handleEvent: SearchApiCallback = async function (event) {
   switch (event.type) {
     case EventType.Dom:
       switch (event.id) {
-        case 'hide-filters-btn':
-          setState({ ...state, hideFiltersPane: !state.hideFiltersPane })
+        case 'toggle-filters-btn':
+          setState({ ...state, showFiltersPane: !state.showFiltersPane })
+          break
+        case 'toggle-header-options-btn':
+          setState({ ...state, showFieldSet: !state.showFieldSet })
           break
         case 'search':
           // Tell GTM a search is starting
