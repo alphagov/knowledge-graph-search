@@ -14,6 +14,20 @@ export enum Combinator {
   NotSet = 'notset',
 }
 
+export enum KeywordLocation {
+  All = 'all',
+  Title = 'title',
+  Description = 'description',
+  BodyContent = 'bodycontent',
+}
+
+export const KeywordLocationToUrlParamMapping = {
+  [KeywordLocation.All]: 'search-in-all',
+  [KeywordLocation.Title]: 'search-in-title',
+  [KeywordLocation.Description]: 'search-in-text',
+  [KeywordLocation.BodyContent]: 'search-in-description',
+}
+
 export enum SearchArea {
   Any = 'any',
   Whitehall = 'whitehall',
@@ -28,10 +42,7 @@ export type SearchParams = {
   selectedOrganisation: string // organisation to search in
   selectedLocale: string // the language to search for
   linkSearchUrl: string // URL to find all pages linking to
-  whereToSearch: {
-    title: boolean
-    text: boolean
-  } // what parts of the pages to search in
+  keywordLocation: KeywordLocation // what parts of the pages to search in
   combinator: Combinator // all keywords or any keywords
   areaToSearch: SearchArea // whitehall, publisher, both
   caseSensitive: boolean // case sensitive keyword search?

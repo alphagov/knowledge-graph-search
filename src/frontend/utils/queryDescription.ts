@@ -1,4 +1,7 @@
-import { SearchParams } from '../../common/types/search-api-types'
+import {
+  KeywordLocation,
+  SearchParams,
+} from '../../common/types/search-api-types'
 import { languageName } from '../../common/utils/lang'
 import { splitKeywords } from '../../common/utils/utils'
 import { makeBold } from './makeBold'
@@ -58,13 +61,13 @@ export const queryDescription = (
 
 // combinedWords as used here must be exactly the same set of keywords as the ones submitted to BigQuery by the function sendSearchQuery.
 const containDescription = (search: SearchParams, includeMarkup: boolean) => {
-  let where: string
-  if (search.whereToSearch.title && search.whereToSearch.text) {
-    where = ''
-  } else if (search.whereToSearch.title) {
+  let where = ''
+  if (search.keywordLocation === KeywordLocation.Title) {
     where = 'in their title'
-  } else {
+  } else if (search.keywordLocation === KeywordLocation.BodyContent) {
     where = 'in their body content'
+  } else if (search.keywordLocation === KeywordLocation.Description) {
+    where = 'in their description'
   }
   const combineOp = search.combinator === 'all' ? 'and' : 'or'
   const combinedWords = splitKeywords(search.selectedWords)

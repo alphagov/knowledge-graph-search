@@ -4,6 +4,8 @@ import {
   SearchParams,
   Combinator,
   SearchArea,
+  KeywordLocation,
+  KeywordLocationToUrlParamMapping,
 } from '../common/types/search-api-types'
 import { State } from './types/state-types'
 import { USER_ERRORS } from './enums/constants'
@@ -23,10 +25,7 @@ const initialSearchParams: SearchParams = {
   selectedOrganisation: '',
   selectedLocale: '',
   linkSearchUrl: '',
-  whereToSearch: {
-    title: true, // whether search should include page titles
-    text: true, // whether search should include page content
-  },
+  keywordLocation: KeywordLocation.All,
   combinator: Combinator.All,
   areaToSearch: SearchArea.Any,
   caseSensitive: false, // whether the keyword search is case sensitive
@@ -103,14 +102,13 @@ const setQueryParamsFromQS = function (): void {
   state.searchParams.areaToSearch = maybeReplace('areaToSearch', 'area')
   state.searchParams.combinator = maybeReplace('combinator', 'combinator')
 
-  state.searchParams.whereToSearch.title =
-    searchParams.get('search-in-title') === 'false'
-      ? false
-      : initialSearchParams.whereToSearch.title
-  state.searchParams.whereToSearch.text =
-    searchParams.get('search-in-text') === 'false'
-      ? false
-      : initialSearchParams.whereToSearch.text
+  state.searchParams.keywordLocation = Object.keys(
+    KeywordLocationToUrlParamMapping
+  ).find(
+    (keywordLocation) =>
+      searchParams.get(KeywordLocationToUrlParamMapping[keywordLocation]) ===
+      'true'
+  ) as KeywordLocation
 }
 
 const searchState = function (): { code: string; errors: string[] } {
@@ -120,8 +118,7 @@ const searchState = function (): { code: string; errors: string[] } {
   // "results": there was a search and there are results to display
   // "initial": there weren't any search criteria specified
   // "errors": the user didn't specify a valid query. In this case
-  //   we add a "errors" field containing an array with values among:
-  //   - "missingWhereToSearch": keywords were specified but not where to look for them on pages
+  //   we add a "errors" field containing an array with values
   // "waiting": there's a query running
   const errors: string[] = []
 
@@ -133,21 +130,11 @@ const searchState = function (): { code: string; errors: string[] } {
     state.searchParams.selectedTaxon === '' &&
     state.searchParams.selectedOrganisation === '' &&
     state.searchParams.selectedLocale === '' &&
-    state.searchParams.linkSearchUrl === '' &&
-    state.searchParams.whereToSearch.title === false &&
-    state.searchParams.whereToSearch.text === false
+    state.searchParams.linkSearchUrl === ''
   ) {
     return { code: 'initial', errors }
   }
 
-  if (state.searchParams.selectedWords !== '') {
-    if (
-      !state.searchParams.whereToSearch.title &&
-      !state.searchParams.whereToSearch.text
-    ) {
-      errors.push(USER_ERRORS.MISSING_WHERE_TO_SEARCH)
-    }
-  }
   if (errors.length > 0) return { code: 'error', errors }
   if (state.searchResults && state.searchResults.length > 0)
     return { code: 'results', errors }
@@ -162,8 +149,7 @@ const resetSearch = function (): void {
   state.searchParams.selectedTaxon = ''
   state.searchParams.selectedOrganisation = ''
   state.searchParams.selectedLocale = ''
-  state.searchParams.whereToSearch.title = true
-  state.searchParams.whereToSearch.text = true
+  state.searchParams.keywordLocation = KeywordLocation.All
   state.searchParams.caseSensitive = false
   state.searchParams.linkSearchUrl = ''
   state.skip = 0 // reset to first page

@@ -1,7 +1,10 @@
 import { sanitiseOutput } from '../../common/utils/utils'
 import { state, searchState } from '../state'
 import { languageName } from '../../common/utils/lang'
-import { SearchType } from '../../common/types/search-api-types'
+import {
+  KeywordLocation,
+  SearchType,
+} from '../../common/types/search-api-types'
 import { USER_ERRORS } from '../enums/constants'
 
 const viewSearchPanel = () => {
@@ -153,44 +156,32 @@ const viewInlineError = (id: string, message: string): string => `
 `
 
 const viewScopeSelector = (): string => {
-  const errors = searchState()?.errors
-  const err = errors && errors.includes(USER_ERRORS.MISSING_WHERE_TO_SEARCH)
   return `
-  <div class="govuk-form-group ${err ? 'govuk-form-group--error' : ''}">
-    <fieldset
-        class="govuk-fieldset"
-        ${state.waiting && 'disabled="disabled"'}
-        id="search-scope-wrapper"
-        ${err ? 'aria-describedby="scope-error"' : ''}>
-      <legend class="govuk-fieldset__legend">
-        Keyword location
-      </legend>
-      ${
-        err
-          ? viewInlineError('scope-error', 'Please choose at least one option')
-          : ''
-      }
-      <div class="govuk-checkboxes" id="search-locations">
-        <div class="govuk-checkboxes__item">
-          <input
-              class="govuk-checkboxes__input"
-              type="checkbox" id="search-title"
-              ${state.searchParams.whereToSearch.title ? 'checked' : ''}/>
-          <label for="search-title" class="govuk-label govuk-checkboxes__label">title</label>
-        </div>
-        <div class="govuk-checkboxes__item">
-          <input
-              class="govuk-checkboxes__input"
-              type="checkbox"
-              id="search-text"
-            ${state.searchParams.whereToSearch.text ? 'checked' : ''}/>
-          <label for="search-text" class="govuk-label govuk-checkboxes__label">
-            body content and description
-          </label>
-        </div>
+      <div class="govuk-form-group">
+        <label class="govuk-label" for="search-keyword-location">
+          Keyword location
+        </label>
+        <select class="govuk-select" id="search-keyword-location" name="search-keyword-location">
+          <option value="${KeywordLocation.All}" ${
+    state.searchParams.keywordLocation === KeywordLocation.All ? 'selected' : ''
+  }>All keyword locations</option>
+          <option value="${KeywordLocation.Title}" ${
+    state.searchParams.keywordLocation === KeywordLocation.Title
+      ? 'selected'
+      : ''
+  }>Title</option>
+          <option value="${KeywordLocation.BodyContent}" ${
+    state.searchParams.keywordLocation === KeywordLocation.BodyContent
+      ? 'selected'
+      : ''
+  }>Body content</option>
+          <option value="${KeywordLocation.Description}" ${
+    state.searchParams.keywordLocation === KeywordLocation.Description
+      ? 'selected'
+      : ''
+  }>Description</option>
+        </select>
       </div>
-    </fieldset>
-  </div>
   `
 }
 

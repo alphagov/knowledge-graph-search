@@ -4,6 +4,7 @@ import {
   Combinator,
   SearchArea,
   SearchType,
+  KeywordLocation,
 } from '../../common/types/search-api-types'
 import { sanitiseInput } from '../../common/utils/utils'
 
@@ -24,10 +25,18 @@ export const getParams = (req: express.Request): SearchParams => {
   const combinator = <Combinator>(
     (sanitiseInput(req.query.combinator as string) || Combinator.All)
   )
-  const whereToSearch = {
-    title: !(req.query['search-in-title'] === 'false'),
-    text: !(req.query['search-in-text'] === 'false'),
+
+  const getKeywordLocationFromQuery = () => {
+    if (req.query['search-in-all'] === 'true') return KeywordLocation.All
+    if (req.query['search-in-title'] === 'true') return KeywordLocation.Title
+    if (req.query['search-in-text'] === 'true')
+      return KeywordLocation.BodyContent
+    if (req.query['search-in-description'] === 'true')
+      return KeywordLocation.Description
+    return KeywordLocation.All
   }
+  const keywordLocation = getKeywordLocationFromQuery()
+
   const areaToSearch = <SearchArea>(
     (sanitiseInput(req.query.area as string) || SearchArea.Any)
   )
@@ -42,7 +51,7 @@ export const getParams = (req: express.Request): SearchParams => {
     selectedLocale,
     caseSensitive,
     combinator,
-    whereToSearch,
+    keywordLocation,
     areaToSearch,
     linkSearchUrl,
   }

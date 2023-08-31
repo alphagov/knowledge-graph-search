@@ -7,23 +7,52 @@ import {
   SearchType,
   SearchArea,
   Combinator,
+  KeywordLocation,
+  KeywordLocationToUrlParamMapping,
 } from '../common/types/search-api-types'
 import { languageCode } from '../common/utils/lang'
 
 declare const window: any
 
-const updateQueryParamsFromFilters = () => {
-  // Keyword radiobuttons
+const updateStateFromFilters = () => {
+  // state.searchParams.selectedWords = getFormInputValue('keyword')
+  state.searchParams.excludedWords = getFormInputValue(
+    'filter-excluded-keyword'
+  )
+  // state.searchParams.selectedTaxon = getFormInputValue('taxon')
+  // state.searchParams.selectedOrganisation = getFormInputValue('organisation')
+  // state.searchParams.selectedLocale = getFormInputValue('locale')
+  // // Keyword Location
+  // searchParams.set(
+  //   KeywordLocationToUrlParamMapping[state.searchParams.keywordLocation],
+  //   'true'
+  // )
+  // ))?.checked
+  state.searchParams.keywordLocation = getFormInputValue(
+    'filter-keyword-location'
+  ) as KeywordLocation
+  // state.searchParams.caseSensitive = (<HTMLInputElement>(
+  //   id('case-sensitive')
+  // ))?.checked
+  // state.searchParams.linkSearchUrl = getFormInputValue('link-search')
+  // state.skip = 0 // reset to first page
+  // if ((<HTMLInputElement>id('area-publisher'))?.checked)
+  //   state.searchParams.areaToSearch = SearchArea.Publisher
+  // if ((<HTMLInputElement>id('area-whitehall'))?.checked)
+  //   state.searchParams.areaToSearch = SearchArea.Whitehall
+  // if ((<HTMLInputElement>id('area-any'))?.checked)
+  //   state.searchParams.areaToSearch = SearchArea.Any
+
+  // if ((<HTMLInputElement>id('combinator-any'))?.checked)
+  //   state.searchParams.combinator = Combinator.Any
+  // if ((<HTMLInputElement>id('combinator-all'))?.checked)
+  //   state.searchParams.combinator = Combinator.All
   const newCombinatorValue = (
     document.querySelector(
       'input[name="search-for"]:checked'
     ) as HTMLInputElement
-  ).value
-
-  setState({
-    ...state,
-    searchParams: { ...state.searchParams, combinator: newCombinatorValue },
-  })
+  ).value as Combinator
+  state.searchParams.combinator = newCombinatorValue
 }
 
 const handleEvent: SearchApiCallback = async function (event) {
@@ -33,7 +62,8 @@ const handleEvent: SearchApiCallback = async function (event) {
     case EventType.Dom:
       switch (event.id) {
         case 'filters-pane-submit-btn':
-          updateQueryParamsFromFilters()
+          // updateQueryParamsFromFilters()
+          updateStateFromFilters()
           state.searchResults = null
           searchButtonClicked()
           break
@@ -59,12 +89,9 @@ const handleEvent: SearchApiCallback = async function (event) {
           state.searchParams.selectedOrganisation =
             getFormInputValue('organisation')
           state.searchParams.selectedLocale = getFormInputValue('locale')
-          state.searchParams.whereToSearch.title = (<HTMLInputElement>(
-            id('search-title')
-          ))?.checked
-          state.searchParams.whereToSearch.text = (<HTMLInputElement>(
-            id('search-text')
-          ))?.checked
+          state.searchParams.keywordLocation = (<HTMLInputElement>(
+            id('search-keyword-location')
+          )).value as KeywordLocation
           state.searchParams.caseSensitive = (<HTMLInputElement>(
             id('case-sensitive')
           ))?.checked
@@ -205,10 +232,10 @@ const updateUrl = function () {
             'case-sensitive',
             state.searchParams.caseSensitive.toString()
           )
-        if (!state.searchParams.whereToSearch.title)
-          searchParams.set('search-in-title', 'false')
-        if (!state.searchParams.whereToSearch.text)
-          searchParams.set('search-in-text', 'false')
+        searchParams.set(
+          KeywordLocationToUrlParamMapping[state.searchParams.keywordLocation],
+          'true'
+        )
         if (state.searchParams.areaToSearch !== SearchArea.Any)
           searchParams.set('area', state.searchParams.areaToSearch)
         if (state.searchParams.combinator !== Combinator.All)
@@ -271,10 +298,10 @@ const updateUrl = function () {
             'case-sensitive',
             state.searchParams.caseSensitive.toString()
           )
-        if (!state.searchParams.whereToSearch.title)
-          searchParams.set('search-in-title', 'false')
-        if (!state.searchParams.whereToSearch.text)
-          searchParams.set('search-in-text', 'false')
+        searchParams.set(
+          KeywordLocationToUrlParamMapping[state.searchParams.keywordLocation],
+          'true'
+        )
         if (state.searchParams.areaToSearch !== SearchArea.Any)
           searchParams.set('area', state.searchParams.areaToSearch)
         if (state.searchParams.combinator !== Combinator.All)

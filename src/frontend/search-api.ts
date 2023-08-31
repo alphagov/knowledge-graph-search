@@ -4,6 +4,7 @@ import {
   SearchArea,
   Combinator,
   SearchResults,
+  KeywordLocationToUrlParamMapping,
 } from '../common/types/search-api-types'
 import { languageCode } from '../common/utils/lang'
 import { EventType, SearchApiCallback } from './types/event-types'
@@ -19,8 +20,9 @@ const makeQueryString = function (sp: SearchParams): string {
     usp.set('selected-organisation', sp.selectedOrganisation)
   if (sp.selectedLocale !== '') usp.set('lang', languageCode(sp.selectedLocale))
   if (sp.caseSensitive) usp.set('case-sensitive', sp.caseSensitive.toString())
-  if (!sp.whereToSearch.title) usp.set('search-in-title', 'false')
-  if (!sp.whereToSearch.text) usp.set('search-in-text', 'false')
+  // Keyword location
+  usp.set(KeywordLocationToUrlParamMapping[sp.keywordLocation], 'true')
+
   if (sp.areaToSearch !== SearchArea.Any) usp.set('area', sp.areaToSearch)
   if (sp.combinator !== Combinator.All) usp.set('combinator', sp.combinator)
   if (sp.linkSearchUrl !== '') usp.set('link-search-url', sp.linkSearchUrl)

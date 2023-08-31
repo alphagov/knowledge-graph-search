@@ -8,7 +8,10 @@ import { EventType } from '../types/event-types'
 import { USER_ERRORS } from '../enums/constants'
 import { fieldName } from './utils'
 import { createAgGrid } from './view-grid'
-import { Combinator } from '../../common/types/search-api-types'
+import {
+  Combinator,
+  KeywordLocation,
+} from '../../common/types/search-api-types'
 
 declare const window: any
 
@@ -203,10 +206,6 @@ const viewErrorBanner = () => {
           `)
     state.userErrors.forEach((userError) => {
       switch (userError) {
-        case USER_ERRORS.MISSING_WHERE_TO_SEARCH:
-          html.push(`
-              <li><a href="#search-locations-wrapper">You need to select a keyword location</a></li>`)
-          break
         case USER_ERRORS.MISSING_AREA:
           html.push(`
               <li><a href="#search-scope-wrapper">You need to select a publishing application</a></li>`)
@@ -291,12 +290,51 @@ const viewFiltersPane = () => {
     </div>
   `
 
+  const excludeWords = `
+  <div class="govuk-form-group">
+    <label class="govuk-label" for="filter-excluded-keywords">
+      Excluding these words
+    </label>
+    <input class="govuk-input" id="filter-excluded-keywords" name="filter-excluded-keywords" type="text" value="${state.searchParams.excludedWords}">
+  </div>
+  `
+
+  const keywordLocation = `
+  <div class="govuk-form-group">
+    <label class="govuk-label" for="filter-keyword-location">
+      Keyword location
+    </label>
+    <select class="govuk-select" id="filter-keyword-location" name="filter-keyword-location">
+      <option value="${KeywordLocation.All}" ${
+    state.searchParams.keywordLocation === KeywordLocation.All ? 'selected' : ''
+  }>All keyword locations</option>
+      <option value="${KeywordLocation.Title}" ${
+    state.searchParams.keywordLocation === KeywordLocation.Title
+      ? 'selected'
+      : ''
+  }>Title</option>
+      <option value="${KeywordLocation.BodyContent}" ${
+    state.searchParams.keywordLocation === KeywordLocation.BodyContent
+      ? 'selected'
+      : ''
+  }>Body content</option>
+      <option value="${KeywordLocation.Description}" ${
+    state.searchParams.keywordLocation === KeywordLocation.Description
+      ? 'selected'
+      : ''
+  }>Description</option>
+    </select>
+  </div>
+  `
+
   const submitButton = `
   <button id="filters-pane-submit-btn" class="govuk-button" data-module="govuk-button">Search</button>
   `
   return `
   <div class="filters-pane">
     ${keywordsRadioButtons}
+    ${excludeWords}
+    ${keywordLocation}
     ${submitButton}
   </div>
   `

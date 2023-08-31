@@ -1,4 +1,8 @@
-import { Combinator, SearchParams } from '../../common/types/search-api-types'
+import {
+  Combinator,
+  KeywordLocation,
+  SearchParams,
+} from '../../common/types/search-api-types'
 
 export const buildSqlQuery = function (
   searchParams: SearchParams,
@@ -6,14 +10,19 @@ export const buildSqlQuery = function (
   excludedKeywords: string[]
 ): string {
   const contentToSearch = []
-  if (searchParams.whereToSearch.title) {
+  if (searchParams.keywordLocation === KeywordLocation.Title) {
     contentToSearch.push('IFNULL(page.title, "")')
   }
-  if (searchParams.whereToSearch.text) {
-    contentToSearch.push(
-      'IFNULL(page.text, "")',
-      'IFNULL(page.description, "")'
-    )
+  if (searchParams.keywordLocation === KeywordLocation.BodyContent) {
+    contentToSearch.push('IFNULL(page.text, "")')
+  }
+  if (searchParams.keywordLocation === KeywordLocation.Description) {
+    contentToSearch.push('IFNULL(page.description, "")')
+  }
+  if (searchParams.keywordLocation === KeywordLocation.All) {
+    contentToSearch.push('IFNULL(page.title, "")')
+    contentToSearch.push('IFNULL(page.text, "")')
+    contentToSearch.push('IFNULL(page.description, "")')
   }
   const contentToSearchString = contentToSearch.join(' || " " || ')
 
