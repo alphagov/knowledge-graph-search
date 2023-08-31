@@ -20,7 +20,9 @@ const updateStateFromFilters = () => {
     'filter-excluded-keywords'
   )
   // state.searchParams.selectedTaxon = getFormInputValue('taxon')
-  // state.searchParams.selectedOrganisation = getFormInputValue('organisation')
+  state.searchParams.selectedOrganisation = getFormInputValue(
+    'filter-publishing-organisation'
+  )
   // state.searchParams.selectedLocale = getFormInputValue('locale')
   // // Keyword Location
   // searchParams.set(

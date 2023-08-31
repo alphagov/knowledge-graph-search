@@ -69,6 +69,38 @@ const viewSelectKeywordLocation = () => `
 </div>
 `
 
+const viewSelectPublishingOrganisations = () => {
+  const html = [
+    `
+    <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+      <label class="govuk-label govuk-label--s" for="filter-publishing-organisation">
+        Publishing organisations
+      </label>
+      <select ${
+        state.waiting && 'disabled="disabled"'
+      } id="filter-publishing-organisation" class="autocomplete__input autocomplete__input--default" name="filter-publishing-organisation">
+      <option value="" ></option>
+  `,
+  ]
+
+  html.push(`
+      ${html.push(
+        ...state.organisations
+          .sort()
+          .map(
+            (organisation) =>
+              `<option value="${organisation}" ${
+                state.searchParams.selectedOrganisation == organisation
+                  ? 'selected'
+                  : ''
+              }>${organisation}</option>`
+          )
+      )}
+        </select>
+    </div>`)
+  return html.join('')
+}
+
 export const viewFiltersPane = () => {
   const submitButton = `
     <button id="filters-pane-submit-btn" class="govuk-button" data-module="govuk-button">Search</button>
@@ -78,6 +110,7 @@ export const viewFiltersPane = () => {
       ${viewKeywordsRadioButtons()}
       ${viewExcludeWords()}
       ${viewSelectKeywordLocation()}
+      ${viewSelectPublishingOrganisations()}
       ${submitButton}
     </div>
     `

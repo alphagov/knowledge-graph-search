@@ -15,8 +15,8 @@ export const hasStateInCache = async () => {
 export const getStateFromCache = async () =>
   await localforage.getItem(CACHE_KEY)
 
-const saveState = async () => {
-  await localforage.setItem(CACHE_KEY, JSON.stringify(state))
+const saveState = async (ste = state) => {
+  await localforage.setItem(CACHE_KEY, JSON.stringify(ste))
 }
 
 export const setStateFromCache = async () => {
