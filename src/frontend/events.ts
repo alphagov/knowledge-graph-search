@@ -12,12 +12,31 @@ import { languageCode } from '../common/utils/lang'
 
 declare const window: any
 
+const updateQueryParamsFromFilters = () => {
+  // Keyword radiobuttons
+  const newCombinatorValue = (
+    document.querySelector(
+      'input[name="search-for"]:checked'
+    ) as HTMLInputElement
+  ).value
+
+  setState({
+    ...state,
+    searchParams: { ...state.searchParams, combinator: newCombinatorValue },
+  })
+}
+
 const handleEvent: SearchApiCallback = async function (event) {
   let fieldClicked: RegExpMatchArray | null
   console.log('handleEvent:', event.type, event.id || '')
   switch (event.type) {
     case EventType.Dom:
       switch (event.id) {
+        case 'filters-pane-submit-btn':
+          updateQueryParamsFromFilters()
+          state.searchResults = null
+          searchButtonClicked()
+          break
         case 'toggle-filters-btn':
           setState({ ...state, showFiltersPane: !state.showFiltersPane })
           break

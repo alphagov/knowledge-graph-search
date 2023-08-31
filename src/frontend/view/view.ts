@@ -8,6 +8,7 @@ import { EventType } from '../types/event-types'
 import { USER_ERRORS } from '../enums/constants'
 import { fieldName } from './utils'
 import { createAgGrid } from './view-grid'
+import { Combinator } from '../../common/types/search-api-types'
 
 declare const window: any
 
@@ -256,7 +257,49 @@ const viewSearchResultsTable = () => {
 }
 
 const viewFiltersPane = () => {
-  return `<div class="filters-pane"></div>`
+  const keywordsRadioButtons = `
+    <div class="govuk-form-group">
+      <fieldset class="govuk-fieldset">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+          <h1 class="govuk-fieldset__heading">
+            Search for
+          </h1>
+        </legend>
+        <div class="govuk-radios" data-module="govuk-radios">
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="search-for-1" name="search-for" type="radio" value="${
+              Combinator.All
+            }" ${
+    state.searchParams.combinator === Combinator.All ? 'checked' : ''
+  }>
+            <label class="govuk-label govuk-radios__label" for="search-for">
+              All keywords
+            </label>
+          </div>
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="search-for-2" name="search-for" type="radio" value="${
+              Combinator.Any
+            }" ${
+    state.searchParams.combinator === Combinator.Any ? 'checked' : ''
+  }>
+            <label class="govuk-label govuk-radios__label" for="search-for">
+              Any keyword
+            </label>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+  `
+
+  const submitButton = `
+  <button id="filters-pane-submit-btn" class="govuk-button" data-module="govuk-button">Search</button>
+  `
+  return `
+  <div class="filters-pane">
+    ${keywordsRadioButtons}
+    ${submitButton}
+  </div>
+  `
 }
 
 const viewWaiting = () => `
