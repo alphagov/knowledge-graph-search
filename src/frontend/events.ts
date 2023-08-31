@@ -17,7 +17,7 @@ declare const window: any
 const updateStateFromFilters = () => {
   // state.searchParams.selectedWords = getFormInputValue('keyword')
   state.searchParams.excludedWords = getFormInputValue(
-    'filter-excluded-keyword'
+    'filter-excluded-keywords'
   )
   // state.searchParams.selectedTaxon = getFormInputValue('taxon')
   // state.searchParams.selectedOrganisation = getFormInputValue('organisation')
