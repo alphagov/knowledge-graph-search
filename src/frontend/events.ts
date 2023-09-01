@@ -8,7 +8,6 @@ import {
   PublishingApplication,
   Combinator,
   KeywordLocation,
-  KeywordLocationToUrlParamMapping,
   UrlParams,
   PublishingStatus,
 } from '../common/types/search-api-types'
@@ -246,10 +245,12 @@ const updateUrl = function () {
             state.searchParams.selectedPublishingOrganisation
           )
         }
-        searchParams.set(
-          KeywordLocationToUrlParamMapping[state.searchParams.keywordLocation],
-          'true'
-        )
+        if (state.searchParams.keywordLocation !== KeywordLocation.All) {
+          searchParams.set(
+            UrlParams.KeywordLocation,
+            state.searchParams.keywordLocation
+          )
+        }
         if (state.searchParams.selectedDocumentType) {
           searchParams.set(
             UrlParams.DocumentType,
@@ -389,10 +390,13 @@ const updateUrl = function () {
           UrlParams.PublishingStatus,
           state.searchParams.publishingStatus
         )
-        searchParams.set(
-          KeywordLocationToUrlParamMapping[state.searchParams.keywordLocation],
-          'true'
-        )
+        if (state.searchParams.keywordLocation !== KeywordLocation.All) {
+          searchParams.set(
+            UrlParams.KeywordLocation,
+            state.searchParams.keywordLocation
+          )
+        }
+
         if (
           state.searchParams.publishingApplication !== PublishingApplication.Any
         )

@@ -13,14 +13,11 @@ export const buildSqlQuery = function (
   const contentToSearch = []
   if (searchParams.keywordLocation === KeywordLocation.Title) {
     contentToSearch.push('IFNULL(page.title, "")')
-  }
-  if (searchParams.keywordLocation === KeywordLocation.BodyContent) {
+  } else if (searchParams.keywordLocation === KeywordLocation.BodyContent) {
     contentToSearch.push('IFNULL(page.text, "")')
-  }
-  if (searchParams.keywordLocation === KeywordLocation.Description) {
+  } else if (searchParams.keywordLocation === KeywordLocation.Description) {
     contentToSearch.push('IFNULL(page.description, "")')
-  }
-  if (searchParams.keywordLocation === KeywordLocation.All) {
+  } else {
     contentToSearch.push('IFNULL(page.title, "")')
     contentToSearch.push('IFNULL(page.text, "")')
     contentToSearch.push('IFNULL(page.description, "")')

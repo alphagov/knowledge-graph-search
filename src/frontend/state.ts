@@ -5,7 +5,6 @@ import {
   Combinator,
   PublishingApplication,
   KeywordLocation,
-  KeywordLocationToUrlParamMapping,
   UrlParams,
   PublishingStatus,
 } from '../common/types/search-api-types'
@@ -115,13 +114,10 @@ const setQueryParamsFromQS = function (): void {
     UrlParams.Combinator
   )
 
-  state.searchParams.keywordLocation = Object.keys(
-    KeywordLocationToUrlParamMapping
-  ).find(
-    (keywordLocation) =>
-      searchParams.get(KeywordLocationToUrlParamMapping[keywordLocation]) ===
-      'true'
-  ) as KeywordLocation
+  state.searchParams.keywordLocation = maybeReplace(
+    'keywordLocation',
+    UrlParams.KeywordLocation
+  )
 
   state.searchParams.selectedDocumentType = maybeReplace(
     'selectedDocumentType',

@@ -1,4 +1,5 @@
 export enum UrlParams {
+  Combinator = 'combinator',
   SearchType = 'search-type',
   SelectedWords = 'selected-words',
   ExcludedWords = 'excluded-words',
@@ -6,6 +7,7 @@ export enum UrlParams {
   SelectedPublishingOrganisation = 'selected-publishing-organisation',
   CaseSensitive = 'case-sensitive',
   DocumentType = 'document-type',
+  KeywordLocation = 'keyword-location',
   SearchInAll = 'search-in-all',
   SearchInTitle = 'search-in-title',
   SearchInText = 'search-in-text',
@@ -14,7 +16,6 @@ export enum UrlParams {
   PublishingApplication = 'publishing-application',
   PublishingStatus = 'publishing-status',
   Language = 'language',
-  Combinator = 'combinator',
 }
 
 export enum SearchType {
@@ -44,13 +45,6 @@ export enum PublishingStatus {
   Withdrawn = 'withdrawn',
   NotWithdrawn = 'notWithdrawn',
   All = 'all',
-}
-
-export const KeywordLocationToUrlParamMapping = {
-  [KeywordLocation.All]: UrlParams.SearchInAll,
-  [KeywordLocation.Title]: UrlParams.SearchInTitle,
-  [KeywordLocation.Description]: UrlParams.SearchInText,
-  [KeywordLocation.BodyContent]: UrlParams.SearchInDescription,
 }
 
 export enum PublishingApplication {

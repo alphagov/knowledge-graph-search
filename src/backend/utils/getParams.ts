@@ -34,17 +34,10 @@ export const getParams = (req: express.Request): SearchParams => {
   const selectedDocumentType =
     sanitiseInput(req.query[UrlParams.DocumentType] as string) || ''
 
-  const getKeywordLocationFromQuery = () => {
-    if (req.query[UrlParams.SearchInAll] === 'true') return KeywordLocation.All
-    if (req.query[UrlParams.SearchInTitle] === 'true')
-      return KeywordLocation.Title
-    if (req.query[UrlParams.SearchInText] === 'true')
-      return KeywordLocation.BodyContent
-    if (req.query[UrlParams.SearchInDescription] === 'true')
-      return KeywordLocation.Description
-    return KeywordLocation.All
-  }
-  const keywordLocation = getKeywordLocationFromQuery()
+  const keywordLocation =
+    (sanitiseInput(
+      req.query[UrlParams.KeywordLocation] as string
+    ) as KeywordLocation) || KeywordLocation.All
 
   const publishingApplication = <PublishingApplication>(
     (sanitiseInput(req.query[UrlParams.PublishingApplication] as string) ||

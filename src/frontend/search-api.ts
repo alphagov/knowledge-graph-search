@@ -4,8 +4,8 @@ import {
   PublishingApplication,
   Combinator,
   SearchResults,
-  KeywordLocationToUrlParamMapping,
   UrlParams,
+  KeywordLocation,
 } from '../common/types/search-api-types'
 import { languageCode } from '../common/utils/lang'
 import { EventType, SearchApiCallback } from './types/event-types'
@@ -29,8 +29,9 @@ const makeQueryString = function (sp: SearchParams): string {
     usp.set(UrlParams.Language, languageCode(sp.selectedLocale))
   if (sp.caseSensitive)
     usp.set(UrlParams.CaseSensitive, sp.caseSensitive.toString())
-  // Keyword location
-  usp.set(KeywordLocationToUrlParamMapping[sp.keywordLocation], 'true')
+  if (sp.keywordLocation !== KeywordLocation.All) {
+    usp.set(UrlParams.KeywordLocation, sp.keywordLocation)
+  }
 
   if (sp.selectedDocumentType)
     usp.set(UrlParams.DocumentType, sp.selectedDocumentType)
