@@ -1,4 +1,4 @@
-import { languageName } from '../common/utils/lang'
+import { defaultAllLanguagesOption, languageName } from '../common/utils/lang'
 import {
   SearchType,
   SearchParams,
@@ -23,7 +23,7 @@ const initialSearchParams: SearchParams = {
   excludedWords: '',
   selectedTaxon: '',
   selectedPublishingOrganisation: '',
-  selectedLocale: '',
+  selectedLocale: defaultAllLanguagesOption,
   selectedDocumentType: '',
   linkSearchUrl: '',
   keywordLocation: KeywordLocation.All,
@@ -98,9 +98,10 @@ const setQueryParamsFromQS = function (): void {
   )
 
   const lang: string | null = searchParams.get(UrlParams.Language)
-  state.searchParams.selectedLocale = lang
-    ? languageName(lang)
-    : initialSearchParams.selectedLocale
+  state.searchParams.selectedLocale =
+    lang && lang !== defaultAllLanguagesOption
+      ? languageName(lang)
+      : initialSearchParams.selectedLocale
   state.searchParams.caseSensitive = maybeReplace(
     'caseSensitive',
     UrlParams.CaseSensitive

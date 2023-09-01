@@ -7,7 +7,7 @@ import {
   UrlParams,
   KeywordLocation,
 } from '../common/types/search-api-types'
-import { languageCode } from '../common/utils/lang'
+import { defaultAllLanguagesOption, languageCode } from '../common/utils/lang'
 import { EventType, SearchApiCallback } from './types/event-types'
 
 const makeQueryString = function (sp: SearchParams): string {
@@ -25,7 +25,7 @@ const makeQueryString = function (sp: SearchParams): string {
       UrlParams.SelectedPublishingOrganisation,
       sp.selectedPublishingOrganisation
     )
-  if (sp.selectedLocale !== '')
+  if (sp.selectedLocale !== defaultAllLanguagesOption)
     usp.set(UrlParams.Language, languageCode(sp.selectedLocale))
   if (sp.caseSensitive)
     usp.set(UrlParams.CaseSensitive, sp.caseSensitive.toString())

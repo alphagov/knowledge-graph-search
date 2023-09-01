@@ -11,7 +11,7 @@ import {
   UrlParams,
   PublishingStatus,
 } from '../common/types/search-api-types'
-import { languageCode } from '../common/utils/lang'
+import { defaultAllLanguagesOption, languageCode } from '../common/utils/lang'
 
 declare const window: any
 
@@ -25,6 +25,9 @@ const updateStateFromFilters = () => {
     'filter-publishing-organisation'
   )
   state.searchParams.selectedLocale = getFormInputValue('filter-language')
+  console.log({
+    'state.searchParams.selectedLocale': state.searchParams.selectedLocale,
+  })
   state.searchParams.keywordLocation = getFormInputValue(
     'filter-keyword-location'
   ) as KeywordLocation
@@ -274,7 +277,7 @@ const updateUrl = function () {
           searchParams.set(UrlParams.Combinator, state.searchParams.combinator)
         }
 
-        if (state.searchParams.selectedLocale !== '') {
+        if (state.searchParams.selectedLocale !== defaultAllLanguagesOption) {
           searchParams.set(
             UrlParams.Language,
             languageCode(state.searchParams.selectedLocale)
