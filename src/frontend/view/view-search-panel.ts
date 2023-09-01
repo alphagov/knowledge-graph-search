@@ -3,6 +3,7 @@ import { state, searchState } from '../state'
 import { languageName } from '../../common/utils/lang'
 import {
   KeywordLocation,
+  PublishingApplication,
   SearchType,
 } from '../../common/types/search-api-types'
 import { USER_ERRORS } from '../enums/constants'
@@ -358,45 +359,31 @@ const viewPublishingOrgSelector = () => `
 `
 
 const viewPublishingAppSelector = () =>
-  ` <div class="govuk-form-group">
-    <fieldset
-        class="govuk-fieldset"
-        id="search-areas-wrapper"
-        ${state.waiting && 'disabled="disabled"'}>
-      <legend class="govuk-fieldset__legend">
-        Limit search
-      </legend>
-      <div class="govuk-radios" id="site-areas">
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input"
-                 type="radio" id="area-publisher"
-                 name="area"
-            ${
-              state.searchParams.areaToSearch === 'publisher' ? 'checked' : ''
-            }/>
-          <label for="area-publisher" class="govuk-label govuk-radios__label">
-            Publisher
-          </label>
-        </div>
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input"
-                 type="radio" id="area-whitehall"
-                 name="area"
-            ${
-              state.searchParams.areaToSearch === 'whitehall' ? 'checked' : ''
-            }/>
-          <label for="area-whitehall" class="govuk-label govuk-radios__label">Whitehall</label>
-        </div>
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input"
-                 type="radio" id="area-any"
-                 name="area"
-            ${state.searchParams.areaToSearch === 'any' ? 'checked' : ''}/>
-          <label for="area-any" class="govuk-label govuk-radios__label">All publishing applications</label>
-        </div>
-      </div>
-    </fieldset>
-  </div>
+  `
+  <div class="govuk-form-group">
+        <label class="govuk-label govuk-label--s" for="publishing-application">
+          Publishing applications
+        </label>
+        <select ${
+          state.waiting && 'disabled="disabled"'
+        } id="publishing-application" class="govuk-select" name="publishing-application">
+          <option value="${PublishingApplication.Any}" ${
+    state.searchParams.publishingApplication === PublishingApplication.Any
+      ? 'selected'
+      : ''
+  }>All publishing applications</option>
+          <option value="${PublishingApplication.Publisher}" ${
+    state.searchParams.publishingApplication === PublishingApplication.Publisher
+      ? 'selected'
+      : ''
+  }>Publisher (mainstream)</option>
+          <option value="${PublishingApplication.Whitehall}" ${
+    state.searchParams.publishingApplication === PublishingApplication.Whitehall
+      ? 'selected'
+      : ''
+  }>Whitehall (specialist)</option>
+        </select>
+    </div>
 `
 
 const viewKeywordsInput = () => `

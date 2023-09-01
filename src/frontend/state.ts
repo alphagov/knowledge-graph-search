@@ -3,7 +3,7 @@ import {
   SearchType,
   SearchParams,
   Combinator,
-  SearchArea,
+  PublishingApplication,
   KeywordLocation,
   KeywordLocationToUrlParamMapping,
   UrlParams,
@@ -28,7 +28,7 @@ const initialSearchParams: SearchParams = {
   linkSearchUrl: '',
   keywordLocation: KeywordLocation.All,
   combinator: Combinator.All,
-  areaToSearch: SearchArea.Any,
+  publishingApplication: PublishingApplication.Any,
   caseSensitive: false, // whether the keyword search is case sensitive
 }
 
@@ -104,9 +104,9 @@ const setQueryParamsFromQS = function (): void {
     'caseSensitive',
     UrlParams.CaseSensitive
   )
-  state.searchParams.areaToSearch = maybeReplace(
-    'areaToSearch',
-    UrlParams.AreaToSearch
+  state.searchParams.publishingApplication = maybeReplace(
+    'publishingApplication',
+    UrlParams.PublishingApplication
   )
   state.searchParams.combinator = maybeReplace('combinator', 'combinator')
 
@@ -166,7 +166,7 @@ const resetSearch = function (): void {
   state.searchParams.caseSensitive = false
   state.searchParams.linkSearchUrl = ''
   state.skip = 0 // reset to first page
-  state.searchParams.areaToSearch = SearchArea.Any
+  state.searchParams.publishingApplication = PublishingApplication.Any
   state.searchResults = null
   state.waiting = false
   state.searchParams.combinator = Combinator.All

@@ -2,7 +2,7 @@ import * as express from 'express'
 import {
   SearchParams,
   Combinator,
-  SearchArea,
+  PublishingApplication,
   SearchType,
   KeywordLocation,
   UrlParams,
@@ -20,7 +20,7 @@ export const getParams = (req: express.Request): SearchParams => {
     sanitiseInput(req.query[UrlParams.ExcludedWords] as string) || ''
   const selectedTaxon =
     sanitiseInput(req.query[UrlParams.SelectedTaxon] as string) || ''
-  const selectedOrganisation =
+  const selectedPublishingOrganisation =
     sanitiseInput(
       req.query[UrlParams.SelectedPublishingOrganisation] as string
     ) || ''
@@ -44,8 +44,9 @@ export const getParams = (req: express.Request): SearchParams => {
   }
   const keywordLocation = getKeywordLocationFromQuery()
 
-  const areaToSearch = <SearchArea>(
-    (sanitiseInput(req.query.area as string) || SearchArea.Any)
+  const publishingApplication = <PublishingApplication>(
+    (sanitiseInput(req.query[UrlParams.PublishingApplication] as string) ||
+      PublishingApplication.Any)
   )
   const linkSearchUrl =
     sanitiseInput(req.query[UrlParams.LinkSearchUrl] as string) || ''
@@ -54,13 +55,13 @@ export const getParams = (req: express.Request): SearchParams => {
     selectedWords,
     excludedWords,
     selectedTaxon,
-    selectedPublishingOrganisation: selectedOrganisation,
+    selectedPublishingOrganisation,
     selectedLocale,
     selectedDocumentType,
     caseSensitive,
     combinator,
     keywordLocation,
-    areaToSearch,
+    publishingApplication,
     linkSearchUrl,
   }
 }

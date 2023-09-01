@@ -52,9 +52,12 @@ export const buildSqlQuery = function (
           .join(' OR ') +
         ')'
   let areaClause = ''
-  if (searchParams.areaToSearch === 'publisher') {
+  console.log({
+    'searchParams.publishingApplication': searchParams.publishingApplication,
+  })
+  if (searchParams.publishingApplication === 'publisher') {
     areaClause = 'AND publishing_app = "publisher"'
-  } else if (searchParams.areaToSearch === 'whitehall') {
+  } else if (searchParams.publishingApplication === 'whitehall') {
     areaClause = 'AND publishing_app = "whitehall"'
   }
 

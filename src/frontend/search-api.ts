@@ -1,7 +1,7 @@
 import {
   SearchParams,
   SearchType,
-  SearchArea,
+  PublishingApplication,
   Combinator,
   SearchResults,
   KeywordLocationToUrlParamMapping,
@@ -34,8 +34,10 @@ const makeQueryString = function (sp: SearchParams): string {
   if (sp.selectedDocumentType)
     usp.set(UrlParams.DocumentType, sp.selectedDocumentType)
 
-  if (sp.areaToSearch !== SearchArea.Any)
-    usp.set(UrlParams.AreaToSearch, sp.areaToSearch)
+  console.log({ 'sp.publishingApplication': sp.publishingApplication })
+  if (sp.publishingApplication !== PublishingApplication.Any) {
+    usp.set(UrlParams.PublishingApplication, sp.publishingApplication)
+  }
   if (sp.combinator !== Combinator.All) usp.set('combinator', sp.combinator)
   if (sp.linkSearchUrl !== '')
     usp.set(UrlParams.LinkSearchUrl, sp.linkSearchUrl)

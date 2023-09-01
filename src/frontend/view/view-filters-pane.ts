@@ -1,6 +1,7 @@
 import {
   Combinator,
   KeywordLocation,
+  PublishingApplication,
 } from '../../common/types/search-api-types'
 import { state } from '../state'
 
@@ -136,6 +137,32 @@ const viewDocumentTypeSelector = () => {
   return html.join('')
 }
 
+const viewPublishingApplications = () => `
+      <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+        <label class="govuk-label govuk-label--s" for="filter-publishing-application">
+          Publishing applications
+        </label>
+        <select ${
+          state.waiting && 'disabled="disabled"'
+        } id="filter-publishing-application" class="govuk-select" name="filter-publishing-application" style="width: 100%;">
+          <option value="${PublishingApplication.Any}" ${
+  state.searchParams.publishingApplication === PublishingApplication.Any
+    ? 'selected'
+    : ''
+}>All publishing applications</option>
+          <option value="${PublishingApplication.Publisher}" ${
+  state.searchParams.publishingApplication === PublishingApplication.Publisher
+    ? 'selected'
+    : ''
+}>Publisher (mainstream)</option>
+          <option value="${PublishingApplication.Whitehall}" ${
+  state.searchParams.publishingApplication === PublishingApplication.Whitehall
+    ? 'selected'
+    : ''
+}>Whitehall (specialist)</option>
+        </select>
+    </div>`
+
 export const viewFiltersPane = () => {
   const submitButton = `
     <button id="filters-pane-submit-btn" class="govuk-button" data-module="govuk-button">Search</button>
@@ -147,6 +174,7 @@ export const viewFiltersPane = () => {
       ${viewSelectKeywordLocation()}
       ${viewSelectPublishingOrganisations()}
       ${viewDocumentTypeSelector()}
+      ${viewPublishingApplications()}
       ${submitButton}
     </div>
     `

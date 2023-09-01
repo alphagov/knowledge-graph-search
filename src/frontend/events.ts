@@ -5,7 +5,7 @@ import { queryBackend } from './search-api'
 import { EventType, SearchApiCallback } from './types/event-types'
 import {
   SearchType,
-  SearchArea,
+  PublishingApplication,
   Combinator,
   KeywordLocation,
   KeywordLocationToUrlParamMapping,
@@ -25,12 +25,6 @@ const updateStateFromFilters = () => {
     'filter-publishing-organisation'
   )
   // state.searchParams.selectedLocale = getFormInputValue('locale')
-  // // Keyword Location
-  // searchParams.set(
-  //   KeywordLocationToUrlParamMapping[state.searchParams.keywordLocation],
-  //   'true'
-  // )
-  // ))?.checked
   state.searchParams.keywordLocation = getFormInputValue(
     'filter-keyword-location'
   ) as KeywordLocation
@@ -39,17 +33,10 @@ const updateStateFromFilters = () => {
   // ))?.checked
   // state.searchParams.linkSearchUrl = getFormInputValue('link-search')
   // state.skip = 0 // reset to first page
-  // if ((<HTMLInputElement>id('area-publisher'))?.checked)
-  //   state.searchParams.areaToSearch = SearchArea.Publisher
-  // if ((<HTMLInputElement>id('area-whitehall'))?.checked)
-  //   state.searchParams.areaToSearch = SearchArea.Whitehall
-  // if ((<HTMLInputElement>id('area-any'))?.checked)
-  //   state.searchParams.areaToSearch = SearchArea.Any
 
-  // if ((<HTMLInputElement>id('combinator-any'))?.checked)
-  //   state.searchParams.combinator = Combinator.Any
-  // if ((<HTMLInputElement>id('combinator-all'))?.checked)
-  //   state.searchParams.combinator = Combinator.All
+  state.searchParams.publishingApplication = getFormInputValue(
+    'filter-publishing-application'
+  ) as PublishingApplication
   const newCombinatorValue = (
     document.querySelector(
       'input[name="search-for"]:checked'
@@ -60,7 +47,6 @@ const updateStateFromFilters = () => {
     getFormInputValue('filter-document-type').charAt(0).toLowerCase() +
     getFormInputValue('filter-document-type').slice(1)
   ).replace(/ /g, '_')
-  console.log({ newSearchParams: state.searchParams })
 }
 
 const handleEvent: SearchApiCallback = async function (event) {
@@ -105,12 +91,10 @@ const handleEvent: SearchApiCallback = async function (event) {
           ))?.checked
           state.searchParams.linkSearchUrl = getFormInputValue('link-search')
           state.skip = 0 // reset to first page
-          if ((<HTMLInputElement>id('area-publisher'))?.checked)
-            state.searchParams.areaToSearch = SearchArea.Publisher
-          if ((<HTMLInputElement>id('area-whitehall'))?.checked)
-            state.searchParams.areaToSearch = SearchArea.Whitehall
-          if ((<HTMLInputElement>id('area-any'))?.checked)
-            state.searchParams.areaToSearch = SearchArea.Any
+          if (getFormInputValue('publishing-application'))
+            state.searchParams.publishingApplication = getFormInputValue(
+              'publishing-application'
+            ) as PublishingApplication
           if ((<HTMLInputElement>id('combinator-any'))?.checked)
             state.searchParams.combinator = Combinator.Any
           if ((<HTMLInputElement>id('combinator-all'))?.checked)
@@ -265,10 +249,12 @@ const updateUrl = function () {
             state.searchParams.selectedDocumentType
           )
         }
-        if (state.searchParams.areaToSearch !== SearchArea.Any)
+        if (
+          state.searchParams.publishingApplication !== PublishingApplication.Any
+        )
           searchParams.set(
-            UrlParams.AreaToSearch,
-            state.searchParams.areaToSearch
+            UrlParams.PublishingApplication,
+            state.searchParams.publishingApplication
           )
         if (state.searchParams.combinator !== Combinator.All)
           searchParams.set('combinator', state.searchParams.combinator)
@@ -280,10 +266,12 @@ const updateUrl = function () {
             UrlParams.LinkSearchUrl,
             state.searchParams.linkSearchUrl
           )
-        if (state.searchParams.areaToSearch !== SearchArea.Any)
+        if (
+          state.searchParams.publishingApplication !== PublishingApplication.Any
+        )
           searchParams.set(
-            UrlParams.AreaToSearch,
-            state.searchParams.areaToSearch
+            UrlParams.PublishingApplication,
+            state.searchParams.publishingApplication
           )
         break
       case SearchType.Taxon:
@@ -293,10 +281,12 @@ const updateUrl = function () {
             UrlParams.SelectedTaxon,
             state.searchParams.selectedTaxon
           )
-        if (state.searchParams.areaToSearch !== SearchArea.Any)
+        if (
+          state.searchParams.publishingApplication !== PublishingApplication.Any
+        )
           searchParams.set(
-            UrlParams.AreaToSearch,
-            state.searchParams.areaToSearch
+            UrlParams.PublishingApplication,
+            state.searchParams.publishingApplication
           )
         break
       case SearchType.Organisation:
@@ -306,10 +296,12 @@ const updateUrl = function () {
             'organisation',
             state.searchParams.selectedPublishingOrganisation
           )
-        if (state.searchParams.areaToSearch !== SearchArea.Any)
+        if (
+          state.searchParams.publishingApplication !== PublishingApplication.Any
+        )
           searchParams.set(
-            UrlParams.AreaToSearch,
-            state.searchParams.areaToSearch
+            UrlParams.PublishingApplication,
+            state.searchParams.publishingApplication
           )
         break
       case SearchType.Language:
@@ -319,10 +311,12 @@ const updateUrl = function () {
             'lang',
             languageCode(state.searchParams.selectedLocale)
           )
-        if (state.searchParams.areaToSearch !== SearchArea.Any)
+        if (
+          state.searchParams.publishingApplication !== PublishingApplication.Any
+        )
           searchParams.set(
-            UrlParams.AreaToSearch,
-            state.searchParams.areaToSearch
+            UrlParams.PublishingApplication,
+            state.searchParams.publishingApplication
           )
         break
       default:
@@ -368,10 +362,12 @@ const updateUrl = function () {
           KeywordLocationToUrlParamMapping[state.searchParams.keywordLocation],
           'true'
         )
-        if (state.searchParams.areaToSearch !== SearchArea.Any)
+        if (
+          state.searchParams.publishingApplication !== PublishingApplication.Any
+        )
           searchParams.set(
-            UrlParams.AreaToSearch,
-            state.searchParams.areaToSearch
+            UrlParams.PublishingApplication,
+            state.searchParams.publishingApplication
           )
         if (state.searchParams.combinator !== Combinator.All)
           searchParams.set('combinator', state.searchParams.combinator)

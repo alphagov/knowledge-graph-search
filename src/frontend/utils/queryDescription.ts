@@ -42,11 +42,14 @@ export const queryDescription = (
   if (search.linkSearchUrl !== '')
     clauses.push(`link to ${makeBold(search.linkSearchUrl, includeMarkup)}`)
   if (
-    search.areaToSearch === 'whitehall' ||
-    search.areaToSearch === 'publisher'
+    search.publishingApplication === 'whitehall' ||
+    search.publishingApplication === 'publisher'
   )
     clauses.push(
-      `are published using ${makeBold(search.areaToSearch, includeMarkup)}`
+      `are published using ${makeBold(
+        search.publishingApplication,
+        includeMarkup
+      )}`
     )
 
   const joinedClauses =

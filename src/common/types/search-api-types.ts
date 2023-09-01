@@ -11,7 +11,7 @@ export enum UrlParams {
   SearchInText = 'search-in-text',
   SearchInDescription = 'search-in-description',
   LinkSearchUrl = 'link-search-url',
-  AreaToSearch = 'area',
+  PublishingApplication = 'publishing-application',
 }
 
 export enum SearchType {
@@ -44,7 +44,7 @@ export const KeywordLocationToUrlParamMapping = {
   [KeywordLocation.BodyContent]: UrlParams.SearchInDescription,
 }
 
-export enum SearchArea {
+export enum PublishingApplication {
   Any = 'any',
   Whitehall = 'whitehall',
   Publisher = 'publisher',
@@ -61,7 +61,7 @@ export type SearchParams = {
   linkSearchUrl: string // URL to find all pages linking to
   keywordLocation: KeywordLocation // what parts of the pages to search in
   combinator: Combinator // all keywords or any keywords
-  areaToSearch: SearchArea // whitehall, publisher, both
+  publishingApplication: PublishingApplication // whitehall, publisher, both
   caseSensitive: boolean // case sensitive keyword search?
 }
 
