@@ -42,12 +42,14 @@ const updateStateFromFilters = () => {
   state.searchParams.publishingApplication = getFormInputValue(
     'filter-publishing-application'
   ) as PublishingApplication
+
   const newCombinatorValue = (
     document.querySelector(
-      'input[name="search-for"]:checked'
+      'input[name="filter-combinator"]:checked'
     ) as HTMLInputElement
   ).value as Combinator
   state.searchParams.combinator = newCombinatorValue
+
   state.searchParams.selectedDocumentType = (
     getFormInputValue('filter-document-type').charAt(0).toLowerCase() +
     getFormInputValue('filter-document-type').slice(1)
@@ -267,8 +269,10 @@ const updateUrl = function () {
             UrlParams.PublishingApplication,
             state.searchParams.publishingApplication
           )
-        if (state.searchParams.combinator !== Combinator.All)
-          searchParams.set('combinator', state.searchParams.combinator)
+        if (state.searchParams.combinator !== Combinator.All) {
+          searchParams.set(UrlParams.Combinator, state.searchParams.combinator)
+        }
+
         if (state.searchParams.selectedLocale !== '') {
           searchParams.set(
             UrlParams.Language,
@@ -396,8 +400,11 @@ const updateUrl = function () {
             UrlParams.PublishingApplication,
             state.searchParams.publishingApplication
           )
-        if (state.searchParams.combinator !== Combinator.All)
-          searchParams.set('combinator', state.searchParams.combinator)
+
+        if (state.searchParams.combinator !== Combinator.All) {
+          searchParams.set(UrlParams.Combinator, state.searchParams.combinator)
+        }
+
         if (state.searchParams.linkSearchUrl !== '')
           searchParams.set(
             UrlParams.LinkSearchUrl,

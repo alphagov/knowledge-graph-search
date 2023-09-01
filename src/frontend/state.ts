@@ -110,7 +110,10 @@ const setQueryParamsFromQS = function (): void {
     'publishingApplication',
     UrlParams.PublishingApplication
   )
-  state.searchParams.combinator = maybeReplace('combinator', 'combinator')
+  state.searchParams.combinator = maybeReplace(
+    'combinator',
+    UrlParams.Combinator
+  )
 
   state.searchParams.keywordLocation = Object.keys(
     KeywordLocationToUrlParamMapping

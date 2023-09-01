@@ -38,7 +38,8 @@ const makeQueryString = function (sp: SearchParams): string {
   if (sp.publishingApplication !== PublishingApplication.Any) {
     usp.set(UrlParams.PublishingApplication, sp.publishingApplication)
   }
-  if (sp.combinator !== Combinator.All) usp.set('combinator', sp.combinator)
+  if (sp.combinator !== Combinator.All)
+    usp.set(UrlParams.Combinator, sp.combinator)
   if (sp.linkSearchUrl !== '')
     usp.set(UrlParams.LinkSearchUrl, sp.linkSearchUrl)
   usp.set(UrlParams.PublishingStatus, sp.publishingStatus)

@@ -29,7 +29,7 @@ export const getParams = (req: express.Request): SearchParams => {
     sanitiseInput(req.query[UrlParams.Language] as string) || ''
   const caseSensitive = req.query[UrlParams.CaseSensitive] === 'true'
   const combinator = <Combinator>(
-    (sanitiseInput(req.query.combinator as string) || Combinator.All)
+    (sanitiseInput(req.query[UrlParams.Combinator] as string) || Combinator.All)
   )
   const selectedDocumentType =
     sanitiseInput(req.query[UrlParams.DocumentType] as string) || ''

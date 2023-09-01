@@ -14,6 +14,7 @@ export enum UrlParams {
   PublishingApplication = 'publishing-application',
   PublishingStatus = 'publishing-status',
   Language = 'language',
+  Combinator = 'combinator',
 }
 
 export enum SearchType {
