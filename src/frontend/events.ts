@@ -268,11 +268,12 @@ const updateUrl = function () {
         }
         if (
           state.searchParams.publishingApplication !== PublishingApplication.Any
-        )
+        ) {
           searchParams.set(
             UrlParams.PublishingApplication,
             state.searchParams.publishingApplication
           )
+        }
         if (state.searchParams.combinator !== Combinator.All) {
           searchParams.set(UrlParams.Combinator, state.searchParams.combinator)
         }
@@ -283,89 +284,102 @@ const updateUrl = function () {
             languageCode(state.searchParams.selectedLocale)
           )
         }
-        searchParams.set(
-          UrlParams.PublishingStatus,
-          state.searchParams.publishingStatus
-        )
+        if (state.searchParams.publishingStatus !== PublishingStatus.All) {
+          searchParams.set(
+            UrlParams.PublishingStatus,
+            state.searchParams.publishingStatus
+          )
+        }
         break
       case SearchType.Link:
         searchParams.set(UrlParams.SearchType, state.searchParams.searchType)
-        if (state.searchParams.linkSearchUrl !== '')
+        if (state.searchParams.linkSearchUrl !== '') {
           searchParams.set(
             UrlParams.LinkSearchUrl,
             state.searchParams.linkSearchUrl
           )
+        }
         if (
           state.searchParams.publishingApplication !== PublishingApplication.Any
-        )
+        ) {
           searchParams.set(
             UrlParams.PublishingApplication,
             state.searchParams.publishingApplication
           )
+        }
         break
       case SearchType.Taxon:
         searchParams.set(UrlParams.SearchType, state.searchParams.searchType)
-        if (state.searchParams.selectedTaxon !== '')
+        if (state.searchParams.selectedTaxon !== '') {
           searchParams.set(
             UrlParams.SelectedTaxon,
             state.searchParams.selectedTaxon
           )
+        }
         if (
           state.searchParams.publishingApplication !== PublishingApplication.Any
-        )
+        ) {
           searchParams.set(
             UrlParams.PublishingApplication,
             state.searchParams.publishingApplication
           )
+        }
         break
       case SearchType.Organisation:
         searchParams.set(UrlParams.SearchType, state.searchParams.searchType)
-        if (state.searchParams.selectedPublishingOrganisation !== '')
+        if (state.searchParams.selectedPublishingOrganisation) {
           searchParams.set(
-            'organisation',
+            UrlParams.SelectedPublishingOrganisation,
             state.searchParams.selectedPublishingOrganisation
           )
+        }
         if (
           state.searchParams.publishingApplication !== PublishingApplication.Any
-        )
+        ) {
           searchParams.set(
             UrlParams.PublishingApplication,
             state.searchParams.publishingApplication
           )
+        }
         break
       case SearchType.Language:
         searchParams.set(UrlParams.SearchType, state.searchParams.searchType)
-        if (state.searchParams.selectedLocale !== '')
+        if (state.searchParams.selectedLocale !== defaultAllLanguagesOption) {
           searchParams.set(
-            'lang',
+            UrlParams.Language,
             languageCode(state.searchParams.selectedLocale)
           )
+        }
         if (
           state.searchParams.publishingApplication !== PublishingApplication.Any
-        )
+        ) {
           searchParams.set(
             UrlParams.PublishingApplication,
             state.searchParams.publishingApplication
           )
+        }
         break
       default:
         searchParams.set(UrlParams.SearchType, state.searchParams.searchType)
-        if (state.searchParams.selectedWords !== '')
+        if (state.searchParams.selectedWords !== '') {
           searchParams.set(
             UrlParams.SelectedWords,
             state.searchParams.selectedWords
           )
-        if (state.searchParams.excludedWords !== '')
+        }
+        if (state.searchParams.excludedWords !== '') {
           searchParams.set(
             UrlParams.ExcludedWords,
             state.searchParams.excludedWords
           )
-        if (state.searchParams.selectedTaxon !== '')
+        }
+        if (state.searchParams.selectedTaxon !== '') {
           searchParams.set(
             UrlParams.SelectedTaxon,
             state.searchParams.selectedTaxon
           )
-        if (state.searchParams.selectedPublishingOrganisation !== '') {
+        }
+        if (state.searchParams.selectedPublishingOrganisation) {
           searchParams.set(
             UrlParams.SelectedPublishingOrganisation,
             state.searchParams.selectedPublishingOrganisation
@@ -377,7 +391,7 @@ const updateUrl = function () {
             state.searchParams.selectedDocumentType
           )
         }
-        if (state.searchParams.selectedLocale !== '') {
+        if (state.searchParams.selectedLocale !== defaultAllLanguagesOption) {
           searchParams.set(
             UrlParams.Language,
             languageCode(state.searchParams.selectedLocale)
@@ -389,10 +403,12 @@ const updateUrl = function () {
             state.searchParams.caseSensitive.toString()
           )
         }
-        searchParams.set(
-          UrlParams.PublishingStatus,
-          state.searchParams.publishingStatus
-        )
+        if (state.searchParams.publishingStatus !== PublishingStatus.All) {
+          searchParams.set(
+            UrlParams.PublishingStatus,
+            state.searchParams.publishingStatus
+          )
+        }
         if (state.searchParams.keywordLocation !== KeywordLocation.All) {
           searchParams.set(
             UrlParams.KeywordLocation,
@@ -402,21 +418,23 @@ const updateUrl = function () {
 
         if (
           state.searchParams.publishingApplication !== PublishingApplication.Any
-        )
+        ) {
           searchParams.set(
             UrlParams.PublishingApplication,
             state.searchParams.publishingApplication
           )
+        }
 
         if (state.searchParams.combinator !== Combinator.All) {
           searchParams.set(UrlParams.Combinator, state.searchParams.combinator)
         }
 
-        if (state.searchParams.linkSearchUrl !== '')
+        if (state.searchParams.linkSearchUrl !== '') {
           searchParams.set(
             UrlParams.LinkSearchUrl,
             state.searchParams.linkSearchUrl
           )
+        }
         break
     }
     const newQueryString = searchParams.toString()
