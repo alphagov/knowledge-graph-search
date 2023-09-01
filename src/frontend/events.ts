@@ -369,11 +369,12 @@ const updateUrl = function () {
             state.searchParams.selectedDocumentType
           )
         }
-        if (state.searchParams.selectedLocale !== '')
+        if (state.searchParams.selectedLocale !== '') {
           searchParams.set(
-            'lang',
+            UrlParams.Language,
             languageCode(state.searchParams.selectedLocale)
           )
+        }
         if (state.searchParams.caseSensitive) {
           searchParams.set(
             UrlParams.CaseSensitive,
