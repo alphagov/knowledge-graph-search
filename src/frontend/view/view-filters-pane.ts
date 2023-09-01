@@ -4,6 +4,7 @@ import {
   PublishingApplication,
 } from '../../common/types/search-api-types'
 import { state } from '../state'
+import { languageName } from '../../common/utils/lang'
 
 const viewKeywordsRadioButtons = () => `
 <div class="govuk-form-group">
@@ -184,6 +185,25 @@ const viewTaxonSelector = () => `
         </select>
     </div>`
 
+const viewLanguageSelector = () => `
+    <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+      <label class="govuk-label govuk-label--s" for="filter-language">
+        Languages
+      </label>
+      <select ${
+        state.waiting && 'disabled="disabled"'
+      } id="filter-language" class="autocomplete__input autocomplete__input--default" name="filter-language">
+      ${state.locales.map(
+        (code) =>
+          `<option value="${code}" ${
+            state.searchParams.selectedLocale === languageName(code)
+              ? 'selected'
+              : ''
+          }>${languageName(code)}</option>`
+      )}
+        </select>
+    </div>`
+
 export const viewFiltersPane = () => {
   const submitButton = `
     <button id="filters-pane-submit-btn" class="govuk-button" data-module="govuk-button">Search</button>
@@ -197,6 +217,7 @@ export const viewFiltersPane = () => {
       ${viewDocumentTypeSelector()}
       ${viewPublishingApplications()}
       ${viewTaxonSelector()}
+      ${viewLanguageSelector()}
       ${submitButton}
     </div>
     `

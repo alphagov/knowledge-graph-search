@@ -24,7 +24,7 @@ const updateStateFromFilters = () => {
   state.searchParams.selectedPublishingOrganisation = getFormInputValue(
     'filter-publishing-organisation'
   )
-  // state.searchParams.selectedLocale = getFormInputValue('locale')
+  state.searchParams.selectedLocale = getFormInputValue('filter-language')
   state.searchParams.keywordLocation = getFormInputValue(
     'filter-keyword-location'
   ) as KeywordLocation
@@ -264,6 +264,11 @@ const updateUrl = function () {
           )
         if (state.searchParams.combinator !== Combinator.All)
           searchParams.set('combinator', state.searchParams.combinator)
+        if (state.searchParams.selectedLocale !== '')
+          searchParams.set(
+            'lang',
+            languageCode(state.searchParams.selectedLocale)
+          )
         break
       case SearchType.Link:
         searchParams.set(UrlParams.SearchType, state.searchParams.searchType)
