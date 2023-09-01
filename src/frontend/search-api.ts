@@ -25,7 +25,8 @@ const makeQueryString = function (sp: SearchParams): string {
       UrlParams.SelectedPublishingOrganisation,
       sp.selectedPublishingOrganisation
     )
-  if (sp.selectedLocale !== '') usp.set('lang', languageCode(sp.selectedLocale))
+  if (sp.selectedLocale !== '')
+    usp.set(UrlParams.Language, languageCode(sp.selectedLocale))
   if (sp.caseSensitive)
     usp.set(UrlParams.CaseSensitive, sp.caseSensitive.toString())
   // Keyword location
@@ -34,14 +35,13 @@ const makeQueryString = function (sp: SearchParams): string {
   if (sp.selectedDocumentType)
     usp.set(UrlParams.DocumentType, sp.selectedDocumentType)
 
-  console.log({ 'sp.publishingApplication': sp.publishingApplication })
   if (sp.publishingApplication !== PublishingApplication.Any) {
     usp.set(UrlParams.PublishingApplication, sp.publishingApplication)
   }
   if (sp.combinator !== Combinator.All) usp.set('combinator', sp.combinator)
   if (sp.linkSearchUrl !== '')
     usp.set(UrlParams.LinkSearchUrl, sp.linkSearchUrl)
-  console.log({ usp: usp.toString() })
+  usp.set(UrlParams.PublishingStatus, sp.publishingStatus)
   return usp.toString()
 }
 

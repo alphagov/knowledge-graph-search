@@ -12,6 +12,8 @@ export enum UrlParams {
   SearchInDescription = 'search-in-description',
   LinkSearchUrl = 'link-search-url',
   PublishingApplication = 'publishing-application',
+  PublishingStatus = 'publishing-status',
+  Language = 'language',
 }
 
 export enum SearchType {
@@ -35,6 +37,12 @@ export enum KeywordLocation {
   Title = 'title',
   Description = 'description',
   BodyContent = 'bodycontent',
+}
+
+export enum PublishingStatus {
+  Withdrawn = 'withdrawn',
+  NotWithdrawn = 'notWithdrawn',
+  All = 'all',
 }
 
 export const KeywordLocationToUrlParamMapping = {
@@ -63,6 +71,7 @@ export type SearchParams = {
   combinator: Combinator // all keywords or any keywords
   publishingApplication: PublishingApplication // whitehall, publisher, both
   caseSensitive: boolean // case sensitive keyword search?
+  publishingStatus: PublishingStatus // Withdrawn, not withdrawn etc.
 }
 
 export enum MetaResultType {

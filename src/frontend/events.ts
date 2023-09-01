@@ -10,6 +10,7 @@ import {
   KeywordLocation,
   KeywordLocationToUrlParamMapping,
   UrlParams,
+  PublishingStatus,
 } from '../common/types/search-api-types'
 import { languageCode } from '../common/utils/lang'
 
@@ -33,6 +34,10 @@ const updateStateFromFilters = () => {
   // ))?.checked
   // state.searchParams.linkSearchUrl = getFormInputValue('link-search')
   // state.skip = 0 // reset to first page
+
+  state.searchParams.publishingStatus = getFormInputValue(
+    'filter-publishing-status'
+  ) as PublishingStatus
 
   state.searchParams.publishingApplication = getFormInputValue(
     'filter-publishing-application'
@@ -264,11 +269,16 @@ const updateUrl = function () {
           )
         if (state.searchParams.combinator !== Combinator.All)
           searchParams.set('combinator', state.searchParams.combinator)
-        if (state.searchParams.selectedLocale !== '')
+        if (state.searchParams.selectedLocale !== '') {
           searchParams.set(
-            'lang',
+            UrlParams.Language,
             languageCode(state.searchParams.selectedLocale)
           )
+        }
+        searchParams.set(
+          UrlParams.PublishingStatus,
+          state.searchParams.publishingStatus
+        )
         break
       case SearchType.Link:
         searchParams.set(UrlParams.SearchType, state.searchParams.searchType)
@@ -364,11 +374,16 @@ const updateUrl = function () {
             'lang',
             languageCode(state.searchParams.selectedLocale)
           )
-        if (state.searchParams.caseSensitive)
+        if (state.searchParams.caseSensitive) {
           searchParams.set(
             UrlParams.CaseSensitive,
             state.searchParams.caseSensitive.toString()
           )
+        }
+        searchParams.set(
+          UrlParams.PublishingStatus,
+          state.searchParams.publishingStatus
+        )
         searchParams.set(
           KeywordLocationToUrlParamMapping[state.searchParams.keywordLocation],
           'true'

@@ -1,6 +1,7 @@
 import {
   Combinator,
   KeywordLocation,
+  PublishingStatus,
   SearchParams,
 } from '../../common/types/search-api-types'
 
@@ -51,14 +52,20 @@ export const buildSqlQuery = function (
           )
           .join(' OR ') +
         ')'
-  let areaClause = ''
-  console.log({
-    'searchParams.publishingApplication': searchParams.publishingApplication,
-  })
+  let publishingAppClause = ''
   if (searchParams.publishingApplication === 'publisher') {
-    areaClause = 'AND publishing_app = "publisher"'
+    publishingAppClause = 'AND publishing_app = "publisher"'
   } else if (searchParams.publishingApplication === 'whitehall') {
-    areaClause = 'AND publishing_app = "whitehall"'
+    publishingAppClause = 'AND publishing_app = "whitehall"'
+  }
+
+  let publishingStatusClause = ''
+  if (searchParams.publishingStatus === PublishingStatus.NotWithdrawn) {
+    publishingStatusClause = 'WHERE withdrawn_at IS NULL'
+  } else if (searchParams.publishingStatus === PublishingStatus.Withdrawn) {
+    publishingStatusClause = 'WHERE withdrawn_at IS NOT NULL'
+  } else {
+    publishingStatusClause = 'WHERE TRUE'
   }
 
   let localeClause = ''
@@ -124,10 +131,11 @@ export const buildSqlQuery = function (
       primary_organisation,
       organisations AS all_organisations
     FROM search.page
-    WHERE TRUE
+    
+    ${publishingStatusClause}
     ${includeClause}
     ${excludeClause}
-    ${areaClause}
+    ${publishingAppClause}
     ${localeClause}
     ${taxonClause}
     ${organisationClause}

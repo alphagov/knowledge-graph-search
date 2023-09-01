@@ -2,6 +2,7 @@ import {
   Combinator,
   KeywordLocation,
   PublishingApplication,
+  PublishingStatus,
 } from '../../common/types/search-api-types'
 import { state } from '../state'
 import { languageName } from '../../common/utils/lang'
@@ -204,6 +205,30 @@ const viewLanguageSelector = () => `
         </select>
     </div>`
 
+const viewPublishingStatusSelector = () => `
+      <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+        <label class="govuk-label govuk-label--s" for="filter-publishing-status">
+          Publishing status
+        </label>
+        <select ${
+          state.waiting && 'disabled="disabled"'
+        } id="filter-publishing-status" class="govuk-select" name="filter-publishing-status" style="width: 100%;">
+          <option value="${PublishingStatus.All}" ${
+  state.searchParams.publishingStatus === PublishingStatus.All ? 'selected' : ''
+}>All statuses</option>
+          <option value="${PublishingStatus.Withdrawn}" ${
+  state.searchParams.publishingStatus === PublishingStatus.Withdrawn
+    ? 'selected'
+    : ''
+}>Withdrawn</option>
+          <option value="${PublishingStatus.NotWithdrawn}" ${
+  state.searchParams.publishingStatus === PublishingStatus.NotWithdrawn
+    ? 'selected'
+    : ''
+}>Non-withdrawn</option>
+        </select>
+    </div>`
+
 export const viewFiltersPane = () => {
   const submitButton = `
     <button id="filters-pane-submit-btn" class="govuk-button" data-module="govuk-button">Search</button>
@@ -218,6 +243,7 @@ export const viewFiltersPane = () => {
       ${viewPublishingApplications()}
       ${viewTaxonSelector()}
       ${viewLanguageSelector()}
+      ${viewPublishingStatusSelector()}
       ${submitButton}
     </div>
     `

@@ -6,6 +6,7 @@ import {
   SearchType,
   KeywordLocation,
   UrlParams,
+  PublishingStatus,
 } from '../../common/types/search-api-types'
 import { sanitiseInput } from '../../common/utils/utils'
 
@@ -24,7 +25,8 @@ export const getParams = (req: express.Request): SearchParams => {
     sanitiseInput(
       req.query[UrlParams.SelectedPublishingOrganisation] as string
     ) || ''
-  const selectedLocale = sanitiseInput(req.query.lang as string) || ''
+  const selectedLocale =
+    sanitiseInput(req.query[UrlParams.Language] as string) || ''
   const caseSensitive = req.query[UrlParams.CaseSensitive] === 'true'
   const combinator = <Combinator>(
     (sanitiseInput(req.query.combinator as string) || Combinator.All)
@@ -50,6 +52,11 @@ export const getParams = (req: express.Request): SearchParams => {
   )
   const linkSearchUrl =
     sanitiseInput(req.query[UrlParams.LinkSearchUrl] as string) || ''
+
+  const publishingStatus = sanitiseInput(
+    req.query[UrlParams.PublishingStatus] as string
+  ) as PublishingStatus
+
   return {
     searchType,
     selectedWords,
@@ -63,6 +70,7 @@ export const getParams = (req: express.Request): SearchParams => {
     keywordLocation,
     publishingApplication,
     linkSearchUrl,
+    publishingStatus,
   }
 }
 

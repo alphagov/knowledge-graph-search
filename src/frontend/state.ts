@@ -7,6 +7,7 @@ import {
   KeywordLocation,
   KeywordLocationToUrlParamMapping,
   UrlParams,
+  PublishingStatus,
 } from '../common/types/search-api-types'
 import { State } from './types/state-types'
 import config from './config'
@@ -30,6 +31,7 @@ const initialSearchParams: SearchParams = {
   combinator: Combinator.All,
   publishingApplication: PublishingApplication.Any,
   caseSensitive: false, // whether the keyword search is case sensitive
+  publishingStatus: PublishingStatus.All,
 }
 
 let state: State = {
@@ -96,7 +98,7 @@ const setQueryParamsFromQS = function (): void {
     UrlParams.SelectedPublishingOrganisation
   )
 
-  const lang: string | null = searchParams.get('lang')
+  const lang: string | null = searchParams.get(UrlParams.Language)
   state.searchParams.selectedLocale = lang
     ? languageName(lang)
     : initialSearchParams.selectedLocale
@@ -121,6 +123,11 @@ const setQueryParamsFromQS = function (): void {
   state.searchParams.selectedDocumentType = maybeReplace(
     'selectedDocumentType',
     UrlParams.DocumentType
+  )
+
+  state.searchParams.publishingStatus = maybeReplace(
+    'publishingStatus',
+    UrlParams.PublishingStatus
   )
 }
 
