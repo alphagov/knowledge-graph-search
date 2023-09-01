@@ -101,6 +101,40 @@ const viewSelectPublishingOrganisations = () => {
   return html.join('')
 }
 
+const viewDocumentTypeSelector = () => {
+  const html = [
+    `
+    <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+      <label class="govuk-label govuk-label--s" for="filter-document-type">
+        Document type
+      </label>
+      <select ${
+        state.waiting && 'disabled="disabled"'
+      } id="filter-document-type" class="autocomplete__input autocomplete__input--default" name="documentType">
+      <option value="" ></option>
+  `,
+  ]
+
+  html.push(`
+      ${html.push(
+        ...state.documentTypes
+          .sort()
+          .map(
+            (documentType) =>
+              `<option value="${documentType}" ${
+                state.searchParams.selectedDocumentType == documentType
+                  ? 'selected'
+                  : ''
+              }>${(
+                documentType.charAt(0).toUpperCase() + documentType.slice(1)
+              ).replace(/_/g, ' ')}</option>`
+          )
+      )}
+        </select>
+    </div>`)
+  return html.join('')
+}
+
 export const viewFiltersPane = () => {
   const submitButton = `
     <button id="filters-pane-submit-btn" class="govuk-button" data-module="govuk-button">Search</button>
@@ -111,6 +145,7 @@ export const viewFiltersPane = () => {
       ${viewExcludeWords()}
       ${viewSelectKeywordLocation()}
       ${viewSelectPublishingOrganisations()}
+      ${viewDocumentTypeSelector()}
       ${submitButton}
     </div>
     `

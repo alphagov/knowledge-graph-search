@@ -24,6 +24,7 @@ const initialSearchParams: SearchParams = {
   selectedTaxon: '',
   selectedOrganisation: '',
   selectedLocale: '',
+  selectedDocumentType: '',
   linkSearchUrl: '',
   keywordLocation: KeywordLocation.All,
   combinator: Combinator.All,
@@ -37,6 +38,7 @@ let state: State = {
   locales: [], // all the languages found in the content store
   organisations: [], // list of names of all the organisations
   systemErrorText: null,
+  documentTypes: [],
   userErrors: [], // error codes due to user not entering valid search criteria
   searchResults: null,
   metaSearchResults: null,
@@ -109,6 +111,11 @@ const setQueryParamsFromQS = function (): void {
       searchParams.get(KeywordLocationToUrlParamMapping[keywordLocation]) ===
       'true'
   ) as KeywordLocation
+
+  state.searchParams.selectedDocumentType = maybeReplace(
+    'selectedDocumentType',
+    'document-type'
+  )
 }
 
 const searchState = function (): { code: string; errors: string[] } {

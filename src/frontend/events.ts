@@ -55,6 +55,11 @@ const updateStateFromFilters = () => {
     ) as HTMLInputElement
   ).value as Combinator
   state.searchParams.combinator = newCombinatorValue
+  state.searchParams.selectedDocumentType = (
+    getFormInputValue('filter-document-type').charAt(0).toLowerCase() +
+    getFormInputValue('filter-document-type').slice(1)
+  ).replace(/ /g, '_')
+  console.log({ newSearchParams: state.searchParams })
 }
 
 const handleEvent: SearchApiCallback = async function (event) {
@@ -225,19 +230,28 @@ const updateUrl = function () {
     const searchParams = new URLSearchParams()
     switch (state.searchParams.searchType) {
       case SearchType.Keyword:
-        if (state.searchParams.selectedWords !== '')
+        if (state.searchParams.selectedWords !== '') {
           searchParams.set('selected-words', state.searchParams.selectedWords)
-        if (state.searchParams.excludedWords !== '')
+        }
+        if (state.searchParams.excludedWords !== '') {
           searchParams.set('excluded-words', state.searchParams.excludedWords)
-        if (state.searchParams.caseSensitive)
+        }
+        if (state.searchParams.caseSensitive) {
           searchParams.set(
             'case-sensitive',
             state.searchParams.caseSensitive.toString()
           )
+        }
         searchParams.set(
           KeywordLocationToUrlParamMapping[state.searchParams.keywordLocation],
           'true'
         )
+        if (state.searchParams.selectedDocumentType) {
+          searchParams.set(
+            'document-type',
+            state.searchParams.selectedDocumentType
+          )
+        }
         if (state.searchParams.areaToSearch !== SearchArea.Any)
           searchParams.set('area', state.searchParams.areaToSearch)
         if (state.searchParams.combinator !== Combinator.All)
@@ -285,11 +299,18 @@ const updateUrl = function () {
           searchParams.set('excluded-words', state.searchParams.excludedWords)
         if (state.searchParams.selectedTaxon !== '')
           searchParams.set('selected-taxon', state.searchParams.selectedTaxon)
-        if (state.searchParams.selectedOrganisation !== '')
+        if (state.searchParams.selectedOrganisation !== '') {
           searchParams.set(
             'selected-organisation',
             state.searchParams.selectedOrganisation
           )
+        }
+        if (state.searchParams.selectedDocumentType) {
+          searchParams.set(
+            'document-type',
+            state.searchParams.selectedDocumentType
+          )
+        }
         if (state.searchParams.selectedLocale !== '')
           searchParams.set(
             'lang',

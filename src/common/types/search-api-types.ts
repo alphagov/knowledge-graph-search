@@ -41,6 +41,7 @@ export type SearchParams = {
   selectedTaxon: string // taxon to search in
   selectedOrganisation: string // organisation to search in
   selectedLocale: string // the language to search for
+  selectedDocumentType: string // documentTypeto search in
   linkSearchUrl: string // URL to find all pages linking to
   keywordLocation: KeywordLocation // what parts of the pages to search in
   combinator: Combinator // all keywords or any keywords
@@ -155,4 +156,5 @@ export type InitResults = {
   taxons: string[]
   locales: string[]
   organisations: string[]
+  documentTypes: string[]
 }

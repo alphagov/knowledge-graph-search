@@ -16,4 +16,5 @@ export interface State {
   showFields: any
   showFiltersPane: boolean
   showFieldSet: boolean
+  documentTypes: string[]
 }

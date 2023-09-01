@@ -23,9 +23,12 @@ const makeQueryString = function (sp: SearchParams): string {
   // Keyword location
   usp.set(KeywordLocationToUrlParamMapping[sp.keywordLocation], 'true')
 
+  if (sp.selectedDocumentType) usp.set('document-type', sp.selectedDocumentType)
+
   if (sp.areaToSearch !== SearchArea.Any) usp.set('area', sp.areaToSearch)
   if (sp.combinator !== Combinator.All) usp.set('combinator', sp.combinator)
   if (sp.linkSearchUrl !== '') usp.set('link-search-url', sp.linkSearchUrl)
+  console.log({ usp: usp.toString() })
   return usp.toString()
 }
 

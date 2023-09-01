@@ -25,6 +25,8 @@ export const getParams = (req: express.Request): SearchParams => {
   const combinator = <Combinator>(
     (sanitiseInput(req.query.combinator as string) || Combinator.All)
   )
+  const selectedDocumentType =
+    sanitiseInput(req.query['document-type'] as string) || ''
 
   const getKeywordLocationFromQuery = () => {
     if (req.query['search-in-all'] === 'true') return KeywordLocation.All
@@ -49,6 +51,7 @@ export const getParams = (req: express.Request): SearchParams => {
     selectedTaxon,
     selectedOrganisation,
     selectedLocale,
+    selectedDocumentType,
     caseSensitive,
     combinator,
     keywordLocation,

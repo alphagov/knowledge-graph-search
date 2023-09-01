@@ -97,6 +97,13 @@ export const buildSqlQuery = function (
     `
   }
 
+  let documentTypeClause = ''
+  if (searchParams.selectedDocumentType !== '') {
+    documentTypeClause = `
+      AND documentType = @documentType
+    `
+  }
+
   return `
     SELECT
       url,
@@ -122,6 +129,7 @@ export const buildSqlQuery = function (
     ${taxonClause}
     ${organisationClause}
     ${linkClause}
+    ${documentTypeClause}
     ORDER BY page_views DESC
     LIMIT 10000
   `
