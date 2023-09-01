@@ -163,6 +163,27 @@ const viewPublishingApplications = () => `
         </select>
     </div>`
 
+const viewTaxonSelector = () => `
+    <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+      <label class="govuk-label govuk-label--s" for="filter-taxon">
+        Taxons
+      </label>
+      <select ${
+        state.waiting && 'disabled="disabled"'
+      } id="filter-taxon" class="autocomplete__input autocomplete__input--default" name="filter-taxon">
+      <option value=""></option>
+      ${state.taxons
+        .sort()
+        .map(
+          (taxon) =>
+            `<option value="${taxon}" ${
+              state.searchParams.selectedTaxon === taxon ? 'selected' : ''
+            }>${taxon}</option>`
+        )
+        .join('')}
+        </select>
+    </div>`
+
 export const viewFiltersPane = () => {
   const submitButton = `
     <button id="filters-pane-submit-btn" class="govuk-button" data-module="govuk-button">Search</button>
@@ -175,6 +196,7 @@ export const viewFiltersPane = () => {
       ${viewSelectPublishingOrganisations()}
       ${viewDocumentTypeSelector()}
       ${viewPublishingApplications()}
+      ${viewTaxonSelector()}
       ${submitButton}
     </div>
     `

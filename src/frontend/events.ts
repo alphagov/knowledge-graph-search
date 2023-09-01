@@ -20,7 +20,7 @@ const updateStateFromFilters = () => {
   state.searchParams.excludedWords = getFormInputValue(
     'filter-excluded-keywords'
   )
-  // state.searchParams.selectedTaxon = getFormInputValue('taxon')
+  state.searchParams.selectedTaxon = getFormInputValue('filter-taxon')
   state.searchParams.selectedPublishingOrganisation = getFormInputValue(
     'filter-publishing-organisation'
   )
@@ -247,6 +247,12 @@ const updateUrl = function () {
           searchParams.set(
             UrlParams.DocumentType,
             state.searchParams.selectedDocumentType
+          )
+        }
+        if (state.searchParams.selectedTaxon !== '') {
+          searchParams.set(
+            UrlParams.SelectedTaxon,
+            state.searchParams.selectedTaxon
           )
         }
         if (
