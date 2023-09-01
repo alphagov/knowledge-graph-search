@@ -1,3 +1,19 @@
+export enum UrlParams {
+  SearchType = 'search-type',
+  SelectedWords = 'selected-words',
+  ExcludedWords = 'excluded-words',
+  SelectedTaxon = 'selected-taxon',
+  SelectedOrganisation = 'selected-organisation',
+  CaseSensitive = 'case-sensitive',
+  DocumentType = 'document-type',
+  SearchInAll = 'search-in-all',
+  SearchInTitle = 'search-in-title',
+  SearchInText = 'search-in-text',
+  SearchInDescription = 'search-in-description',
+  LinkSearchUrl = 'link-search-url',
+  AreaToSearch = 'area',
+}
+
 export enum SearchType {
   Keyword = 'keyword',
   Link = 'link',
@@ -22,10 +38,10 @@ export enum KeywordLocation {
 }
 
 export const KeywordLocationToUrlParamMapping = {
-  [KeywordLocation.All]: 'search-in-all',
-  [KeywordLocation.Title]: 'search-in-title',
-  [KeywordLocation.Description]: 'search-in-text',
-  [KeywordLocation.BodyContent]: 'search-in-description',
+  [KeywordLocation.All]: UrlParams.SearchInAll,
+  [KeywordLocation.Title]: UrlParams.SearchInTitle,
+  [KeywordLocation.Description]: UrlParams.SearchInText,
+  [KeywordLocation.BodyContent]: UrlParams.SearchInDescription,
 }
 
 export enum SearchArea {

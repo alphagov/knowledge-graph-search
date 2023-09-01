@@ -9,6 +9,7 @@ import {
   Combinator,
   KeywordLocation,
   KeywordLocationToUrlParamMapping,
+  UrlParams,
 } from '../common/types/search-api-types'
 import { languageCode } from '../common/utils/lang'
 
@@ -34,7 +35,7 @@ const updateStateFromFilters = () => {
     'filter-keyword-location'
   ) as KeywordLocation
   // state.searchParams.caseSensitive = (<HTMLInputElement>(
-  //   id('case-sensitive')
+  //   id(UrlParams.CaseSensitive)
   // ))?.checked
   // state.searchParams.linkSearchUrl = getFormInputValue('link-search')
   // state.skip = 0 // reset to first page
@@ -100,7 +101,7 @@ const handleEvent: SearchApiCallback = async function (event) {
             id('search-keyword-location')
           )).value as KeywordLocation
           state.searchParams.caseSensitive = (<HTMLInputElement>(
-            id('case-sensitive')
+            id(UrlParams.CaseSensitive)
           ))?.checked
           state.searchParams.linkSearchUrl = getFormInputValue('link-search')
           state.skip = 0 // reset to first page
@@ -231,14 +232,20 @@ const updateUrl = function () {
     switch (state.searchParams.searchType) {
       case SearchType.Keyword:
         if (state.searchParams.selectedWords !== '') {
-          searchParams.set('selected-words', state.searchParams.selectedWords)
+          searchParams.set(
+            UrlParams.SelectedWords,
+            state.searchParams.selectedWords
+          )
         }
         if (state.searchParams.excludedWords !== '') {
-          searchParams.set('excluded-words', state.searchParams.excludedWords)
+          searchParams.set(
+            UrlParams.ExcludedWords,
+            state.searchParams.excludedWords
+          )
         }
         if (state.searchParams.caseSensitive) {
           searchParams.set(
-            'case-sensitive',
+            UrlParams.CaseSensitive,
             state.searchParams.caseSensitive.toString()
           )
         }
@@ -248,66 +255,96 @@ const updateUrl = function () {
         )
         if (state.searchParams.selectedDocumentType) {
           searchParams.set(
-            'document-type',
+            UrlParams.DocumentType,
             state.searchParams.selectedDocumentType
           )
         }
         if (state.searchParams.areaToSearch !== SearchArea.Any)
-          searchParams.set('area', state.searchParams.areaToSearch)
+          searchParams.set(
+            UrlParams.AreaToSearch,
+            state.searchParams.areaToSearch
+          )
         if (state.searchParams.combinator !== Combinator.All)
           searchParams.set('combinator', state.searchParams.combinator)
         break
       case SearchType.Link:
-        searchParams.set('search-type', state.searchParams.searchType)
+        searchParams.set(UrlParams.SearchType, state.searchParams.searchType)
         if (state.searchParams.linkSearchUrl !== '')
-          searchParams.set('link-search-url', state.searchParams.linkSearchUrl)
+          searchParams.set(
+            UrlParams.LinkSearchUrl,
+            state.searchParams.linkSearchUrl
+          )
         if (state.searchParams.areaToSearch !== SearchArea.Any)
-          searchParams.set('area', state.searchParams.areaToSearch)
+          searchParams.set(
+            UrlParams.AreaToSearch,
+            state.searchParams.areaToSearch
+          )
         break
       case SearchType.Taxon:
-        searchParams.set('search-type', state.searchParams.searchType)
+        searchParams.set(UrlParams.SearchType, state.searchParams.searchType)
         if (state.searchParams.selectedTaxon !== '')
-          searchParams.set('selected-taxon', state.searchParams.selectedTaxon)
+          searchParams.set(
+            UrlParams.SelectedTaxon,
+            state.searchParams.selectedTaxon
+          )
         if (state.searchParams.areaToSearch !== SearchArea.Any)
-          searchParams.set('area', state.searchParams.areaToSearch)
+          searchParams.set(
+            UrlParams.AreaToSearch,
+            state.searchParams.areaToSearch
+          )
         break
       case SearchType.Organisation:
-        searchParams.set('search-type', state.searchParams.searchType)
+        searchParams.set(UrlParams.SearchType, state.searchParams.searchType)
         if (state.searchParams.selectedOrganisation !== '')
           searchParams.set(
             'organisation',
             state.searchParams.selectedOrganisation
           )
         if (state.searchParams.areaToSearch !== SearchArea.Any)
-          searchParams.set('area', state.searchParams.areaToSearch)
+          searchParams.set(
+            UrlParams.AreaToSearch,
+            state.searchParams.areaToSearch
+          )
         break
       case SearchType.Language:
-        searchParams.set('search-type', state.searchParams.searchType)
+        searchParams.set(UrlParams.SearchType, state.searchParams.searchType)
         if (state.searchParams.selectedLocale !== '')
           searchParams.set(
             'lang',
             languageCode(state.searchParams.selectedLocale)
           )
         if (state.searchParams.areaToSearch !== SearchArea.Any)
-          searchParams.set('area', state.searchParams.areaToSearch)
+          searchParams.set(
+            UrlParams.AreaToSearch,
+            state.searchParams.areaToSearch
+          )
         break
       default:
-        searchParams.set('search-type', state.searchParams.searchType)
+        searchParams.set(UrlParams.SearchType, state.searchParams.searchType)
         if (state.searchParams.selectedWords !== '')
-          searchParams.set('selected-words', state.searchParams.selectedWords)
+          searchParams.set(
+            UrlParams.SelectedWords,
+            state.searchParams.selectedWords
+          )
         if (state.searchParams.excludedWords !== '')
-          searchParams.set('excluded-words', state.searchParams.excludedWords)
+          searchParams.set(
+            UrlParams.ExcludedWords,
+            state.searchParams.excludedWords
+          )
         if (state.searchParams.selectedTaxon !== '')
-          searchParams.set('selected-taxon', state.searchParams.selectedTaxon)
+          searchParams.set(
+            UrlParams.SelectedTaxon,
+            state.searchParams.selectedTaxon
+          )
         if (state.searchParams.selectedOrganisation !== '') {
           searchParams.set(
-            'selected-organisation',
+            UrlParams.SelectedOrganisation,
             state.searchParams.selectedOrganisation
           )
         }
         if (state.searchParams.selectedDocumentType) {
           searchParams.set(
-            'document-type',
+            UrlParams.DocumentType,
             state.searchParams.selectedDocumentType
           )
         }
@@ -318,7 +355,7 @@ const updateUrl = function () {
           )
         if (state.searchParams.caseSensitive)
           searchParams.set(
-            'case-sensitive',
+            UrlParams.CaseSensitive,
             state.searchParams.caseSensitive.toString()
           )
         searchParams.set(
@@ -326,11 +363,17 @@ const updateUrl = function () {
           'true'
         )
         if (state.searchParams.areaToSearch !== SearchArea.Any)
-          searchParams.set('area', state.searchParams.areaToSearch)
+          searchParams.set(
+            UrlParams.AreaToSearch,
+            state.searchParams.areaToSearch
+          )
         if (state.searchParams.combinator !== Combinator.All)
           searchParams.set('combinator', state.searchParams.combinator)
         if (state.searchParams.linkSearchUrl !== '')
-          searchParams.set('link-search-url', state.searchParams.linkSearchUrl)
+          searchParams.set(
+            UrlParams.LinkSearchUrl,
+            state.searchParams.linkSearchUrl
+          )
         break
     }
     const newQueryString = searchParams.toString()

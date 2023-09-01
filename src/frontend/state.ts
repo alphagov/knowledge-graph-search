@@ -6,6 +6,7 @@ import {
   SearchArea,
   KeywordLocation,
   KeywordLocationToUrlParamMapping,
+  UrlParams,
 } from '../common/types/search-api-types'
 import { State } from './types/state-types'
 import { USER_ERRORS } from './enums/constants'
@@ -71,26 +72,29 @@ const setQueryParamsFromQS = function (): void {
       ? searchParams.get(qspName)
       : initialSearchParams[stateField]
 
-  state.searchParams.searchType = maybeReplace('searchType', 'search-type')
+  state.searchParams.searchType = maybeReplace(
+    'searchType',
+    UrlParams.SearchType
+  )
   state.searchParams.selectedWords = maybeReplace(
     'selectedWords',
-    'selected-words'
+    UrlParams.SelectedWords
   )
   state.searchParams.excludedWords = maybeReplace(
     'excludedWords',
-    'excluded-words'
+    UrlParams.ExcludedWords
   )
   state.searchParams.linkSearchUrl = maybeReplace(
     'linkSearchUrl',
-    'link-search-url'
+    UrlParams.LinkSearchUrl
   )
   state.searchParams.selectedTaxon = maybeReplace(
     'selectedTaxon',
-    'selected-taxon'
+    UrlParams.SelectedTaxon
   )
   state.searchParams.selectedOrganisation = maybeReplace(
     'selectedOrganisation',
-    'selected-organisation'
+    UrlParams.SelectedOrganisation
   )
 
   const lang: string | null = searchParams.get('lang')
@@ -99,9 +103,12 @@ const setQueryParamsFromQS = function (): void {
     : initialSearchParams.selectedLocale
   state.searchParams.caseSensitive = maybeReplace(
     'caseSensitive',
-    'case-sensitive'
+    UrlParams.CaseSensitive
   )
-  state.searchParams.areaToSearch = maybeReplace('areaToSearch', 'area')
+  state.searchParams.areaToSearch = maybeReplace(
+    'areaToSearch',
+    UrlParams.AreaToSearch
+  )
   state.searchParams.combinator = maybeReplace('combinator', 'combinator')
 
   state.searchParams.keywordLocation = Object.keys(
@@ -114,7 +121,7 @@ const setQueryParamsFromQS = function (): void {
 
   state.searchParams.selectedDocumentType = maybeReplace(
     'selectedDocumentType',
-    'document-type'
+    UrlParams.DocumentType
   )
 }
 

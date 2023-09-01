@@ -5,6 +5,7 @@ import {
   Combinator,
   SearchResults,
   KeywordLocationToUrlParamMapping,
+  UrlParams,
 } from '../common/types/search-api-types'
 import { languageCode } from '../common/utils/lang'
 import { EventType, SearchApiCallback } from './types/event-types'
@@ -12,22 +13,29 @@ import { EventType, SearchApiCallback } from './types/event-types'
 const makeQueryString = function (sp: SearchParams): string {
   const usp = new URLSearchParams()
   if (sp.searchType !== SearchType.Keyword)
-    usp.set('search-type', sp.searchType)
-  if (sp.selectedWords !== '') usp.set('selected-words', sp.selectedWords)
-  if (sp.excludedWords !== '') usp.set('excluded-words', sp.excludedWords)
-  if (sp.selectedTaxon !== '') usp.set('selected-taxon', sp.selectedTaxon)
+    usp.set(UrlParams.SearchType, sp.searchType)
+  if (sp.selectedWords !== '')
+    usp.set(UrlParams.SelectedWords, sp.selectedWords)
+  if (sp.excludedWords !== '')
+    usp.set(UrlParams.ExcludedWords, sp.excludedWords)
+  if (sp.selectedTaxon !== '')
+    usp.set(UrlParams.SelectedTaxon, sp.selectedTaxon)
   if (sp.selectedOrganisation !== '')
-    usp.set('selected-organisation', sp.selectedOrganisation)
+    usp.set(UrlParams.SelectedOrganisation, sp.selectedOrganisation)
   if (sp.selectedLocale !== '') usp.set('lang', languageCode(sp.selectedLocale))
-  if (sp.caseSensitive) usp.set('case-sensitive', sp.caseSensitive.toString())
+  if (sp.caseSensitive)
+    usp.set(UrlParams.CaseSensitive, sp.caseSensitive.toString())
   // Keyword location
   usp.set(KeywordLocationToUrlParamMapping[sp.keywordLocation], 'true')
 
-  if (sp.selectedDocumentType) usp.set('document-type', sp.selectedDocumentType)
+  if (sp.selectedDocumentType)
+    usp.set(UrlParams.DocumentType, sp.selectedDocumentType)
 
-  if (sp.areaToSearch !== SearchArea.Any) usp.set('area', sp.areaToSearch)
+  if (sp.areaToSearch !== SearchArea.Any)
+    usp.set(UrlParams.AreaToSearch, sp.areaToSearch)
   if (sp.combinator !== Combinator.All) usp.set('combinator', sp.combinator)
-  if (sp.linkSearchUrl !== '') usp.set('link-search-url', sp.linkSearchUrl)
+  if (sp.linkSearchUrl !== '')
+    usp.set(UrlParams.LinkSearchUrl, sp.linkSearchUrl)
   console.log({ usp: usp.toString() })
   return usp.toString()
 }
