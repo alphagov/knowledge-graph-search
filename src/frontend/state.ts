@@ -17,7 +17,7 @@ import config from './config'
 // it easier to reset to those initial
 // values only while keeping the rest of the state
 
-const initialSearchParams: SearchParams = {
+export const initialSearchParams: SearchParams = {
   searchType: SearchType.Keyword,
   selectedWords: '',
   excludedWords: '',

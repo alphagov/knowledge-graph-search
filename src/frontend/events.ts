@@ -1,4 +1,10 @@
-import { state, searchState, resetSearch, setState } from './state'
+import {
+  state,
+  searchState,
+  resetSearch,
+  setState,
+  initialSearchParams,
+} from './state'
 import { id, getFormInputValue } from '../common/utils/utils'
 import { view } from './view/view'
 import { queryBackend } from './search-api'
@@ -10,6 +16,7 @@ import {
   KeywordLocation,
   UrlParams,
   PublishingStatus,
+  SearchParams,
 } from '../common/types/search-api-types'
 import { defaultAllLanguagesOption, languageCode } from '../common/utils/lang'
 
@@ -58,12 +65,35 @@ const updateStateFromFilters = () => {
   ).replace(/ /g, '_')
 }
 
+const resetFilters = () => {
+  const newSearchParams: SearchParams = {
+    ...state.searchParams,
+    combinator: initialSearchParams.combinator,
+    excludedWords: initialSearchParams.excludedWords,
+    keywordLocation: initialSearchParams.keywordLocation,
+    publishingApplication: initialSearchParams.publishingApplication,
+    selectedPublishingOrganisation:
+      initialSearchParams.selectedPublishingOrganisation,
+    selectedDocumentType: initialSearchParams.selectedDocumentType,
+    selectedTaxon: initialSearchParams.selectedTaxon,
+    selectedLocale: initialSearchParams.selectedLocale,
+    publishingStatus: initialSearchParams.publishingStatus,
+  }
+
+  state.searchParams = newSearchParams
+}
+
 const handleEvent: SearchApiCallback = async function (event) {
   let fieldClicked: RegExpMatchArray | null
   console.log('handleEvent:', event.type, event.id || '')
   switch (event.type) {
     case EventType.Dom:
       switch (event.id) {
+        case 'clear-filters':
+          resetFilters()
+          state.searchResults = null
+          searchButtonClicked()
+          break
         case 'filters-pane-submit-btn':
           // updateQueryParamsFromFilters()
           updateStateFromFilters()
@@ -192,6 +222,7 @@ const searchButtonClicked = async function (): Promise<void> {
   state.systemErrorText = null
   state.userErrors = []
   const searchStatus = searchState()
+  console.log({ 'searchStatus.code': searchStatus.code })
   switch (searchStatus.code) {
     case 'ready-to-search':
       if (

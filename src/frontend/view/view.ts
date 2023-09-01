@@ -40,7 +40,7 @@ const view = () => {
   // Add event handlers
   document
     .querySelectorAll(
-      'button, a.govuk-tabs__tab, input[type=checkbox][data-interactive=true]'
+      'button, a.govuk-tabs__tab, input[type=checkbox][data-interactive=true], a'
     )
     .forEach((input) =>
       input.addEventListener('click', (event) =>
@@ -221,27 +221,29 @@ const viewSearchResultsTable = () => {
     return ''
   }
   const viewFieldSet = () => `
-      <fieldset class="govuk-fieldset" ${
-        state.waiting && 'disabled="disabled"'
-      }>
-        <legend class="govuk-fieldset__legend">For each result, display:</legend>
-        <ul class="kg-checkboxes" id="show-fields">
-        ${Object.keys(state.searchResults[0])
-          .map(
-            (key) => `
-              <li class="kg-checkboxes__item">
-                <input class="kg-checkboxes__input"
-                        data-interactive="true"
-                        type="checkbox" id="show-field-${key}"
-                  ${state.showFields[key] ? 'checked' : ''}/>
-                <label for="show-field-${key}" class="kg-label kg-checkboxes__label">${fieldName(
-              key
-            )}</label>
-              </li>`
-          )
-          .join('')}
-          </ul>
-          </fieldset>
+    <div class="govuk-fieldset header-options-container" ${
+      state.waiting && 'disabled="disabled"'
+    }>
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+        Customise table headers
+      </legend>
+      <div class="header-options-checkboxes-container govuk-checkboxes govuk-checkboxes--small checkbox-list">
+      ${Object.keys(state.searchResults[0])
+        .map(
+          (key) => `
+            <div class="govuk-checkboxes__item">
+              <input class="govuk-checkboxes__input"
+                      data-interactive="true"
+                      type="checkbox" id="show-field-${key}"
+                ${state.showFields[key] ? 'checked' : ''}/>
+              <label for="show-field-${key}" class="govuk-label govuk-checkboxes__label">${fieldName(
+            key
+          )}</label>
+            </div>`
+        )
+        .join('')}
+      </div>
+    </div>
   `
   html.push(`<div class="govuk-body">
   ${state.showFieldSet ? viewFieldSet() : ''}

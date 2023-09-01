@@ -278,8 +278,6 @@ h2:focus-visible {
 }
 
 .results-container {
-  border: 1px solid red;
-
   $filters-pane-width: 434px;
   $filters-pane-margin-right: 20px;
 
@@ -299,6 +297,21 @@ h2:focus-visible {
       flex: 1;
     }
 
+    .header-options-container {
+      padding: 20px;
+      border: 1px solid #c4c4c4;
+      margin-bottom: 20px;
+
+      .header-options-checkboxes-container {
+        display: flex;
+        flex-wrap: wrap;
+
+        .govuk-checkboxes__item {
+          flex-basis: 20%;
+        }
+      }
+    }
+
     .filters-pane {
       display: flex;
       flex-direction: column;
@@ -306,8 +319,11 @@ h2:focus-visible {
       flex-grow: 0;
       flex-shrink: 0;
       height: 1500px;
-      border: 1px solid green;
       margin-right: $filters-pane-margin-right;
+      padding: 20px 30px;
+      box-sizing: border-box;
+
+      border: 1px solid #c4c4c4;
 
       &.closed {
         display: none;

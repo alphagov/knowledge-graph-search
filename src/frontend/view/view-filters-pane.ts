@@ -10,12 +10,10 @@ import { languageName } from '../../common/utils/lang'
 const viewCombinatorRadios = () => `
 <div class="govuk-form-group">
   <fieldset class="govuk-fieldset">
-    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-      <h1 class="govuk-fieldset__heading">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
         Search for
-      </h1>
     </legend>
-    <div class="govuk-radios" data-module="govuk-radios">
+    <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
       <div class="govuk-radios__item">
         <input class="govuk-radios__input" id="filter-combinator-1" name="filter-combinator" type="radio" value="${
           Combinator.All
@@ -23,6 +21,9 @@ const viewCombinatorRadios = () => `
         <label class="govuk-label govuk-radios__label" for="filter-combinator">
           All keywords
         </label>
+        <div class="govuk-hint govuk-radios__hint">
+            Narrows search eg, dog and cat
+          </div>
       </div>
       <div class="govuk-radios__item">
         <input class="govuk-radios__input" id="filter-combinator-2" name="filter-combinator" type="radio" value="${
@@ -31,6 +32,9 @@ const viewCombinatorRadios = () => `
         <label class="govuk-label govuk-radios__label" for="filter-combinator">
           Any keyword
         </label>
+        <div class="govuk-hint govuk-radios__hint">
+            Expands search eg, dog or cat
+          </div>
       </div>
     </div>
   </fieldset>
@@ -39,7 +43,7 @@ const viewCombinatorRadios = () => `
 
 const viewExcludeWords = () => `
 <div class="govuk-form-group">
-  <label class="govuk-label" for="filter-excluded-keywords">
+  <label class="govuk-label govuk-label--s" for="filter-excluded-keywords">
     Excluding these words
   </label>
   <input class="govuk-input" id="filter-excluded-keywords" name="filter-excluded-keywords" type="text" value="${state.searchParams.excludedWords}">
@@ -48,10 +52,10 @@ const viewExcludeWords = () => `
 
 const viewSelectKeywordLocation = () => `
 <div class="govuk-form-group">
-  <label class="govuk-label" for="filter-keyword-location">
+  <label class="govuk-label govuk-label--s" for="filter-keyword-location">
     Keyword location
   </label>
-  <select class="govuk-select" id="filter-keyword-location" name="filter-keyword-location">
+  <select class="govuk-select" id="filter-keyword-location" name="filter-keyword-location" style="width: 100%;">
     <option value="${KeywordLocation.All}" ${
   state.searchParams.keywordLocation === KeywordLocation.All ? 'selected' : ''
 }>All keyword locations</option>
@@ -230,11 +234,15 @@ const viewPublishingStatusSelector = () => `
     </div>`
 
 export const viewFiltersPane = () => {
-  const submitButton = `
-    <button id="filters-pane-submit-btn" class="govuk-button" data-module="govuk-button">Search</button>
+  const submitButton = () => `
+      <button id="filters-pane-submit-btn" class="govuk-button" data-module="govuk-button" style="width: auto;">Apply filters</button>
     `
+  const viewClearFilters = () =>
+    `<a href="javascript:void(0)" id="clear-filters" class="govuk-link">Clear filters</a>`
+
   return `
     <div class="filters-pane">
+      <h2 class="govuk-heading-m">Filters</h2>
       ${viewCombinatorRadios()}
       ${viewExcludeWords()}
       ${viewSelectKeywordLocation()}
@@ -244,7 +252,8 @@ export const viewFiltersPane = () => {
       ${viewTaxonSelector()}
       ${viewLanguageSelector()}
       ${viewPublishingStatusSelector()}
-      ${submitButton}
+      ${submitButton()}
+      ${viewClearFilters()}
     </div>
     `
 }
