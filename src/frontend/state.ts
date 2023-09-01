@@ -9,7 +9,6 @@ import {
   UrlParams,
 } from '../common/types/search-api-types'
 import { State } from './types/state-types'
-import { USER_ERRORS } from './enums/constants'
 import config from './config'
 
 // user inputs that are used to build the query.
@@ -23,7 +22,7 @@ const initialSearchParams: SearchParams = {
   selectedWords: '',
   excludedWords: '',
   selectedTaxon: '',
-  selectedOrganisation: '',
+  selectedPublishingOrganisation: '',
   selectedLocale: '',
   selectedDocumentType: '',
   linkSearchUrl: '',
@@ -92,9 +91,9 @@ const setQueryParamsFromQS = function (): void {
     'selectedTaxon',
     UrlParams.SelectedTaxon
   )
-  state.searchParams.selectedOrganisation = maybeReplace(
-    'selectedOrganisation',
-    UrlParams.SelectedOrganisation
+  state.searchParams.selectedPublishingOrganisation = maybeReplace(
+    'selectedPublishingOrganisation',
+    UrlParams.SelectedPublishingOrganisation
   )
 
   const lang: string | null = searchParams.get('lang')
@@ -142,7 +141,7 @@ const searchState = function (): { code: string; errors: string[] } {
     state.searchParams.selectedWords === '' &&
     state.searchParams.excludedWords === '' &&
     state.searchParams.selectedTaxon === '' &&
-    state.searchParams.selectedOrganisation === '' &&
+    state.searchParams.selectedPublishingOrganisation === '' &&
     state.searchParams.selectedLocale === '' &&
     state.searchParams.linkSearchUrl === ''
   ) {
@@ -161,7 +160,7 @@ const resetSearch = function (): void {
   state.searchParams.selectedWords = ''
   state.searchParams.excludedWords = ''
   state.searchParams.selectedTaxon = ''
-  state.searchParams.selectedOrganisation = ''
+  state.searchParams.selectedPublishingOrganisation = ''
   state.searchParams.selectedLocale = ''
   state.searchParams.keywordLocation = KeywordLocation.All
   state.searchParams.caseSensitive = false

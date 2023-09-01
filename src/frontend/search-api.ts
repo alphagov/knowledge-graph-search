@@ -20,8 +20,11 @@ const makeQueryString = function (sp: SearchParams): string {
     usp.set(UrlParams.ExcludedWords, sp.excludedWords)
   if (sp.selectedTaxon !== '')
     usp.set(UrlParams.SelectedTaxon, sp.selectedTaxon)
-  if (sp.selectedOrganisation !== '')
-    usp.set(UrlParams.SelectedOrganisation, sp.selectedOrganisation)
+  if (sp.selectedPublishingOrganisation !== '')
+    usp.set(
+      UrlParams.SelectedPublishingOrganisation,
+      sp.selectedPublishingOrganisation
+    )
   if (sp.selectedLocale !== '') usp.set('lang', languageCode(sp.selectedLocale))
   if (sp.caseSensitive)
     usp.set(UrlParams.CaseSensitive, sp.caseSensitive.toString())

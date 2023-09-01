@@ -28,10 +28,10 @@ export const queryDescription = (
         includeMarkup
       )} taxon (or its sub-taxons)`
     )
-  if (search.selectedOrganisation !== '')
+  if (search.selectedPublishingOrganisation !== '')
     clauses.push(
       `are published by the ${makeBold(
-        search.selectedOrganisation,
+        search.selectedPublishingOrganisation,
         includeMarkup
       )}`
     )

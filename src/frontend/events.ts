@@ -21,7 +21,7 @@ const updateStateFromFilters = () => {
     'filter-excluded-keywords'
   )
   // state.searchParams.selectedTaxon = getFormInputValue('taxon')
-  state.searchParams.selectedOrganisation = getFormInputValue(
+  state.searchParams.selectedPublishingOrganisation = getFormInputValue(
     'filter-publishing-organisation'
   )
   // state.searchParams.selectedLocale = getFormInputValue('locale')
@@ -94,7 +94,7 @@ const handleEvent: SearchApiCallback = async function (event) {
           state.searchParams.excludedWords =
             getFormInputValue('excluded-keyword')
           state.searchParams.selectedTaxon = getFormInputValue('taxon')
-          state.searchParams.selectedOrganisation =
+          state.searchParams.selectedPublishingOrganisation =
             getFormInputValue('organisation')
           state.searchParams.selectedLocale = getFormInputValue('locale')
           state.searchParams.keywordLocation = (<HTMLInputElement>(
@@ -205,7 +205,7 @@ const searchButtonClicked = async function (): Promise<void> {
         state.searchParams.selectedWords !== '' ||
         state.searchParams.selectedLocale !== '' ||
         state.searchParams.selectedTaxon !== '' ||
-        state.searchParams.selectedOrganisation !== '' ||
+        state.searchParams.selectedPublishingOrganisation !== '' ||
         state.searchParams.linkSearchUrl !== ''
       ) {
         state.waiting = true
@@ -247,6 +247,12 @@ const updateUrl = function () {
           searchParams.set(
             UrlParams.CaseSensitive,
             state.searchParams.caseSensitive.toString()
+          )
+        }
+        if (state.searchParams.selectedPublishingOrganisation) {
+          searchParams.set(
+            UrlParams.SelectedPublishingOrganisation,
+            state.searchParams.selectedPublishingOrganisation
           )
         }
         searchParams.set(
@@ -295,10 +301,10 @@ const updateUrl = function () {
         break
       case SearchType.Organisation:
         searchParams.set(UrlParams.SearchType, state.searchParams.searchType)
-        if (state.searchParams.selectedOrganisation !== '')
+        if (state.searchParams.selectedPublishingOrganisation !== '')
           searchParams.set(
             'organisation',
-            state.searchParams.selectedOrganisation
+            state.searchParams.selectedPublishingOrganisation
           )
         if (state.searchParams.areaToSearch !== SearchArea.Any)
           searchParams.set(
@@ -336,10 +342,10 @@ const updateUrl = function () {
             UrlParams.SelectedTaxon,
             state.searchParams.selectedTaxon
           )
-        if (state.searchParams.selectedOrganisation !== '') {
+        if (state.searchParams.selectedPublishingOrganisation !== '') {
           searchParams.set(
-            UrlParams.SelectedOrganisation,
-            state.searchParams.selectedOrganisation
+            UrlParams.SelectedPublishingOrganisation,
+            state.searchParams.selectedPublishingOrganisation
           )
         }
         if (state.searchParams.selectedDocumentType) {

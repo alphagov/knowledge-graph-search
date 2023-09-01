@@ -50,7 +50,7 @@ const fetchInitialData = async function () {
       state.searchParams.selectedWords !== '' ||
       state.searchParams.selectedLocale !== '' ||
       state.searchParams.selectedTaxon !== '' ||
-      state.searchParams.selectedOrganisation !== '' ||
+      state.searchParams.selectedPublishingOrganisation !== '' ||
       state.searchParams.linkSearchUrl !== ''
     ) {
       state.waiting = true

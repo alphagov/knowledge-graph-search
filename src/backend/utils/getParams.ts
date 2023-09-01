@@ -21,7 +21,9 @@ export const getParams = (req: express.Request): SearchParams => {
   const selectedTaxon =
     sanitiseInput(req.query[UrlParams.SelectedTaxon] as string) || ''
   const selectedOrganisation =
-    sanitiseInput(req.query[UrlParams.SelectedOrganisation] as string) || ''
+    sanitiseInput(
+      req.query[UrlParams.SelectedPublishingOrganisation] as string
+    ) || ''
   const selectedLocale = sanitiseInput(req.query.lang as string) || ''
   const caseSensitive = req.query[UrlParams.CaseSensitive] === 'true'
   const combinator = <Combinator>(
@@ -52,7 +54,7 @@ export const getParams = (req: express.Request): SearchParams => {
     selectedWords,
     excludedWords,
     selectedTaxon,
-    selectedOrganisation,
+    selectedPublishingOrganisation: selectedOrganisation,
     selectedLocale,
     selectedDocumentType,
     caseSensitive,

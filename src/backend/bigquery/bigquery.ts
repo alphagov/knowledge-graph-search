@@ -188,7 +188,7 @@ const sendSearchQuery = async function (
   const query = buildSqlQuery(searchParams, keywords, excludedKeywords)
   const locale = languageCode(searchParams.selectedLocale)
   const taxon = searchParams.selectedTaxon
-  const organisation = searchParams.selectedOrganisation
+  const organisation = searchParams.selectedPublishingOrganisation
   const documentType = searchParams.selectedDocumentType
   const selectedWordsWithoutQuotes = searchParams.selectedWords.replace(
     /"/g,
@@ -221,7 +221,7 @@ const sendSearchQuery = async function (
       results = await Promise.all(queries)
       bqMainResults = results[0]
       bqMetaResults = await getOrganisationInfo(
-        searchParams.selectedOrganisation
+        searchParams.selectedPublishingOrganisation
       )
       break
     default:

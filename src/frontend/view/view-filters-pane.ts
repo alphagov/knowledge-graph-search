@@ -90,7 +90,8 @@ const viewSelectPublishingOrganisations = () => {
           .map(
             (organisation) =>
               `<option value="${organisation}" ${
-                state.searchParams.selectedOrganisation == organisation
+                state.searchParams.selectedPublishingOrganisation ===
+                organisation
                   ? 'selected'
                   : ''
               }>${organisation}</option>`

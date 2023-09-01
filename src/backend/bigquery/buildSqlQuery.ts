@@ -75,7 +75,7 @@ export const buildSqlQuery = function (
   }
 
   let organisationClause = ''
-  if (searchParams.selectedOrganisation !== '') {
+  if (searchParams.selectedPublishingOrganisation !== '') {
     organisationClause = `
       AND EXISTS
         (

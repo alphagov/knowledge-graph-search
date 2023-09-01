@@ -348,7 +348,7 @@ const viewPublishingOrgSelector = () => `
         ${state.waiting && 'disabled="disabled"'}
         style="display: inline-block"
         list="orgList"
-        value="${state.searchParams.selectedOrganisation}"
+        value="${state.searchParams.selectedPublishingOrganisation}"
         class="govuk-input"
         id="organisation"
         autocomplete="off" />
