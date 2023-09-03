@@ -8,12 +8,7 @@ import {
 } from '../../common/types/search-api-types'
 import { USER_ERRORS } from '../enums/constants'
 
-const viewSearchPanel = () => {
-  const result = []
-  switch (state.searchParams.searchType) {
-    case SearchType.Advanced:
-    case SearchType.Results:
-      result.push(`
+const viewAdvancedSearchPanel = () => `
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
           <h1 class="govuk-heading-xl">Advanced search</h1>
@@ -30,10 +25,9 @@ const viewSearchPanel = () => {
           ${viewSearchButton()}
         </div>
       </form>
-    `)
-      break
-    case SearchType.Keyword:
-      result.push(`
+    `
+
+const viewKeywordSearchPanel = () => `
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
           <a class="govuk-skip-link" href="#results-table">Skip to results</a>
@@ -55,31 +49,9 @@ const viewSearchPanel = () => {
           ${viewSearchButton()}
         </div>
       </form>
-    `)
-      break
-    case SearchType.Link:
-      result.push(`
-      <form id="search-form" class="search-panel govuk-form">
-        <div class="search-mode-panel">
-          <a class="govuk-skip-link" href="#results-table">Skip to results</a>
-          ${viewLinkSearch()}
-          <details class="govuk-details" data-module="govuk-details">
-            <summary class="govuk-details__summary">
-              <span class="govuk-details__summary-text">
-                Filters
-              </span>
-            </summary>
-            <div class="govuk-details__text">
-              ${viewPublishingAppSelector()}
-            </div>
-          </details>
-          ${viewSearchButton()}
-        </div>
-      </form>
-    `)
-      break
-    case SearchType.Taxon:
-      result.push(`
+    `
+
+const viewTaxonSearchPanel = () => `
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
           <a class="govuk-skip-link" href="#results-table">Skip to results</a>
@@ -97,10 +69,29 @@ const viewSearchPanel = () => {
           ${viewSearchButton()}
         </div>
       </form>
-    `)
-      break
-    case SearchType.Language:
-      result.push(`
+    `
+
+const viewLinkSearchPanel = () => `
+      <form id="search-form" class="search-panel govuk-form">
+        <div class="search-mode-panel">
+          <a class="govuk-skip-link" href="#results-table">Skip to results</a>
+          ${viewLinkSearch()}
+          <details class="govuk-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+              <span class="govuk-details__summary-text">
+                Filters
+              </span>
+            </summary>
+            <div class="govuk-details__text">
+              ${viewPublishingAppSelector()}
+            </div>
+          </details>
+          ${viewSearchButton()}
+        </div>
+      </form>
+    `
+
+const viewLanguageSearchPanel = () => `
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
           <a class="govuk-skip-link" href="#results-table">Skip to results</a>
@@ -118,10 +109,9 @@ const viewSearchPanel = () => {
           ${viewSearchButton()}
         </div>
       </form>
-    `)
-      break
-    case SearchType.Organisation:
-      result.push(`
+    `
+
+const viewOrganisationSearchPanel = () => `
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
           <a class="govuk-skip-link" href="#results-table">Skip to results</a>
@@ -139,15 +129,26 @@ const viewSearchPanel = () => {
           ${viewSearchButton()}
         </div>
       </form>
-    `)
-      break
-    default:
-      console.log(
-        'viewSearchPanel: unknown value',
-        state.searchParams.searchType
-      )
+    `
+
+const viewSearchPanel = () => {
+  const { searchType } = state.searchParams
+  const mapping = {
+    [SearchType.Advanced]: viewAdvancedSearchPanel,
+    [SearchType.Results]: viewAdvancedSearchPanel,
+    [SearchType.Keyword]: viewKeywordSearchPanel,
+    [SearchType.Link]: viewLinkSearchPanel,
+    [SearchType.Taxon]: viewTaxonSearchPanel,
+    [SearchType.Language]: viewLanguageSearchPanel,
+    [SearchType.Organisation]: viewOrganisationSearchPanel,
   }
-  return result.join('')
+
+  if (!(searchType in mapping)) {
+    console.error('viewSearchPanel: unknown value', searchType)
+    return null
+  }
+
+  return searchType in mapping ? mapping[searchType]() : console.error()
 }
 
 const viewInlineError = (id: string, message: string): string => `
