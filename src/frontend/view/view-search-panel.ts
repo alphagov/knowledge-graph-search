@@ -1,12 +1,11 @@
 import { sanitiseOutput } from '../../common/utils/utils'
-import { state, searchState } from '../state'
+import { state } from '../state'
 import { languageName } from '../../common/utils/lang'
 import {
   KeywordLocation,
   PublishingApplication,
   SearchType,
 } from '../../common/types/search-api-types'
-import { USER_ERRORS } from '../enums/constants'
 
 const viewAdvancedSearchPanel = () => `
       <form id="search-form" class="search-panel govuk-form">
@@ -150,12 +149,6 @@ const viewSearchPanel = () => {
 
   return searchType in mapping ? mapping[searchType]() : console.error()
 }
-
-const viewInlineError = (id: string, message: string): string => `
-  <p id="${id}" class="govuk-error-message">
-    <span class="govuk-visually-hidden">Error:</span> ${message}
-  </p>
-`
 
 const viewScopeSelector = (): string => {
   return `
