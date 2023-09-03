@@ -113,6 +113,17 @@ pre {
   }
 }
 
+.search-filters-container {
+  display: flex;
+  flex-flow: column wrap;
+  align-items: flex-start;
+  height: 600px;
+
+  & > div {
+    width: 300px;
+  }
+}
+
 h1:focus-visible,
 h2:focus-visible {
   outline: none;
