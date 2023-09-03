@@ -42,6 +42,7 @@ const viewKeywordSearchPanel = () => `
               ${viewCaseSensitiveSelector()}
               ${viewKeywordsCombinator()}
               ${viewExclusionsInput()}
+              ${viewKeywordLocation()}
               ${viewScopeSelector()}
               ${viewPublishingAppSelector()}
             </div>
@@ -150,6 +151,32 @@ const viewSearchPanel = () => {
 
   return searchType in mapping ? mapping[searchType]() : console.error()
 }
+
+const viewKeywordLocation = () => `
+<div class="govuk-form-group">
+  <label class="govuk-label govuk-label--s" for="search-filters-keyword-location">
+    Keyword location
+  </label>
+  <select class="govuk-select" id="search-filters-keyword-location" name="search-filters-keyword-location" style="width: 100%;">
+    <option value="${KeywordLocation.All}" ${
+  state.searchParams.keywordLocation === KeywordLocation.All ? 'selected' : ''
+}>All keyword locations</option>
+    <option value="${KeywordLocation.Title}" ${
+  state.searchParams.keywordLocation === KeywordLocation.Title ? 'selected' : ''
+}>Title</option>
+    <option value="${KeywordLocation.BodyContent}" ${
+  state.searchParams.keywordLocation === KeywordLocation.BodyContent
+    ? 'selected'
+    : ''
+}>Body content</option>
+    <option value="${KeywordLocation.Description}" ${
+  state.searchParams.keywordLocation === KeywordLocation.Description
+    ? 'selected'
+    : ''
+}>Description</option>
+  </select>
+</div>
+`
 
 const viewScopeSelector = (): string => {
   return `

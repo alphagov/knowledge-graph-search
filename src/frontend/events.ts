@@ -95,6 +95,9 @@ const updateStateFromSearchFilters = () => {
 
   // NEW
   state.searchParams.selectedWords = getFormInputValue('keyword')
+  state.searchParams.caseSensitive = (<HTMLInputElement>(
+    id('search-filters-case-sensitive')
+  ))?.checked
   const newCombinatorValue = (
     document.querySelector(
       'input[name="search-filters-combinator"]:checked'
@@ -104,9 +107,9 @@ const updateStateFromSearchFilters = () => {
   state.searchParams.excludedWords = getFormInputValue(
     'search-filters-excluded-keywords'
   )
-  state.searchParams.caseSensitive = (<HTMLInputElement>(
-    id('search-filters-case-sensitive')
-  ))?.checked
+  state.searchParams.keywordLocation = getFormInputValue(
+    'search-filters-keyword-location'
+  ) as KeywordLocation
 }
 
 const resetFilters = () => {
