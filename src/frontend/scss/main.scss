@@ -323,13 +323,20 @@ h2:focus-visible {
       }
     }
 
+    .search-results-table-container {
+      margin-bottom: 0;
+
+      .govuk-pagination {
+        margin-bottom: 0;
+      }
+    }
+
     .side-filters {
       display: flex;
       flex-direction: column;
       flex-basis: $side-filters-width;
       flex-grow: 0;
       flex-shrink: 0;
-      height: 1500px;
       margin-right: $side-filters-margin-right;
       padding: 20px 30px;
       box-sizing: border-box;
@@ -338,6 +345,11 @@ h2:focus-visible {
 
       &.closed {
         display: none;
+      }
+
+      #side-filters-submit-btn {
+        max-width: 175px;
+        margin-bottom: 20px;
       }
     }
   }

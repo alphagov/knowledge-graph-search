@@ -245,7 +245,7 @@ const viewSearchResultsTable = () => {
       </div>
     </div>
   `
-  html.push(`<div class="govuk-body">
+  html.push(`<div class="govuk-body search-results-table-container">
   ${state.showFieldSet ? viewFieldSet() : ''}
   <div id="results-grid-container" class="ag-theme-alpine"></div>
   <div id="pagination-container"></div>
@@ -255,9 +255,10 @@ const viewSearchResultsTable = () => {
 
 const viewWaiting = () => `
   <div aria-live="polite" role="region">
-    <div class="govuk-body">Searching for ${queryDescription(
-      state.searchParams
-    )}</div>
+    <div class="govuk-body">${queryDescription({
+      searchParams: state.searchParams,
+      waiting: true,
+    })}</div>
     <p class="govuk-body-s">Some queries may take up to a minute</p>
   </div>
 `
@@ -268,10 +269,12 @@ const viewResults = function () {
     const nbRecords = state.searchResults.length
 
     if (nbRecords < 10000) {
-      html.push(`
-        <h1 tabindex="0" id="results-heading" class="govuk-heading-l">${nbRecords} result${
-        nbRecords !== 0 ? 's' : ''
-      }</h1>`)
+      html.push(
+        `<div class="govuk-body">${queryDescription({
+          searchParams: state.searchParams,
+          nbRecords,
+        })}</div>`
+      )
     } else {
       html.push(`
         <div class="govuk-warning-text">
@@ -283,12 +286,6 @@ const viewResults = function () {
         </div>
       `)
     }
-
-    html.push(
-      `<div class="govuk-body">for ${queryDescription(
-        state.searchParams
-      )}</div>`
-    )
 
     if (nbRecords > state.resultsPerPage) {
       html.push(`
@@ -334,23 +331,25 @@ const viewResults = function () {
 const viewNoResults = () => {
   return `
     <h1 tabindex="0" id="results-heading" class="govuk-heading-l">No results</h1>
-    <div class="govuk-body">for ${queryDescription(state.searchParams)} </div>
+    <div class="govuk-body">for ${queryDescription({
+      searchParams: state.searchParams,
+    })} </div>
   `
 }
 
 const viewSearchResults = () => {
   switch (searchState().code) {
     case 'waiting':
-      document.title = `GOV.UK ${queryDescription(
-        state.searchParams,
-        false
-      )} - ${serviceName}`
+      document.title = `GOV.UK ${queryDescription({
+        searchParams: state.searchParams,
+        includeMarkup: false,
+      })} - ${serviceName}`
       return viewWaiting()
     case 'results':
-      document.title = `GOV.UK ${queryDescription(
-        state.searchParams,
-        false
-      )} - ${serviceName}`
+      document.title = `GOV.UK ${queryDescription({
+        searchParams: state.searchParams,
+        includeMarkup: false,
+      })} - ${serviceName}`
       if (window.ga)
         window.ga('send', 'search', {
           search: document.title,
@@ -358,10 +357,10 @@ const viewSearchResults = () => {
         })
       return `${viewMetaResults() || ''} ${viewResults()}` // FIXME - avoid || ''
     case 'no-results':
-      document.title = `GOV.UK ${queryDescription(
-        state.searchParams,
-        false
-      )} - ${serviceName}`
+      document.title = `GOV.UK ${queryDescription({
+        searchParams: state.searchParams,
+        includeMarkup: false,
+      })} - ${serviceName}`
       if (window.ga)
         window.ga('send', 'search', {
           search: document.title,

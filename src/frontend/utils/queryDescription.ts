@@ -6,48 +6,62 @@ import { languageName } from '../../common/utils/lang'
 import { splitKeywords } from '../../common/utils/utils'
 import { makeBold } from './makeBold'
 
-export const queryDescription = (
-  search: SearchParams,
-  includeMarkup = true
-) => {
+type QueryDescriptionParams = {
+  searchParams: SearchParams
+  nbRecords?: number
+  includeMarkup?: boolean
+  waiting?: boolean
+}
+
+export const queryDescription = ({
+  searchParams,
+  nbRecords = 0,
+  includeMarkup = true,
+  waiting = false,
+}: QueryDescriptionParams) => {
   const clauses = []
-  if (search.selectedWords !== '') {
-    let keywords = `contain ${containDescription(search, includeMarkup)}`
-    if (search.excludedWords !== '') {
+  if (searchParams.selectedWords !== '') {
+    let keywords = ` contain ${containDescription(searchParams, includeMarkup)}`
+    if (searchParams.excludedWords !== '') {
       keywords = `${keywords} (but don't contain ${makeBold(
-        search.excludedWords,
+        searchParams.excludedWords,
         includeMarkup
       )})`
     }
     clauses.push(keywords)
   }
-  if (search.selectedTaxon !== '')
+  if (searchParams.selectedTaxon !== '')
     clauses.push(
       `belong to the ${makeBold(
-        search.selectedTaxon,
+        searchParams.selectedTaxon,
         includeMarkup
       )} taxon (or its sub-taxons)`
     )
-  if (search.selectedPublishingOrganisation !== '')
+  if (searchParams.selectedPublishingOrganisation !== '')
     clauses.push(
       `are published by the ${makeBold(
-        search.selectedPublishingOrganisation,
+        searchParams.selectedPublishingOrganisation,
         includeMarkup
       )}`
     )
-  if (search.selectedLocale !== '')
+  if (searchParams.selectedLocale !== '')
     clauses.push(
-      `are in ${makeBold(languageName(search.selectedLocale), includeMarkup)}`
+      `are in ${makeBold(
+        languageName(searchParams.selectedLocale),
+        includeMarkup
+      )}`
     )
-  if (search.linkSearchUrl !== '')
-    clauses.push(`link to ${makeBold(search.linkSearchUrl, includeMarkup)}`)
+  if (searchParams.linkSearchUrl !== '')
+    clauses.push(
+      `link to ${makeBold(searchParams.linkSearchUrl, includeMarkup)}`
+    )
   if (
-    search.publishingApplication === 'whitehall' ||
-    search.publishingApplication === 'publisher'
+    searchParams.publishingApplication === 'whitehall' ||
+    searchParams.publishingApplication === 'publisher'
   )
     clauses.push(
       `are published using ${makeBold(
-        search.publishingApplication,
+        searchParams.publishingApplication,
         includeMarkup
       )}`
     )
@@ -59,7 +73,10 @@ export const queryDescription = (
           clauses[clauses.length - 1]
         }`
 
-  return `pages that ${joinedClauses}`
+  const prefix = waiting
+    ? 'Searching for'
+    : `${nbRecords} result${nbRecords !== 0 ? 's' : ''} for`
+  return `${prefix} pages that ${joinedClauses}`
 }
 
 // combinedWords as used here must be exactly the same set of keywords as the ones submitted to BigQuery by the function sendSearchQuery.
