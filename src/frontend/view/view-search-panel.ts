@@ -44,6 +44,7 @@ const viewKeywordSearchPanel = () => `
               ${viewExclusionsInput()}
               ${viewKeywordLocation()}
               ${viewPublishingOrganisation()}
+              ${viewDocumentType()}
               ${viewScopeSelector()}
               ${viewPublishingAppSelector()}
             </div>
@@ -205,6 +206,40 @@ const viewPublishingOrganisation = () => {
                   ? 'selected'
                   : ''
               }>${organisation}</option>`
+          )
+      )}
+        </select>
+    </div>`)
+  return html.join('')
+}
+
+const viewDocumentType = () => {
+  const html = [
+    `
+    <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+      <label class="govuk-label govuk-label--s" for="search-filters-document-type">
+        Document type
+      </label>
+      <select ${
+        state.waiting && 'disabled="disabled"'
+      } id="search-filters-document-type" class="autocomplete__input autocomplete__input--default" name="documentType">
+      <option value="" ></option>
+  `,
+  ]
+
+  html.push(`
+      ${html.push(
+        ...state.documentTypes
+          .sort()
+          .map(
+            (documentType) =>
+              `<option value="${documentType}" ${
+                state.searchParams.selectedDocumentType == documentType
+                  ? 'selected'
+                  : ''
+              }>${(
+                documentType.charAt(0).toUpperCase() + documentType.slice(1)
+              ).replace(/_/g, ' ')}</option>`
           )
       )}
         </select>

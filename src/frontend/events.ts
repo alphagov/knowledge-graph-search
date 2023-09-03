@@ -113,6 +113,10 @@ const updateStateFromSearchFilters = () => {
   state.searchParams.selectedPublishingOrganisation = getFormInputValue(
     'search-filters-publishing-organisation'
   )
+  state.searchParams.selectedDocumentType = (
+    getFormInputValue('search-filters-document-type').charAt(0).toLowerCase() +
+    getFormInputValue('search-filters-document-type').slice(1)
+  ).replace(/ /g, '_')
 }
 
 const resetFilters = () => {
