@@ -110,6 +110,9 @@ const updateStateFromSearchFilters = () => {
   state.searchParams.keywordLocation = getFormInputValue(
     'search-filters-keyword-location'
   ) as KeywordLocation
+  state.searchParams.selectedPublishingOrganisation = getFormInputValue(
+    'search-filters-publishing-organisation'
+  )
 }
 
 const resetFilters = () => {

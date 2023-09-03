@@ -43,6 +43,7 @@ const viewKeywordSearchPanel = () => `
               ${viewKeywordsCombinator()}
               ${viewExclusionsInput()}
               ${viewKeywordLocation()}
+              ${viewPublishingOrganisation()}
               ${viewScopeSelector()}
               ${viewPublishingAppSelector()}
             </div>
@@ -177,6 +178,39 @@ const viewKeywordLocation = () => `
   </select>
 </div>
 `
+
+const viewPublishingOrganisation = () => {
+  const html = [
+    `
+    <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+      <label class="govuk-label govuk-label--s" for="search-filters-publishing-organisation">
+        Publishing organisations
+      </label>
+      <select ${
+        state.waiting && 'disabled="disabled"'
+      } id="search-filters-publishing-organisation" class="autocomplete__input autocomplete__input--default" name="search-filters-publishing-organisation">
+      <option value="" ></option>
+  `,
+  ]
+
+  html.push(`
+      ${html.push(
+        ...state.organisations
+          .sort()
+          .map(
+            (organisation) =>
+              `<option value="${organisation}" ${
+                state.searchParams.selectedPublishingOrganisation ===
+                organisation
+                  ? 'selected'
+                  : ''
+              }>${organisation}</option>`
+          )
+      )}
+        </select>
+    </div>`)
+  return html.join('')
+}
 
 const viewScopeSelector = (): string => {
   return `
@@ -429,7 +463,7 @@ const viewExclusionsInput = () => `
   <label class="govuk-label govuk-label--s" for="search-filters-excluded-keywords">
     Excluding these words
   </label>
-  <input class="govuk-input" id="search-filters-excluded-keywords" name="side-filters-excluded-keywords" type="text" value="${state.searchParams.excludedWords}">
+  <input class="govuk-input" id="search-filters-excluded-keywords" name="search-filters-excluded-keywords" type="text" value="${state.searchParams.excludedWords}">
 </div>
 `
 
