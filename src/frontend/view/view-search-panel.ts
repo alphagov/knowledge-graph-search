@@ -35,7 +35,7 @@ const viewKeywordSearchPanel = () => `
           <details class="govuk-details" data-module="govuk-details">
             <summary class="govuk-details__summary">
               <span class="govuk-details__summary-text">
-                Filters
+                Search filters
               </span>
             </summary>
             <div class="govuk-details__text">
@@ -59,7 +59,7 @@ const viewTaxonSearchPanel = () => `
           <details class="govuk-details" data-module="govuk-details">
             <summary class="govuk-details__summary">
               <span class="govuk-details__summary-text">
-                Filters
+                Search filters
               </span>
             </summary>
             <div class="govuk-details__text">
@@ -79,7 +79,7 @@ const viewLinkSearchPanel = () => `
           <details class="govuk-details" data-module="govuk-details">
             <summary class="govuk-details__summary">
               <span class="govuk-details__summary-text">
-                Filters
+                Search filters
               </span>
             </summary>
             <div class="govuk-details__text">
@@ -99,7 +99,7 @@ const viewLanguageSearchPanel = () => `
           <details class="govuk-details" data-module="govuk-details">
             <summary class="govuk-details__summary">
               <span class="govuk-details__summary-text">
-                Filters
+                Search filters
               </span>
             </summary>
             <div class="govuk-details__text">
@@ -119,7 +119,7 @@ const viewOrganisationSearchPanel = () => `
           <details class="govuk-details" data-module="govuk-details">
             <summary class="govuk-details__summary">
               <span class="govuk-details__summary-text">
-                Filters
+                Search filters
               </span>
             </summary>
             <div class="govuk-details__text">
