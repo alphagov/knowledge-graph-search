@@ -233,7 +233,7 @@ const viewPublishingStatusSelector = () => `
         </select>
     </div>`
 
-export const viewFiltersPane = () => {
+export const viewSideFilters = () => {
   const submitButton = () => `
       <button id="filters-pane-submit-btn" class="govuk-button" data-module="govuk-button" style="width: auto;">Apply filters</button>
     `

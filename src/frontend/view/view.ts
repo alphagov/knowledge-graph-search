@@ -8,7 +8,7 @@ import { EventType } from '../types/event-types'
 import { USER_ERRORS } from '../enums/constants'
 import { fieldName } from './utils'
 import { createAgGrid } from './view-grid'
-import { viewFiltersPane } from './view-filters-pane'
+import { viewSideFilters } from './view-side-filters'
 
 declare const window: any
 
@@ -316,7 +316,7 @@ const viewResults = function () {
         }</button>
       </div>
       <div class="results-container-row-2-results">
-        ${viewFiltersPane()}
+        ${viewSideFilters()}
         ${viewSearchResultsTable()}
       </div>
     </div>`
