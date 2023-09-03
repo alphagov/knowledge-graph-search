@@ -73,6 +73,7 @@ const view = () => {
 
 const viewSearchTypeSelector = () => `
   <div class="govuk-tabs" data-module="govuk-tabs">
+  <span class="govuk-tabs__title">Search for</span>
   <ul class="govuk-tabs__list">
     <li class="govuk-tabs__list-item ${
       state.searchParams.searchType === 'keyword'
