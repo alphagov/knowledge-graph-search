@@ -46,6 +46,7 @@ const viewKeywordSearchPanel = () => `
               ${viewPublishingOrganisation()}
               ${viewDocumentType()}
               ${viewPublishingAppSelector()}
+              ${viewTaxonSelector()}
             </div>
           </details>
           ${viewSearchButton()}
@@ -277,30 +278,25 @@ const viewScopeSelector = (): string => {
 }
 
 const viewTaxonSelector = () => `
-  <div class="govuk-body">
-    <div class="taxon-facet">
-      <label class="govuk-label label--bold" for="taxon">
-        Search for taxons
+    <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+      <label class="govuk-label govuk-label--s" for="search-filters-taxon">
+        Taxons
       </label>
-      <div class="govuk-hint">
-        Type the first letters of a taxon or select from the dropdown
-      </div>
-      <datalist id="taxonList">
-        ${state.taxons.map((taxon) => `<option>${taxon}</option>`)}
-      </datalist>
-      <div>
-      <input
-        ${state.waiting && 'disabled="disabled"'}
-        style="display: inline-block"
-        list="taxonList"
-        value="${state.searchParams.selectedTaxon}"
-        class="govuk-input"
-        id="taxon"
-        autocomplete="off" />
-      </div>
-    </div>
-  </div>
-`
+      <select ${
+        state.waiting && 'disabled="disabled"'
+      } id="search-filters-taxon" class="autocomplete__input autocomplete__input--default" name="search-filters-taxon">
+      <option value=""></option>
+      ${state.taxons
+        .sort()
+        .map(
+          (taxon) =>
+            `<option value="${taxon}" ${
+              state.searchParams.selectedTaxon === taxon ? 'selected' : ''
+            }>${taxon}</option>`
+        )
+        .join('')}
+        </select>
+    </div>`
 
 const viewLocaleSelector = () => {
   const html = [

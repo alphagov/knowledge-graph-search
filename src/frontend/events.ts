@@ -120,6 +120,7 @@ const updateStateFromSearchFilters = () => {
   state.searchParams.publishingApplication = getFormInputValue(
     'search-filters-publishing-application'
   ) as PublishingApplication
+  state.searchParams.selectedTaxon = getFormInputValue('search-filters-taxon')
 }
 
 const resetFilters = () => {
