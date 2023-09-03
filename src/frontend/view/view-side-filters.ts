@@ -15,10 +15,10 @@ const viewCombinatorRadios = () => `
     </legend>
     <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
       <div class="govuk-radios__item">
-        <input class="govuk-radios__input" id="filter-combinator-1" name="filter-combinator" type="radio" value="${
+        <input class="govuk-radios__input" id="side-filters-combinator-1" name="side-filters-combinator" type="radio" value="${
           Combinator.All
         }" ${state.searchParams.combinator === Combinator.All ? 'checked' : ''}>
-        <label class="govuk-label govuk-radios__label" for="filter-combinator">
+        <label class="govuk-label govuk-radios__label" for="side-filters-combinator">
           All keywords
         </label>
         <div class="govuk-hint govuk-radios__hint">
@@ -26,10 +26,10 @@ const viewCombinatorRadios = () => `
           </div>
       </div>
       <div class="govuk-radios__item">
-        <input class="govuk-radios__input" id="filter-combinator-2" name="filter-combinator" type="radio" value="${
+        <input class="govuk-radios__input" id="side-filters-combinator-2" name="side-filters-combinator" type="radio" value="${
           Combinator.Any
         }" ${state.searchParams.combinator === Combinator.Any ? 'checked' : ''}>
-        <label class="govuk-label govuk-radios__label" for="filter-combinator">
+        <label class="govuk-label govuk-radios__label" for="side-filters-combinator">
           Any keyword
         </label>
         <div class="govuk-hint govuk-radios__hint">
@@ -43,19 +43,19 @@ const viewCombinatorRadios = () => `
 
 const viewExcludeWords = () => `
 <div class="govuk-form-group">
-  <label class="govuk-label govuk-label--s" for="filter-excluded-keywords">
+  <label class="govuk-label govuk-label--s" for="side-filters-excluded-keywords">
     Excluding these words
   </label>
-  <input class="govuk-input" id="filter-excluded-keywords" name="filter-excluded-keywords" type="text" value="${state.searchParams.excludedWords}">
+  <input class="govuk-input" id="side-filters-excluded-keywords" name="side-filters-excluded-keywords" type="text" value="${state.searchParams.excludedWords}">
 </div>
 `
 
 const viewSelectKeywordLocation = () => `
 <div class="govuk-form-group">
-  <label class="govuk-label govuk-label--s" for="filter-keyword-location">
+  <label class="govuk-label govuk-label--s" for="side-filters-keyword-location">
     Keyword location
   </label>
-  <select class="govuk-select" id="filter-keyword-location" name="filter-keyword-location" style="width: 100%;">
+  <select class="govuk-select" id="side-filters-keyword-location" name="side-filters-keyword-location" style="width: 100%;">
     <option value="${KeywordLocation.All}" ${
   state.searchParams.keywordLocation === KeywordLocation.All ? 'selected' : ''
 }>All keyword locations</option>
@@ -80,12 +80,12 @@ const viewSelectPublishingOrganisations = () => {
   const html = [
     `
     <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
-      <label class="govuk-label govuk-label--s" for="filter-publishing-organisation">
+      <label class="govuk-label govuk-label--s" for="side-filters-publishing-organisation">
         Publishing organisations
       </label>
       <select ${
         state.waiting && 'disabled="disabled"'
-      } id="filter-publishing-organisation" class="autocomplete__input autocomplete__input--default" name="filter-publishing-organisation">
+      } id="side-filters-publishing-organisation" class="autocomplete__input autocomplete__input--default" name="side-filters-publishing-organisation">
       <option value="" ></option>
   `,
   ]
@@ -113,12 +113,12 @@ const viewDocumentTypeSelector = () => {
   const html = [
     `
     <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
-      <label class="govuk-label govuk-label--s" for="filter-document-type">
+      <label class="govuk-label govuk-label--s" for="side-filters-document-type">
         Document type
       </label>
       <select ${
         state.waiting && 'disabled="disabled"'
-      } id="filter-document-type" class="autocomplete__input autocomplete__input--default" name="documentType">
+      } id="side-filters-document-type" class="autocomplete__input autocomplete__input--default" name="documentType">
       <option value="" ></option>
   `,
   ]
@@ -145,12 +145,12 @@ const viewDocumentTypeSelector = () => {
 
 const viewPublishingApplications = () => `
       <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
-        <label class="govuk-label govuk-label--s" for="filter-publishing-application">
+        <label class="govuk-label govuk-label--s" for="side-filters-publishing-application">
           Publishing applications
         </label>
         <select ${
           state.waiting && 'disabled="disabled"'
-        } id="filter-publishing-application" class="govuk-select" name="filter-publishing-application" style="width: 100%;">
+        } id="side-filters-publishing-application" class="govuk-select" name="side-filters-publishing-application" style="width: 100%;">
           <option value="${PublishingApplication.Any}" ${
   state.searchParams.publishingApplication === PublishingApplication.Any
     ? 'selected'
@@ -171,12 +171,12 @@ const viewPublishingApplications = () => `
 
 const viewTaxonSelector = () => `
     <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
-      <label class="govuk-label govuk-label--s" for="filter-taxon">
+      <label class="govuk-label govuk-label--s" for="side-filters-taxon">
         Taxons
       </label>
       <select ${
         state.waiting && 'disabled="disabled"'
-      } id="filter-taxon" class="autocomplete__input autocomplete__input--default" name="filter-taxon">
+      } id="side-filters-taxon" class="autocomplete__input autocomplete__input--default" name="side-filters-taxon">
       <option value=""></option>
       ${state.taxons
         .sort()
@@ -192,12 +192,12 @@ const viewTaxonSelector = () => `
 
 const viewLanguageSelector = () => `
     <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
-      <label class="govuk-label govuk-label--s" for="filter-language">
+      <label class="govuk-label govuk-label--s" for="side-filters-language">
         Languages
       </label>
       <select ${
         state.waiting && 'disabled="disabled"'
-      } id="filter-language" class="autocomplete__input autocomplete__input--default" name="filter-language">
+      } id="side-filters-language" class="autocomplete__input autocomplete__input--default" name="side-filters-language">
       ${state.locales.map(
         (code) =>
           `<option value="${code}" ${
@@ -211,12 +211,12 @@ const viewLanguageSelector = () => `
 
 const viewPublishingStatusSelector = () => `
       <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
-        <label class="govuk-label govuk-label--s" for="filter-publishing-status">
+        <label class="govuk-label govuk-label--s" for="side-filters-publishing-status">
           Publishing status
         </label>
         <select ${
           state.waiting && 'disabled="disabled"'
-        } id="filter-publishing-status" class="govuk-select" name="filter-publishing-status" style="width: 100%;">
+        } id="side-filters-publishing-status" class="govuk-select" name="side-filters-publishing-status" style="width: 100%;">
           <option value="${PublishingStatus.All}" ${
   state.searchParams.publishingStatus === PublishingStatus.All ? 'selected' : ''
 }>All statuses</option>
@@ -235,13 +235,13 @@ const viewPublishingStatusSelector = () => `
 
 export const viewSideFilters = () => {
   const submitButton = () => `
-      <button id="filters-pane-submit-btn" class="govuk-button" data-module="govuk-button" style="width: auto;">Apply filters</button>
+      <button id="side-filters-submit-btn" class="govuk-button" data-module="govuk-button" style="width: auto;">Apply filters</button>
     `
   const viewClearFilters = () =>
-    `<a href="javascript:void(0)" id="clear-filters" class="govuk-link">Clear filters</a>`
+    `<a href="javascript:void(0)" id="clear-side-filters-link" class="govuk-link">Clear filters</a>`
 
   return `
-    <div class="filters-pane">
+    <div class="side-filters">
       <h2 class="govuk-heading-m">Filters</h2>
       ${viewCombinatorRadios()}
       ${viewExcludeWords()}

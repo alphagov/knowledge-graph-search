@@ -22,21 +22,21 @@ import { defaultAllLanguagesOption, languageCode } from '../common/utils/lang'
 
 declare const window: any
 
-const updateStateFromFilters = () => {
+const updateStateFromSideFilters = () => {
   // state.searchParams.selectedWords = getFormInputValue('keyword')
   state.searchParams.excludedWords = getFormInputValue(
-    'filter-excluded-keywords'
+    'side-filters-excluded-keywords'
   )
-  state.searchParams.selectedTaxon = getFormInputValue('filter-taxon')
+  state.searchParams.selectedTaxon = getFormInputValue('side-filters-taxon')
   state.searchParams.selectedPublishingOrganisation = getFormInputValue(
-    'filter-publishing-organisation'
+    'side-filters-publishing-organisation'
   )
-  state.searchParams.selectedLocale = getFormInputValue('filter-language')
+  state.searchParams.selectedLocale = getFormInputValue('side-filters-language')
   console.log({
     'state.searchParams.selectedLocale': state.searchParams.selectedLocale,
   })
   state.searchParams.keywordLocation = getFormInputValue(
-    'filter-keyword-location'
+    'side-filters-keyword-location'
   ) as KeywordLocation
   // state.searchParams.caseSensitive = (<HTMLInputElement>(
   //   id(UrlParams.CaseSensitive)
@@ -45,23 +45,23 @@ const updateStateFromFilters = () => {
   // state.skip = 0 // reset to first page
 
   state.searchParams.publishingStatus = getFormInputValue(
-    'filter-publishing-status'
+    'side-filters-publishing-status'
   ) as PublishingStatus
 
   state.searchParams.publishingApplication = getFormInputValue(
-    'filter-publishing-application'
+    'side-filters-publishing-application'
   ) as PublishingApplication
 
   const newCombinatorValue = (
     document.querySelector(
-      'input[name="filter-combinator"]:checked'
+      'input[name="side-filters-combinator"]:checked'
     ) as HTMLInputElement
   ).value as Combinator
   state.searchParams.combinator = newCombinatorValue
 
   state.searchParams.selectedDocumentType = (
-    getFormInputValue('filter-document-type').charAt(0).toLowerCase() +
-    getFormInputValue('filter-document-type').slice(1)
+    getFormInputValue('side-filters-document-type').charAt(0).toLowerCase() +
+    getFormInputValue('side-filters-document-type').slice(1)
   ).replace(/ /g, '_')
 }
 
@@ -89,14 +89,14 @@ const handleEvent: SearchApiCallback = async function (event) {
   switch (event.type) {
     case EventType.Dom:
       switch (event.id) {
-        case 'clear-filters':
+        case 'clear-side-filters-link':
           resetFilters()
           state.searchResults = null
           searchButtonClicked()
           break
-        case 'filters-pane-submit-btn':
+        case 'side-filters-submit-btn':
           // updateQueryParamsFromFilters()
-          updateStateFromFilters()
+          updateStateFromSideFilters()
           state.searchResults = null
           searchButtonClicked()
           break

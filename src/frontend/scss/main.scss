@@ -278,15 +278,15 @@ h2:focus-visible {
 }
 
 .results-container {
-  $filters-pane-width: 434px;
-  $filters-pane-margin-right: 20px;
+  $side-filters-width: 434px;
+  $side-filters-margin-right: 20px;
 
   .results-container-row-1-headers {
     display: flex;
     padding-bottom: 20px;
 
     .hide-filters-button-container {
-      width: calc($filters-pane-width + $filters-pane-margin-right);
+      width: calc($side-filters-width + $side-filters-margin-right);
       padding-right: 0;
     }
   }
@@ -312,14 +312,14 @@ h2:focus-visible {
       }
     }
 
-    .filters-pane {
+    .side-filters {
       display: flex;
       flex-direction: column;
-      flex-basis: $filters-pane-width;
+      flex-basis: $side-filters-width;
       flex-grow: 0;
       flex-shrink: 0;
       height: 1500px;
-      margin-right: $filters-pane-margin-right;
+      margin-right: $side-filters-margin-right;
       padding: 20px 30px;
       box-sizing: border-box;
 
@@ -336,7 +336,7 @@ h2:focus-visible {
       width: unset;
       padding-right: 16px;
     }
-    .filters-pane {
+    .side-filters {
       display: none;
     }
   }
