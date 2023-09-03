@@ -39,7 +39,7 @@ const viewKeywordSearchPanel = () => `
                 Search filters
               </span>
             </summary>
-            <div class="govuk-details__text">
+            <div class="govuk-details__text search-filters-container">
               ${viewCaseSensitiveSelector()}
               ${viewKeywordsCombinator()}
               ${viewExclusionsInput()}
@@ -49,6 +49,7 @@ const viewKeywordSearchPanel = () => `
               ${viewPublishingAppSelector()}
               ${viewTaxonSelector()}
               ${viewPublishingStatusSelector()}
+              ${viewLocaleSelector()}
             </div>
           </details>
           ${viewSearchButton()}
@@ -324,39 +325,24 @@ const viewPublishingStatusSelector = () => `
       </select>
   </div>`
 
-const viewLocaleSelector = () => {
-  const html = [
-    `
-    <div class="govuk-body taxon-facet">
-      <label class="govuk-label label--bold" for="locale">
-        Search for languages
+const viewLocaleSelector = () => `
+    <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+      <label class="govuk-label govuk-label--s" for="search-filters-language">
+        Languages
       </label>
-      <div class="govuk-hint">
-        Type the first letters of a language or select from the dropdown
-      </div>
-      <datalist id="localeList">
-  `,
-  ]
-  html.push(
-    ...state.locales.map(
-      (code) =>
-        `<option data-value="${code}" ${
-          state.searchParams.selectedLocale === code ? 'selected' : ''
-        }>${languageName(code)}</option>`
-    )
-  )
-  html.push(`
-      </datalist>
-      <input type="text"
-         ${state.waiting && 'disabled="disabled"'}
-         value="${state.searchParams.selectedLocale}"
-         class="govuk-input"
-         list="localeList"
-         id="locale" name="locale"
-         autocomplete="off" />
-    </div>`)
-  return html.join('')
-}
+      <select ${
+        state.waiting && 'disabled="disabled"'
+      } id="search-filters-language" class="autocomplete__input autocomplete__input--default" name="search-filters-language">
+      ${state.locales.map(
+        (code) =>
+          `<option value="${code}" ${
+            state.searchParams.selectedLocale === languageName(code)
+              ? 'selected'
+              : ''
+          }>${languageName(code)}</option>`
+      )}
+        </select>
+    </div>`
 
 const viewSearchButton = () => `
   <p class="govuk-body">

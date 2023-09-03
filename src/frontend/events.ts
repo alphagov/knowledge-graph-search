@@ -35,9 +35,6 @@ const updateStateFromSideFilters = () => {
     'side-filters-publishing-organisation'
   )
   state.searchParams.selectedLocale = getFormInputValue('side-filters-language')
-  console.log({
-    'state.searchParams.selectedLocale': state.searchParams.selectedLocale,
-  })
   state.searchParams.keywordLocation = getFormInputValue(
     'side-filters-keyword-location'
   ) as KeywordLocation
@@ -124,6 +121,9 @@ const updateStateFromSearchFilters = () => {
   state.searchParams.publishingStatus = getFormInputValue(
     'search-filters-publishing-status'
   ) as PublishingStatus
+  state.searchParams.selectedLocale = getFormInputValue(
+    'search-filters-language'
+  )
 }
 
 const resetFilters = () => {
