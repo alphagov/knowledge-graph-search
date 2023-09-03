@@ -67,8 +67,8 @@ class App {
 
   private initializeMiddlewares() {
     if (config.enableHMR) {
-      this.app.use(devMiddleware)
-      this.app.use(hotMiddleware)
+      this.app.use(devMiddleware())
+      this.app.use(hotMiddleware())
     }
     this.app.use(cookieParser())
     this.app.use(cors())

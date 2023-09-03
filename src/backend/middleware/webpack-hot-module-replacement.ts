@@ -9,7 +9,8 @@ const webpackConfig: any = require('../../../webpack.config.js')({ enableHMR })
 
 const compiler = webpack(webpackConfig)
 
-export const devMiddleware = webpackDevMiddleware(compiler, {
-  publicPath: webpackConfig.output.publicPath,
-})
-export const hotMiddleware = webpackHotMiddleware(compiler)
+export const devMiddleware = () =>
+  webpackDevMiddleware(compiler, {
+    publicPath: webpackConfig.output.publicPath,
+  })
+export const hotMiddleware = () => webpackHotMiddleware(compiler)
