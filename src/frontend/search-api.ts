@@ -10,40 +10,40 @@ import {
 import { defaultAllLanguagesOption, languageCode } from '../common/utils/lang'
 import { EventType, SearchApiCallback } from './types/event-types'
 
-const makeQueryString = function (sp: SearchParams): string {
+const makeQueryString = function (searchParams: SearchParams): string {
   const usp = new URLSearchParams()
-  if (sp.searchType !== SearchType.Keyword)
-    usp.set(UrlParams.SearchType, sp.searchType)
-  if (sp.selectedWords !== '')
-    usp.set(UrlParams.SelectedWords, sp.selectedWords)
-  if (sp.excludedWords !== '')
-    usp.set(UrlParams.ExcludedWords, sp.excludedWords)
-  if (sp.selectedTaxon !== '')
-    usp.set(UrlParams.SelectedTaxon, sp.selectedTaxon)
-  if (sp.selectedPublishingOrganisation !== '')
+  if (searchParams.searchType !== SearchType.Keyword)
+    usp.set(UrlParams.SearchType, searchParams.searchType)
+  if (searchParams.selectedWords !== '')
+    usp.set(UrlParams.SelectedWords, searchParams.selectedWords)
+  if (searchParams.excludedWords !== '')
+    usp.set(UrlParams.ExcludedWords, searchParams.excludedWords)
+  if (searchParams.selectedTaxon !== '')
+    usp.set(UrlParams.SelectedTaxon, searchParams.selectedTaxon)
+  if (searchParams.selectedPublishingOrganisation !== '')
     usp.set(
       UrlParams.SelectedPublishingOrganisation,
-      sp.selectedPublishingOrganisation
+      searchParams.selectedPublishingOrganisation
     )
-  if (sp.selectedLocale !== defaultAllLanguagesOption)
-    usp.set(UrlParams.Language, languageCode(sp.selectedLocale))
-  if (sp.caseSensitive)
-    usp.set(UrlParams.CaseSensitive, sp.caseSensitive.toString())
-  if (sp.keywordLocation !== KeywordLocation.All) {
-    usp.set(UrlParams.KeywordLocation, sp.keywordLocation)
+  if (searchParams.selectedLocale !== defaultAllLanguagesOption)
+    usp.set(UrlParams.Language, languageCode(searchParams.selectedLocale))
+  if (searchParams.caseSensitive)
+    usp.set(UrlParams.CaseSensitive, searchParams.caseSensitive.toString())
+  if (searchParams.keywordLocation !== KeywordLocation.All) {
+    usp.set(UrlParams.KeywordLocation, searchParams.keywordLocation)
   }
 
-  if (sp.selectedDocumentType)
-    usp.set(UrlParams.DocumentType, sp.selectedDocumentType)
+  if (searchParams.selectedDocumentType)
+    usp.set(UrlParams.DocumentType, searchParams.selectedDocumentType)
 
-  if (sp.publishingApplication !== PublishingApplication.Any) {
-    usp.set(UrlParams.PublishingApplication, sp.publishingApplication)
+  if (searchParams.publishingApplication !== PublishingApplication.Any) {
+    usp.set(UrlParams.PublishingApplication, searchParams.publishingApplication)
   }
-  if (sp.combinator !== Combinator.All)
-    usp.set(UrlParams.Combinator, sp.combinator)
-  if (sp.linkSearchUrl !== '')
-    usp.set(UrlParams.LinkSearchUrl, sp.linkSearchUrl)
-  usp.set(UrlParams.PublishingStatus, sp.publishingStatus)
+  if (searchParams.combinator !== Combinator.All)
+    usp.set(UrlParams.Combinator, searchParams.combinator)
+  if (searchParams.linkSearchUrl !== '')
+    usp.set(UrlParams.LinkSearchUrl, searchParams.linkSearchUrl)
+  usp.set(UrlParams.PublishingStatus, searchParams.publishingStatus)
   return usp.toString()
 }
 

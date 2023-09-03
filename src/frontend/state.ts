@@ -63,13 +63,16 @@ const setState = (newState) => {
   state = newState
 }
 
-const setQueryParamsFromQS = function (): void {
+const setStateSearchParamsFromURL = function (): void {
   const searchParams: URLSearchParams = new URLSearchParams(
     window.location.search
   )
-  const maybeReplace = (stateField: keyof SearchParams, qspName: string): any =>
-    searchParams.get(qspName) !== null
-      ? searchParams.get(qspName)
+  const maybeReplace = (
+    stateField: keyof SearchParams,
+    urlParam: string
+  ): any =>
+    searchParams.get(urlParam) !== null
+      ? searchParams.get(urlParam)
       : initialSearchParams[stateField]
 
   state.searchParams.searchType = maybeReplace(
@@ -179,4 +182,10 @@ const resetSearch = function (): void {
   state.searchParams.combinator = Combinator.All
 }
 
-export { state, setState, setQueryParamsFromQS, searchState, resetSearch }
+export {
+  state,
+  setState,
+  setStateSearchParamsFromURL as setQueryParamsFromQS,
+  searchState,
+  resetSearch,
+}

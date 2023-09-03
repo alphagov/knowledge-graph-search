@@ -45,7 +45,6 @@ const viewKeywordSearchPanel = () => `
               ${viewKeywordLocation()}
               ${viewPublishingOrganisation()}
               ${viewDocumentType()}
-              ${viewScopeSelector()}
               ${viewPublishingAppSelector()}
             </div>
           </details>
@@ -450,33 +449,31 @@ const viewPublishingOrgSelector = () => `
   </div>
 `
 
-const viewPublishingAppSelector = () =>
-  `
-  <div class="govuk-form-group">
-        <label class="govuk-label govuk-label--s" for="publishing-application">
+const viewPublishingAppSelector = () => `
+      <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+        <label class="govuk-label govuk-label--s" for="search-filters-publishing-application">
           Publishing applications
         </label>
         <select ${
           state.waiting && 'disabled="disabled"'
-        } id="publishing-application" class="govuk-select" name="publishing-application">
+        } id="search-filters-publishing-application" class="govuk-select" name="search-filters-publishing-application" style="width: 100%;">
           <option value="${PublishingApplication.Any}" ${
-    state.searchParams.publishingApplication === PublishingApplication.Any
-      ? 'selected'
-      : ''
-  }>All publishing applications</option>
+  state.searchParams.publishingApplication === PublishingApplication.Any
+    ? 'selected'
+    : ''
+}>All publishing applications</option>
           <option value="${PublishingApplication.Publisher}" ${
-    state.searchParams.publishingApplication === PublishingApplication.Publisher
-      ? 'selected'
-      : ''
-  }>Publisher (mainstream)</option>
+  state.searchParams.publishingApplication === PublishingApplication.Publisher
+    ? 'selected'
+    : ''
+}>Publisher (mainstream)</option>
           <option value="${PublishingApplication.Whitehall}" ${
-    state.searchParams.publishingApplication === PublishingApplication.Whitehall
-      ? 'selected'
-      : ''
-  }>Whitehall (specialist)</option>
+  state.searchParams.publishingApplication === PublishingApplication.Whitehall
+    ? 'selected'
+    : ''
+}>Whitehall (specialist)</option>
         </select>
-    </div>
-`
+    </div>`
 
 const viewKeywordsInput = () => `
   <div class="govuk-body">

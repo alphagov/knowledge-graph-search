@@ -71,23 +71,23 @@ const updateStateFromSideFilters = () => {
 const updateStateFromSearchFilters = () => {
   // Update the state
   // state.searchParams.selectedWords = getFormInputValue('keyword')
-  state.searchParams.excludedWords = getFormInputValue('excluded-keyword')
+  // state.searchParams.excludedWords = getFormInputValue('excluded-keyword')
   state.searchParams.selectedTaxon = getFormInputValue('taxon')
-  state.searchParams.selectedPublishingOrganisation =
-    getFormInputValue('organisation')
+  // state.searchParams.selectedPublishingOrganisation =
+  //   getFormInputValue('organisation')
   state.searchParams.selectedLocale = getFormInputValue('locale')
-  state.searchParams.keywordLocation = (<HTMLInputElement>(
-    id('search-keyword-location')
-  )).value as KeywordLocation
-  state.searchParams.caseSensitive = (<HTMLInputElement>(
-    id(UrlParams.CaseSensitive)
-  ))?.checked
+  // state.searchParams.keywordLocation = (<HTMLInputElement>(
+  //   id('search-keyword-location')
+  // )).value as KeywordLocation
+  // state.searchParams.caseSensitive = (<HTMLInputElement>(
+  //   id(UrlParams.CaseSensitive)
+  // ))?.checked
   state.searchParams.linkSearchUrl = getFormInputValue('link-search')
   state.skip = 0 // reset to first page
-  if (getFormInputValue('publishing-application'))
-    state.searchParams.publishingApplication = getFormInputValue(
-      'publishing-application'
-    ) as PublishingApplication
+  // if (getFormInputValue('publishing-application'))
+  //   state.searchParams.publishingApplication = getFormInputValue(
+  //     'publishing-application'
+  //   ) as PublishingApplication
   // if ((<HTMLInputElement>id('combinator-any'))?.checked)
   //   state.searchParams.combinator = Combinator.Any
   // if ((<HTMLInputElement>id('combinator-all'))?.checked)
@@ -117,6 +117,9 @@ const updateStateFromSearchFilters = () => {
     getFormInputValue('search-filters-document-type').charAt(0).toLowerCase() +
     getFormInputValue('search-filters-document-type').slice(1)
   ).replace(/ /g, '_')
+  state.searchParams.publishingApplication = getFormInputValue(
+    'search-filters-publishing-application'
+  ) as PublishingApplication
 }
 
 const resetFilters = () => {
@@ -340,7 +343,11 @@ const updateUrl = function () {
           searchParams.set(UrlParams.Combinator, state.searchParams.combinator)
         }
 
-        if (state.searchParams.selectedLocale !== defaultAllLanguagesOption) {
+        if (
+          ![defaultAllLanguagesOption, ''].includes(
+            state.searchParams.selectedLocale
+          )
+        ) {
           searchParams.set(
             UrlParams.Language,
             languageCode(state.searchParams.selectedLocale)
