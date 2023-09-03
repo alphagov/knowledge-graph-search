@@ -5,6 +5,7 @@ import {
   Combinator,
   KeywordLocation,
   PublishingApplication,
+  PublishingStatus,
   SearchType,
 } from '../../common/types/search-api-types'
 
@@ -47,6 +48,7 @@ const viewKeywordSearchPanel = () => `
               ${viewDocumentType()}
               ${viewPublishingAppSelector()}
               ${viewTaxonSelector()}
+              ${viewPublishingStatusSelector()}
             </div>
           </details>
           ${viewSearchButton()}
@@ -297,6 +299,30 @@ const viewTaxonSelector = () => `
         .join('')}
         </select>
     </div>`
+
+const viewPublishingStatusSelector = () => `
+    <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+      <label class="govuk-label govuk-label--s" for="search-filters-publishing-status">
+        Publishing status
+      </label>
+      <select ${
+        state.waiting && 'disabled="disabled"'
+      } id="search-filters-publishing-status" class="govuk-select" name="search-filters-publishing-status" style="width: 100%;">
+        <option value="${PublishingStatus.All}" ${
+  state.searchParams.publishingStatus === PublishingStatus.All ? 'selected' : ''
+}>All statuses</option>
+        <option value="${PublishingStatus.Withdrawn}" ${
+  state.searchParams.publishingStatus === PublishingStatus.Withdrawn
+    ? 'selected'
+    : ''
+}>Withdrawn</option>
+        <option value="${PublishingStatus.NotWithdrawn}" ${
+  state.searchParams.publishingStatus === PublishingStatus.NotWithdrawn
+    ? 'selected'
+    : ''
+}>Non-withdrawn</option>
+      </select>
+  </div>`
 
 const viewLocaleSelector = () => {
   const html = [
