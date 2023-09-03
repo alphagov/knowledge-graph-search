@@ -7,6 +7,24 @@ import {
 import { state } from '../state'
 import { languageName } from '../../common/utils/lang'
 
+const viewEnableCaseSensitive = () => `
+<div class="govuk-form-group">
+  <div class="govuk-checkboxes govuk-checkboxes--small">
+    <div class="govuk-checkboxes__item">
+      <input
+          class="govuk-checkboxes__input"
+          ${state.waiting && 'disabled="disabled"'}
+          type="checkbox"
+          id="side-filters-case-sensitive"
+          name="side-filters-case-sensitive"
+          ${state.searchParams.caseSensitive ? 'checked' : ''}
+      />
+      <label for="side-filters-case-sensitive" class="govuk-label govuk-checkboxes__label">Enable case sensitive</label>
+    </div>
+  </div>
+</div>
+`
+
 const viewCombinatorRadios = () => `
 <div class="govuk-form-group">
   <fieldset class="govuk-fieldset">
@@ -243,6 +261,7 @@ export const viewSideFilters = () => {
   return `
     <div class="side-filters">
       <h2 class="govuk-heading-m">Filters</h2>
+      ${viewEnableCaseSensitive()}
       ${viewCombinatorRadios()}
       ${viewExcludeWords()}
       ${viewSelectKeywordLocation()}

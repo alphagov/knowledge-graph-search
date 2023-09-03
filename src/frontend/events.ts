@@ -23,6 +23,9 @@ import { defaultAllLanguagesOption, languageCode } from '../common/utils/lang'
 declare const window: any
 
 const updateStateFromSideFilters = () => {
+  state.searchParams.caseSensitive = (<HTMLInputElement>(
+    id('side-filters-case-sensitive')
+  ))?.checked
   // state.searchParams.selectedWords = getFormInputValue('keyword')
   state.searchParams.excludedWords = getFormInputValue(
     'side-filters-excluded-keywords'
@@ -63,6 +66,47 @@ const updateStateFromSideFilters = () => {
     getFormInputValue('side-filters-document-type').charAt(0).toLowerCase() +
     getFormInputValue('side-filters-document-type').slice(1)
   ).replace(/ /g, '_')
+}
+
+const updateStateFromSearchFilters = () => {
+  // Update the state
+  // state.searchParams.selectedWords = getFormInputValue('keyword')
+  state.searchParams.excludedWords = getFormInputValue('excluded-keyword')
+  state.searchParams.selectedTaxon = getFormInputValue('taxon')
+  state.searchParams.selectedPublishingOrganisation =
+    getFormInputValue('organisation')
+  state.searchParams.selectedLocale = getFormInputValue('locale')
+  state.searchParams.keywordLocation = (<HTMLInputElement>(
+    id('search-keyword-location')
+  )).value as KeywordLocation
+  state.searchParams.caseSensitive = (<HTMLInputElement>(
+    id(UrlParams.CaseSensitive)
+  ))?.checked
+  state.searchParams.linkSearchUrl = getFormInputValue('link-search')
+  state.skip = 0 // reset to first page
+  if (getFormInputValue('publishing-application'))
+    state.searchParams.publishingApplication = getFormInputValue(
+      'publishing-application'
+    ) as PublishingApplication
+  // if ((<HTMLInputElement>id('combinator-any'))?.checked)
+  //   state.searchParams.combinator = Combinator.Any
+  // if ((<HTMLInputElement>id('combinator-all'))?.checked)
+  //   state.searchParams.combinator = Combinator.All
+
+  // NEW
+  state.searchParams.selectedWords = getFormInputValue('keyword')
+  const newCombinatorValue = (
+    document.querySelector(
+      'input[name="search-filters-combinator"]:checked'
+    ) as HTMLInputElement
+  ).value as Combinator
+  state.searchParams.combinator = newCombinatorValue
+  state.searchParams.excludedWords = getFormInputValue(
+    'search-filters-excluded-keywords'
+  )
+  state.searchParams.caseSensitive = (<HTMLInputElement>(
+    id('search-filters-case-sensitive')
+  ))?.checked
 }
 
 const resetFilters = () => {
@@ -114,30 +158,7 @@ const handleEvent: SearchApiCallback = async function (event) {
             formPosition: 'Page',
           })
 
-          // Update the state
-          state.searchParams.selectedWords = getFormInputValue('keyword')
-          state.searchParams.excludedWords =
-            getFormInputValue('excluded-keyword')
-          state.searchParams.selectedTaxon = getFormInputValue('taxon')
-          state.searchParams.selectedPublishingOrganisation =
-            getFormInputValue('organisation')
-          state.searchParams.selectedLocale = getFormInputValue('locale')
-          state.searchParams.keywordLocation = (<HTMLInputElement>(
-            id('search-keyword-location')
-          )).value as KeywordLocation
-          state.searchParams.caseSensitive = (<HTMLInputElement>(
-            id(UrlParams.CaseSensitive)
-          ))?.checked
-          state.searchParams.linkSearchUrl = getFormInputValue('link-search')
-          state.skip = 0 // reset to first page
-          if (getFormInputValue('publishing-application'))
-            state.searchParams.publishingApplication = getFormInputValue(
-              'publishing-application'
-            ) as PublishingApplication
-          if ((<HTMLInputElement>id('combinator-any'))?.checked)
-            state.searchParams.combinator = Combinator.Any
-          if ((<HTMLInputElement>id('combinator-all'))?.checked)
-            state.searchParams.combinator = Combinator.All
+          updateStateFromSearchFilters()
           state.searchResults = null
           searchButtonClicked()
           break

@@ -31,7 +31,7 @@ const clearCache = async () => await localforage.removeItem(CACHE_KEY)
 
 if (config.enableHMR) {
   require('../scss/main.scss')
-  global.hmr = { saveState, setStateFromCache, clearCache }
+  global.hmr = { saveState, setStateFromCache, clearCache, getStateFromCache }
   document.addEventListener('DOMContentLoaded', function () {
     setStateFromCache()
   })

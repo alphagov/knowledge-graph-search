@@ -2,6 +2,7 @@ import { sanitiseOutput } from '../../common/utils/utils'
 import { state } from '../state'
 import { languageName } from '../../common/utils/lang'
 import {
+  Combinator,
   KeywordLocation,
   PublishingApplication,
   SearchType,
@@ -38,9 +39,9 @@ const viewKeywordSearchPanel = () => `
               </span>
             </summary>
             <div class="govuk-details__text">
+              ${viewCaseSensitiveSelector()}
               ${viewKeywordsCombinator()}
               ${viewExclusionsInput()}
-              ${viewCaseSensitiveSelector()}
               ${viewScopeSelector()}
               ${viewPublishingAppSelector()}
             </div>
@@ -274,54 +275,55 @@ const viewLinkSearch = () => `
 `
 
 const viewCaseSensitiveSelector = () => `
-  <div class="govuk-body">
-    <div class="govuk-checkboxes">
-      <div class="govuk-checkboxes__item">
-        <input
-            class="govuk-checkboxes__input"
-            ${state.waiting && 'disabled="disabled"'}
-            type="checkbox"
-            id="case-sensitive"
-            ${state.searchParams.caseSensitive ? 'checked' : ''}
-        />
-        <label for="case-sensitive" class="govuk-label govuk-checkboxes__label">case-sensitive search</label>
-      </div>
+<div class="govuk-form-group">
+  <div class="govuk-checkboxes govuk-checkboxes--small">
+    <div class="govuk-checkboxes__item">
+      <input
+          class="govuk-checkboxes__input"
+          ${state.waiting && 'disabled="disabled"'}
+          type="checkbox"
+          id="search-filters-case-sensitive"
+          name="search-filters-case-sensitive"
+          ${state.searchParams.caseSensitive ? 'checked' : ''}
+      />
+      <label for="search-filters-case-sensitive" class="govuk-label govuk-checkboxes__label">Enable case sensitive</label>
     </div>
   </div>
+</div>
 `
 
-const viewKeywordsCombinator = () =>
-  ` <div class="govuk-form-group">
-    <fieldset
-        class="govuk-fieldset"
-        id="combinator-wrapper"
-        ${state.waiting && 'disabled="disabled"'}>
-
-      <legend class="govuk-fieldset__legend">
+const viewKeywordsCombinator = () => `
+<div class="govuk-form-group">
+  <fieldset class="govuk-fieldset">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
         Search for
-      </legend>
-      <div class="govuk-radios" id="combinators">
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input"
-                 type="radio" id="combinator-any"
-                 name="combinator"
-            ${state.searchParams.combinator === 'any' ? 'checked' : ''}/>
-          <label for="combinator-any" class="govuk-label govuk-radios__label">
-            any keyword
-          </label>
-        </div>
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input"
-                 type="radio" id="combinator-all"
-                 name="combinator"
-            ${state.searchParams.combinator === 'all' ? 'checked' : ''}/>
-          <label for="combinator-all" class="govuk-label govuk-radios__label">
-            all keywords
-          </label>
-        </div>
+    </legend>
+    <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input" id="search-filters-combinator-1" name="search-filters-combinator" type="radio" value="${
+          Combinator.All
+        }" ${state.searchParams.combinator === Combinator.All ? 'checked' : ''}>
+        <label class="govuk-label govuk-radios__label" for="search-filters-combinator">
+          All keywords
+        </label>
+        <div class="govuk-hint govuk-radios__hint">
+            Narrows search eg, dog and cat
+          </div>
       </div>
-    </fieldset>
-  </div>
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input" id="search-filters-combinator-2" name="search-filters-combinator" type="radio" value="${
+          Combinator.Any
+        }" ${state.searchParams.combinator === Combinator.Any ? 'checked' : ''}>
+        <label class="govuk-label govuk-radios__label" for="search-filters-combinator">
+          Any keyword
+        </label>
+        <div class="govuk-hint govuk-radios__hint">
+            Expands search eg, dog or cat
+          </div>
+      </div>
+    </div>
+  </fieldset>
+</div>
 `
 
 const viewPublishingOrgSelector = () => `
@@ -396,21 +398,12 @@ const viewKeywordsInput = () => `
 `
 
 const viewExclusionsInput = () => `
-  <div class="govuk-body">
-    <label for="excluded-keyword" class="govuk-label label--bold">
-      Exclude keywords
-    </label>
-    <div class="govuk-hint">
-      For example: passport
-    </div>
-    <input class="govuk-input"
-        ${state.waiting && 'disabled="disabled"'}
-        id="excluded-keyword"
-        value='${sanitiseOutput(state.searchParams.excludedWords).replace(
-          '"',
-          '&quot;'
-        )}'/>
-  </div>
+<div class="govuk-form-group">
+  <label class="govuk-label govuk-label--s" for="search-filters-excluded-keywords">
+    Excluding these words
+  </label>
+  <input class="govuk-input" id="search-filters-excluded-keywords" name="side-filters-excluded-keywords" type="text" value="${state.searchParams.excludedWords}">
+</div>
 `
 
 export { viewSearchPanel }
