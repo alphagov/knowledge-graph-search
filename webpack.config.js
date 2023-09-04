@@ -1,8 +1,15 @@
 const path = require('path')
+const webpack = require('webpack')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
-module.exports = {
-  entry: './src/frontend/main.ts',
+module.exports = (env) => ({
   mode: 'development',
+  entry: {
+    main: env?.enableHMR
+      ? ['./src/frontend/main.ts', 'webpack-hot-middleware/client?reload=true']
+      : './src/frontend/main.ts',
+    styles: './src/frontend/scss/main.scss',
+  },
   module: {
     rules: [
       {
@@ -10,13 +17,38 @@ module.exports = {
         use: 'ts-loader',
         exclude: /node_modules/,
       },
+      {
+        test: /\.scss$/,
+        use: [
+          env?.enableHMR ? 'style-loader' : MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: { url: { filter: (url) => !url.startsWith('/assets') } },
+          },
+          {
+            loader: 'sass-loader',
+          },
+        ],
+      },
     ],
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
   },
   output: {
-    filename: 'main.js',
+    filename: '[name].js',
     path: path.resolve(__dirname, 'public'),
   },
-}
+  plugins: [
+    env?.enableHMR
+      ? new webpack.HotModuleReplacementPlugin()
+      : new MiniCssExtractPlugin({
+          filename: '[name].css',
+        }),
+    new webpack.DefinePlugin({
+      buildConfig: {
+        ENABLE_HMR: env?.enableHMR,
+      },
+    }),
+  ],
+})
