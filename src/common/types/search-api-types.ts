@@ -3,8 +3,8 @@ export enum UrlParams {
   SearchType = 'search-type',
   SelectedWords = 'selected-words',
   ExcludedWords = 'excluded-words',
-  SelectedTaxon = 'selected-taxon',
-  SelectedPublishingOrganisation = 'selected-publishing-organisation',
+  Taxon = 'taxon',
+  PublishingOrganisation = 'publishing-organisation',
   CaseSensitive = 'case-sensitive',
   DocumentType = 'document-type',
   KeywordLocation = 'keyword-location',
@@ -57,10 +57,10 @@ export type SearchParams = {
   searchType: SearchType
   selectedWords: string // list of words to search
   excludedWords: string // list of words to exclude
-  selectedTaxon: string // taxon to search in
-  selectedPublishingOrganisation: string // organisation to search in
-  selectedLocale: string // the language to search for
-  selectedDocumentType: string // documentTypeto search in
+  taxon: string // taxon to search in
+  publishingOrganisation: string // organisation to search in
+  language: string // the language to search for
+  documentType: string // documentTypeto search in
   linkSearchUrl: string // URL to find all pages linking to
   keywordLocation: KeywordLocation // what parts of the pages to search in
   combinator: Combinator // all keywords or any keywords

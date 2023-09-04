@@ -204,8 +204,7 @@ const viewPublishingOrganisation = () => {
           .map(
             (organisation) =>
               `<option value="${organisation}" ${
-                state.searchParams.selectedPublishingOrganisation ===
-                organisation
+                state.searchParams.publishingOrganisation === organisation
                   ? 'selected'
                   : ''
               }>${organisation}</option>`
@@ -237,7 +236,7 @@ const viewDocumentType = () => {
           .map(
             (documentType) =>
               `<option value="${documentType}" ${
-                state.searchParams.selectedDocumentType == documentType
+                state.searchParams.documentType == documentType
                   ? 'selected'
                   : ''
               }>${(
@@ -294,7 +293,7 @@ const viewTaxonSelector = () => `
         .map(
           (taxon) =>
             `<option value="${taxon}" ${
-              state.searchParams.selectedTaxon === taxon ? 'selected' : ''
+              state.searchParams.taxon === taxon ? 'selected' : ''
             }>${taxon}</option>`
         )
         .join('')}
@@ -336,9 +335,7 @@ const viewLocaleSelector = () => `
       ${state.locales.map(
         (code) =>
           `<option value="${code}" ${
-            state.searchParams.selectedLocale === languageName(code)
-              ? 'selected'
-              : ''
+            state.searchParams.language === languageName(code) ? 'selected' : ''
           }>${languageName(code)}</option>`
       )}
         </select>
@@ -448,7 +445,7 @@ const viewPublishingOrgSelector = () => `
         ${state.waiting && 'disabled="disabled"'}
         style="display: inline-block"
         list="orgList"
-        value="${state.searchParams.selectedPublishingOrganisation}"
+        value="${state.searchParams.publishingOrganisation}"
         class="govuk-input"
         id="organisation"
         autocomplete="off" />

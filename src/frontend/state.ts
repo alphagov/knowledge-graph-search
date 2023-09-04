@@ -21,10 +21,10 @@ export const initialSearchParams: SearchParams = {
   searchType: SearchType.Keyword,
   selectedWords: '',
   excludedWords: '',
-  selectedTaxon: '',
-  selectedPublishingOrganisation: '',
-  selectedLocale: defaultAllLanguagesOption,
-  selectedDocumentType: '',
+  taxon: '',
+  publishingOrganisation: '',
+  language: defaultAllLanguagesOption,
+  documentType: '',
   linkSearchUrl: '',
   keywordLocation: KeywordLocation.All,
   combinator: Combinator.All,
@@ -91,20 +91,17 @@ const setStateSearchParamsFromURL = function (): void {
     'linkSearchUrl',
     UrlParams.LinkSearchUrl
   )
-  state.searchParams.selectedTaxon = maybeReplace(
-    'selectedTaxon',
-    UrlParams.SelectedTaxon
-  )
-  state.searchParams.selectedPublishingOrganisation = maybeReplace(
-    'selectedPublishingOrganisation',
-    UrlParams.SelectedPublishingOrganisation
+  state.searchParams.taxon = maybeReplace('taxon', UrlParams.Taxon)
+  state.searchParams.publishingOrganisation = maybeReplace(
+    'publishingOrganisation',
+    UrlParams.PublishingOrganisation
   )
 
   const lang: string | null = searchParams.get(UrlParams.Language)
-  state.searchParams.selectedLocale =
+  state.searchParams.language =
     lang && lang !== defaultAllLanguagesOption
       ? languageName(lang)
-      : initialSearchParams.selectedLocale
+      : initialSearchParams.language
   state.searchParams.caseSensitive = maybeReplace(
     'caseSensitive',
     UrlParams.CaseSensitive
@@ -123,8 +120,8 @@ const setStateSearchParamsFromURL = function (): void {
     UrlParams.KeywordLocation
   )
 
-  state.searchParams.selectedDocumentType = maybeReplace(
-    'selectedDocumentType',
+  state.searchParams.documentType = maybeReplace(
+    'documentType',
     UrlParams.DocumentType
   )
 
@@ -150,9 +147,9 @@ const searchState = function (): { code: string; errors: string[] } {
   if (
     state.searchParams.selectedWords === '' &&
     state.searchParams.excludedWords === '' &&
-    state.searchParams.selectedTaxon === '' &&
-    state.searchParams.selectedPublishingOrganisation === '' &&
-    state.searchParams.selectedLocale === '' &&
+    state.searchParams.taxon === '' &&
+    state.searchParams.publishingOrganisation === '' &&
+    state.searchParams.language === '' &&
     state.searchParams.linkSearchUrl === ''
   ) {
     return { code: 'initial', errors }
@@ -169,9 +166,9 @@ const searchState = function (): { code: string; errors: string[] } {
 const resetSearch = function (): void {
   state.searchParams.selectedWords = ''
   state.searchParams.excludedWords = ''
-  state.searchParams.selectedTaxon = ''
-  state.searchParams.selectedPublishingOrganisation = ''
-  state.searchParams.selectedLocale = ''
+  state.searchParams.taxon = ''
+  state.searchParams.publishingOrganisation = ''
+  state.searchParams.language = ''
   state.searchParams.keywordLocation = KeywordLocation.All
   state.searchParams.caseSensitive = false
   state.searchParams.linkSearchUrl = ''

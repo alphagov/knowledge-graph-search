@@ -186,10 +186,10 @@ const sendSearchQuery = async function (
   const keywords = splitKeywords(searchParams.selectedWords)
   const excludedKeywords = splitKeywords(searchParams.excludedWords)
   const query = buildSqlQuery(searchParams, keywords, excludedKeywords)
-  const locale = languageCode(searchParams.selectedLocale)
-  const taxon = searchParams.selectedTaxon
-  const organisation = searchParams.selectedPublishingOrganisation
-  const documentType = searchParams.selectedDocumentType
+  const locale = languageCode(searchParams.language)
+  const taxon = searchParams.taxon
+  const organisation = searchParams.publishingOrganisation
+  const documentType = searchParams.documentType
   const selectedWordsWithoutQuotes = searchParams.selectedWords.replace(
     /"/g,
     ''
@@ -215,13 +215,13 @@ const sendSearchQuery = async function (
     case SearchType.Taxon:
       results = await Promise.all(queries)
       bqMainResults = results[0]
-      bqMetaResults = await getTaxonInfo(searchParams.selectedTaxon)
+      bqMetaResults = await getTaxonInfo(searchParams.taxon)
       break
     case SearchType.Organisation:
       results = await Promise.all(queries)
       bqMainResults = results[0]
       bqMetaResults = await getOrganisationInfo(
-        searchParams.selectedPublishingOrganisation
+        searchParams.publishingOrganisation
       )
       break
     default:

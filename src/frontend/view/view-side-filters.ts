@@ -115,8 +115,7 @@ const viewSelectPublishingOrganisations = () => {
           .map(
             (organisation) =>
               `<option value="${organisation}" ${
-                state.searchParams.selectedPublishingOrganisation ===
-                organisation
+                state.searchParams.publishingOrganisation === organisation
                   ? 'selected'
                   : ''
               }>${organisation}</option>`
@@ -148,7 +147,7 @@ const viewDocumentTypeSelector = () => {
           .map(
             (documentType) =>
               `<option value="${documentType}" ${
-                state.searchParams.selectedDocumentType == documentType
+                state.searchParams.documentType == documentType
                   ? 'selected'
                   : ''
               }>${(
@@ -201,7 +200,7 @@ const viewTaxonSelector = () => `
         .map(
           (taxon) =>
             `<option value="${taxon}" ${
-              state.searchParams.selectedTaxon === taxon ? 'selected' : ''
+              state.searchParams.taxon === taxon ? 'selected' : ''
             }>${taxon}</option>`
         )
         .join('')}
@@ -219,9 +218,7 @@ const viewLanguageSelector = () => `
       ${state.locales.map(
         (code) =>
           `<option value="${code}" ${
-            state.searchParams.selectedLocale === languageName(code)
-              ? 'selected'
-              : ''
+            state.searchParams.language === languageName(code) ? 'selected' : ''
           }>${languageName(code)}</option>`
       )}
         </select>

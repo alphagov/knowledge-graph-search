@@ -18,23 +18,22 @@ const makeQueryString = function (searchParams: SearchParams): string {
     usp.set(UrlParams.SelectedWords, searchParams.selectedWords)
   if (searchParams.excludedWords !== '')
     usp.set(UrlParams.ExcludedWords, searchParams.excludedWords)
-  if (searchParams.selectedTaxon !== '')
-    usp.set(UrlParams.SelectedTaxon, searchParams.selectedTaxon)
-  if (searchParams.selectedPublishingOrganisation !== '')
+  if (searchParams.taxon !== '') usp.set(UrlParams.Taxon, searchParams.taxon)
+  if (searchParams.publishingOrganisation !== '')
     usp.set(
-      UrlParams.SelectedPublishingOrganisation,
-      searchParams.selectedPublishingOrganisation
+      UrlParams.PublishingOrganisation,
+      searchParams.publishingOrganisation
     )
-  if (searchParams.selectedLocale !== defaultAllLanguagesOption)
-    usp.set(UrlParams.Language, languageCode(searchParams.selectedLocale))
+  if (searchParams.language !== defaultAllLanguagesOption)
+    usp.set(UrlParams.Language, languageCode(searchParams.language))
   if (searchParams.caseSensitive)
     usp.set(UrlParams.CaseSensitive, searchParams.caseSensitive.toString())
   if (searchParams.keywordLocation !== KeywordLocation.All) {
     usp.set(UrlParams.KeywordLocation, searchParams.keywordLocation)
   }
 
-  if (searchParams.selectedDocumentType)
-    usp.set(UrlParams.DocumentType, searchParams.selectedDocumentType)
+  if (searchParams.documentType)
+    usp.set(UrlParams.DocumentType, searchParams.documentType)
 
   if (searchParams.publishingApplication !== PublishingApplication.Any) {
     usp.set(UrlParams.PublishingApplication, searchParams.publishingApplication)

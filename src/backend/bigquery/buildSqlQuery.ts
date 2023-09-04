@@ -66,12 +66,12 @@ export const buildSqlQuery = function (
   }
 
   let localeClause = ''
-  if (searchParams.selectedLocale !== '') {
+  if (searchParams.language !== '') {
     localeClause = `AND locale = @locale`
   }
 
   let taxonClause = ''
-  if (searchParams.selectedTaxon !== '') {
+  if (searchParams.taxon !== '') {
     taxonClause = `
       AND EXISTS
         (
@@ -82,7 +82,7 @@ export const buildSqlQuery = function (
   }
 
   let organisationClause = ''
-  if (searchParams.selectedPublishingOrganisation !== '') {
+  if (searchParams.publishingOrganisation !== '') {
     organisationClause = `
       AND EXISTS
         (
@@ -105,7 +105,7 @@ export const buildSqlQuery = function (
   }
 
   let documentTypeClause = ''
-  if (searchParams.selectedDocumentType !== '') {
+  if (searchParams.documentType !== '') {
     documentTypeClause = `
       AND documentType = @documentType
     `

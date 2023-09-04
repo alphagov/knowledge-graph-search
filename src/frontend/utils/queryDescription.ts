@@ -30,26 +30,23 @@ export const queryDescription = ({
     }
     clauses.push(keywords)
   }
-  if (searchParams.selectedTaxon !== '')
+  if (searchParams.taxon !== '')
     clauses.push(
       `belong to the ${makeBold(
-        searchParams.selectedTaxon,
+        searchParams.taxon,
         includeMarkup
       )} taxon (or its sub-taxons)`
     )
-  if (searchParams.selectedPublishingOrganisation !== '')
+  if (searchParams.publishingOrganisation !== '')
     clauses.push(
       `are published by the ${makeBold(
-        searchParams.selectedPublishingOrganisation,
+        searchParams.publishingOrganisation,
         includeMarkup
       )}`
     )
-  if (searchParams.selectedLocale !== '')
+  if (searchParams.language !== '')
     clauses.push(
-      `are in ${makeBold(
-        languageName(searchParams.selectedLocale),
-        includeMarkup
-      )}`
+      `are in ${makeBold(languageName(searchParams.language), includeMarkup)}`
     )
   if (searchParams.linkSearchUrl !== '')
     clauses.push(

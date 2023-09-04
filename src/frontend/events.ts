@@ -29,11 +29,11 @@ const updateStateFromSideFilters = () => {
   state.searchParams.excludedWords = getFormInputValue(
     'side-filters-excluded-keywords'
   )
-  state.searchParams.selectedTaxon = getFormInputValue('side-filters-taxon')
-  state.searchParams.selectedPublishingOrganisation = getFormInputValue(
+  state.searchParams.taxon = getFormInputValue('side-filters-taxon')
+  state.searchParams.publishingOrganisation = getFormInputValue(
     'side-filters-publishing-organisation'
   )
-  state.searchParams.selectedLocale = getFormInputValue('side-filters-language')
+  state.searchParams.language = getFormInputValue('side-filters-language')
   state.searchParams.keywordLocation = getFormInputValue(
     'side-filters-keyword-location'
   ) as KeywordLocation
@@ -53,7 +53,7 @@ const updateStateFromSideFilters = () => {
   ).value as Combinator
   state.searchParams.combinator = newCombinatorValue
 
-  state.searchParams.selectedDocumentType = (
+  state.searchParams.documentType = (
     getFormInputValue('side-filters-document-type').charAt(0).toLowerCase() +
     getFormInputValue('side-filters-document-type').slice(1)
   ).replace(/ /g, '_')
@@ -76,23 +76,21 @@ const updateStateFromSearchFilters = () => {
   state.searchParams.keywordLocation = getFormInputValue(
     'search-filters-keyword-location'
   ) as KeywordLocation
-  state.searchParams.selectedPublishingOrganisation = getFormInputValue(
+  state.searchParams.publishingOrganisation = getFormInputValue(
     'search-filters-publishing-organisation'
   )
-  state.searchParams.selectedDocumentType = (
+  state.searchParams.documentType = (
     getFormInputValue('search-filters-document-type').charAt(0).toLowerCase() +
     getFormInputValue('search-filters-document-type').slice(1)
   ).replace(/ /g, '_')
   state.searchParams.publishingApplication = getFormInputValue(
     'search-filters-publishing-application'
   ) as PublishingApplication
-  state.searchParams.selectedTaxon = getFormInputValue('search-filters-taxon')
+  state.searchParams.taxon = getFormInputValue('search-filters-taxon')
   state.searchParams.publishingStatus = getFormInputValue(
     'search-filters-publishing-status'
   ) as PublishingStatus
-  state.searchParams.selectedLocale = getFormInputValue(
-    'search-filters-language'
-  )
+  state.searchParams.language = getFormInputValue('search-filters-language')
 }
 
 const resetFilters = () => {
@@ -102,11 +100,10 @@ const resetFilters = () => {
     excludedWords: initialSearchParams.excludedWords,
     keywordLocation: initialSearchParams.keywordLocation,
     publishingApplication: initialSearchParams.publishingApplication,
-    selectedPublishingOrganisation:
-      initialSearchParams.selectedPublishingOrganisation,
-    selectedDocumentType: initialSearchParams.selectedDocumentType,
-    selectedTaxon: initialSearchParams.selectedTaxon,
-    selectedLocale: initialSearchParams.selectedLocale,
+    publishingOrganisation: initialSearchParams.publishingOrganisation,
+    documentType: initialSearchParams.documentType,
+    taxon: initialSearchParams.taxon,
+    language: initialSearchParams.language,
     publishingStatus: initialSearchParams.publishingStatus,
   }
 
@@ -233,9 +230,9 @@ const searchButtonClicked = async function (): Promise<void> {
     case 'ready-to-search':
       if (
         state.searchParams.selectedWords !== '' ||
-        state.searchParams.selectedLocale !== '' ||
-        state.searchParams.selectedTaxon !== '' ||
-        state.searchParams.selectedPublishingOrganisation !== '' ||
+        state.searchParams.language !== '' ||
+        state.searchParams.taxon !== '' ||
+        state.searchParams.publishingOrganisation !== '' ||
         state.searchParams.linkSearchUrl !== ''
       ) {
         state.waiting = true
@@ -279,10 +276,10 @@ const updateUrl = function () {
             state.searchParams.caseSensitive.toString()
           )
         }
-        if (state.searchParams.selectedPublishingOrganisation) {
+        if (state.searchParams.publishingOrganisation) {
           searchParams.set(
-            UrlParams.SelectedPublishingOrganisation,
-            state.searchParams.selectedPublishingOrganisation
+            UrlParams.PublishingOrganisation,
+            state.searchParams.publishingOrganisation
           )
         }
         if (state.searchParams.keywordLocation !== KeywordLocation.All) {
@@ -291,17 +288,14 @@ const updateUrl = function () {
             state.searchParams.keywordLocation
           )
         }
-        if (state.searchParams.selectedDocumentType) {
+        if (state.searchParams.documentType) {
           searchParams.set(
             UrlParams.DocumentType,
-            state.searchParams.selectedDocumentType
+            state.searchParams.documentType
           )
         }
-        if (state.searchParams.selectedTaxon !== '') {
-          searchParams.set(
-            UrlParams.SelectedTaxon,
-            state.searchParams.selectedTaxon
-          )
+        if (state.searchParams.taxon !== '') {
+          searchParams.set(UrlParams.Taxon, state.searchParams.taxon)
         }
         if (
           state.searchParams.publishingApplication !== PublishingApplication.Any
@@ -316,13 +310,11 @@ const updateUrl = function () {
         }
 
         if (
-          ![defaultAllLanguagesOption, ''].includes(
-            state.searchParams.selectedLocale
-          )
+          ![defaultAllLanguagesOption, ''].includes(state.searchParams.language)
         ) {
           searchParams.set(
             UrlParams.Language,
-            languageCode(state.searchParams.selectedLocale)
+            languageCode(state.searchParams.language)
           )
         }
         if (state.searchParams.publishingStatus !== PublishingStatus.All) {
@@ -351,11 +343,8 @@ const updateUrl = function () {
         break
       case SearchType.Taxon:
         searchParams.set(UrlParams.SearchType, state.searchParams.searchType)
-        if (state.searchParams.selectedTaxon !== '') {
-          searchParams.set(
-            UrlParams.SelectedTaxon,
-            state.searchParams.selectedTaxon
-          )
+        if (state.searchParams.taxon !== '') {
+          searchParams.set(UrlParams.Taxon, state.searchParams.taxon)
         }
         if (
           state.searchParams.publishingApplication !== PublishingApplication.Any
@@ -368,10 +357,10 @@ const updateUrl = function () {
         break
       case SearchType.Organisation:
         searchParams.set(UrlParams.SearchType, state.searchParams.searchType)
-        if (state.searchParams.selectedPublishingOrganisation) {
+        if (state.searchParams.publishingOrganisation) {
           searchParams.set(
-            UrlParams.SelectedPublishingOrganisation,
-            state.searchParams.selectedPublishingOrganisation
+            UrlParams.PublishingOrganisation,
+            state.searchParams.publishingOrganisation
           )
         }
         if (
@@ -385,10 +374,10 @@ const updateUrl = function () {
         break
       case SearchType.Language:
         searchParams.set(UrlParams.SearchType, state.searchParams.searchType)
-        if (state.searchParams.selectedLocale !== defaultAllLanguagesOption) {
+        if (state.searchParams.language !== defaultAllLanguagesOption) {
           searchParams.set(
             UrlParams.Language,
-            languageCode(state.searchParams.selectedLocale)
+            languageCode(state.searchParams.language)
           )
         }
         if (
@@ -414,28 +403,25 @@ const updateUrl = function () {
             state.searchParams.excludedWords
           )
         }
-        if (state.searchParams.selectedTaxon !== '') {
+        if (state.searchParams.taxon !== '') {
+          searchParams.set(UrlParams.Taxon, state.searchParams.taxon)
+        }
+        if (state.searchParams.publishingOrganisation) {
           searchParams.set(
-            UrlParams.SelectedTaxon,
-            state.searchParams.selectedTaxon
+            UrlParams.PublishingOrganisation,
+            state.searchParams.publishingOrganisation
           )
         }
-        if (state.searchParams.selectedPublishingOrganisation) {
-          searchParams.set(
-            UrlParams.SelectedPublishingOrganisation,
-            state.searchParams.selectedPublishingOrganisation
-          )
-        }
-        if (state.searchParams.selectedDocumentType) {
+        if (state.searchParams.documentType) {
           searchParams.set(
             UrlParams.DocumentType,
-            state.searchParams.selectedDocumentType
+            state.searchParams.documentType
           )
         }
-        if (state.searchParams.selectedLocale !== defaultAllLanguagesOption) {
+        if (state.searchParams.language !== defaultAllLanguagesOption) {
           searchParams.set(
             UrlParams.Language,
-            languageCode(state.searchParams.selectedLocale)
+            languageCode(state.searchParams.language)
           )
         }
         if (state.searchParams.caseSensitive) {

@@ -48,9 +48,9 @@ const fetchInitialData = async function () {
     // Find if we need to run a search
     if (
       state.searchParams.selectedWords !== '' ||
-      state.searchParams.selectedLocale !== '' ||
-      state.searchParams.selectedTaxon !== '' ||
-      state.searchParams.selectedPublishingOrganisation !== '' ||
+      state.searchParams.language !== '' ||
+      state.searchParams.taxon !== '' ||
+      state.searchParams.publishingOrganisation !== '' ||
       state.searchParams.linkSearchUrl !== ''
     ) {
       state.waiting = true
