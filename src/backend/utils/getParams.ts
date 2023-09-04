@@ -19,17 +19,15 @@ export const getParams = (req: express.Request): SearchParams => {
     sanitiseInput(req.query[UrlParams.SelectedWords] as string) || ''
   const excludedWords =
     sanitiseInput(req.query[UrlParams.ExcludedWords] as string) || ''
-  const selectedTaxon =
-    sanitiseInput(req.query[UrlParams.Taxon] as string) || ''
-  const selectedPublishingOrganisation =
+  const taxon = sanitiseInput(req.query[UrlParams.Taxon] as string) || ''
+  const publishingOrganisation =
     sanitiseInput(req.query[UrlParams.PublishingOrganisation] as string) || ''
-  const selectedLocale =
-    sanitiseInput(req.query[UrlParams.Language] as string) || ''
+  const language = sanitiseInput(req.query[UrlParams.Language] as string) || ''
   const caseSensitive = req.query[UrlParams.CaseSensitive] === 'true'
   const combinator = <Combinator>(
     (sanitiseInput(req.query[UrlParams.Combinator] as string) || Combinator.All)
   )
-  const selectedDocumentType =
+  const documentType =
     sanitiseInput(req.query[UrlParams.DocumentType] as string) || ''
 
   const keywordLocation =
@@ -52,10 +50,10 @@ export const getParams = (req: express.Request): SearchParams => {
     searchType,
     selectedWords,
     excludedWords,
-    taxon: selectedTaxon,
-    publishingOrganisation: selectedPublishingOrganisation,
-    language: selectedLocale,
-    documentType: selectedDocumentType,
+    taxon,
+    publishingOrganisation,
+    language,
+    documentType,
     caseSensitive,
     combinator,
     keywordLocation,
