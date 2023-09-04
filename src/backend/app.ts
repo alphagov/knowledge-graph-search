@@ -62,6 +62,14 @@ class App {
   }
 
   private initializeMiddlewares() {
+    if (config.enableHMR) {
+      const {
+        devMiddleware,
+        hotMiddleware,
+      } = require('./middleware/webpack-hot-module-replacement')
+      this.app.use(devMiddleware())
+      this.app.use(hotMiddleware())
+    }
     this.app.use(cookieParser())
     this.app.use(cors())
     this.app.use(express.static('./public'))

@@ -2,11 +2,12 @@ import { queryDescription } from '../utils/queryDescription'
 import { id } from '../../common/utils/utils'
 import { state, searchState } from '../state'
 import { handleEvent } from '../events'
-import { languageName } from '../../common/utils/lang'
 import { viewMetaResults } from './view-metabox'
 import { viewSearchPanel } from './view-search-panel'
 import { EventType } from '../types/event-types'
 import { USER_ERRORS } from '../enums/constants'
+import { fieldName } from './utils'
+import { createAgGrid } from './view-grid'
 
 declare const window: any
 
@@ -33,9 +34,13 @@ const view = () => {
       </div>`)
   }
 
+  createAgGrid()
+
   // Add event handlers
   document
-    .querySelectorAll('button, input[type=checkbox][data-interactive=true]')
+    .querySelectorAll(
+      'button, a.govuk-tabs__tab, input[type=checkbox][data-interactive=true]'
+    )
     .forEach((input) =>
       input.addEventListener('click', (event) =>
         handleEvent({
@@ -67,30 +72,65 @@ const view = () => {
 }
 
 const viewSearchTypeSelector = () => `
-    <p class="govuk-body search-selector">
-      Search for:
-      <button class="${
-        state.searchParams.searchType === 'keyword' ? 'active' : ''
-      }" id="search-keyword">Keywords</button>
-      <button class="${
-        state.searchParams.searchType === 'link' ? 'active' : ''
-      }" id="search-link">Links</button>
-      <!-- Org search is disabled until we have tested a new design with users
-        <button class="${
-          state.searchParams.searchType === 'organisation' ? 'active' : ''
-        }" id="search-organisation">Organisations</button>
-      -->
-      <button class="${
-        state.searchParams.searchType === 'taxon' ? 'active' : ''
-      }" id="search-taxon">Taxons</button>
-      <button class="${
-        state.searchParams.searchType === 'language' ? 'active' : ''
-      }" id="search-language">Languages</button>
-      <button class="${
-        state.searchParams.searchType === 'advanced' ? 'active' : ''
-      }" id="search-advanced">Advanced</button>
-    </p>
-  `
+  <div class="govuk-tabs" data-module="govuk-tabs">
+  <span class="govuk-tabs__title">Search for</span>
+  <ul class="govuk-tabs__list">
+    <li class="govuk-tabs__list-item ${
+      state.searchParams.searchType === 'keyword'
+        ? 'govuk-tabs__list-item--selected'
+        : ''
+    }">
+      <a class="govuk-tabs__tab" href="#search-keywords" id="search-keyword">
+      Keywords
+      </a>
+    </li>
+    <li class="govuk-tabs__list-item ${
+      state.searchParams.searchType === 'link'
+        ? 'govuk-tabs__list-item--selected'
+        : ''
+    }">
+      <a class="govuk-tabs__tab" href="#search-links" id="search-link">
+      Links
+      </a>
+    </li>
+    <li class="govuk-tabs__list-item ${
+      state.searchParams.searchType === 'organisation'
+        ? 'govuk-tabs__list-item--selected'
+        : ''
+    }">
+      <a class="govuk-tabs__tab" href="#search-organisation" id="search-organisation">
+      Organisations
+      </a>
+    </li>
+    <li class="govuk-tabs__list-item ${
+      state.searchParams.searchType === 'taxon'
+        ? 'govuk-tabs__list-item--selected'
+        : ''
+    }">
+      <a class="govuk-tabs__tab" href="#search-taxon" id="search-taxon">
+      Taxons
+      </a>
+    </li>
+    <li class="govuk-tabs__list-item ${
+      state.searchParams.searchType === 'language'
+        ? 'govuk-tabs__list-item--selected'
+        : ''
+    }">
+      <a class="govuk-tabs__tab" href="#search-language" id="search-language">
+      Languages
+      </a>
+    </li>
+    <li class="govuk-tabs__list-item ${
+      state.searchParams.searchType === 'advanced'
+        ? 'govuk-tabs__list-item--selected'
+        : ''
+    }">
+      <a class="govuk-tabs__tab" href="#search-advanced" id="search-advanced">
+      Advanced
+      </a>
+    </li>
+  </ul>
+</div>`
 
 const viewMainLayout = () => {
   const result = []
@@ -181,73 +221,40 @@ const viewErrorBanner = () => {
 
 const viewSearchResultsTable = () => {
   const html = []
-  if (state.searchResults && state.searchResults?.length > 0) {
-    const recordsToShow = state.searchResults?.slice(
-      state.skip,
-      state.skip + state.resultsPerPage
-    )
-    html.push(`
-      <div class="govuk-body">
-        <fieldset class="govuk-fieldset" ${
-          state.waiting && 'disabled="disabled"'
-        }>
-          <legend class="govuk-fieldset__legend">For each result, display:</legend>
-          <ul class="kg-checkboxes" id="show-fields">`)
-    html.push(
-      Object.keys(state.searchResults[0])
-        .map(
-          (key) => `
-            <li class="kg-checkboxes__item">
-              <input class="kg-checkboxes__input"
-                     data-interactive="true"
-                     type="checkbox" id="show-field-${key}"
-                ${state.showFields[key] ? 'checked' : ''}/>
-              <label for="show-field-${key}" class="kg-label kg-checkboxes__label">${fieldName(
-            key
-          )}</label>
-            </li>`
-        )
-        .join('')
-    )
-    html.push(`
-          </ul>
-        </fieldset>
-        <table id="results-table" class="govuk-table">
-          <tbody class="govuk-table__body">
-          <tr class="govuk-table__row">
-            <th scope="col" class="a11y-hidden">Page</th>`)
-    Object.keys(state.showFields).forEach((key) => {
-      if (state.showFields[key]) {
-        html.push(
-          `<th scope="col" class="govuk-table__header">${fieldName(key)}</th>`
-        )
-      }
-    })
-
-    recordsToShow.forEach((record, recordIndex) => {
-      html.push(`
-        <tr class="govuk-table__row">
-          <th class="a11y-hidden">${recordIndex}</th>`)
-      Object.keys(state.showFields).forEach((key) => {
-        if (state.showFields[key]) {
-          html.push(
-            `<td class="govuk-table__cell">${fieldFormat(
-              key,
-              record[key]
-            )}</td>`
-          )
-        }
-      })
-      html.push(`</tr>`)
-    })
-    html.push(`
-          </tbody>
-        </table>
-      </div>`)
-    return html.join('')
-  } else {
+  if (!state.searchResults || state.searchResults?.length <= 0) {
     return ''
   }
+  html.push(`
+    <div class="govuk-body">
+      <fieldset class="govuk-fieldset" ${
+        state.waiting && 'disabled="disabled"'
+      }>
+        <legend class="govuk-fieldset__legend">For each result, display:</legend>
+        <ul class="kg-checkboxes" id="show-fields">`)
+  html.push(
+    Object.keys(state.searchResults[0])
+      .map(
+        (key) => `
+          <li class="kg-checkboxes__item">
+            <input class="kg-checkboxes__input"
+                    data-interactive="true"
+                    type="checkbox" id="show-field-${key}"
+              ${state.showFields[key] ? 'checked' : ''}/>
+            <label for="show-field-${key}" class="kg-label kg-checkboxes__label">${fieldName(
+          key
+        )}</label>
+          </li>`
+      )
+      .join('')
+  )
+  html.push(`
+        </ul>
+      </fieldset>`)
+  html.push('<div id="results-grid-container" class="ag-theme-alpine"></div>')
+  html.push('<div id="pagination-container"></div>')
+  html.push(`
+    </div>`)
+  return html.join('')
 }
 
 const viewWaiting = () => `
@@ -301,16 +308,6 @@ const viewResults = function () {
     html.push(viewSearchResultsTable())
 
     html.push(`
-      <p class="govuk-body">
-        <button type="button" class="govuk-button" id="button-prev-page" ${
-          state.skip < state.resultsPerPage ? 'disabled' : ''
-        }>Previous</button>
-        <button type="button" class="govuk-button" id="button-next-page" ${
-          state.skip + state.resultsPerPage >= nbRecords ? 'disabled' : ''
-        }>Next</button>
-      </p>`)
-
-    html.push(`
       <p class="govuk-body"><a class="govuk-link" href="/csv${window.location.search}" download="export.csv">Download all ${state.searchResults.length} records in CSV</a></p>`)
     return html.join('')
   } else {
@@ -359,66 +356,6 @@ const viewSearchResults = () => {
       document.title = serviceName
       return ''
   }
-}
-
-const formatNames = (array: []) =>
-  [...new Set(array)].map((x) => `“${x}”`).join(', ')
-
-const formatDateTime = (date: any) =>
-  `${date.value.slice(0, 10)} at ${date.value.slice(11, 16)}`
-
-const fieldFormatters: Record<string, any> = {
-  url: {
-    name: 'URL',
-    format: (url: string) => `<a class="govuk-link" href="${url}">${url}</a>`,
-  },
-  title: { name: 'Title' },
-  locale: { name: 'Language', format: languageName },
-  documentType: { name: 'Document type' },
-  contentId: { name: 'Content ID' },
-  publishing_app: { name: 'Publishing app' },
-  first_published_at: {
-    name: 'First published',
-    format: formatDateTime,
-  },
-  public_updated_at: {
-    name: 'Last major update',
-    format: formatDateTime,
-  },
-  taxons: {
-    name: 'Taxons',
-    format: formatNames,
-  },
-  primary_organisation: {
-    name: 'Primary publishing organisation',
-    format: (x: string) => x,
-  },
-  all_organisations: {
-    name: 'All publishing organisations',
-    format: formatNames,
-  },
-  page_views: {
-    name: 'Page views',
-    format: (val: string) => (val ? parseInt(val).toString() : '<5'),
-  },
-  withdrawn_at: {
-    name: 'Withdrawn at',
-    format: (date: string) => (date ? formatDateTime(date) : 'not withdrawn'),
-  },
-  withdrawn_explanation: {
-    name: 'Withdrawn reason',
-    format: (text: string) => text || 'n/a',
-  },
-}
-
-const fieldName = function (key: string) {
-  const f = fieldFormatters[key]
-  return f ? f.name : key
-}
-
-const fieldFormat = function (key: string, val: string | number): string {
-  const f = fieldFormatters[key]
-  return f && f.format ? f.format(val) : val
 }
 
 export { view }

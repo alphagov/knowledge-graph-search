@@ -2,15 +2,15 @@ import { view } from './view/view'
 import { state, setQueryParamsFromQS, resetSearch } from './state'
 import { searchButtonClicked, handleEvent } from './events'
 import { fetchWithTimeout, queryBackend } from './search-api'
+import config from './config'
 
 //= =================================================
 // INIT
 //= =================================================
 
-console.log('TEST MESSAGE FOR PRODUCTION')
 // dummy comment
 
-const initDatabase = async function () {
+const getInitialData = async function () {
   console.log('retrieving taxons, locales and organisations')
   const apiResponse = await fetchWithTimeout('/get-init-data')
   if (
@@ -23,10 +23,10 @@ const initDatabase = async function () {
   return apiResponse
 }
 
-const init = async function () {
+const fetchInitialData = async function () {
   state.systemErrorText = null
   try {
-    const dbInitResults = await initDatabase()
+    const dbInitResults = await getInitialData()
     state.taxons = dbInitResults.taxons
     state.organisations = dbInitResults.organisations
     state.locales = dbInitResults.locales
@@ -62,8 +62,8 @@ const init = async function () {
 // START
 //= =================================================
 
-;(async () => {
-  await init()
+const initWithoutHMR = async () => {
+  await fetchInitialData()
   if (!state.systemErrorText) {
     setQueryParamsFromQS()
     view()
@@ -72,4 +72,17 @@ const init = async function () {
     searchButtonClicked()
   }
   view()
-})()
+}
+
+const initWithHMR = async () => {
+  const { hasStateInCache, setStateFromCache } = require('./utils/hmr')
+  const stateInCache = await hasStateInCache()
+  if (stateInCache) {
+    await setStateFromCache()
+    view()
+  } else {
+    await initWithoutHMR()
+  }
+}
+
+config.enableHMR ? initWithHMR() : initWithoutHMR()
