@@ -1,5 +1,6 @@
 import {
   KeywordLocation,
+  PublishingApplication,
   SearchParams,
 } from '../../common/types/search-api-types'
 import { languageName } from '../../common/utils/lang'
@@ -53,8 +54,8 @@ export const queryDescription = ({
       `link to ${makeBold(searchParams.linkSearchUrl, includeMarkup)}`
     )
   if (
-    searchParams.publishingApplication === 'whitehall' ||
-    searchParams.publishingApplication === 'publisher'
+    searchParams.publishingApplication === PublishingApplication.Whitehall ||
+    searchParams.publishingApplication === PublishingApplication.Publisher
   )
     clauses.push(
       `are published using ${makeBold(

@@ -1,6 +1,7 @@
 import {
   Combinator,
   KeywordLocation,
+  PublishingApplication,
   PublishingStatus,
   SearchParams,
 } from '../../common/types/search-api-types'
@@ -50,9 +51,11 @@ export const buildSqlQuery = function (
           .join(' OR ') +
         ')'
   let publishingAppClause = ''
-  if (searchParams.publishingApplication === 'publisher') {
+  if (searchParams.publishingApplication === PublishingApplication.Publisher) {
     publishingAppClause = 'AND publishing_app = "publisher"'
-  } else if (searchParams.publishingApplication === 'whitehall') {
+  } else if (
+    searchParams.publishingApplication === PublishingApplication.Whitehall
+  ) {
     publishingAppClause = 'AND publishing_app = "whitehall"'
   }
 
