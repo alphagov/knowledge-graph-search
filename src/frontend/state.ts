@@ -67,7 +67,7 @@ const setStateSearchParamsFromURL = function (): void {
   const searchParams: URLSearchParams = new URLSearchParams(
     window.location.search
   )
-  const maybeReplace = (
+  const getURLParamOrFallback = (
     stateField: keyof SearchParams,
     urlParam: string
   ): any =>
@@ -75,24 +75,24 @@ const setStateSearchParamsFromURL = function (): void {
       ? searchParams.get(urlParam)
       : initialSearchParams[stateField]
 
-  state.searchParams.searchType = maybeReplace(
+  state.searchParams.searchType = getURLParamOrFallback(
     'searchType',
     UrlParams.SearchType
   )
-  state.searchParams.selectedWords = maybeReplace(
+  state.searchParams.selectedWords = getURLParamOrFallback(
     'selectedWords',
     UrlParams.SelectedWords
   )
-  state.searchParams.excludedWords = maybeReplace(
+  state.searchParams.excludedWords = getURLParamOrFallback(
     'excludedWords',
     UrlParams.ExcludedWords
   )
-  state.searchParams.linkSearchUrl = maybeReplace(
+  state.searchParams.linkSearchUrl = getURLParamOrFallback(
     'linkSearchUrl',
     UrlParams.LinkSearchUrl
   )
-  state.searchParams.taxon = maybeReplace('taxon', UrlParams.Taxon)
-  state.searchParams.publishingOrganisation = maybeReplace(
+  state.searchParams.taxon = getURLParamOrFallback('taxon', UrlParams.Taxon)
+  state.searchParams.publishingOrganisation = getURLParamOrFallback(
     'publishingOrganisation',
     UrlParams.PublishingOrganisation
   )
@@ -102,30 +102,30 @@ const setStateSearchParamsFromURL = function (): void {
     lang && lang !== defaultAllLanguagesOption
       ? languageName(lang)
       : initialSearchParams.language
-  state.searchParams.caseSensitive = maybeReplace(
+  state.searchParams.caseSensitive = getURLParamOrFallback(
     'caseSensitive',
     UrlParams.CaseSensitive
   )
-  state.searchParams.publishingApplication = maybeReplace(
+  state.searchParams.publishingApplication = getURLParamOrFallback(
     'publishingApplication',
     UrlParams.PublishingApplication
   )
-  state.searchParams.combinator = maybeReplace(
+  state.searchParams.combinator = getURLParamOrFallback(
     'combinator',
     UrlParams.Combinator
   )
 
-  state.searchParams.keywordLocation = maybeReplace(
+  state.searchParams.keywordLocation = getURLParamOrFallback(
     'keywordLocation',
     UrlParams.KeywordLocation
   )
 
-  state.searchParams.documentType = maybeReplace(
+  state.searchParams.documentType = getURLParamOrFallback(
     'documentType',
     UrlParams.DocumentType
   )
 
-  state.searchParams.publishingStatus = maybeReplace(
+  state.searchParams.publishingStatus = getURLParamOrFallback(
     'publishingStatus',
     UrlParams.PublishingStatus
   )
