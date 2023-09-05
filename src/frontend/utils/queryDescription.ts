@@ -1,6 +1,7 @@
 import {
   KeywordLocation,
   PublishingApplication,
+  PublishingStatus,
   SearchParams,
 } from '../../common/types/search-api-types'
 import { languageName } from '../../common/utils/lang'
@@ -45,6 +46,13 @@ export const queryDescription = ({
         includeMarkup
       )}`
     )
+  if (searchParams.publishingStatus !== PublishingStatus.All) {
+    const status = {
+      [PublishingStatus.Withdrawn]: 'withdrawn',
+      [PublishingStatus.NotWithdrawn]: 'not withdrawn',
+    }[searchParams.publishingStatus]
+    clauses.push(`are ${makeBold(status, includeMarkup)}`)
+  }
   if (searchParams.language !== '')
     clauses.push(
       `are in ${makeBold(languageName(searchParams.language), includeMarkup)}`
