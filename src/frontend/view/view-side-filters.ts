@@ -36,7 +36,7 @@ const viewCombinatorRadios = () => `
         <input class="govuk-radios__input" id="side-filters-combinator-1" name="side-filters-combinator" type="radio" value="${
           Combinator.All
         }" ${state.searchParams.combinator === Combinator.All ? 'checked' : ''}>
-        <label class="govuk-label govuk-radios__label" for="side-filters-combinator">
+        <label class="govuk-label govuk-radios__label" for="side-filters-combinator-1">
           All keywords
         </label>
         <div class="govuk-hint govuk-radios__hint">
@@ -47,7 +47,7 @@ const viewCombinatorRadios = () => `
         <input class="govuk-radios__input" id="side-filters-combinator-2" name="side-filters-combinator" type="radio" value="${
           Combinator.Any
         }" ${state.searchParams.combinator === Combinator.Any ? 'checked' : ''}>
-        <label class="govuk-label govuk-radios__label" for="side-filters-combinator">
+        <label class="govuk-label govuk-radios__label" for="side-filters-combinator-2">
           Any keyword
         </label>
         <div class="govuk-hint govuk-radios__hint">
@@ -135,7 +135,7 @@ const viewDocumentTypeSelector = () => {
       </label>
       <select ${
         state.waiting && 'disabled="disabled"'
-      } id="side-filters-document-type" class="autocomplete__input autocomplete__input--default" name="documentType">
+      } id="side-filters-document-type" class="autocomplete__input autocomplete__input--default" name="side-filters-document-type">
       <option value="" ></option>
   `,
   ]

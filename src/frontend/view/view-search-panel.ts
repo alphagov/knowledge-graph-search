@@ -224,7 +224,7 @@ const viewDocumentType = () => {
       </label>
       <select ${
         state.waiting && 'disabled="disabled"'
-      } id="search-filters-document-type" class="autocomplete__input autocomplete__input--default" name="documentType">
+      } id="search-filters-document-type" class="autocomplete__input autocomplete__input--default" name="search-filters-document-type">
       <option value="" ></option>
   `,
   ]
@@ -403,7 +403,7 @@ const viewKeywordsCombinator = () => `
         <input class="govuk-radios__input" id="search-filters-combinator-1" name="search-filters-combinator" type="radio" value="${
           Combinator.All
         }" ${state.searchParams.combinator === Combinator.All ? 'checked' : ''}>
-        <label class="govuk-label govuk-radios__label" for="search-filters-combinator">
+        <label class="govuk-label govuk-radios__label" for="search-filters-combinator-1">
           All keywords
         </label>
         <div class="govuk-hint govuk-radios__hint">
@@ -414,7 +414,7 @@ const viewKeywordsCombinator = () => `
         <input class="govuk-radios__input" id="search-filters-combinator-2" name="search-filters-combinator" type="radio" value="${
           Combinator.Any
         }" ${state.searchParams.combinator === Combinator.Any ? 'checked' : ''}>
-        <label class="govuk-label govuk-radios__label" for="search-filters-combinator">
+        <label class="govuk-label govuk-radios__label" for="search-filters-combinator-2">
           Any keyword
         </label>
         <div class="govuk-hint govuk-radios__hint">
