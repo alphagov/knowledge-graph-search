@@ -14,15 +14,17 @@ const viewAdvancedSearchPanel = () => `
         <div class="search-mode-panel">
           <h1 class="govuk-heading-xl">Advanced search</h1>
           ${viewKeywordsInput()}
+          ${viewCaseSensitiveSelector()}
           ${viewKeywordsCombinator()}
           ${viewExclusionsInput()}
-          ${viewCaseSensitiveSelector()}
-          ${viewScopeSelector()}
           ${viewLinkSearch()}
+          ${viewKeywordLocation()}
           ${viewPublishingOrgSelector()}
+          ${viewDocumentType()}
           ${viewPublishingAppSelector()}
           ${viewTaxonSelector()}
-          ${viewLocaleSelector()}
+          ${viewPublishingStatusSelector()}
+          ${viewLanguageSelector()}
           ${viewSearchButton()}
         </div>
       </form>
@@ -49,7 +51,7 @@ const viewKeywordSearchPanel = () => `
               ${viewPublishingAppSelector()}
               ${viewTaxonSelector()}
               ${viewPublishingStatusSelector()}
-              ${viewLocaleSelector()}
+              ${viewLanguageSelector()}
             </div>
           </details>
           ${viewSearchButton()}
@@ -68,8 +70,12 @@ const viewTaxonSearchPanel = () => `
                 Search filters
               </span>
             </summary>
-            <div class="govuk-details__text">
-              ${viewPublishingAppSelector()}
+            <div class="govuk-details__text search-filters-container">
+            ${viewPublishingOrganisation()}
+            ${viewPublishingStatusSelector()}
+            ${viewLanguageSelector()}
+            ${viewDocumentType()}
+            ${viewPublishingAppSelector()}
             </div>
           </details>
           ${viewSearchButton()}
@@ -88,8 +94,13 @@ const viewLinkSearchPanel = () => `
                 Search filters
               </span>
             </summary>
-            <div class="govuk-details__text">
-              ${viewPublishingAppSelector()}
+            <div class="govuk-details__text search-filters-container">
+            ${viewPublishingOrganisation()}
+            ${viewPublishingAppSelector()}
+            ${viewDocumentType()}
+            ${viewTaxonSelector()}
+            ${viewPublishingStatusSelector()}
+            ${viewLanguageSelector()}
             </div>
           </details>
           ${viewSearchButton()}
@@ -101,15 +112,19 @@ const viewLanguageSearchPanel = () => `
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
           <a class="govuk-skip-link" href="#results-table">Skip to results</a>
-          ${viewLocaleSelector()}
+          ${viewLanguageSelector()}
           <details class="govuk-details" data-module="govuk-details">
             <summary class="govuk-details__summary">
               <span class="govuk-details__summary-text">
                 Search filters
               </span>
             </summary>
-            <div class="govuk-details__text">
-              ${viewPublishingAppSelector()}
+            <div class="govuk-details__text search-filters-container">
+            ${viewPublishingOrganisation()}
+            ${viewPublishingAppSelector()}
+            ${viewDocumentType()}
+            ${viewTaxonSelector()}
+            ${viewPublishingStatusSelector()}
             </div>
           </details>
           ${viewSearchButton()}
@@ -249,36 +264,6 @@ const viewDocumentType = () => {
   return html.join('')
 }
 
-const viewScopeSelector = (): string => {
-  return `
-      <div class="govuk-form-group">
-        <label class="govuk-label" for="search-keyword-location">
-          Keyword location
-        </label>
-        <select class="govuk-select" id="search-keyword-location" name="search-keyword-location">
-          <option value="${KeywordLocation.All}" ${
-    state.searchParams.keywordLocation === KeywordLocation.All ? 'selected' : ''
-  }>All keyword locations</option>
-          <option value="${KeywordLocation.Title}" ${
-    state.searchParams.keywordLocation === KeywordLocation.Title
-      ? 'selected'
-      : ''
-  }>Title</option>
-          <option value="${KeywordLocation.BodyContent}" ${
-    state.searchParams.keywordLocation === KeywordLocation.BodyContent
-      ? 'selected'
-      : ''
-  }>Body content</option>
-          <option value="${KeywordLocation.Description}" ${
-    state.searchParams.keywordLocation === KeywordLocation.Description
-      ? 'selected'
-      : ''
-  }>Description</option>
-        </select>
-      </div>
-  `
-}
-
 const viewTaxonSelector = () => `
     <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
       <label class="govuk-label govuk-label--s" for="search-filters-taxon">
@@ -324,7 +309,7 @@ const viewPublishingStatusSelector = () => `
       </select>
   </div>`
 
-const viewLocaleSelector = () => `
+const viewLanguageSelector = () => `
     <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
       <label class="govuk-label govuk-label--s" for="search-filters-language">
         Languages
