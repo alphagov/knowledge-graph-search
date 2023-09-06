@@ -41,7 +41,7 @@ const view = () => {
   // Add event handlers
   document
     .querySelectorAll(
-      'button, a.govuk-tabs__tab, input[type=checkbox][data-interactive=true], a'
+      'button, input[type=checkbox][data-interactive=true], a#clear-side-filters-link'
     )
     .forEach((input) =>
       input.addEventListener('click', (event) =>
@@ -51,6 +51,16 @@ const view = () => {
         })
       )
     )
+
+  document.querySelectorAll('a.govuk-tabs__tab').forEach((tabAnchor) => {
+    tabAnchor.addEventListener('click', (event) => {
+      event.preventDefault()
+      handleEvent({
+        type: EventType.SearchTabClick,
+        id: (event.target as HTMLElement).getAttribute('id') || undefined,
+      })
+    })
+  })
 
   // Not sure this is even fired, since browser blocks submit because "the form is not connected"
   id('search-form')?.addEventListener('submit', (event) => {
@@ -81,7 +91,7 @@ const viewSearchTypeSelector = () => `
         ? 'govuk-tabs__list-item--selected'
         : ''
     }">
-      <a class="govuk-tabs__tab" href="#search-keywords" id="search-keyword">
+      <a class="govuk-tabs__tab" href="#search-keywords" id="tab_search-keywords">
       Keywords
       </a>
     </li>
@@ -90,7 +100,7 @@ const viewSearchTypeSelector = () => `
         ? 'govuk-tabs__list-item--selected'
         : ''
     }">
-      <a class="govuk-tabs__tab" href="#search-links" id="search-link">
+      <a class="govuk-tabs__tab" href="#search-links" id="tab_search-links">
       Links
       </a>
     </li>
@@ -99,7 +109,7 @@ const viewSearchTypeSelector = () => `
         ? 'govuk-tabs__list-item--selected'
         : ''
     }">
-      <a class="govuk-tabs__tab" href="#search-organisation" id="search-organisation">
+      <a class="govuk-tabs__tab" href="#search-orgs" id="tab_search-orgs">
       Organisations
       </a>
     </li>
@@ -108,7 +118,7 @@ const viewSearchTypeSelector = () => `
         ? 'govuk-tabs__list-item--selected'
         : ''
     }">
-      <a class="govuk-tabs__tab" href="#search-taxon" id="search-taxon">
+      <a class="govuk-tabs__tab" href="#search-taxons" id="tab_search-taxons">
       Taxons
       </a>
     </li>
@@ -117,7 +127,7 @@ const viewSearchTypeSelector = () => `
         ? 'govuk-tabs__list-item--selected'
         : ''
     }">
-      <a class="govuk-tabs__tab" href="#search-language" id="search-language">
+      <a class="govuk-tabs__tab" href="#search-langs" id="tab_search-langs">
       Languages
       </a>
     </li>
@@ -126,7 +136,7 @@ const viewSearchTypeSelector = () => `
         ? 'govuk-tabs__list-item--selected'
         : ''
     }">
-      <a class="govuk-tabs__tab" href="#search-advanced" id="search-advanced">
+      <a class="govuk-tabs__tab" href="#search-adv" id="tab_search-adv">
       Advanced
       </a>
     </li>

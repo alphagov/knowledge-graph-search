@@ -110,10 +110,26 @@ const resetFilters = () => {
   state.searchParams = newSearchParams
 }
 
+const handleSearchTabClick = (id: string) => {
+  resetSearch()
+  const mapping = {
+    'tab_search-keyword': SearchType.Keyword,
+    'tab_search-links': SearchType.Link,
+    'tab_search-taxons': SearchType.Taxon,
+    'tab_search-orgs': SearchType.Organisation,
+    'tab_search-langs': SearchType.Language,
+    'tab_search-adv': SearchType.Advanced,
+  }
+  state.searchParams.searchType = mapping[id] || SearchType.Keyword
+}
+
 const handleEvent: SearchApiCallback = async function (event) {
   let fieldClicked: RegExpMatchArray | null
   console.log('handleEvent:', event.type, event.id || '')
   switch (event.type) {
+    case EventType.SearchTabClick:
+      handleSearchTabClick(event.id)
+      break
     case EventType.Dom:
       switch (event.id) {
         case 'clear-side-filters-link':
@@ -152,30 +168,6 @@ const handleEvent: SearchApiCallback = async function (event) {
           break
         case 'toggleDisamBox':
           state.disamboxExpanded = !state.disamboxExpanded
-          break
-        case 'search-keyword':
-          resetSearch()
-          state.searchParams.searchType = SearchType.Keyword
-          break
-        case 'search-link':
-          resetSearch()
-          state.searchParams.searchType = SearchType.Link
-          break
-        case 'search-taxon':
-          resetSearch()
-          state.searchParams.searchType = SearchType.Taxon
-          break
-        case 'search-organisation':
-          resetSearch()
-          state.searchParams.searchType = SearchType.Organisation
-          break
-        case 'search-language':
-          resetSearch()
-          state.searchParams.searchType = SearchType.Language
-          break
-        case 'search-advanced':
-          resetSearch()
-          state.searchParams.searchType = SearchType.Advanced
           break
         default:
           fieldClicked = event.id ? event.id.match(/show-field-(.*)/) : null
@@ -225,16 +217,21 @@ const searchButtonClicked = async function (): Promise<void> {
   state.systemErrorText = null
   state.userErrors = []
   const searchStatus = searchState()
-  console.log({ 'searchStatus.code': searchStatus.code })
   switch (searchStatus.code) {
     case 'ready-to-search':
       if (
         state.searchParams.selectedWords !== '' ||
-        state.searchParams.language !== '' ||
+        (state.searchParams.language !== '' &&
+          state.searchParams.language !== defaultAllLanguagesOption) ||
         state.searchParams.taxon !== '' ||
         state.searchParams.publishingOrganisation !== '' ||
-        state.searchParams.linkSearchUrl !== ''
+        state.searchParams.linkSearchUrl !== '' ||
+        state.searchParams.documentType !== '' ||
+        state.searchParams.publishingApplication !==
+          PublishingApplication.Any ||
+        state.searchParams.publishingStatus !== PublishingStatus.All
       ) {
+        console.log('QUERY BACKEND')
         state.waiting = true
         queryBackend(state.searchParams, handleEvent)
       }

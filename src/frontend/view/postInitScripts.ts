@@ -48,7 +48,7 @@ export default function govukPostInitScripts() {
             if (val && document.getElementById('filters')) {
               ;(document.getElementById(id) as HTMLInputElement).value =
                 val === 'undefined' ? '' : val
-              // document.getElementById('search').click()
+              document.getElementById('search').click()
             }
           },
         })
