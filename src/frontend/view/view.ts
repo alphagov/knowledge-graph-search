@@ -317,7 +317,7 @@ const viewResults = function () {
       <div class="results-container-row-2-results">
         ${
           state.searchParams.searchType === 'advanced'
-            ? viewAdvancedSearchPanel()
+            ? viewAdvancedSearchPanel(true)
             : viewSideFilters()
         }
         ${viewSearchResultsTable()}

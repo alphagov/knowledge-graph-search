@@ -9,10 +9,14 @@ import {
   SearchType,
 } from '../../common/types/search-api-types'
 
-export const viewAdvancedSearchPanel = () => `
+export const viewAdvancedSearchPanel = (onTheSide = true) => {
+  const title = onTheSide
+    ? `<h2 class="govuk-heading-m">Advanced search</h2>`
+    : `<h1 class="govuk-heading-xl">Advanced search</h1>`
+  const inside = `
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
-          <h1 class="govuk-heading-xl">Advanced search</h1>
+          ${title}
           ${viewKeywordsInput()}
           ${viewCaseSensitiveSelector()}
           ${viewKeywordsCombinator()}
@@ -29,6 +33,11 @@ export const viewAdvancedSearchPanel = () => `
         </div>
       </form>
     `
+  const outsideWrap = (_inside) =>
+    onTheSide ? `<div class="side-filters">${_inside}</div>` : _inside
+
+  return outsideWrap(inside)
+}
 
 const viewKeywordSearchPanel = () => `
       <form id="search-form" class="search-panel govuk-form">
