@@ -3,7 +3,7 @@ import { id } from '../../common/utils/utils'
 import { state, searchState } from '../state'
 import { handleEvent } from '../events'
 import { viewMetaResults } from './view-metabox'
-import { viewSearchPanel } from './view-search-panel'
+import { viewAdvancedSearchPanel, viewSearchPanel } from './view-search-panel'
 import { EventType } from '../types/event-types'
 import { USER_ERRORS } from '../enums/constants'
 import { fieldName } from './utils'
@@ -155,16 +155,7 @@ const viewMainLayout = () => {
         </div>
       `)
     } else {
-      result.push(`
-        <div class="govuk-grid-row advanced-layout">
-          <div class="govuk-grid-column-one-third">
-            ${viewSearchPanel()}
-          </div>
-          <div class="govuk-grid-column-two-thirds">
-            ${viewSearchResults()}
-          </div>
-        </div>
-      `)
+      result.push(viewSearchResults())
     }
   } else {
     result.push(`
@@ -324,7 +315,11 @@ const viewResults = function () {
         }</button>
       </div>
       <div class="results-container-row-2-results">
-        ${viewSideFilters()}
+        ${
+          state.searchParams.searchType === 'advanced'
+            ? viewAdvancedSearchPanel()
+            : viewSideFilters()
+        }
         ${viewSearchResultsTable()}
       </div>
     </div>`
