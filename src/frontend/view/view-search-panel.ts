@@ -35,7 +35,10 @@ const viewKeywordSearchPanel = () => `
         <div class="search-mode-panel">
           <a class="govuk-skip-link" href="#results-table">Skip to results</a>
           ${viewKeywordsInput()}
-          <details class="govuk-details" data-module="govuk-details">
+          ${
+            state.searchResults
+              ? ''
+              : `<details class="govuk-details" data-module="govuk-details">
             <summary class="govuk-details__summary">
               <span class="govuk-details__summary-text">
                 Search filters
@@ -53,11 +56,41 @@ const viewKeywordSearchPanel = () => `
               ${viewPublishingStatusSelector()}
               ${viewLanguageSelector()}
             </div>
-          </details>
+          </details>`
+          }
           ${viewSearchButton()}
         </div>
       </form>
     `
+
+const viewLinkSearchPanel = () => `
+    <form id="search-form" class="search-panel govuk-form">
+      <div class="search-mode-panel">
+        <a class="govuk-skip-link" href="#results-table">Skip to results</a>
+        ${viewLinkSearch()}
+        ${
+          state.searchResults
+            ? ''
+            : `<details class="govuk-details" data-module="govuk-details">
+          <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+              Search filters
+            </span>
+          </summary>
+          <div class="govuk-details__text search-filters-container">
+          ${viewPublishingOrganisation()}
+          ${viewPublishingAppSelector()}
+          ${viewDocumentType()}
+          ${viewTaxonSelector()}
+          ${viewPublishingStatusSelector()}
+          ${viewLanguageSelector()}
+          </div>
+        </details>`
+        }
+        ${viewSearchButton()}
+      </div>
+    </form>
+  `
 
 const viewTaxonSearchPanel = () => `
       <form id="search-form" class="search-panel govuk-form">
@@ -76,31 +109,6 @@ const viewTaxonSearchPanel = () => `
             ${viewLanguageSelector()}
             ${viewDocumentType()}
             ${viewPublishingAppSelector()}
-            </div>
-          </details>
-          ${viewSearchButton()}
-        </div>
-      </form>
-    `
-
-const viewLinkSearchPanel = () => `
-      <form id="search-form" class="search-panel govuk-form">
-        <div class="search-mode-panel">
-          <a class="govuk-skip-link" href="#results-table">Skip to results</a>
-          ${viewLinkSearch()}
-          <details class="govuk-details" data-module="govuk-details">
-            <summary class="govuk-details__summary">
-              <span class="govuk-details__summary-text">
-                Search filters
-              </span>
-            </summary>
-            <div class="govuk-details__text search-filters-container">
-            ${viewPublishingOrganisation()}
-            ${viewPublishingAppSelector()}
-            ${viewDocumentType()}
-            ${viewTaxonSelector()}
-            ${viewPublishingStatusSelector()}
-            ${viewLanguageSelector()}
             </div>
           </details>
           ${viewSearchButton()}
@@ -352,7 +360,7 @@ const viewLinkSearch = () => `
     </div>
     <input
         class="govuk-input"
-        id="link-search"
+        id="search-filters-link-search"
         ${state.waiting && 'disabled="disabled"'}
         value="${state.searchParams.linkSearchUrl}"
      />
