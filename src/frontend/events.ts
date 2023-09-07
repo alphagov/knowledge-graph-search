@@ -306,9 +306,12 @@ const updateUrl = function () {
       condition: (v) => v !== '',
       param: UrlParams.LinkSearchUrl,
     },
+    searchType: {
+      condition: (v) => v !== SearchType.Keyword,
+      param: UrlParams.SearchType,
+    },
   }
 
-  console.log('Updating URL')
   const updateSearchParams = (key) => {
     const item = config[key]
     const value = state.searchParams[key]
@@ -334,6 +337,7 @@ const updateUrl = function () {
       'taxon',
       'publishingStatus',
       'language',
+      'searchType',
     ],
     [SearchType.Link]: [
       'linkSearchUrl',
@@ -343,10 +347,12 @@ const updateUrl = function () {
       'taxon',
       'publishingStatus',
       'language',
+      'searchType',
     ],
     [SearchType.Organisation]: [
       'publishingOrganisation',
       'publishingApplication',
+      'searchType',
     ],
     [SearchType.Taxon]: [
       'taxon',
@@ -355,6 +361,7 @@ const updateUrl = function () {
       'language',
       'documentType',
       'publishingApplication',
+      'searchType',
     ],
     [SearchType.Language]: [
       'language',
@@ -363,6 +370,7 @@ const updateUrl = function () {
       'documentType',
       'taxon',
       'publishingStatus',
+      'searchType',
     ],
     [SearchType.Advanced]: [
       'selectedWords',
@@ -377,6 +385,7 @@ const updateUrl = function () {
       'taxon',
       'publishingStatus',
       'language',
+      'searchType',
     ],
   }
 
