@@ -206,6 +206,39 @@ const viewKeywordLocation = () => `
 </div>
 `
 
+const viewPublishingOrgSelector = () => {
+  const options = state.organisations
+    .sort()
+    .map(
+      (organisation) =>
+        `<option value="${organisation}" ${
+          state.searchParams.publishingOrganisation === organisation
+            ? 'selected'
+            : ''
+        }>${organisation}</option>`
+    )
+    .join('')
+  return `
+  <div class="govuk-body">
+    <div class="taxon-facet">
+      <label class="govuk-label label--bold" for="publishing-organisation">
+        Search for publishing organisations
+      </label>
+      <div class="govuk-hint">
+        Type the first letters of an organisation or select from the dropdown
+      </div>
+
+      <select ${
+        state.waiting && 'disabled="disabled"'
+      } id="search-filters-publishing-organisation" class="autocomplete__input autocomplete__input--default" name="search-filters-publishing-organisation" style="display: inline-block">
+        <option value="" ></option>
+        ${options}
+      </select>
+    </div>
+  </div>
+`
+}
+
 const viewPublishingOrganisation = () => {
   const options = state.organisations
     .sort()
@@ -415,34 +448,6 @@ const viewKeywordsCombinator = () => `
     </div>
   </fieldset>
 </div>
-`
-
-const viewPublishingOrgSelector = () => `
-  <div class="govuk-body">
-    <div class="taxon-facet">
-      <label class="govuk-label label--bold" for="publishing-organisation">
-        Search for publishing organisations
-      </label>
-      <div class="govuk-hint">
-        Type the first letters of an organisation or select from the dropdown
-      </div>
-      <datalist id="orgList">
-        ${state.organisations.map(
-          (organisation) => `<option>${organisation}</option>`
-        )}
-      </datalist>
-      <div>
-      <input
-        ${state.waiting && 'disabled="disabled"'}
-        style="display: inline-block"
-        list="orgList"
-        value="${state.searchParams.publishingOrganisation}"
-        class="govuk-input"
-        id="organisation"
-        autocomplete="off" />
-      </div>
-    </div>
-  </div>
 `
 
 const viewPublishingAppSelector = () => `
