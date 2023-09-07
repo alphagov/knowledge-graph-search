@@ -125,7 +125,10 @@ const viewLanguageSearchPanel = () => `
         <div class="search-mode-panel">
           <a class="govuk-skip-link" href="#results-table">Skip to results</a>
           ${viewLanguageSelector()}
-          <details class="govuk-details" data-module="govuk-details">
+          ${
+            state.searchResults
+              ? ''
+              : `<details class="govuk-details" data-module="govuk-details">
             <summary class="govuk-details__summary">
               <span class="govuk-details__summary-text">
                 Search filters
@@ -138,7 +141,8 @@ const viewLanguageSearchPanel = () => `
             ${viewTaxonSelector()}
             ${viewPublishingStatusSelector()}
             </div>
-          </details>
+          </details>`
+          }
           ${viewSearchButton()}
         </div>
       </form>

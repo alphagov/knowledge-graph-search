@@ -405,12 +405,33 @@ const updateUrl = function () {
             languageCode(state.searchParams.language)
           )
         }
+        if (state.searchParams.publishingOrganisation) {
+          searchParams.set(
+            UrlParams.PublishingOrganisation,
+            state.searchParams.publishingOrganisation
+          )
+        }
         if (
           state.searchParams.publishingApplication !== PublishingApplication.Any
         ) {
           searchParams.set(
             UrlParams.PublishingApplication,
             state.searchParams.publishingApplication
+          )
+        }
+        if (state.searchParams.documentType) {
+          searchParams.set(
+            UrlParams.DocumentType,
+            state.searchParams.documentType
+          )
+        }
+        if (state.searchParams.taxon !== '') {
+          searchParams.set(UrlParams.Taxon, state.searchParams.taxon)
+        }
+        if (state.searchParams.publishingStatus !== PublishingStatus.All) {
+          searchParams.set(
+            UrlParams.PublishingStatus,
+            state.searchParams.publishingStatus
           )
         }
         break
