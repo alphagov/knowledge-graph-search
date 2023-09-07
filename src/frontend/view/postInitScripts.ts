@@ -13,7 +13,8 @@ export default function govukPostInitScripts() {
   const initialFocusOnHeading = () => id('results-heading')?.focus()
 
   const initGovUKFrontendScripts = () => {
-    window.GOVUKFrontend.initAll()
+    // console.log('INIT')
+    // window.GOVUKFrontend.initAll()
   }
 
   const initAutoComplete = () => {

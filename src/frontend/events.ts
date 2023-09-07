@@ -113,12 +113,12 @@ const resetFilters = () => {
 const handleSearchTabClick = (id: string) => {
   resetSearch()
   const mapping = {
-    'tab_search-keyword': SearchType.Keyword,
-    'tab_search-links': SearchType.Link,
-    'tab_search-taxons': SearchType.Taxon,
-    'tab_search-orgs': SearchType.Organisation,
-    'tab_search-langs': SearchType.Language,
-    'tab_search-adv': SearchType.Advanced,
+    'search-keyword': SearchType.Keyword,
+    'search-links': SearchType.Link,
+    'search-taxons': SearchType.Taxon,
+    'search-orgs': SearchType.Organisation,
+    'search-langs': SearchType.Language,
+    'search-adv': SearchType.Advanced,
   }
   state.searchParams.searchType = mapping[id] || SearchType.Keyword
 }

@@ -54,7 +54,6 @@ const view = () => {
 
   document.querySelectorAll('a.govuk-tabs__tab').forEach((tabAnchor) => {
     tabAnchor.addEventListener('click', (event) => {
-      event.preventDefault()
       handleEvent({
         type: EventType.SearchTabClick,
         id: (event.target as HTMLElement).getAttribute('id') || undefined,
@@ -91,7 +90,7 @@ const viewSearchTypeSelector = () => `
         ? 'govuk-tabs__list-item--selected'
         : ''
     }">
-      <a class="govuk-tabs__tab" href="#search-keywords" id="tab_search-keywords">
+      <a class="govuk-tabs__tab" href="#search-keywords" id="search-keywords">
       Keywords
       </a>
     </li>
@@ -100,7 +99,7 @@ const viewSearchTypeSelector = () => `
         ? 'govuk-tabs__list-item--selected'
         : ''
     }">
-      <a class="govuk-tabs__tab" href="#search-links" id="tab_search-links">
+      <a class="govuk-tabs__tab" href="#search-links" id="search-links">
       Links
       </a>
     </li>
@@ -109,7 +108,7 @@ const viewSearchTypeSelector = () => `
         ? 'govuk-tabs__list-item--selected'
         : ''
     }">
-      <a class="govuk-tabs__tab" href="#search-orgs" id="tab_search-orgs">
+      <a class="govuk-tabs__tab" href="#search-orgs" id="search-orgs">
       Organisations
       </a>
     </li>
@@ -118,7 +117,7 @@ const viewSearchTypeSelector = () => `
         ? 'govuk-tabs__list-item--selected'
         : ''
     }">
-      <a class="govuk-tabs__tab" href="#search-taxons" id="tab_search-taxons">
+      <a class="govuk-tabs__tab" href="#search-taxons" id="search-taxons">
       Taxons
       </a>
     </li>
@@ -127,7 +126,7 @@ const viewSearchTypeSelector = () => `
         ? 'govuk-tabs__list-item--selected'
         : ''
     }">
-      <a class="govuk-tabs__tab" href="#search-langs" id="tab_search-langs">
+      <a class="govuk-tabs__tab" href="#search-langs" id="search-langs">
       Languages
       </a>
     </li>
@@ -136,7 +135,7 @@ const viewSearchTypeSelector = () => `
         ? 'govuk-tabs__list-item--selected'
         : ''
     }">
-      <a class="govuk-tabs__tab" href="#search-adv" id="tab_search-adv">
+      <a class="govuk-tabs__tab" href="#search-adv" id="search-adv">
       Advanced
       </a>
     </li>
