@@ -145,7 +145,10 @@ const viewOrganisationSearchPanel = () => `
         <div class="search-mode-panel">
           <a class="govuk-skip-link" href="#results-table">Skip to results</a>
           ${viewPublishingOrgSelector()}
-          <details class="govuk-details" data-module="govuk-details">
+          ${
+            state.searchResults
+              ? ''
+              : `<details class="govuk-details" data-module="govuk-details">
             <summary class="govuk-details__summary">
               <span class="govuk-details__summary-text">
                 Search filters
@@ -154,7 +157,8 @@ const viewOrganisationSearchPanel = () => `
             <div class="govuk-details__text">
               ${viewPublishingAppSelector()}
             </div>
-          </details>
+          </details>`
+          }
           ${viewSearchButton()}
         </div>
       </form>

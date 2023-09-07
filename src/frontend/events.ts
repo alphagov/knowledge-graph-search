@@ -91,9 +91,10 @@ const updateStateFromSearchFilters = () => {
     'search-filters-publishing-application'
   ) as PublishingApplication
   state.searchParams.taxon = getFormInputValue('search-filters-taxon')
-  state.searchParams.publishingStatus = getFormInputValue(
-    'search-filters-publishing-status'
-  ) as PublishingStatus
+  state.searchParams.publishingStatus =
+    (getFormInputValue(
+      'search-filters-publishing-status'
+    ) as PublishingStatus) || PublishingStatus.All
   state.searchParams.language = getFormInputValue('search-filters-language')
 }
 
