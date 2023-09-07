@@ -95,35 +95,33 @@ const viewSelectKeywordLocation = () => `
 `
 
 const viewSelectPublishingOrganisations = () => {
-  const html = [
-    `
-    <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
-      <label class="govuk-label govuk-label--s" for="side-filters-publishing-organisation">
-        Publishing organisations
-      </label>
-      <select ${
-        state.waiting && 'disabled="disabled"'
-      } id="side-filters-publishing-organisation" class="autocomplete__input autocomplete__input--default" name="side-filters-publishing-organisation">
-      <option value="" ></option>
-  `,
-  ]
+  const options = state.organisations
+    .sort()
+    .map(
+      (organisation) =>
+        `<option value="${organisation}" ${
+          state.searchParams.publishingOrganisation === organisation
+            ? 'selected'
+            : ''
+        }>${organisation}</option>`
+    )
+    .join('')
 
-  html.push(`
-      ${html.push(
-        ...state.organisations
-          .sort()
-          .map(
-            (organisation) =>
-              `<option value="${organisation}" ${
-                state.searchParams.publishingOrganisation === organisation
-                  ? 'selected'
-                  : ''
-              }>${organisation}</option>`
-          )
-      )}
-        </select>
-    </div>`)
-  return html.join('')
+  const html = `
+  <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+    <label class="govuk-label govuk-label--s" for="side-filters-publishing-organisation">
+      Publishing organisations
+    </label>
+    <select ${
+      state.waiting && 'disabled="disabled"'
+    } id="side-filters-publishing-organisation" class="autocomplete__input autocomplete__input--default" name="side-filters-publishing-organisation">
+      <option value="" ></option>
+      ${options}
+    </select>
+  </div>
+  `
+
+  return html
 }
 
 const viewDocumentTypeSelector = () => {
