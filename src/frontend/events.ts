@@ -236,7 +236,6 @@ const searchButtonClicked = async function (): Promise<void> {
           PublishingApplication.Any ||
         state.searchParams.publishingStatus !== PublishingStatus.All
       ) {
-        console.log('QUERY BACKEND')
         state.waiting = true
         queryBackend(state.searchParams, handleEvent)
       }
@@ -347,6 +346,30 @@ const updateUrl = function () {
         searchParams.set(UrlParams.SearchType, state.searchParams.searchType)
         if (state.searchParams.taxon !== '') {
           searchParams.set(UrlParams.Taxon, state.searchParams.taxon)
+        }
+        if (state.searchParams.publishingOrganisation) {
+          searchParams.set(
+            UrlParams.PublishingOrganisation,
+            state.searchParams.publishingOrganisation
+          )
+        }
+        if (state.searchParams.publishingStatus !== PublishingStatus.All) {
+          searchParams.set(
+            UrlParams.PublishingStatus,
+            state.searchParams.publishingStatus
+          )
+        }
+        if (state.searchParams.language !== defaultAllLanguagesOption) {
+          searchParams.set(
+            UrlParams.Language,
+            languageCode(state.searchParams.language)
+          )
+        }
+        if (state.searchParams.documentType) {
+          searchParams.set(
+            UrlParams.DocumentType,
+            state.searchParams.documentType
+          )
         }
         if (
           state.searchParams.publishingApplication !== PublishingApplication.Any
