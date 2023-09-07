@@ -270,6 +270,8 @@ const viewResults = function () {
     const html = []
     const nbRecords = state.searchResults.length
 
+    html.push(`<div class="before-results-container">`)
+    html.push(`<div class="results-comments">`)
     if (nbRecords < 10000) {
       html.push(
         `<div class="govuk-body">${queryDescription({
@@ -299,6 +301,12 @@ const viewResults = function () {
         <a class="govuk-skip-link" href="#search-form">Back to search filters</a>
      `)
     }
+
+    // .results-comments
+    html.push(`</div>`)
+    html.push(viewMetaResults())
+    // .before-results-container
+    html.push(`</div>`)
 
     const resultsContainer = `
     <div class="results-container ${
@@ -361,7 +369,7 @@ const viewSearchResults = () => {
           search: document.title,
           resultsFound: true,
         })
-      return `${viewMetaResults() || ''} ${viewResults()}` // FIXME - avoid || ''
+      return viewResults()
     case 'no-results':
       document.title = `GOV.UK ${queryDescription({
         searchParams: state.searchParams,

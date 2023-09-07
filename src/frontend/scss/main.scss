@@ -134,14 +134,22 @@ h2:focus-visible {
   max-width: unset;
 }
 
+.before-results-container {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  .results-comments {
+    display: inline-block;
+    flex-basis: 50%;
+  }
+}
+
 .meta-results-panel {
-  max-height: 226px;
-  float: right;
-  max-width: 30%;
+  flex-basis: 80%;
+  max-height: 300px;
   overflow-y: scroll;
   border: 3px solid black;
   padding: 20px 20px 4px 20px;
-  margin-bottom: 20px;
   h1 {
     margin: 0;
   }
