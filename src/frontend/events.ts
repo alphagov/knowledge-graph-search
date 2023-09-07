@@ -255,270 +255,142 @@ const searchButtonClicked = async function (): Promise<void> {
 }
 
 const updateUrl = function () {
-  if ('URLSearchParams' in window) {
-    const searchParams = new URLSearchParams()
-    switch (state.searchParams.searchType) {
-      case SearchType.Keyword:
-        if (state.searchParams.selectedWords !== '') {
-          searchParams.set(
-            UrlParams.SelectedWords,
-            state.searchParams.selectedWords
-          )
-        }
-        if (state.searchParams.excludedWords !== '') {
-          searchParams.set(
-            UrlParams.ExcludedWords,
-            state.searchParams.excludedWords
-          )
-        }
-        if (state.searchParams.caseSensitive) {
-          searchParams.set(
-            UrlParams.CaseSensitive,
-            state.searchParams.caseSensitive.toString()
-          )
-        }
-        if (state.searchParams.publishingOrganisation) {
-          searchParams.set(
-            UrlParams.PublishingOrganisation,
-            state.searchParams.publishingOrganisation
-          )
-        }
-        if (state.searchParams.keywordLocation !== KeywordLocation.All) {
-          searchParams.set(
-            UrlParams.KeywordLocation,
-            state.searchParams.keywordLocation
-          )
-        }
-        if (state.searchParams.documentType) {
-          searchParams.set(
-            UrlParams.DocumentType,
-            state.searchParams.documentType
-          )
-        }
-        if (state.searchParams.taxon !== '') {
-          searchParams.set(UrlParams.Taxon, state.searchParams.taxon)
-        }
-        if (
-          state.searchParams.publishingApplication !== PublishingApplication.Any
-        ) {
-          searchParams.set(
-            UrlParams.PublishingApplication,
-            state.searchParams.publishingApplication
-          )
-        }
-        if (state.searchParams.combinator !== Combinator.All) {
-          searchParams.set(UrlParams.Combinator, state.searchParams.combinator)
-        }
+  if (!('URLSearchParams' in window)) {
+    return
+  }
 
-        if (
-          ![defaultAllLanguagesOption, ''].includes(state.searchParams.language)
-        ) {
-          searchParams.set(
-            UrlParams.Language,
-            languageCode(state.searchParams.language)
-          )
-        }
-        if (state.searchParams.publishingStatus !== PublishingStatus.All) {
-          searchParams.set(
-            UrlParams.PublishingStatus,
-            state.searchParams.publishingStatus
-          )
-        }
-        break
-      case SearchType.Link:
-        searchParams.set(UrlParams.SearchType, state.searchParams.searchType)
-        if (state.searchParams.linkSearchUrl !== '') {
-          searchParams.set(
-            UrlParams.LinkSearchUrl,
-            state.searchParams.linkSearchUrl
-          )
-        }
-        if (
-          state.searchParams.publishingApplication !== PublishingApplication.Any
-        ) {
-          searchParams.set(
-            UrlParams.PublishingApplication,
-            state.searchParams.publishingApplication
-          )
-        }
-        break
-      case SearchType.Taxon:
-        searchParams.set(UrlParams.SearchType, state.searchParams.searchType)
-        if (state.searchParams.taxon !== '') {
-          searchParams.set(UrlParams.Taxon, state.searchParams.taxon)
-        }
-        if (state.searchParams.publishingOrganisation) {
-          searchParams.set(
-            UrlParams.PublishingOrganisation,
-            state.searchParams.publishingOrganisation
-          )
-        }
-        if (state.searchParams.publishingStatus !== PublishingStatus.All) {
-          searchParams.set(
-            UrlParams.PublishingStatus,
-            state.searchParams.publishingStatus
-          )
-        }
-        if (state.searchParams.language !== defaultAllLanguagesOption) {
-          searchParams.set(
-            UrlParams.Language,
-            languageCode(state.searchParams.language)
-          )
-        }
-        if (state.searchParams.documentType) {
-          searchParams.set(
-            UrlParams.DocumentType,
-            state.searchParams.documentType
-          )
-        }
-        if (
-          state.searchParams.publishingApplication !== PublishingApplication.Any
-        ) {
-          searchParams.set(
-            UrlParams.PublishingApplication,
-            state.searchParams.publishingApplication
-          )
-        }
-        break
-      case SearchType.Organisation:
-        searchParams.set(UrlParams.SearchType, state.searchParams.searchType)
-        if (state.searchParams.publishingOrganisation) {
-          searchParams.set(
-            UrlParams.PublishingOrganisation,
-            state.searchParams.publishingOrganisation
-          )
-        }
-        if (
-          state.searchParams.publishingApplication !== PublishingApplication.Any
-        ) {
-          searchParams.set(
-            UrlParams.PublishingApplication,
-            state.searchParams.publishingApplication
-          )
-        }
-        break
-      case SearchType.Language:
-        searchParams.set(UrlParams.SearchType, state.searchParams.searchType)
-        if (state.searchParams.language !== defaultAllLanguagesOption) {
-          searchParams.set(
-            UrlParams.Language,
-            languageCode(state.searchParams.language)
-          )
-        }
-        if (state.searchParams.publishingOrganisation) {
-          searchParams.set(
-            UrlParams.PublishingOrganisation,
-            state.searchParams.publishingOrganisation
-          )
-        }
-        if (
-          state.searchParams.publishingApplication !== PublishingApplication.Any
-        ) {
-          searchParams.set(
-            UrlParams.PublishingApplication,
-            state.searchParams.publishingApplication
-          )
-        }
-        if (state.searchParams.documentType) {
-          searchParams.set(
-            UrlParams.DocumentType,
-            state.searchParams.documentType
-          )
-        }
-        if (state.searchParams.taxon !== '') {
-          searchParams.set(UrlParams.Taxon, state.searchParams.taxon)
-        }
-        if (state.searchParams.publishingStatus !== PublishingStatus.All) {
-          searchParams.set(
-            UrlParams.PublishingStatus,
-            state.searchParams.publishingStatus
-          )
-        }
-        break
-      default:
-        searchParams.set(UrlParams.SearchType, state.searchParams.searchType)
-        if (state.searchParams.selectedWords !== '') {
-          searchParams.set(
-            UrlParams.SelectedWords,
-            state.searchParams.selectedWords
-          )
-        }
-        if (state.searchParams.excludedWords !== '') {
-          searchParams.set(
-            UrlParams.ExcludedWords,
-            state.searchParams.excludedWords
-          )
-        }
-        if (state.searchParams.taxon !== '') {
-          searchParams.set(UrlParams.Taxon, state.searchParams.taxon)
-        }
-        if (state.searchParams.publishingOrganisation) {
-          searchParams.set(
-            UrlParams.PublishingOrganisation,
-            state.searchParams.publishingOrganisation
-          )
-        }
-        if (state.searchParams.documentType) {
-          searchParams.set(
-            UrlParams.DocumentType,
-            state.searchParams.documentType
-          )
-        }
-        if (state.searchParams.language !== defaultAllLanguagesOption) {
-          searchParams.set(
-            UrlParams.Language,
-            languageCode(state.searchParams.language)
-          )
-        }
-        if (state.searchParams.caseSensitive) {
-          searchParams.set(
-            UrlParams.CaseSensitive,
-            state.searchParams.caseSensitive.toString()
-          )
-        }
-        if (state.searchParams.publishingStatus !== PublishingStatus.All) {
-          searchParams.set(
-            UrlParams.PublishingStatus,
-            state.searchParams.publishingStatus
-          )
-        }
-        if (state.searchParams.keywordLocation !== KeywordLocation.All) {
-          searchParams.set(
-            UrlParams.KeywordLocation,
-            state.searchParams.keywordLocation
-          )
-        }
+  const searchParams = new URLSearchParams()
 
-        if (
-          state.searchParams.publishingApplication !== PublishingApplication.Any
-        ) {
-          searchParams.set(
-            UrlParams.PublishingApplication,
-            state.searchParams.publishingApplication
-          )
-        }
+  const config = {
+    selectedWords: {
+      condition: (v) => v !== '',
+      param: UrlParams.SelectedWords,
+    },
+    excludedWords: {
+      condition: (v) => v !== '',
+      param: UrlParams.ExcludedWords,
+    },
+    caseSensitive: {
+      condition: (v) => v,
+      param: UrlParams.CaseSensitive,
+      transform: (v) => v.toString(),
+    },
+    publishingOrganisation: {
+      condition: (v) => v,
+      param: UrlParams.PublishingOrganisation,
+    },
+    keywordLocation: {
+      condition: (v) => v !== KeywordLocation.All,
+      param: UrlParams.KeywordLocation,
+    },
+    documentType: { condition: (v) => v, param: UrlParams.DocumentType },
+    taxon: { condition: (v) => v !== '', param: UrlParams.Taxon },
+    publishingApplication: {
+      condition: (v) => v !== PublishingApplication.Any,
+      param: UrlParams.PublishingApplication,
+    },
+    combinator: {
+      condition: (v) => v !== Combinator.All,
+      param: UrlParams.Combinator,
+    },
+    language: {
+      condition: (v) => ![defaultAllLanguagesOption, ''].includes(v),
+      param: UrlParams.Language,
+      transform: (v) => languageCode(v),
+    },
+    publishingStatus: {
+      condition: (v) => v !== PublishingStatus.All,
+      param: UrlParams.PublishingStatus,
+    },
+    linkSearchUrl: {
+      condition: (v) => v !== '',
+      param: UrlParams.LinkSearchUrl,
+    },
+  }
 
-        if (state.searchParams.combinator !== Combinator.All) {
-          searchParams.set(UrlParams.Combinator, state.searchParams.combinator)
-        }
+  console.log('Updating URL')
+  const updateSearchParams = (key) => {
+    const item = config[key]
+    const value = state.searchParams[key]
 
-        if (state.searchParams.linkSearchUrl !== '') {
-          searchParams.set(
-            UrlParams.LinkSearchUrl,
-            state.searchParams.linkSearchUrl
-          )
-        }
-        break
+    if (item.condition(value)) {
+      searchParams.set(
+        item.param,
+        item.transform ? item.transform(value) : value
+      )
     }
-    const newQueryString = searchParams.toString()
-    const oldQueryString = location.search.slice(1)
-    if (newQueryString !== oldQueryString) {
-      let newRelativePathQuery = window.location.pathname
-      if (newQueryString.length > 0) {
-        newRelativePathQuery += '?' + searchParams.toString()
-      }
-      history.pushState(null, '', newRelativePathQuery)
+  }
+
+  const mappings = {
+    [SearchType.Keyword]: [
+      'selectedWords',
+      'caseSensitive',
+      'combinator',
+      'excludedWords',
+      'keywordLocation',
+      'publishingOrganisation',
+      'documentType',
+      'publishingApplication',
+      'taxon',
+      'publishingStatus',
+      'language',
+    ],
+    [SearchType.Link]: [
+      'linkSearchUrl',
+      'publishingOrganisation',
+      'publishingApplication',
+      'documentType',
+      'taxon',
+      'publishingStatus',
+      'language',
+    ],
+    [SearchType.Organisation]: [
+      'publishingOrganisation',
+      'publishingApplication',
+    ],
+    [SearchType.Taxon]: [
+      'taxon',
+      'publishingOrganisation',
+      'publishingStatus',
+      'language',
+      'documentType',
+      'publishingApplication',
+    ],
+    [SearchType.Language]: [
+      'language',
+      'publishingOrganisation',
+      'publishingApplication',
+      'documentType',
+      'taxon',
+      'publishingStatus',
+    ],
+    [SearchType.Advanced]: [
+      'selectedWords',
+      'caseSensitive',
+      'combinator',
+      'excludedWords',
+      'linkSearchUrl',
+      'keywordLocation',
+      'publishingOrganisation',
+      'documentType',
+      'publishingApplication',
+      'taxon',
+      'publishingStatus',
+      'language',
+    ],
+  }
+
+  mappings[state.searchParams.searchType].forEach(updateSearchParams)
+
+  const newQueryString = searchParams.toString()
+  const oldQueryString = location.search.slice(1)
+
+  if (newQueryString !== oldQueryString) {
+    let newRelativePathQuery = window.location.pathname
+    if (newQueryString.length > 0) {
+      newRelativePathQuery += '?' + searchParams.toString()
     }
+    history.pushState(null, '', newRelativePathQuery)
   }
 }
 
