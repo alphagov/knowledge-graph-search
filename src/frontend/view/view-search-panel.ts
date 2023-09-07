@@ -9,7 +9,7 @@ import {
   SearchType,
 } from '../../common/types/search-api-types'
 
-const viewAdvancedSearchPanel = () => `
+export const viewAdvancedSearchPanel = () => `
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
           <h1 class="govuk-heading-xl">Advanced search</h1>
@@ -17,9 +17,9 @@ const viewAdvancedSearchPanel = () => `
           ${viewCaseSensitiveSelector()}
           ${viewKeywordsCombinator()}
           ${viewExclusionsInput()}
-          ${viewLinkSearch()}
+          ${viewLinkSearchInput()}
           ${viewKeywordLocation()}
-          ${viewPublishingOrgSelector()}
+          ${viewPublishingOrganisation()}
           ${viewDocumentType()}
           ${viewPublishingAppSelector()}
           ${viewTaxonSelector()}
@@ -67,7 +67,7 @@ const viewLinkSearchPanel = () => `
     <form id="search-form" class="search-panel govuk-form">
       <div class="search-mode-panel">
         <a class="govuk-skip-link" href="#results-table">Skip to results</a>
-        ${viewLinkSearch()}
+        ${viewMainLinkSearch()}
         ${
           state.searchResults
             ? ''
@@ -393,9 +393,9 @@ const viewSearchButton = () => `
   </p>
 `
 
-const viewLinkSearch = () => `
+const viewMainLinkSearch = () => `
   <div class="govuk-body">
-    <label class="govuk-label label--bold" for="link-search">
+    <label class="govuk-label label--bold" for="search-filters-link-search">
       Search for links
     </label>
     <div class="govuk-hint">
@@ -408,6 +408,15 @@ const viewLinkSearch = () => `
         value="${state.searchParams.linkSearchUrl}"
      />
   </div>
+`
+
+const viewLinkSearchInput = () => `
+<div class="govuk-form-group">
+  <label class="govuk-label govuk-label--s" for="search-filters-link-search">
+  Search for links
+  </label>
+  <input class="govuk-input" id="search-filters-link-search" name="search-filters-link-search" type="text" value="${state.searchParams.linkSearchUrl}">
+</div>
 `
 
 const viewCaseSensitiveSelector = () => `
