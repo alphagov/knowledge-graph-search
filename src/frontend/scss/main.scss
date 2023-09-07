@@ -124,9 +124,9 @@ h2:focus-visible {
 }
 
 .meta-results-panel {
+  max-height: 226px;
   float: right;
   max-width: 30%;
-  max-height: 300px;
   overflow-y: scroll;
   border: 3px solid black;
   padding: 20px 20px 4px 20px;
