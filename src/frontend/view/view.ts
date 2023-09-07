@@ -10,6 +10,7 @@ import { fieldName } from './utils'
 import { createAgGrid } from './view-grid'
 import { viewSideFilters } from './view-side-filters'
 import govukPostInitScripts from './postInitScripts'
+import { SearchType } from '../../common/types/search-api-types'
 
 declare const window: any
 
@@ -86,7 +87,7 @@ const viewSearchTypeSelector = () => `
   <span class="govuk-tabs__title">Search for</span>
   <ul class="govuk-tabs__list">
     <li class="govuk-tabs__list-item ${
-      state.searchParams.searchType === 'keyword'
+      state.searchParams.searchType === SearchType.Keyword
         ? 'govuk-tabs__list-item--selected'
         : ''
     }">
@@ -95,7 +96,7 @@ const viewSearchTypeSelector = () => `
       </a>
     </li>
     <li class="govuk-tabs__list-item ${
-      state.searchParams.searchType === 'link'
+      state.searchParams.searchType === SearchType.Link
         ? 'govuk-tabs__list-item--selected'
         : ''
     }">
@@ -104,7 +105,7 @@ const viewSearchTypeSelector = () => `
       </a>
     </li>
     <li class="govuk-tabs__list-item ${
-      state.searchParams.searchType === 'organisation'
+      state.searchParams.searchType === SearchType.Organisation
         ? 'govuk-tabs__list-item--selected'
         : ''
     }">
@@ -113,7 +114,7 @@ const viewSearchTypeSelector = () => `
       </a>
     </li>
     <li class="govuk-tabs__list-item ${
-      state.searchParams.searchType === 'taxon'
+      state.searchParams.searchType === SearchType.Taxon
         ? 'govuk-tabs__list-item--selected'
         : ''
     }">
@@ -131,7 +132,7 @@ const viewSearchTypeSelector = () => `
       </a>
     </li>
     <li class="govuk-tabs__list-item ${
-      state.searchParams.searchType === 'advanced'
+      state.searchParams.searchType === SearchType.Advanced
         ? 'govuk-tabs__list-item--selected'
         : ''
     }">
