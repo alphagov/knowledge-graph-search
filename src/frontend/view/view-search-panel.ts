@@ -15,7 +15,7 @@ export const viewAdvancedSearchPanel = (onTheSide = true) => {
     : `<h1 class="govuk-heading-xl">Advanced search</h1>`
   const inside = `
       <form id="search-form" class="search-panel govuk-form">
-        <div class="search-mode-panel">
+        <div class="search-mode-panel advanced-panel">
           ${title}
           ${viewKeywordsInput()}
           ${viewCaseSensitiveSelector()}
@@ -53,17 +53,23 @@ const viewKeywordSearchPanel = () => `
                 Search filters
               </span>
             </summary>
-            <div class="govuk-details__text search-filters-container">
-              ${viewCaseSensitiveSelector()}
-              ${viewKeywordsCombinator()}
-              ${viewExclusionsInput()}
-              ${viewKeywordLocation()}
-              ${viewPublishingOrganisation()}
-              ${viewDocumentType()}
-              ${viewPublishingAppSelector()}
-              ${viewTaxonSelector()}
-              ${viewPublishingStatusSelector()}
-              ${viewLanguageSelector()}
+            <div class="govuk-details__text">
+              <div class="search-filters-container">
+                <div class="search-filters-left-col">
+                  ${viewCaseSensitiveSelector()}
+                  ${viewKeywordsCombinator()}
+                  ${viewExclusionsInput()}
+                  ${viewKeywordLocation()}
+                  ${viewPublishingOrganisation()}
+                </div>
+                <div class="search-filters-left-col">
+                  ${viewDocumentType()}
+                  ${viewPublishingAppSelector()}
+                  ${viewTaxonSelector()}
+                  ${viewPublishingStatusSelector()}
+                  ${viewLanguageSelector()}
+                </div>
+              </div>
             </div>
           </details>`
           }
@@ -86,13 +92,19 @@ const viewLinkSearchPanel = () => `
               Search filters
             </span>
           </summary>
-          <div class="govuk-details__text search-filters-container">
-          ${viewPublishingOrganisation()}
-          ${viewPublishingAppSelector()}
-          ${viewDocumentType()}
-          ${viewTaxonSelector()}
-          ${viewPublishingStatusSelector()}
-          ${viewLanguageSelector()}
+          <div class="govuk-details__text">
+            <div class="search-filters-container">
+              <div class="search-filters-left-col">
+              ${viewPublishingOrganisation()}
+              ${viewPublishingAppSelector()}
+              ${viewDocumentType()}
+              </div>
+              <div class="search-filters-left-col">
+                ${viewTaxonSelector()}
+                ${viewPublishingStatusSelector()}
+                ${viewLanguageSelector()}
+              </div>
+            </div>
           </div>
         </details>`
         }
@@ -115,12 +127,18 @@ const viewTaxonSearchPanel = () => `
                 Search filters
               </span>
             </summary>
-            <div class="govuk-details__text search-filters-container">
-            ${viewPublishingOrganisation()}
-            ${viewPublishingStatusSelector()}
-            ${viewLanguageSelector()}
-            ${viewDocumentType()}
-            ${viewPublishingAppSelector()}
+            <div class="govuk-details__text">
+              <div class="search-filters-container">
+                <div class="search-filters-left-col">
+                  ${viewPublishingOrganisation()}
+                  ${viewPublishingStatusSelector()}
+                  ${viewLanguageSelector()}
+                </div>
+                <div class="search-filters-left-col">
+                  ${viewDocumentType()}
+                  ${viewPublishingAppSelector()}
+                </div>
+              </div>
             </div>
           </details>`
           }
@@ -143,12 +161,18 @@ const viewLanguageSearchPanel = () => `
                 Search filters
               </span>
             </summary>
-            <div class="govuk-details__text search-filters-container">
-            ${viewPublishingOrganisation()}
-            ${viewPublishingAppSelector()}
-            ${viewDocumentType()}
-            ${viewTaxonSelector()}
-            ${viewPublishingStatusSelector()}
+            <div class="govuk-details__text">
+              <div class="search-filters-container">
+                <div class="search-filters-left-col">
+                  ${viewPublishingOrganisation()}
+                  ${viewPublishingAppSelector()}
+                  ${viewDocumentType()}
+                </div>
+                <div class="search-filters-left-col">
+                  ${viewTaxonSelector()}
+                  ${viewPublishingStatusSelector()}
+                </div>
+              </div>
             </div>
           </details>`
           }

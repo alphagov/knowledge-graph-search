@@ -115,13 +115,21 @@ pre {
 
 .search-filters-container {
   display: flex;
-  flex-flow: column wrap;
-  align-items: flex-start;
-  height: 600px;
 
-  & > div {
-    width: 300px;
+  .search-filters-left-col {
+    width: 100%;
+    margin-right: 20px;
+    float: left;
   }
+  .search-filters-right-col {
+    width: 100%;
+    float: left;
+  }
+}
+
+.search-mode-panel.advanced-panel {
+  width: 70%;
+  min-width: 35%;
 }
 
 h1:focus-visible,
