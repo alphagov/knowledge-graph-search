@@ -164,11 +164,12 @@ const searchState = function (): { code: string; errors: string[] } {
 }
 
 const resetSearch = function (): void {
+  console.log('resetting search')
   state.searchParams.selectedWords = ''
   state.searchParams.excludedWords = ''
   state.searchParams.taxon = ''
   state.searchParams.publishingOrganisation = ''
-  state.searchParams.language = ''
+  state.searchParams.language = defaultAllLanguagesOption
   state.searchParams.keywordLocation = KeywordLocation.All
   state.searchParams.caseSensitive = false
   state.searchParams.linkSearchUrl = ''
@@ -177,6 +178,8 @@ const resetSearch = function (): void {
   state.searchResults = null
   state.waiting = false
   state.searchParams.combinator = Combinator.All
+  state.searchParams.publishingStatus = PublishingStatus.All
+  state.searchParams.documentType = ''
 }
 
 export {
