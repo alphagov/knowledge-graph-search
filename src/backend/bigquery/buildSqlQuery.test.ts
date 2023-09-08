@@ -24,7 +24,7 @@ const PREFIX = `
     page_views,
     taxons,
     primary_organisation,
-    organisations AS all_organisations
+    organisations AS all_organisations,
   FROM search.page
   
   WHERE TRUE`
