@@ -322,12 +322,8 @@ h2:focus-visible {
       margin-bottom: 20px;
 
       .header-options-checkboxes-container {
-        display: flex;
-        flex-wrap: wrap;
-
-        .govuk-checkboxes__item {
-          flex-basis: 20%;
-        }
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
       }
     }
 
