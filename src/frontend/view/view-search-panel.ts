@@ -196,7 +196,17 @@ const viewOrganisationSearchPanel = () => `
               </span>
             </summary>
             <div class="govuk-details__text">
-              ${viewPublishingAppSelector()}
+              <div class="search-filters-container">
+                <div class="search-filters-left-col">
+                  ${viewPublishingAppSelector()}
+                  ${viewPublishingStatusSelector()}
+                  ${viewDocumentType()}
+                </div>
+                <div class="search-filters-left-col">
+                  ${viewTaxonSelector()}
+                  ${viewLanguageSelector()}
+                </div>
+              </div>
             </div>
           </details>`
           }
