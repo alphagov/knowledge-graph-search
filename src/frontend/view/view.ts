@@ -14,6 +14,7 @@ import {
   PublishingStatus,
   SearchType,
 } from '../../common/types/search-api-types'
+import config from '../config'
 
 declare const window: any
 
@@ -320,7 +321,11 @@ const viewResults = function () {
 
     // .results-comments
     html.push(`</div>`)
-    html.push(viewMetaResults())
+
+    if (config.featureFlags.enableInfoBox) {
+      html.push(viewMetaResults())
+    }
+
     // .before-results-container
     html.push(`</div>`)
 
@@ -396,7 +401,12 @@ const viewSearchResults = () => {
           search: document.title,
           resultsFound: false,
         })
-      return `${viewMetaResults() || ''} ${viewNoResults()}` // FIXME - avoid || ''
+
+      return [
+        config.featureFlags.enableInfoBox ? viewMetaResults() : '',
+        viewNoResults(),
+      ].join('')
+
     default:
       document.title = serviceName
       return ''
