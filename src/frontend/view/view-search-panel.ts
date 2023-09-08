@@ -438,7 +438,7 @@ const viewSearchButton = () => `
 
 const viewMainLinkSearch = () => `
   <div class="govuk-body">
-    <label class="govuk-label label--bold" for="search-filters-link-search">
+    <label class="govuk-label govuk-label--s" for="search-filters-link-search">
       Search for links
     </label>
     <div class="govuk-hint">
