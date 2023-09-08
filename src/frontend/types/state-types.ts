@@ -14,4 +14,7 @@ export interface State {
   waiting: boolean
   disamboxExpanded: boolean
   showFields: any
+  showFiltersPane: boolean
+  showFieldSet: boolean
+  documentTypes: string[]
 }

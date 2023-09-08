@@ -1,29 +1,48 @@
 import {
   SearchParams,
   SearchType,
-  SearchArea,
+  PublishingApplication,
   Combinator,
   SearchResults,
+  UrlParams,
+  KeywordLocation,
 } from '../common/types/search-api-types'
-import { languageCode } from '../common/utils/lang'
+import { defaultAllLanguagesOption, languageCode } from '../common/utils/lang'
 import { EventType, SearchApiCallback } from './types/event-types'
 
-const makeQueryString = function (sp: SearchParams): string {
+const makeQueryString = function (searchParams: SearchParams): string {
   const usp = new URLSearchParams()
-  if (sp.searchType !== SearchType.Keyword)
-    usp.set('search-type', sp.searchType)
-  if (sp.selectedWords !== '') usp.set('selected-words', sp.selectedWords)
-  if (sp.excludedWords !== '') usp.set('excluded-words', sp.excludedWords)
-  if (sp.selectedTaxon !== '') usp.set('selected-taxon', sp.selectedTaxon)
-  if (sp.selectedOrganisation !== '')
-    usp.set('selected-organisation', sp.selectedOrganisation)
-  if (sp.selectedLocale !== '') usp.set('lang', languageCode(sp.selectedLocale))
-  if (sp.caseSensitive) usp.set('case-sensitive', sp.caseSensitive.toString())
-  if (!sp.whereToSearch.title) usp.set('search-in-title', 'false')
-  if (!sp.whereToSearch.text) usp.set('search-in-text', 'false')
-  if (sp.areaToSearch !== SearchArea.Any) usp.set('area', sp.areaToSearch)
-  if (sp.combinator !== Combinator.All) usp.set('combinator', sp.combinator)
-  if (sp.linkSearchUrl !== '') usp.set('link-search-url', sp.linkSearchUrl)
+  if (searchParams.searchType !== SearchType.Keyword)
+    usp.set(UrlParams.SearchType, searchParams.searchType)
+  if (searchParams.selectedWords !== '')
+    usp.set(UrlParams.SelectedWords, searchParams.selectedWords)
+  if (searchParams.excludedWords !== '')
+    usp.set(UrlParams.ExcludedWords, searchParams.excludedWords)
+  if (searchParams.taxon !== '') usp.set(UrlParams.Taxon, searchParams.taxon)
+  if (searchParams.publishingOrganisation !== '')
+    usp.set(
+      UrlParams.PublishingOrganisation,
+      searchParams.publishingOrganisation
+    )
+  if (searchParams.language !== defaultAllLanguagesOption)
+    usp.set(UrlParams.Language, languageCode(searchParams.language))
+  if (searchParams.caseSensitive)
+    usp.set(UrlParams.CaseSensitive, searchParams.caseSensitive.toString())
+  if (searchParams.keywordLocation !== KeywordLocation.All) {
+    usp.set(UrlParams.KeywordLocation, searchParams.keywordLocation)
+  }
+
+  if (searchParams.documentType)
+    usp.set(UrlParams.DocumentType, searchParams.documentType)
+
+  if (searchParams.publishingApplication !== PublishingApplication.Any) {
+    usp.set(UrlParams.PublishingApplication, searchParams.publishingApplication)
+  }
+  if (searchParams.combinator !== Combinator.All)
+    usp.set(UrlParams.Combinator, searchParams.combinator)
+  if (searchParams.linkSearchUrl !== '')
+    usp.set(UrlParams.LinkSearchUrl, searchParams.linkSearchUrl)
+  usp.set(UrlParams.PublishingStatus, searchParams.publishingStatus)
   return usp.toString()
 }
 

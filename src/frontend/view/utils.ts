@@ -1,4 +1,5 @@
 import { languageName } from '../../common/utils/lang'
+import { state } from '../state'
 
 export const formatNames = (array: []) =>
   [...new Set(array)].map((x) => `“${x}”`).join(', ')
@@ -7,6 +8,34 @@ export const formatDateTime = (date: any) =>
   date?.value
     ? `${date.value.slice(0, 10)} at ${date.value.slice(11, 16)}`
     : 'n/a'
+
+const splitKeywords = function (keywords: string): string[] {
+  const wordsToIgnore = ['of', 'for', 'the', 'or', 'and']
+  const regexp = /[^\s,"]+|"([^"]*)"/gi
+  const output = []
+  let match: RegExpExecArray | null
+  do {
+    match = regexp.exec(keywords)
+    if (match) {
+      output.push(match[1] ? match[1] : match[0])
+    }
+  } while (match)
+  return output.filter((d) => d.length > 0 && !wordsToIgnore.includes(d))
+}
+
+const formatOccurrences = (obj: any) =>
+  obj && Object.values(obj)?.length > 1
+    ? `Total (${Object.values(obj).reduce(
+        (partialSum: any, a: any) => partialSum + a,
+        0
+      )}),
+      ${Object.values(obj)
+        .map(
+          (x, i) =>
+            `${splitKeywords(state.searchParams.selectedWords)[i]} (${x})`
+        )
+        .join(', ')}`
+    : `${obj}`
 
 export const fieldFormatters: Record<string, any> = {
   url: {
@@ -49,6 +78,10 @@ export const fieldFormatters: Record<string, any> = {
   withdrawn_explanation: {
     name: 'Withdrawn reason',
     format: (text: string) => text || 'n/a',
+  },
+  occurrences: {
+    name: 'Occurrences',
+    format: formatOccurrences,
   },
 }
 

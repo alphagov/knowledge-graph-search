@@ -1,49 +1,81 @@
-import { SearchParams } from '../../common/types/search-api-types'
-import { languageName } from '../../common/utils/lang'
+import {
+  KeywordLocation,
+  PublishingApplication,
+  PublishingStatus,
+  SearchParams,
+} from '../../common/types/search-api-types'
+import {
+  defaultAllLanguagesOption,
+  languageName,
+} from '../../common/utils/lang'
 import { splitKeywords } from '../../common/utils/utils'
 import { makeBold } from './makeBold'
 
-export const queryDescription = (
-  search: SearchParams,
-  includeMarkup = true
-) => {
+type QueryDescriptionParams = {
+  searchParams: SearchParams
+  nbRecords?: number
+  includeMarkup?: boolean
+  waiting?: boolean
+}
+
+export const queryDescription = ({
+  searchParams,
+  nbRecords = 0,
+  includeMarkup = true,
+  waiting = false,
+}: QueryDescriptionParams) => {
   const clauses = []
-  if (search.selectedWords !== '') {
-    let keywords = `contain ${containDescription(search, includeMarkup)}`
-    if (search.excludedWords !== '') {
+  if (searchParams.selectedWords !== '') {
+    let keywords = ` contain ${containDescription(searchParams, includeMarkup)}`
+    if (searchParams.excludedWords !== '') {
       keywords = `${keywords} (but don't contain ${makeBold(
-        search.excludedWords,
+        searchParams.excludedWords,
         includeMarkup
       )})`
     }
     clauses.push(keywords)
   }
-  if (search.selectedTaxon !== '')
+  if (searchParams.taxon !== '')
     clauses.push(
       `belong to the ${makeBold(
-        search.selectedTaxon,
+        searchParams.taxon,
         includeMarkup
       )} taxon (or its sub-taxons)`
     )
-  if (search.selectedOrganisation !== '')
+  if (searchParams.publishingOrganisation !== '')
     clauses.push(
       `are published by the ${makeBold(
-        search.selectedOrganisation,
+        searchParams.publishingOrganisation,
         includeMarkup
       )}`
     )
-  if (search.selectedLocale !== '')
-    clauses.push(
-      `are in ${makeBold(languageName(search.selectedLocale), includeMarkup)}`
-    )
-  if (search.linkSearchUrl !== '')
-    clauses.push(`link to ${makeBold(search.linkSearchUrl, includeMarkup)}`)
+  if (searchParams.publishingStatus !== PublishingStatus.All) {
+    const status = {
+      [PublishingStatus.Withdrawn]: 'withdrawn',
+      [PublishingStatus.NotWithdrawn]: 'not withdrawn',
+    }[searchParams.publishingStatus]
+    clauses.push(`are ${makeBold(status, includeMarkup)}`)
+  }
   if (
-    search.areaToSearch === 'whitehall' ||
-    search.areaToSearch === 'publisher'
+    searchParams.language !== defaultAllLanguagesOption &&
+    searchParams.language !== ''
   )
     clauses.push(
-      `are published using ${makeBold(search.areaToSearch, includeMarkup)}`
+      `are in ${makeBold(languageName(searchParams.language), includeMarkup)}`
+    )
+  if (searchParams.linkSearchUrl !== '')
+    clauses.push(
+      `link to ${makeBold(searchParams.linkSearchUrl, includeMarkup)}`
+    )
+  if (
+    searchParams.publishingApplication === PublishingApplication.Whitehall ||
+    searchParams.publishingApplication === PublishingApplication.Publisher
+  )
+    clauses.push(
+      `are published using ${makeBold(
+        searchParams.publishingApplication,
+        includeMarkup
+      )}`
     )
 
   const joinedClauses =
@@ -53,18 +85,21 @@ export const queryDescription = (
           clauses[clauses.length - 1]
         }`
 
-  return `pages that ${joinedClauses}`
+  const prefix = waiting
+    ? 'Searching for'
+    : `${nbRecords} result${nbRecords !== 0 ? 's' : ''} for`
+  return `${prefix} pages that ${joinedClauses}`
 }
 
 // combinedWords as used here must be exactly the same set of keywords as the ones submitted to BigQuery by the function sendSearchQuery.
 const containDescription = (search: SearchParams, includeMarkup: boolean) => {
-  let where: string
-  if (search.whereToSearch.title && search.whereToSearch.text) {
-    where = ''
-  } else if (search.whereToSearch.title) {
+  let where = ''
+  if (search.keywordLocation === KeywordLocation.Title) {
     where = 'in their title'
-  } else {
+  } else if (search.keywordLocation === KeywordLocation.BodyContent) {
     where = 'in their body content'
+  } else if (search.keywordLocation === KeywordLocation.Description) {
+    where = 'in their description'
   }
   const combineOp = search.combinator === 'all' ? 'and' : 'or'
   const combinedWords = splitKeywords(search.selectedWords)

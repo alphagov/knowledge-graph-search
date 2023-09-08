@@ -1,4 +1,11 @@
-import { Combinator, SearchParams } from '../../common/types/search-api-types'
+import {
+  Combinator,
+  KeywordLocation,
+  PublishingApplication,
+  PublishingStatus,
+  SearchParams,
+  SearchType,
+} from '../../common/types/search-api-types'
 
 export const buildSqlQuery = function (
   searchParams: SearchParams,
@@ -6,16 +13,51 @@ export const buildSqlQuery = function (
   excludedKeywords: string[]
 ): string {
   const contentToSearch = []
-  if (searchParams.whereToSearch.title) {
+  if (searchParams.keywordLocation === KeywordLocation.Title) {
     contentToSearch.push('IFNULL(page.title, "")')
-  }
-  if (searchParams.whereToSearch.text) {
-    contentToSearch.push(
-      'IFNULL(page.text, "")',
-      'IFNULL(page.description, "")'
-    )
+  } else if (searchParams.keywordLocation === KeywordLocation.BodyContent) {
+    contentToSearch.push('IFNULL(page.text, "")')
+  } else if (searchParams.keywordLocation === KeywordLocation.Description) {
+    contentToSearch.push('IFNULL(page.description, "")')
+  } else {
+    contentToSearch.push('IFNULL(page.title, "")')
+    contentToSearch.push('IFNULL(page.text, "")')
+    contentToSearch.push('IFNULL(page.description, "")')
   }
   const contentToSearchString = contentToSearch.join(' || " " || ')
+
+  const textOccurrences =
+    searchParams.searchType !== SearchType.Link &&
+    searchParams.searchType !== SearchType.Advanced &&
+    !searchParams.taxon &&
+    !searchParams.publishingOrganisation &&
+    !searchParams.documentType &&
+    searchParams.keywordLocation !== KeywordLocation.Title &&
+    !searchParams.language
+      ? keywords.length === 1
+        ? `(
+    SELECT
+    ARRAY_LENGTH(REGEXP_EXTRACT_ALL(LOWER(${contentToSearchString}), LOWER(r'(${keywords[0]})')))
+  ) AS occurrences,`
+        : `
+  (
+    ${keywords.map(
+      (value) =>
+        `(
+          SELECT
+        ARRAY_LENGTH(REGEXP_EXTRACT_ALL(LOWER(${contentToSearchString}), LOWER(r'(${value})')))
+        ) `
+    )}
+  ) AS occurrences,`
+      : ''
+
+  const linkOccurrences =
+    searchParams.searchType === SearchType.Link
+      ? `(
+        SELECT
+        COUNT(1) FROM UNNEST(hyperlinks) as hyperlink WHERE CONTAINS_SUBSTR(hyperlink.link_url, @link)
+      ) AS occurrences,`
+      : ''
 
   const includeClause =
     keywords.length === 0
@@ -42,20 +84,31 @@ export const buildSqlQuery = function (
           )
           .join(' OR ') +
         ')'
-  let areaClause = ''
-  if (searchParams.areaToSearch === 'publisher') {
-    areaClause = 'AND publishing_app = "publisher"'
-  } else if (searchParams.areaToSearch === 'whitehall') {
-    areaClause = 'AND publishing_app = "whitehall"'
+  let publishingAppClause = ''
+  if (searchParams.publishingApplication === PublishingApplication.Publisher) {
+    publishingAppClause = 'AND publishing_app = "publisher"'
+  } else if (
+    searchParams.publishingApplication === PublishingApplication.Whitehall
+  ) {
+    publishingAppClause = 'AND publishing_app = "whitehall"'
+  }
+
+  let publishingStatusClause = ''
+  if (searchParams.publishingStatus === PublishingStatus.NotWithdrawn) {
+    publishingStatusClause = 'WHERE withdrawn_at IS NULL'
+  } else if (searchParams.publishingStatus === PublishingStatus.Withdrawn) {
+    publishingStatusClause = 'WHERE withdrawn_at IS NOT NULL'
+  } else {
+    publishingStatusClause = 'WHERE TRUE'
   }
 
   let localeClause = ''
-  if (searchParams.selectedLocale !== '') {
+  if (searchParams.language !== '') {
     localeClause = `AND locale = @locale`
   }
 
   let taxonClause = ''
-  if (searchParams.selectedTaxon !== '') {
+  if (searchParams.taxon !== '') {
     taxonClause = `
       AND EXISTS
         (
@@ -66,7 +119,7 @@ export const buildSqlQuery = function (
   }
 
   let organisationClause = ''
-  if (searchParams.selectedOrganisation !== '') {
+  if (searchParams.publishingOrganisation !== '') {
     organisationClause = `
       AND EXISTS
         (
@@ -88,6 +141,13 @@ export const buildSqlQuery = function (
     `
   }
 
+  let documentTypeClause = ''
+  if (searchParams.documentType !== '') {
+    documentTypeClause = `
+      AND documentType = @documentType
+    `
+  }
+
   return `
     SELECT
       url,
@@ -103,16 +163,20 @@ export const buildSqlQuery = function (
       page_views,
       taxons,
       primary_organisation,
-      organisations AS all_organisations
+      organisations AS all_organisations,
+      ${textOccurrences}
+      ${linkOccurrences}
     FROM search.page
-    WHERE TRUE
+    
+    ${publishingStatusClause}
     ${includeClause}
     ${excludeClause}
-    ${areaClause}
+    ${publishingAppClause}
     ${localeClause}
     ${taxonClause}
     ${organisationClause}
     ${linkClause}
+    ${documentTypeClause}
     ORDER BY page_views DESC
     LIMIT 10000
   `

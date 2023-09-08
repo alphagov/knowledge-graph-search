@@ -2,49 +2,64 @@ import * as express from 'express'
 import {
   SearchParams,
   Combinator,
-  SearchArea,
+  PublishingApplication,
   SearchType,
+  KeywordLocation,
+  UrlParams,
+  PublishingStatus,
 } from '../../common/types/search-api-types'
 import { sanitiseInput } from '../../common/utils/utils'
 
 export const getParams = (req: express.Request): SearchParams => {
   const searchType = <SearchType>(
-    (sanitiseInput(req.query['search-type'] as string) || SearchType.Keyword)
+    (sanitiseInput(req.query[UrlParams.SearchType] as string) ||
+      SearchType.Keyword)
   )
   const selectedWords =
-    sanitiseInput(req.query['selected-words'] as string) || ''
+    sanitiseInput(req.query[UrlParams.SelectedWords] as string) || ''
   const excludedWords =
-    sanitiseInput(req.query['excluded-words'] as string) || ''
-  const selectedTaxon =
-    sanitiseInput(req.query['selected-taxon'] as string) || ''
-  const selectedOrganisation =
-    sanitiseInput(req.query['selected-organisation'] as string) || ''
-  const selectedLocale = sanitiseInput(req.query.lang as string) || ''
-  const caseSensitive = req.query['case-sensitive'] === 'true'
+    sanitiseInput(req.query[UrlParams.ExcludedWords] as string) || ''
+  const taxon = sanitiseInput(req.query[UrlParams.Taxon] as string) || ''
+  const publishingOrganisation =
+    sanitiseInput(req.query[UrlParams.PublishingOrganisation] as string) || ''
+  const language = sanitiseInput(req.query[UrlParams.Language] as string) || ''
+  const caseSensitive = req.query[UrlParams.CaseSensitive] === 'true'
   const combinator = <Combinator>(
-    (sanitiseInput(req.query.combinator as string) || Combinator.All)
+    (sanitiseInput(req.query[UrlParams.Combinator] as string) || Combinator.All)
   )
-  const whereToSearch = {
-    title: !(req.query['search-in-title'] === 'false'),
-    text: !(req.query['search-in-text'] === 'false'),
-  }
-  const areaToSearch = <SearchArea>(
-    (sanitiseInput(req.query.area as string) || SearchArea.Any)
+  const documentType =
+    sanitiseInput(req.query[UrlParams.DocumentType] as string) || ''
+
+  const keywordLocation =
+    (sanitiseInput(
+      req.query[UrlParams.KeywordLocation] as string
+    ) as KeywordLocation) || KeywordLocation.All
+
+  const publishingApplication = <PublishingApplication>(
+    (sanitiseInput(req.query[UrlParams.PublishingApplication] as string) ||
+      PublishingApplication.Any)
   )
   const linkSearchUrl =
-    sanitiseInput(req.query['link-search-url'] as string) || ''
+    sanitiseInput(req.query[UrlParams.LinkSearchUrl] as string) || ''
+
+  const publishingStatus = sanitiseInput(
+    req.query[UrlParams.PublishingStatus] as string
+  ) as PublishingStatus
+
   return {
     searchType,
     selectedWords,
     excludedWords,
-    selectedTaxon,
-    selectedOrganisation,
-    selectedLocale,
+    taxon,
+    publishingOrganisation,
+    language,
+    documentType,
     caseSensitive,
     combinator,
-    whereToSearch,
-    areaToSearch,
+    keywordLocation,
+    publishingApplication,
     linkSearchUrl,
+    publishingStatus,
   }
 }
 

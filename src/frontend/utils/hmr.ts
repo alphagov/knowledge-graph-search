@@ -15,8 +15,8 @@ export const hasStateInCache = async () => {
 export const getStateFromCache = async () =>
   await localforage.getItem(CACHE_KEY)
 
-const saveState = async () => {
-  await localforage.setItem(CACHE_KEY, JSON.stringify(state))
+const saveState = async (_state = state) => {
+  await localforage.setItem(CACHE_KEY, JSON.stringify(_state))
 }
 
 export const setStateFromCache = async () => {
@@ -31,7 +31,7 @@ const clearCache = async () => await localforage.removeItem(CACHE_KEY)
 
 if (config.enableHMR) {
   require('../scss/main.scss')
-  global.hmr = { saveState, setStateFromCache, clearCache }
+  global.hmr = { saveState, setStateFromCache, clearCache, getStateFromCache }
   document.addEventListener('DOMContentLoaded', function () {
     setStateFromCache()
   })

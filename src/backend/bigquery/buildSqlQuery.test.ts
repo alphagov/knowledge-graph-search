@@ -1,8 +1,10 @@
 import {
   SearchParams,
   Combinator,
-  SearchArea,
+  PublishingApplication,
   SearchType,
+  KeywordLocation,
+  PublishingStatus,
 } from '../../common/types/search-api-types'
 import { buildSqlQuery } from './buildSqlQuery'
 import { expect } from '@jest/globals'
@@ -22,7 +24,7 @@ const PREFIX = `
     page_views,
     taxons,
     primary_organisation,
-    organisations AS all_organisations
+    organisations AS all_organisations,
   FROM search.page
   
   WHERE TRUE`
@@ -45,17 +47,19 @@ const queryFmt = (query: string) =>
 
 const makeParams = (opts = {}) =>
   ({
-    linkSearchUrl: '',
-    whereToSearch: { title: true, text: true },
-    caseSensitive: false,
-    combinator: Combinator.Any,
-    areaToSearch: SearchArea.Any,
-    selectedLocale: '',
-    selectedTaxon: '',
-    selectedOrganisation: '',
     searchType: SearchType.Advanced,
     selectedWords: '',
     excludedWords: '',
+    taxon: '',
+    publishingOrganisation: '',
+    language: '',
+    documentType: '',
+    linkSearchUrl: '',
+    keywordLocation: KeywordLocation.All,
+    combinator: Combinator.Any,
+    publishingApplication: PublishingApplication.Any,
+    caseSensitive: false,
+    publishingStatus: PublishingStatus.All,
     ...opts,
   } as SearchParams)
 
@@ -122,7 +126,9 @@ describe('buildSqlQuery', () => {
   })
 
   it('can filter by publishing app', () => {
-    let searchParams: SearchParams = makeParams({ areaToSearch: 'publisher' })
+    let searchParams: SearchParams = makeParams({
+      publishingApplication: 'publisher',
+    })
     const keywords: string[] = []
     const excludedKeywords: string[] = []
 
@@ -132,7 +138,7 @@ describe('buildSqlQuery', () => {
 
     expect(queryFmt(query)).toEqual(queryFmt(expected))
 
-    searchParams = makeParams({ areaToSearch: 'whitehall' })
+    searchParams = makeParams({ publishingApplication: 'whitehall' })
     query = buildSqlQuery(searchParams, keywords, excludedKeywords)
     expectedClauses = `\nAND publishing_app = "whitehall"`
     expected = expectedQuery(expectedClauses)
@@ -142,7 +148,7 @@ describe('buildSqlQuery', () => {
 
   it('can filter by any locale', () => {
     const searchParams: SearchParams = makeParams({
-      selectedLocale: 'whatever',
+      language: 'whatever',
     })
     const keywords: string[] = []
     const excludedKeywords: string[] = []
@@ -156,7 +162,7 @@ describe('buildSqlQuery', () => {
 
   it('can filter by any taxon', () => {
     const searchParams: SearchParams = makeParams({
-      selectedTaxon: 'whatever',
+      taxon: 'whatever',
     })
     const keywords: string[] = []
     const excludedKeywords: string[] = []
@@ -176,7 +182,7 @@ describe('buildSqlQuery', () => {
 
   it('can filter by any organisation', () => {
     const searchParams: SearchParams = makeParams({
-      selectedOrganisation: 'whatever',
+      publishingOrganisation: 'whatever',
     })
     const keywords: string[] = []
     const excludedKeywords: string[] = []
@@ -217,10 +223,10 @@ describe('buildSqlQuery', () => {
   it('can mix all the clauses togetuer', () => {
     const searchParams: SearchParams = makeParams({
       caseSensitive: true,
-      areaToSearch: 'whitehall',
-      selectedLocale: 'whatever',
-      selectedTaxon: 'whatever',
-      selectedOrganisation: 'whatever',
+      publishingApplication: 'whitehall',
+      language: 'whatever',
+      taxon: 'whatever',
+      publishingOrganisation: 'whatever',
       linkSearchUrl: 'whatever',
     })
     const keywords: string[] = ['test1', 'test2']

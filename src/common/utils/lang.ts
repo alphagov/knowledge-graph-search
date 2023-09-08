@@ -8,10 +8,12 @@ const languageName = (code: string) =>
   // returns the language name from the language's code
   languageNames[code] || code
 
+export const defaultAllLanguagesOption = 'All languages'
+
 // IETF language codes https://en.wikipedia.org/wiki/IETF_language_tag
 // with additions
 const languageNames: { [index: string]: any } = {
-  '': 'All languages',
+  '': defaultAllLanguagesOption,
   af: 'Afrikaans',
   am: 'Amharic',
   ar: 'Arabic',

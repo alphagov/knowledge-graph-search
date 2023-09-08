@@ -5,12 +5,14 @@ export enum EventType {
   SearchRunning,
   SearchApiCallbackOk,
   SearchApiCallbackFail,
+  SearchTabClick = 'SearchTabClick',
 }
 export interface AppEvent {
   type: EventType
   id?: string
   results?: SearchResults
   error?: string
+  preventDefault?: () => void
 }
 export interface SearchApiCallback {
   (event: AppEvent): Promise<void>

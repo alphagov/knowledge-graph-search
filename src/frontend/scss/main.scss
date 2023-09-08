@@ -113,6 +113,25 @@ pre {
   }
 }
 
+.search-filters-container {
+  display: flex;
+
+  .search-filters-left-col {
+    width: 100%;
+    margin-right: 20px;
+    float: left;
+  }
+  .search-filters-right-col {
+    width: 100%;
+    float: left;
+  }
+}
+
+.search-mode-panel.advanced-panel {
+  width: 70%;
+  min-width: 35%;
+}
+
 h1:focus-visible,
 h2:focus-visible {
   outline: none;
@@ -123,14 +142,22 @@ h2:focus-visible {
   max-width: unset;
 }
 
+.before-results-container {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  .results-comments {
+    display: inline-block;
+    flex-basis: 50%;
+  }
+}
+
 .meta-results-panel {
-  max-height: 226px;
-  float: right;
-  max-width: 30%;
+  flex-basis: 80%;
+  max-height: 300px;
   overflow-y: scroll;
   border: 3px solid black;
   padding: 20px 20px 4px 20px;
-  margin-bottom: 20px;
   h1 {
     margin: 0;
   }
@@ -147,6 +174,15 @@ h2:focus-visible {
     padding: 0 2px 0 2px;
     border: 1px solid black;
   }
+}
+
+#clear-all-headers {
+  border-right: 1px solid grey;
+  padding-right: 14px;
+}
+
+#check-all-headers {
+  margin-left: 10px;
 }
 
 #taxon-label {
@@ -275,4 +311,77 @@ h2:focus-visible {
   margin-top: -1px;
   float: right;
   margin-left: 8px;
+}
+
+.results-container {
+  $side-filters-width: 434px;
+  $side-filters-margin-right: 20px;
+
+  .results-container-row-1-headers {
+    display: flex;
+    padding-bottom: 20px;
+
+    .hide-filters-button-container {
+      width: calc($side-filters-width + $side-filters-margin-right);
+      padding-right: 0;
+    }
+  }
+
+  .results-container-row-2-results {
+    display: flex;
+    .govuk-body {
+      flex: 1;
+    }
+
+    .header-options-container {
+      padding: 20px;
+      border: 1px solid #c4c4c4;
+      margin-bottom: 20px;
+
+      .header-options-checkboxes-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .search-results-table-container {
+      margin-bottom: 0;
+
+      .govuk-pagination {
+        margin-bottom: 0;
+      }
+    }
+
+    .side-filters {
+      display: flex;
+      flex-direction: column;
+      flex-basis: $side-filters-width;
+      flex-grow: 0;
+      flex-shrink: 0;
+      margin-right: $side-filters-margin-right;
+      padding: 20px 30px;
+      box-sizing: border-box;
+
+      border: 1px solid #c4c4c4;
+
+      &.closed {
+        display: none;
+      }
+
+      #side-filters-submit-btn {
+        max-width: 175px;
+        margin-bottom: 20px;
+      }
+    }
+  }
+
+  &.hide-filters {
+    .hide-filters-button-container {
+      width: unset;
+      padding-right: 16px;
+    }
+    .side-filters {
+      display: none;
+    }
+  }
 }

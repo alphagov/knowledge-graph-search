@@ -1,258 +1,424 @@
 import { sanitiseOutput } from '../../common/utils/utils'
-import { state, searchState } from '../state'
+import { state } from '../state'
 import { languageName } from '../../common/utils/lang'
-import { SearchType } from '../../common/types/search-api-types'
-import { USER_ERRORS } from '../enums/constants'
+import {
+  Combinator,
+  KeywordLocation,
+  PublishingApplication,
+  PublishingStatus,
+  SearchType,
+} from '../../common/types/search-api-types'
 
-const viewSearchPanel = () => {
-  const result = []
-  switch (state.searchParams.searchType) {
-    case SearchType.Advanced:
-    case SearchType.Results:
-      result.push(`
+export const viewAdvancedSearchPanel = (onTheSide = true) => {
+  const title = onTheSide
+    ? `<h2 class="govuk-heading-m">Advanced search</h2>`
+    : `<h1 class="govuk-heading-xl">Advanced search</h1>`
+  const inside = `
       <form id="search-form" class="search-panel govuk-form">
-        <div class="search-mode-panel">
-          <h1 class="govuk-heading-xl">Advanced search</h1>
+        <div class="search-mode-panel ${onTheSide ? '' : 'advanced-panel'}">
+          ${title}
           ${viewKeywordsInput()}
+          ${viewCaseSensitiveSelector()}
           ${viewKeywordsCombinator()}
           ${viewExclusionsInput()}
-          ${viewCaseSensitiveSelector()}
-          ${viewScopeSelector()}
-          ${viewLinkSearch()}
-          ${viewPublishingOrgSelector()}
+          ${viewLinkSearchInput()}
+          ${viewKeywordLocation()}
+          ${viewPublishingOrganisation()}
+          ${viewDocumentType()}
           ${viewPublishingAppSelector()}
           ${viewTaxonSelector()}
-          ${viewLocaleSelector()}
+          ${viewPublishingStatusSelector()}
+          ${viewLanguageSelector()}
           ${viewSearchButton()}
         </div>
       </form>
-    `)
-      break
-    case SearchType.Keyword:
-      result.push(`
+    `
+  const outsideWrap = (_inside) =>
+    onTheSide ? `<div class="side-filters">${_inside}</div>` : _inside
+
+  return outsideWrap(inside)
+}
+
+const viewKeywordSearchPanel = () => `
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
           <a class="govuk-skip-link" href="#results-table">Skip to results</a>
           ${viewKeywordsInput()}
-          <details class="govuk-details" data-module="govuk-details">
+          ${
+            state.searchResults
+              ? ''
+              : `<details class="govuk-details" data-module="govuk-details">
             <summary class="govuk-details__summary">
               <span class="govuk-details__summary-text">
-                Filters
+                Search filters
               </span>
             </summary>
             <div class="govuk-details__text">
-              ${viewKeywordsCombinator()}
-              ${viewExclusionsInput()}
-              ${viewCaseSensitiveSelector()}
-              ${viewScopeSelector()}
-              ${viewPublishingAppSelector()}
+              <div class="search-filters-container">
+                <div class="search-filters-left-col">
+                  ${viewCaseSensitiveSelector()}
+                  ${viewKeywordsCombinator()}
+                  ${viewExclusionsInput()}
+                  ${viewKeywordLocation()}
+                  ${viewPublishingOrganisation()}
+                </div>
+                <div class="search-filters-left-col">
+                  ${viewDocumentType()}
+                  ${viewPublishingAppSelector()}
+                  ${viewTaxonSelector()}
+                  ${viewPublishingStatusSelector()}
+                  ${viewLanguageSelector()}
+                </div>
+              </div>
             </div>
-          </details>
+          </details>`
+          }
           ${viewSearchButton()}
         </div>
       </form>
-    `)
-      break
-    case SearchType.Link:
-      result.push(`
-      <form id="search-form" class="search-panel govuk-form">
-        <div class="search-mode-panel">
-          <a class="govuk-skip-link" href="#results-table">Skip to results</a>
-          ${viewLinkSearch()}
-          <details class="govuk-details" data-module="govuk-details">
-            <summary class="govuk-details__summary">
-              <span class="govuk-details__summary-text">
-                Filters
-              </span>
-            </summary>
-            <div class="govuk-details__text">
+    `
+
+const viewLinkSearchPanel = () => `
+    <form id="search-form" class="search-panel govuk-form">
+      <div class="search-mode-panel">
+        <a class="govuk-skip-link" href="#results-table">Skip to results</a>
+        ${viewMainLinkSearch()}
+        ${
+          state.searchResults
+            ? ''
+            : `<details class="govuk-details" data-module="govuk-details">
+          <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+              Search filters
+            </span>
+          </summary>
+          <div class="govuk-details__text">
+            <div class="search-filters-container">
+              <div class="search-filters-left-col">
+              ${viewPublishingOrganisation()}
               ${viewPublishingAppSelector()}
+              ${viewDocumentType()}
+              </div>
+              <div class="search-filters-left-col">
+                ${viewTaxonSelector()}
+                ${viewPublishingStatusSelector()}
+                ${viewLanguageSelector()}
+              </div>
             </div>
-          </details>
-          ${viewSearchButton()}
-        </div>
-      </form>
-    `)
-      break
-    case SearchType.Taxon:
-      result.push(`
+          </div>
+        </details>`
+        }
+        ${viewSearchButton()}
+      </div>
+    </form>
+  `
+
+const viewTaxonSearchPanel = () => `
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
           <a class="govuk-skip-link" href="#results-table">Skip to results</a>
           ${viewTaxonSelector()}
-          <details class="govuk-details" data-module="govuk-details">
+          ${
+            state.searchResults
+              ? ''
+              : `<details class="govuk-details" data-module="govuk-details">
             <summary class="govuk-details__summary">
               <span class="govuk-details__summary-text">
-                Filters
+                Search filters
               </span>
             </summary>
             <div class="govuk-details__text">
-              ${viewPublishingAppSelector()}
+              <div class="search-filters-container">
+                <div class="search-filters-left-col">
+                  ${viewPublishingOrganisation()}
+                  ${viewPublishingStatusSelector()}
+                  ${viewLanguageSelector()}
+                </div>
+                <div class="search-filters-left-col">
+                  ${viewDocumentType()}
+                  ${viewPublishingAppSelector()}
+                </div>
+              </div>
             </div>
-          </details>
+          </details>`
+          }
           ${viewSearchButton()}
         </div>
       </form>
-    `)
-      break
-    case SearchType.Language:
-      result.push(`
+    `
+
+const viewLanguageSearchPanel = () => `
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
           <a class="govuk-skip-link" href="#results-table">Skip to results</a>
-          ${viewLocaleSelector()}
-          <details class="govuk-details" data-module="govuk-details">
+          ${viewLanguageSelector()}
+          ${
+            state.searchResults
+              ? ''
+              : `<details class="govuk-details" data-module="govuk-details">
             <summary class="govuk-details__summary">
               <span class="govuk-details__summary-text">
-                Filters
+                Search filters
               </span>
             </summary>
             <div class="govuk-details__text">
-              ${viewPublishingAppSelector()}
+              <div class="search-filters-container">
+                <div class="search-filters-left-col">
+                  ${viewPublishingOrganisation()}
+                  ${viewPublishingAppSelector()}
+                  ${viewDocumentType()}
+                </div>
+                <div class="search-filters-left-col">
+                  ${viewTaxonSelector()}
+                  ${viewPublishingStatusSelector()}
+                </div>
+              </div>
             </div>
-          </details>
+          </details>`
+          }
           ${viewSearchButton()}
         </div>
       </form>
-    `)
-      break
-    case SearchType.Organisation:
-      result.push(`
+    `
+
+const viewOrganisationSearchPanel = () => `
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
           <a class="govuk-skip-link" href="#results-table">Skip to results</a>
           ${viewPublishingOrgSelector()}
-          <details class="govuk-details" data-module="govuk-details">
+          ${
+            state.searchResults
+              ? ''
+              : `<details class="govuk-details" data-module="govuk-details">
             <summary class="govuk-details__summary">
               <span class="govuk-details__summary-text">
-                Filters
+                Search filters
               </span>
             </summary>
             <div class="govuk-details__text">
-              ${viewPublishingAppSelector()}
+              <div class="search-filters-container">
+                <div class="search-filters-left-col">
+                  ${viewPublishingAppSelector()}
+                  ${viewPublishingStatusSelector()}
+                  ${viewDocumentType()}
+                </div>
+                <div class="search-filters-left-col">
+                  ${viewTaxonSelector()}
+                  ${viewLanguageSelector()}
+                </div>
+              </div>
             </div>
-          </details>
+          </details>`
+          }
           ${viewSearchButton()}
         </div>
       </form>
-    `)
-      break
-    default:
-      console.log(
-        'viewSearchPanel: unknown value',
-        state.searchParams.searchType
-      )
+    `
+
+const viewSearchPanel = () => {
+  const { searchType } = state.searchParams
+  const mapping = {
+    [SearchType.Advanced]: viewAdvancedSearchPanel,
+    [SearchType.Results]: viewAdvancedSearchPanel,
+    [SearchType.Keyword]: viewKeywordSearchPanel,
+    [SearchType.Link]: viewLinkSearchPanel,
+    [SearchType.Taxon]: viewTaxonSearchPanel,
+    [SearchType.Language]: viewLanguageSearchPanel,
+    [SearchType.Organisation]: viewOrganisationSearchPanel,
   }
-  return result.join('')
+
+  if (!(searchType in mapping)) {
+    console.error('viewSearchPanel: unknown value', searchType)
+    return null
+  }
+
+  return searchType in mapping ? mapping[searchType]() : console.error()
 }
 
-const viewInlineError = (id: string, message: string): string => `
-  <p id="${id}" class="govuk-error-message">
-    <span class="govuk-visually-hidden">Error:</span> ${message}
-  </p>
+const viewKeywordLocation = () => `
+<div class="govuk-form-group">
+  <label class="govuk-label govuk-label--s" for="search-filters-keyword-location">
+    Keyword location
+  </label>
+  <select class="govuk-select" id="search-filters-keyword-location" name="search-filters-keyword-location" style="width: 100%;">
+    <option value="${KeywordLocation.All}" ${
+  state.searchParams.keywordLocation === KeywordLocation.All ? 'selected' : ''
+}>All keyword locations</option>
+    <option value="${KeywordLocation.Title}" ${
+  state.searchParams.keywordLocation === KeywordLocation.Title ? 'selected' : ''
+}>Title</option>
+    <option value="${KeywordLocation.BodyContent}" ${
+  state.searchParams.keywordLocation === KeywordLocation.BodyContent
+    ? 'selected'
+    : ''
+}>Body content</option>
+    <option value="${KeywordLocation.Description}" ${
+  state.searchParams.keywordLocation === KeywordLocation.Description
+    ? 'selected'
+    : ''
+}>Description</option>
+  </select>
+</div>
 `
 
-const viewScopeSelector = (): string => {
-  const errors = searchState()?.errors
-  const err = errors && errors.includes(USER_ERRORS.MISSING_WHERE_TO_SEARCH)
+const viewPublishingOrgSelector = () => {
+  const options = state.organisations
+    .sort()
+    .map(
+      (organisation) =>
+        `<option value="${organisation}" ${
+          state.searchParams.publishingOrganisation === organisation
+            ? 'selected'
+            : ''
+        }>${organisation}</option>`
+    )
+    .join('')
   return `
-  <div class="govuk-form-group ${err ? 'govuk-form-group--error' : ''}">
-    <fieldset
-        class="govuk-fieldset"
-        ${state.waiting && 'disabled="disabled"'}
-        id="search-scope-wrapper"
-        ${err ? 'aria-describedby="scope-error"' : ''}>
-      <legend class="govuk-fieldset__legend">
-        Keyword location
-      </legend>
-      ${
-        err
-          ? viewInlineError('scope-error', 'Please choose at least one option')
-          : ''
-      }
-      <div class="govuk-checkboxes" id="search-locations">
-        <div class="govuk-checkboxes__item">
-          <input
-              class="govuk-checkboxes__input"
-              type="checkbox" id="search-title"
-              ${state.searchParams.whereToSearch.title ? 'checked' : ''}/>
-          <label for="search-title" class="govuk-label govuk-checkboxes__label">title</label>
-        </div>
-        <div class="govuk-checkboxes__item">
-          <input
-              class="govuk-checkboxes__input"
-              type="checkbox"
-              id="search-text"
-            ${state.searchParams.whereToSearch.text ? 'checked' : ''}/>
-          <label for="search-text" class="govuk-label govuk-checkboxes__label">
-            body content and description
-          </label>
-        </div>
-      </div>
-    </fieldset>
-  </div>
-  `
-}
-
-const viewTaxonSelector = () => `
   <div class="govuk-body">
     <div class="taxon-facet">
-      <label class="govuk-label label--bold" for="taxon">
-        Search for taxons
+      <label class="govuk-label govuk-label--s" for="publishing-organisation">
+        Search for publishing organisations
       </label>
       <div class="govuk-hint">
-        Type the first letters of a taxon or select from the dropdown
+        Type the first letters of an organisation or select from the dropdown
       </div>
-      <datalist id="taxonList">
-        ${state.taxons.map((taxon) => `<option>${taxon}</option>`)}
-      </datalist>
-      <div>
-      <input
-        ${state.waiting && 'disabled="disabled"'}
-        style="display: inline-block"
-        list="taxonList"
-        value="${state.searchParams.selectedTaxon}"
-        class="govuk-input"
-        id="taxon"
-        autocomplete="off" />
-      </div>
+
+      <select ${
+        state.waiting && 'disabled="disabled"'
+      } id="search-filters-publishing-organisation" class="autocomplete__input autocomplete__input--default" name="search-filters-publishing-organisation" style="display: inline-block">
+        <option value="" ></option>
+        ${options}
+      </select>
     </div>
   </div>
 `
+}
 
-const viewLocaleSelector = () => {
+const viewPublishingOrganisation = () => {
+  const options = state.organisations
+    .sort()
+    .map(
+      (organisation) =>
+        `<option value="${organisation}" ${
+          state.searchParams.publishingOrganisation === organisation
+            ? 'selected'
+            : ''
+        }>${organisation}</option>`
+    )
+    .join('')
+
+  const html = `
+  <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+    <label class="govuk-label govuk-label--s" for="search-filters-publishing-organisation">
+      Publishing organisations
+    </label>
+    <select ${
+      state.waiting && 'disabled="disabled"'
+    } id="search-filters-publishing-organisation" class="autocomplete__input autocomplete__input--default" name="search-filters-publishing-organisation">
+      <option value="" ></option>
+      ${options}
+    </select>
+  </div>
+  `
+
+  return html
+}
+
+const viewDocumentType = () => {
   const html = [
     `
-    <div class="govuk-body taxon-facet">
-      <label class="govuk-label label--bold" for="locale">
-        Search for languages
+    <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+      <label class="govuk-label govuk-label--s" for="search-filters-document-type">
+        Document type
       </label>
-      <div class="govuk-hint">
-        Type the first letters of a language or select from the dropdown
-      </div>
-      <datalist id="localeList">
+      <select ${
+        state.waiting && 'disabled="disabled"'
+      } id="search-filters-document-type" class="autocomplete__input autocomplete__input--default" name="search-filters-document-type">
+      <option value="" ></option>
   `,
   ]
-  html.push(
-    ...state.locales.map(
-      (code) =>
-        `<option data-value="${code}" ${
-          state.searchParams.selectedLocale === code ? 'selected' : ''
-        }>${languageName(code)}</option>`
-    )
-  )
+
   html.push(`
-      </datalist>
-      <input type="text"
-         ${state.waiting && 'disabled="disabled"'}
-         value="${state.searchParams.selectedLocale}"
-         class="govuk-input"
-         list="localeList"
-         id="locale" name="locale"
-         autocomplete="off" />
+      ${html.push(
+        ...state.documentTypes
+          .sort()
+          .map(
+            (documentType) =>
+              `<option value="${documentType}" ${
+                state.searchParams.documentType === documentType
+                  ? 'selected'
+                  : ''
+              }>${(
+                documentType.charAt(0).toUpperCase() + documentType.slice(1)
+              ).replace(/_/g, ' ')}</option>`
+          )
+      )}
+        </select>
     </div>`)
   return html.join('')
 }
+
+const viewTaxonSelector = () => `
+    <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+      <label class="govuk-label govuk-label--s" for="search-filters-taxon">
+        Taxons
+      </label>
+      <select ${
+        state.waiting && 'disabled="disabled"'
+      } id="search-filters-taxon" class="autocomplete__input autocomplete__input--default" name="search-filters-taxon">
+      <option value=""></option>
+      ${state.taxons
+        .sort()
+        .map(
+          (taxon) =>
+            `<option value="${taxon}" ${
+              state.searchParams.taxon === taxon ? 'selected' : ''
+            }>${taxon}</option>`
+        )
+        .join('')}
+        </select>
+    </div>`
+
+const viewPublishingStatusSelector = () => `
+    <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+      <label class="govuk-label govuk-label--s" for="search-filters-publishing-status">
+        Publishing status
+      </label>
+      <select ${
+        state.waiting && 'disabled="disabled"'
+      } id="search-filters-publishing-status" class="govuk-select" name="search-filters-publishing-status" style="width: 100%;">
+        <option value="${PublishingStatus.All}" ${
+  state.searchParams.publishingStatus === PublishingStatus.All ? 'selected' : ''
+}>All statuses</option>
+        <option value="${PublishingStatus.Withdrawn}" ${
+  state.searchParams.publishingStatus === PublishingStatus.Withdrawn
+    ? 'selected'
+    : ''
+}>Withdrawn</option>
+        <option value="${PublishingStatus.NotWithdrawn}" ${
+  state.searchParams.publishingStatus === PublishingStatus.NotWithdrawn
+    ? 'selected'
+    : ''
+}>Non-withdrawn</option>
+      </select>
+  </div>`
+
+const viewLanguageSelector = () => `
+    <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+      <label class="govuk-label govuk-label--s" for="search-filters-language">
+        Languages
+      </label>
+      <select ${
+        state.waiting && 'disabled="disabled"'
+      } id="search-filters-language" class="autocomplete__input autocomplete__input--default" name="search-filters-language">
+      ${state.locales.map(
+        (code) =>
+          `<option value="${code}" ${
+            state.searchParams.language === languageName(code) ? 'selected' : ''
+          }>${languageName(code)}</option>`
+      )}
+        </select>
+    </div>`
 
 const viewSearchButton = () => `
   <p class="govuk-body">
@@ -270,9 +436,9 @@ const viewSearchButton = () => `
   </p>
 `
 
-const viewLinkSearch = () => `
+const viewMainLinkSearch = () => `
   <div class="govuk-body">
-    <label class="govuk-label label--bold" for="link-search">
+    <label class="govuk-label govuk-label--s" for="search-filters-link-search">
       Search for links
     </label>
     <div class="govuk-hint">
@@ -280,133 +446,99 @@ const viewLinkSearch = () => `
     </div>
     <input
         class="govuk-input"
-        id="link-search"
+        id="search-filters-link-search"
         ${state.waiting && 'disabled="disabled"'}
         value="${state.searchParams.linkSearchUrl}"
      />
   </div>
 `
 
+const viewLinkSearchInput = () => `
+<div class="govuk-form-group">
+  <label class="govuk-label govuk-label--s" for="search-filters-link-search">
+  Search for links
+  </label>
+  <input class="govuk-input" id="search-filters-link-search" name="search-filters-link-search" type="text" value="${state.searchParams.linkSearchUrl}">
+</div>
+`
+
 const viewCaseSensitiveSelector = () => `
-  <div class="govuk-body">
-    <div class="govuk-checkboxes">
-      <div class="govuk-checkboxes__item">
-        <input
-            class="govuk-checkboxes__input"
-            ${state.waiting && 'disabled="disabled"'}
-            type="checkbox"
-            id="case-sensitive"
-            ${state.searchParams.caseSensitive ? 'checked' : ''}
-        />
-        <label for="case-sensitive" class="govuk-label govuk-checkboxes__label">case-sensitive search</label>
-      </div>
-    </div>
-  </div>
-`
-
-const viewKeywordsCombinator = () =>
-  ` <div class="govuk-form-group">
-    <fieldset
-        class="govuk-fieldset"
-        id="combinator-wrapper"
-        ${state.waiting && 'disabled="disabled"'}>
-
-      <legend class="govuk-fieldset__legend">
-        Search for
-      </legend>
-      <div class="govuk-radios" id="combinators">
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input"
-                 type="radio" id="combinator-any"
-                 name="combinator"
-            ${state.searchParams.combinator === 'any' ? 'checked' : ''}/>
-          <label for="combinator-any" class="govuk-label govuk-radios__label">
-            any keyword
-          </label>
-        </div>
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input"
-                 type="radio" id="combinator-all"
-                 name="combinator"
-            ${state.searchParams.combinator === 'all' ? 'checked' : ''}/>
-          <label for="combinator-all" class="govuk-label govuk-radios__label">
-            all keywords
-          </label>
-        </div>
-      </div>
-    </fieldset>
-  </div>
-`
-
-const viewPublishingOrgSelector = () => `
-  <div class="govuk-body">
-    <div class="taxon-facet">
-      <label class="govuk-label label--bold" for="publishing-organisation">
-        Search for publishing organisations
-      </label>
-      <div class="govuk-hint">
-        Type the first letters of an organisation or select from the dropdown
-      </div>
-      <datalist id="orgList">
-        ${state.organisations.map(
-          (organisation) => `<option>${organisation}</option>`
-        )}
-      </datalist>
-      <div>
+<div class="govuk-form-group">
+  <div class="govuk-checkboxes govuk-checkboxes--small">
+    <div class="govuk-checkboxes__item">
       <input
-        ${state.waiting && 'disabled="disabled"'}
-        style="display: inline-block"
-        list="orgList"
-        value="${state.searchParams.selectedOrganisation}"
-        class="govuk-input"
-        id="organisation"
-        autocomplete="off" />
-      </div>
+          class="govuk-checkboxes__input"
+          ${state.waiting && 'disabled="disabled"'}
+          type="checkbox"
+          id="search-filters-case-sensitive"
+          name="search-filters-case-sensitive"
+          ${state.searchParams.caseSensitive ? 'checked' : ''}
+      />
+      <label for="search-filters-case-sensitive" class="govuk-label govuk-checkboxes__label">Enable case sensitive</label>
     </div>
   </div>
+</div>
 `
 
-const viewPublishingAppSelector = () =>
-  ` <div class="govuk-form-group">
-    <fieldset
-        class="govuk-fieldset"
-        id="search-areas-wrapper"
-        ${state.waiting && 'disabled="disabled"'}>
-      <legend class="govuk-fieldset__legend">
-        Limit search
-      </legend>
-      <div class="govuk-radios" id="site-areas">
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input"
-                 type="radio" id="area-publisher"
-                 name="area"
-            ${
-              state.searchParams.areaToSearch === 'publisher' ? 'checked' : ''
-            }/>
-          <label for="area-publisher" class="govuk-label govuk-radios__label">
-            Publisher
-          </label>
-        </div>
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input"
-                 type="radio" id="area-whitehall"
-                 name="area"
-            ${
-              state.searchParams.areaToSearch === 'whitehall' ? 'checked' : ''
-            }/>
-          <label for="area-whitehall" class="govuk-label govuk-radios__label">Whitehall</label>
-        </div>
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input"
-                 type="radio" id="area-any"
-                 name="area"
-            ${state.searchParams.areaToSearch === 'any' ? 'checked' : ''}/>
-          <label for="area-any" class="govuk-label govuk-radios__label">All publishing applications</label>
-        </div>
+const viewKeywordsCombinator = () => `
+<div class="govuk-form-group">
+  <fieldset class="govuk-fieldset">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+        Search for
+    </legend>
+    <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input" id="search-filters-combinator-1" name="search-filters-combinator" type="radio" value="${
+          Combinator.All
+        }" ${state.searchParams.combinator === Combinator.All ? 'checked' : ''}>
+        <label class="govuk-label govuk-radios__label" for="search-filters-combinator-1">
+          All keywords
+        </label>
+        <div class="govuk-hint govuk-radios__hint">
+            Narrows search eg, dog and cat
+          </div>
       </div>
-    </fieldset>
-  </div>
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input" id="search-filters-combinator-2" name="search-filters-combinator" type="radio" value="${
+          Combinator.Any
+        }" ${state.searchParams.combinator === Combinator.Any ? 'checked' : ''}>
+        <label class="govuk-label govuk-radios__label" for="search-filters-combinator-2">
+          Any keyword
+        </label>
+        <div class="govuk-hint govuk-radios__hint">
+            Expands search eg, dog or cat
+          </div>
+      </div>
+    </div>
+  </fieldset>
+</div>
 `
+
+const viewPublishingAppSelector = () => `
+      <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+        <label class="govuk-label govuk-label--s" for="search-filters-publishing-application">
+          Publishing applications
+        </label>
+        <select ${
+          state.waiting && 'disabled="disabled"'
+        } id="search-filters-publishing-application" class="govuk-select" name="search-filters-publishing-application" style="width: 100%;">
+          <option value="${PublishingApplication.Any}" ${
+  state.searchParams.publishingApplication === PublishingApplication.Any
+    ? 'selected'
+    : ''
+}>All publishing applications</option>
+          <option value="${PublishingApplication.Publisher}" ${
+  state.searchParams.publishingApplication === PublishingApplication.Publisher
+    ? 'selected'
+    : ''
+}>Publisher (mainstream)</option>
+          <option value="${PublishingApplication.Whitehall}" ${
+  state.searchParams.publishingApplication === PublishingApplication.Whitehall
+    ? 'selected'
+    : ''
+}>Whitehall (specialist)</option>
+        </select>
+    </div>`
 
 const viewKeywordsInput = () => `
   <div class="govuk-body">
@@ -424,21 +556,12 @@ const viewKeywordsInput = () => `
 `
 
 const viewExclusionsInput = () => `
-  <div class="govuk-body">
-    <label for="excluded-keyword" class="govuk-label label--bold">
-      Exclude keywords
-    </label>
-    <div class="govuk-hint">
-      For example: passport
-    </div>
-    <input class="govuk-input"
-        ${state.waiting && 'disabled="disabled"'}
-        id="excluded-keyword"
-        value='${sanitiseOutput(state.searchParams.excludedWords).replace(
-          '"',
-          '&quot;'
-        )}'/>
-  </div>
+<div class="govuk-form-group">
+  <label class="govuk-label govuk-label--s" for="search-filters-excluded-keywords">
+    Excluding these words
+  </label>
+  <input class="govuk-input" id="search-filters-excluded-keywords" name="search-filters-excluded-keywords" type="text" value="${state.searchParams.excludedWords}">
+</div>
 `
 
 export { viewSearchPanel }
