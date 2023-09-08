@@ -25,6 +25,9 @@ const tagOrComment = new RegExp(
 const getFormInputValue = (inputId: string): string =>
   sanitiseInput((<HTMLInputElement>id(inputId))?.value)
 
+const getFormSelectValueById = (selectId: string): string =>
+  sanitiseInput((<HTMLSelectElement>id(selectId))?.selectedOptions[0].value)
+
 const sanitiseInput = function (text: string | undefined): string {
   // remove text that could lead to script injections
   if (!text) return ''
@@ -56,4 +59,11 @@ const splitKeywords = function (keywords: string): string[] {
   return output.filter((d) => d.length > 0 && !wordsToIgnore.includes(d))
 }
 
-export { id, sanitiseInput, sanitiseOutput, getFormInputValue, splitKeywords }
+export {
+  id,
+  getFormSelectValueById,
+  sanitiseInput,
+  sanitiseOutput,
+  getFormInputValue,
+  splitKeywords,
+}

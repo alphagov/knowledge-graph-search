@@ -10,7 +10,10 @@ import { fieldName } from './utils'
 import { createAgGrid } from './view-grid'
 import { viewSideFilters } from './view-side-filters'
 import govukPostInitScripts from './postInitScripts'
-import { SearchType } from '../../common/types/search-api-types'
+import {
+  PublishingStatus,
+  SearchType,
+} from '../../common/types/search-api-types'
 
 declare const window: any
 
@@ -42,7 +45,7 @@ const view = () => {
   // Add event handlers
   document
     .querySelectorAll(
-      'button, input[type=checkbox][data-interactive=true], a#clear-side-filters-link'
+      'button, input[type=checkbox][data-interactive=true], a#clear-side-filters-link, #clear-all-headers, #check-all-headers'
     )
     .forEach((input) =>
       input.addEventListener('click', (event) =>
@@ -222,31 +225,44 @@ const viewSearchResultsTable = () => {
   if (!state.searchResults || state.searchResults?.length <= 0) {
     return ''
   }
-  const viewFieldSet = () => `
+  const viewFieldSet = () => {
+    let excludeList = ['hyperlinks']
+
+    if (state.searchParams.publishingStatus === PublishingStatus.NotWithdrawn) {
+      excludeList.push(...['withdrawn_at', 'withdrawn_explanation'])
+    }
+    return `
     <div class="govuk-fieldset header-options-container" ${
       state.waiting && 'disabled="disabled"'
     }>
       <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
         Customise table headers
       </legend>
+      <p class="govuk-body">
+        <a class="govuk-link" id="clear-all-headers" href="javascript:void(0)">Clear all headers</a>
+        <a class="govuk-link" id="check-all-headers" href="javascript:void(0)">Select all headers</a>
+       </p>
       <div class="header-options-checkboxes-container govuk-checkboxes govuk-checkboxes--small checkbox-list">
       ${Object.keys(state.searchResults[0])
-        .map(
-          (key) => `
+        .map((key) =>
+          !excludeList.includes(key)
+            ? `
             <div class="govuk-checkboxes__item">
               <input class="govuk-checkboxes__input"
                       data-interactive="true"
                       type="checkbox" id="show-field-${key}"
                 ${state.showFields[key] ? 'checked' : ''}/>
               <label for="show-field-${key}" class="govuk-label govuk-checkboxes__label">${fieldName(
-            key
-          )}</label>
+                key
+              )}</label>
             </div>`
+            : ''
         )
         .join('')}
       </div>
     </div>
   `
+  }
   html.push(`<div class="govuk-body search-results-table-container">
   ${state.showFieldSet ? viewFieldSet() : ''}
   <div id="results-grid-container" class="ag-theme-alpine"></div>

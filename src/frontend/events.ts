@@ -5,7 +5,11 @@ import {
   setState,
   initialSearchParams,
 } from './state'
-import { id, getFormInputValue } from '../common/utils/utils'
+import {
+  id,
+  getFormInputValue,
+  getFormSelectValueById,
+} from '../common/utils/utils'
 import { view } from './view/view'
 import { queryBackend } from './search-api'
 import { EventType, SearchApiCallback } from './types/event-types'
@@ -173,6 +177,22 @@ const handleEvent: SearchApiCallback = async function (event) {
           break
         case 'toggleDisamBox':
           state.disamboxExpanded = !state.disamboxExpanded
+          break
+        case 'clear-all-headers':
+          state.showFields = {}
+          break
+        case 'check-all-headers':
+          state.showFields = Object.keys(state.searchResults[0])
+            .filter((k: any) => !['hyperlinks'].includes(k))
+            .reduce((a, v) => ({ ...a, [v]: true }), {})
+          if (
+            (getFormInputValue(
+              'side-filters-publishing-status'
+            ) as PublishingStatus) === PublishingStatus.NotWithdrawn
+          ) {
+            state.showFields.withdrawn_at = false
+            state.showFields.withdrawn_explanation = false
+          }
           break
         default:
           fieldClicked = event.id ? event.id.match(/show-field-(.*)/) : null

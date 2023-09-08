@@ -176,6 +176,15 @@ h2:focus-visible {
   }
 }
 
+#clear-all-headers {
+  border-right: 1px solid grey;
+  padding-right: 14px;
+}
+
+#check-all-headers {
+  margin-left: 10px;
+}
+
 #taxon-label {
   background: white;
 }
