@@ -1,5 +1,4 @@
 import { id } from '../../common/utils/utils'
-import { state } from '../state'
 
 export default function govukPostInitScripts() {
   // A few evals to set things straight

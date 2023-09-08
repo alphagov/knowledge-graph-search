@@ -226,7 +226,7 @@ const viewSearchResultsTable = () => {
     return ''
   }
   const viewFieldSet = () => {
-    let excludeList = ['hyperlinks']
+    const excludeList = ['hyperlinks']
 
     if (state.searchParams.publishingStatus === PublishingStatus.NotWithdrawn) {
       excludeList.push(...['withdrawn_at', 'withdrawn_explanation'])

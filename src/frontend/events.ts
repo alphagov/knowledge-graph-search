@@ -5,11 +5,7 @@ import {
   setState,
   initialSearchParams,
 } from './state'
-import {
-  id,
-  getFormInputValue,
-  getFormSelectValueById,
-} from '../common/utils/utils'
+import { id, getFormInputValue } from '../common/utils/utils'
 import { view } from './view/view'
 import { queryBackend } from './search-api'
 import { EventType, SearchApiCallback } from './types/event-types'

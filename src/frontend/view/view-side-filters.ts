@@ -145,7 +145,7 @@ const viewDocumentTypeSelector = () => {
           .map(
             (documentType) =>
               `<option value="${documentType}" ${
-                state.searchParams.documentType == documentType
+                state.searchParams.documentType === documentType
                   ? 'selected'
                   : ''
               }>${(
