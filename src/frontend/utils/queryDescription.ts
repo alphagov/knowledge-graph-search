@@ -4,7 +4,10 @@ import {
   PublishingStatus,
   SearchParams,
 } from '../../common/types/search-api-types'
-import { languageName } from '../../common/utils/lang'
+import {
+  defaultAllLanguagesOption,
+  languageName,
+} from '../../common/utils/lang'
 import { splitKeywords } from '../../common/utils/utils'
 import { makeBold } from './makeBold'
 
@@ -53,7 +56,10 @@ export const queryDescription = ({
     }[searchParams.publishingStatus]
     clauses.push(`are ${makeBold(status, includeMarkup)}`)
   }
-  if (searchParams.language !== '')
+  if (
+    searchParams.language !== defaultAllLanguagesOption &&
+    searchParams.language !== ''
+  )
     clauses.push(
       `are in ${makeBold(languageName(searchParams.language), includeMarkup)}`
     )
