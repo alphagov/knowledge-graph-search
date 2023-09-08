@@ -276,7 +276,7 @@ const viewPublishingOrgSelector = () => {
   return `
   <div class="govuk-body">
     <div class="taxon-facet">
-      <label class="govuk-label label--bold" for="publishing-organisation">
+      <label class="govuk-label govuk-label--s" for="publishing-organisation">
         Search for publishing organisations
       </label>
       <div class="govuk-hint">
