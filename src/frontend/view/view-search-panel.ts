@@ -15,7 +15,7 @@ export const viewAdvancedSearchPanel = (onTheSide = true) => {
     : `<h1 class="govuk-heading-xl">Advanced search</h1>`
   const inside = `
       <form id="search-form" class="search-panel govuk-form">
-        <div class="search-mode-panel advanced-panel">
+        <div class="search-mode-panel ${onTheSide ? '' : 'advanced-panel'}">
           ${title}
           ${viewKeywordsInput()}
           ${viewCaseSensitiveSelector()}
