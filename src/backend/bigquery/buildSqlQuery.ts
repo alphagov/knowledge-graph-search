@@ -4,6 +4,7 @@ import {
   PublishingApplication,
   PublishingStatus,
   SearchParams,
+  SearchType,
 } from '../../common/types/search-api-types'
 
 export const buildSqlQuery = function (
@@ -24,6 +25,39 @@ export const buildSqlQuery = function (
     contentToSearch.push('IFNULL(page.description, "")')
   }
   const contentToSearchString = contentToSearch.join(' || " " || ')
+
+  const textOccurrences =
+    searchParams.searchType !== SearchType.Link &&
+    searchParams.searchType !== SearchType.Advanced &&
+    !searchParams.taxon &&
+    !searchParams.publishingOrganisation &&
+    !searchParams.documentType &&
+    searchParams.keywordLocation !== KeywordLocation.Title &&
+    !searchParams.language
+      ? keywords.length === 1
+        ? `(
+    SELECT
+    ARRAY_LENGTH(REGEXP_EXTRACT_ALL(LOWER(${contentToSearchString}), LOWER(r'(${keywords[0]})')))
+  ) AS occurrences,`
+        : `
+  (
+    ${keywords.map(
+      (value) =>
+        `(
+          SELECT
+        ARRAY_LENGTH(REGEXP_EXTRACT_ALL(LOWER(${contentToSearchString}), LOWER(r'(${value})')))
+        ) `
+    )}
+  ) AS occurrences,`
+      : ''
+
+  const linkOccurrences =
+    searchParams.searchType === SearchType.Link
+      ? `(
+        SELECT
+        COUNT(1) FROM UNNEST(hyperlinks) as hyperlink WHERE CONTAINS_SUBSTR(hyperlink.link_url, @link)
+      ) AS occurrences,`
+      : ''
 
   const includeClause =
     keywords.length === 0
@@ -129,7 +163,9 @@ export const buildSqlQuery = function (
       page_views,
       taxons,
       primary_organisation,
-      organisations AS all_organisations
+      organisations AS all_organisations,
+      ${textOccurrences}
+      ${linkOccurrences}
     FROM search.page
     
     ${publishingStatusClause}
