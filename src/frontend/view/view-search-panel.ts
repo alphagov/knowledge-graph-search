@@ -545,7 +545,7 @@ const viewPublishingAppSelector = () => `
 
 const viewKeywordsInput = () => `
   <div class="govuk-body">
-    <label for="keyword" class="govuk-label label--bold">Search for keywords</label>
+    <label for="keyword" class="govuk-label govuk-label--s">Search for keywords</label>
     <div class="govuk-hint">
       For example: cat, dog, &quot;Department for Education&quot;
     </div>
