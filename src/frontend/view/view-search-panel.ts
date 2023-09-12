@@ -439,10 +439,10 @@ const viewSearchButton = () => `
 const viewMainLinkSearch = () => `
   <div class="govuk-body">
     <label class="govuk-label govuk-label--s" for="search-filters-link-search">
-      Search for links
+      Search for pages that link to
     </label>
     <div class="govuk-hint">
-      For example: /maternity-pay-leave or youtube.com
+      Use full or partial URLs eg, https://www.gov.uk/tax-codes or tax-codes
     </div>
     <input
         class="govuk-input"
@@ -456,8 +456,11 @@ const viewMainLinkSearch = () => `
 const viewLinkSearchInput = () => `
 <div class="govuk-form-group">
   <label class="govuk-label govuk-label--s" for="search-filters-link-search">
-  Search for links
+  Search for pages that link to
   </label>
+  <div class="govuk-hint">
+      Use full or partial URLs eg, https://www.gov.uk/tax-codes or tax-codes
+    </div>
   <input class="govuk-input" id="search-filters-link-search" name="search-filters-link-search" type="text" value="${state.searchParams.linkSearchUrl}">
 </div>
 `
