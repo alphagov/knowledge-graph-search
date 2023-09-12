@@ -10,6 +10,7 @@ import {
 } from '../common/types/search-api-types'
 import { State } from './types/state-types'
 import config from './config'
+import { loadShowFieldsState } from './utils/localStorageService'
 
 // user inputs that are used to build the query.
 // (basically, everything whose value could be found in the URL)
@@ -33,6 +34,14 @@ export const initialSearchParams: SearchParams = {
   publishingStatus: PublishingStatus.All,
 }
 
+const defaultShowFields = {
+  page_views: true,
+  url: true,
+  title: true,
+  primary_organisation: true,
+  documentType: true,
+}
+
 let state: State = {
   searchParams: JSON.parse(JSON.stringify(initialSearchParams)), // deep copy
   taxons: [], // list of names of all the taxons
@@ -45,14 +54,7 @@ let state: State = {
   metaSearchResults: null,
   skip: 0, // where to start the pagination (number of results)
   resultsPerPage: config.pagination.defaultResultsPerPage, // number of results per page
-  showFields: {
-    // what result fields to show by default
-    page_views: true,
-    url: true,
-    title: true,
-    primary_organisation: true,
-    documentType: true,
-  },
+  showFields: loadShowFieldsState() || defaultShowFields, // what result columns to show
   waiting: false, // whether we're waiting for a request to return,
   disamboxExpanded: false, // if there's a resizeable disamb meta box, whether it's expanded or not
   showFiltersPane: true,

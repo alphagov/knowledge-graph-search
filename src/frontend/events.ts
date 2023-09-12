@@ -19,6 +19,7 @@ import {
   SearchParams,
 } from '../common/types/search-api-types'
 import { defaultAllLanguagesOption, languageCode } from '../common/utils/lang'
+import { saveShowFieldsState } from './utils/localStorageService'
 
 declare const window: any
 
@@ -176,6 +177,7 @@ const handleEvent: SearchApiCallback = async function (event) {
           break
         case 'clear-all-headers':
           state.showFields = {}
+          saveShowFieldsState(state.showFields)
           break
         case 'check-all-headers':
           state.showFields = Object.keys(state.searchResults[0])
@@ -189,6 +191,7 @@ const handleEvent: SearchApiCallback = async function (event) {
             state.showFields.withdrawn_at = false
             state.showFields.withdrawn_explanation = false
           }
+          saveShowFieldsState(state.showFields)
           break
         default:
           fieldClicked = event.id ? event.id.match(/show-field-(.*)/) : null
@@ -196,6 +199,7 @@ const handleEvent: SearchApiCallback = async function (event) {
             state.showFields[fieldClicked[1]] = (<HTMLInputElement>(
               id(event.id)
             ))?.checked
+            saveShowFieldsState(state.showFields)
           } else {
             console.log('unknown DOM event received:', event)
           }
