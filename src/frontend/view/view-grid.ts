@@ -42,6 +42,8 @@ const createAgGrid = () => {
     domLayout: 'autoHeight',
     ensureDomOrder: true,
     enableCellTextSelection: true,
+    alwaysShowHorizontalScroll: true,
+    alwaysShowVerticalScroll: true,
   }
 
   const gridDiv = id('results-grid-container')

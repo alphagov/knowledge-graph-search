@@ -1,6 +1,17 @@
 .ag-theme-alpine {
   margin-bottom: 30px;
   font-family: 'GDS Transport', arial, sans-serif;
+
+  ::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 2px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border-radius: 2px;
+    background-color: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
+  }
 }
 
 .ag-theme-alpine,
