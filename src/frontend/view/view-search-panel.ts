@@ -495,7 +495,7 @@ const viewKeywordsCombinator = () => `
           All keywords
         </label>
         <div class="govuk-hint govuk-radios__hint">
-            Narrows search eg, dog and cat
+            Narrows search for example: cat, dog will search for pages that contain cat AND dog
           </div>
       </div>
       <div class="govuk-radios__item">
