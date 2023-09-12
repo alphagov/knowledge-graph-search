@@ -509,7 +509,7 @@ const viewKeywordsCombinator = () => `
           Any keyword
         </label>
         <div class="govuk-hint govuk-radios__hint">
-            Expands search eg, dog or cat
+            Expands search for example: cat, dog will search for pages that contain cat OR dog
           </div>
       </div>
     </div>
