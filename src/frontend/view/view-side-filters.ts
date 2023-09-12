@@ -242,7 +242,7 @@ const viewPublishingStatusSelector = () => `
   state.searchParams.publishingStatus === PublishingStatus.NotWithdrawn
     ? 'selected'
     : ''
-}>Non-withdrawn</option>
+}>Not withdrawn</option>
         </select>
     </div>`
 
