@@ -547,7 +547,7 @@ const viewKeywordsInput = () => `
   <div class="govuk-body">
     <label for="keyword" class="govuk-label govuk-label--s">Search for keywords</label>
     <div class="govuk-hint">
-      For example: cat, dog, &quot;Department for Education&quot;
+    Use quotes for phrases. For example, "UK driving licence" and spaces or commas for multiple keywords or phrases
     </div>
     <input
       ${state.waiting && 'disabled="disabled"'}
