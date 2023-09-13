@@ -1,5 +1,6 @@
 import { languageName } from '../../common/utils/lang'
 import { state } from '../state'
+import { Field } from '../types/state-types'
 
 export const formatNames = (array: []) =>
   [...new Set(array)].map((x) => `“${x}”`).join(', ')
@@ -37,7 +38,7 @@ const formatOccurrences = (obj: any) =>
         .join(', ')}`
     : `${obj}`
 
-export const fieldFormatters: Record<string, any> = {
+export const fieldFormatters: Record<Field, any> = {
   url: {
     name: 'URL',
     format: (url: string) => `<a class="govuk-link" href="${url}">${url}</a>`,
