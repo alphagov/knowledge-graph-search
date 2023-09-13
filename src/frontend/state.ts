@@ -8,7 +8,7 @@ import {
   UrlParams,
   PublishingStatus,
 } from '../common/types/search-api-types'
-import { State } from './types/state-types'
+import { SortAction, State } from './types/state-types'
 import config from './config'
 import {
   loadLayoutStateFromCache,
@@ -46,6 +46,10 @@ const defaultShowFields = {
   documentType: true,
 }
 
+const defaultSortingState = {
+  page_views: SortAction.ASC,
+}
+
 const cachedLayout = loadLayoutStateFromCache()
 const cachedPagination = loadPaginationStateFromCache()
 let state: State = {
@@ -68,6 +72,7 @@ let state: State = {
   disamboxExpanded: false, // if there's a resizeable disamb meta box, whether it's expanded or not
   showFiltersPane: true,
   showFieldSet: true,
+  sorting: defaultSortingState,
 }
 if (cachedLayout) {
   const { showFiltersPane, showFieldSet } = loadLayoutStateFromCache()
