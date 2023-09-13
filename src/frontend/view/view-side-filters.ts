@@ -187,7 +187,7 @@ const viewPublishingApplications = () => `
 const viewTaxonSelector = () => `
     <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
       <label class="govuk-label govuk-label--s" for="side-filters-taxon">
-        Taxons
+        Topic tags
       </label>
       <select ${
         state.waiting && 'disabled="disabled"'
