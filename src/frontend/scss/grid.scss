@@ -39,3 +39,44 @@
   background-color: rgba(0, 0, 0, 0.5);
   box-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
 }
+
+.customHeaderLabel {
+  font-weight: normal;
+  position: relative;
+
+  &.sortable {
+    cursor: pointer;
+
+    &.sorting-active {
+      color: black;
+      font-weight: bold;
+
+      &.sorting-desc::before {
+        color: black;
+      }
+      &.sorting-asc::after {
+        color: black;
+      }
+    }
+
+    &:hover {
+      text-decoration: underline;
+    }
+    &::before {
+      content: ' ▼';
+      position: absolute;
+      right: -20px;
+      bottom: -1px;
+      font-size: 12px;
+      color: lightgray;
+    }
+    &::after {
+      content: ' ▲';
+      position: absolute;
+      right: -20px;
+      top: -1px;
+      font-size: 12px;
+      color: lightgray;
+    }
+  }
+}

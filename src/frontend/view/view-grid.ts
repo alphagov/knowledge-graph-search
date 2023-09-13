@@ -11,6 +11,7 @@ import {
 } from '../utils/localStorageService'
 import { fieldFormat, fieldName } from './utils'
 import { viewPagination } from './view-pagination'
+import CustomAgGridHeader from './customAgGridHeader'
 
 const overlayElement = () => {
   const el = document.createElement('div')
@@ -49,6 +50,17 @@ const createAgGrid = () => {
     documentType: (p) => formatDocumentType(p.value),
     publishing_app: (p) => formatPublishingApp(p.value),
   }
+  const parsePageViews = (x) => (x.charAt(0) === '<' ? 0 : parseInt(x))
+
+  const sortConfig = {
+    page_views: {
+      sortable: true,
+      sort: state.sorting.page_views,
+      comparator: (a, b) => {
+        return parsePageViews(a) - parsePageViews(b)
+      },
+    },
+  }
   const columnDefs = enabledFields.map((field) => ({
     field,
     headerName: fieldName(field),
@@ -56,6 +68,8 @@ const createAgGrid = () => {
     resizable: true,
     suppressSizeToFit: ['url', 'title'].includes(field),
     width: ['url', 'title'].includes(field) ? 500 : null,
+    sortable: field !== 'contentId',
+    ...(sortConfig[field] || {}),
   }))
 
   const gridOptions = {
@@ -73,6 +87,9 @@ const createAgGrid = () => {
     enableCellTextSelection: true,
     alwaysShowHorizontalScroll: true,
     alwaysShowVerticalScroll: true,
+    components: {
+      agColumnHeader: CustomAgGridHeader,
+    },
   }
 
   const gridDiv = id('results-grid-container')
