@@ -210,7 +210,7 @@ const viewResultsPerPageSelector = () => {
 
   return `
   <div class="govuk-form-group">
-    <label class="govuk-label" for="resultsPerPageSelect">
+    <label class="govuk-label" for="resultsPerPage-select">
       Results per page
     </label>
     <select class="govuk-select" id="resultsPerPage-select" name="resultsPerPageSelect">
