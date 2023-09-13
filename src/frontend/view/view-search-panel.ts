@@ -459,7 +459,7 @@ const viewLinkSearchInput = () => `
   Search for pages that link to
   </label>
   <div class="govuk-hint">
-      Use full or partial URLs eg, https://www.gov.uk/tax-codes or tax-codes
+      Use full or partial URLs for example, https://www.gov.uk/tax-codes or tax-codes
     </div>
   <input class="govuk-input" id="search-filters-link-search" name="search-filters-link-search" type="text" value="${state.searchParams.linkSearchUrl}">
 </div>
