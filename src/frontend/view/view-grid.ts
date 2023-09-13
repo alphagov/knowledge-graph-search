@@ -1,5 +1,9 @@
 import { id } from '../../common/utils/utils'
 import { state } from '../state'
+import {
+  loadGridColumnState,
+  saveGridColumnState,
+} from '../utils/localStorageService'
 import { fieldFormat, fieldName } from './utils'
 import { viewPagination } from './view-pagination'
 
@@ -50,10 +54,21 @@ const createAgGrid = () => {
   /* eslint-disable */ // @ts-ignore
   const grid = new agGrid.Grid(gridDiv, gridOptions)
 
-  // window.addEventListener('resize', function () {
-  //   // @ts-ignore
-  //   gridOptions.api.sizeColumnsToFit()
-  // })
+  const cachedColumnState = loadGridColumnState()
+  if (cachedColumnState) {
+    // @ts-ignore
+    gridOptions.columnApi.applyColumnState({
+      state: cachedColumnState,
+      applyOrder: true,
+    })
+  }
+
+  // @ts-ignore
+  gridOptions.api.addEventListener('columnMoved', () => {
+    // @ts-ignore
+    const colState = gridOptions.columnApi.getColumnState()
+    saveGridColumnState(colState)
+  })
 
   return { grid, gridOptions }
 }
