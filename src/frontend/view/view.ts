@@ -123,7 +123,7 @@ const viewSearchTypeSelector = () => `
         : ''
     }">
       <a class="govuk-tabs__tab" href="#search-taxons" id="search-taxons">
-      Taxons
+      Topic tags
       </a>
     </li>
     <li class="govuk-tabs__list-item ${

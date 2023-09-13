@@ -56,7 +56,7 @@ export const fieldFormatters: Record<string, any> = {
     format: formatDateTime,
   },
   taxons: {
-    name: 'Taxons',
+    name: 'Topic tags',
     format: formatNames,
   },
   primary_organisation: {
