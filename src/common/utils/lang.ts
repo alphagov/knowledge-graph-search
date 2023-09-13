@@ -8,7 +8,7 @@ const languageName = (code: string) =>
   // returns the language name from the language's code
   languageNames[code] || code
 
-export const defaultAllLanguagesOption = 'All languages'
+export const defaultAllLanguagesOption = ''
 
 // IETF language codes https://en.wikipedia.org/wiki/IETF_language_tag
 // with additions

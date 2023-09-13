@@ -10,7 +10,10 @@ import {
 } from '../common/types/search-api-types'
 import { State } from './types/state-types'
 import config from './config'
-import { loadShowFieldsState } from './utils/localStorageService'
+import {
+  loadLayoutState,
+  loadShowFieldsState,
+} from './utils/localStorageService'
 
 // user inputs that are used to build the query.
 // (basically, everything whose value could be found in the URL)
@@ -42,6 +45,7 @@ const defaultShowFields = {
   documentType: true,
 }
 
+const cachedLayout = loadLayoutState()
 let state: State = {
   searchParams: JSON.parse(JSON.stringify(initialSearchParams)), // deep copy
   taxons: [], // list of names of all the taxons
@@ -59,6 +63,14 @@ let state: State = {
   disamboxExpanded: false, // if there's a resizeable disamb meta box, whether it's expanded or not
   showFiltersPane: true,
   showFieldSet: true,
+}
+if (cachedLayout) {
+  const { showFiltersPane, showFieldSet } = loadLayoutState()
+  state = {
+    ...state,
+    showFiltersPane,
+    showFieldSet,
+  }
 }
 
 const setState = (newState) => {

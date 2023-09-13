@@ -361,7 +361,7 @@ const viewDocumentType = () => {
 const viewTaxonSelector = () => `
     <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
       <label class="govuk-label govuk-label--s" for="search-filters-taxon">
-        Taxons
+        Topic tags
       </label>
       <select ${
         state.waiting && 'disabled="disabled"'
@@ -399,7 +399,7 @@ const viewPublishingStatusSelector = () => `
   state.searchParams.publishingStatus === PublishingStatus.NotWithdrawn
     ? 'selected'
     : ''
-}>Non-withdrawn</option>
+}>Not withdrawn</option>
       </select>
   </div>`
 
@@ -439,10 +439,10 @@ const viewSearchButton = () => `
 const viewMainLinkSearch = () => `
   <div class="govuk-body">
     <label class="govuk-label govuk-label--s" for="search-filters-link-search">
-      Search for links
+      Search for pages that link to
     </label>
     <div class="govuk-hint">
-      For example: /maternity-pay-leave or youtube.com
+      Use full or partial URLs eg, https://www.gov.uk/tax-codes or tax-codes
     </div>
     <input
         class="govuk-input"
@@ -456,8 +456,11 @@ const viewMainLinkSearch = () => `
 const viewLinkSearchInput = () => `
 <div class="govuk-form-group">
   <label class="govuk-label govuk-label--s" for="search-filters-link-search">
-  Search for links
+  Search for pages that link to
   </label>
+  <div class="govuk-hint">
+      Use full or partial URLs for example, https://www.gov.uk/tax-codes or tax-codes
+    </div>
   <input class="govuk-input" id="search-filters-link-search" name="search-filters-link-search" type="text" value="${state.searchParams.linkSearchUrl}">
 </div>
 `
@@ -495,7 +498,7 @@ const viewKeywordsCombinator = () => `
           All keywords
         </label>
         <div class="govuk-hint govuk-radios__hint">
-            Narrows search eg, dog and cat
+            Narrows search for example: cat, dog will search for pages that contain cat AND dog
           </div>
       </div>
       <div class="govuk-radios__item">
@@ -506,7 +509,7 @@ const viewKeywordsCombinator = () => `
           Any keyword
         </label>
         <div class="govuk-hint govuk-radios__hint">
-            Expands search eg, dog or cat
+            Expands search for example: cat, dog will search for pages that contain cat OR dog
           </div>
       </div>
     </div>
@@ -542,7 +545,7 @@ const viewPublishingAppSelector = () => `
 
 const viewKeywordsInput = () => `
   <div class="govuk-body">
-    <label for="keyword" class="govuk-label label--bold">Search for keywords</label>
+    <label for="keyword" class="govuk-label govuk-label--s">Search for keywords</label>
     <div class="govuk-hint">
       For example: cat, dog, &quot;Department for Education&quot;
     </div>

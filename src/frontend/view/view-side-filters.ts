@@ -40,7 +40,7 @@ const viewCombinatorRadios = () => `
           All keywords
         </label>
         <div class="govuk-hint govuk-radios__hint">
-            Narrows search eg, dog and cat
+            Narrows search for example: cat, dog will search for pages that contain cat AND dog
           </div>
       </div>
       <div class="govuk-radios__item">
@@ -51,7 +51,7 @@ const viewCombinatorRadios = () => `
           Any keyword
         </label>
         <div class="govuk-hint govuk-radios__hint">
-            Expands search eg, dog or cat
+            Expands search for example: cat, dog will search for pages that contain cat OR dog
           </div>
       </div>
     </div>
@@ -187,7 +187,7 @@ const viewPublishingApplications = () => `
 const viewTaxonSelector = () => `
     <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
       <label class="govuk-label govuk-label--s" for="side-filters-taxon">
-        Taxons
+        Topic tags
       </label>
       <select ${
         state.waiting && 'disabled="disabled"'
@@ -242,7 +242,7 @@ const viewPublishingStatusSelector = () => `
   state.searchParams.publishingStatus === PublishingStatus.NotWithdrawn
     ? 'selected'
     : ''
-}>Non-withdrawn</option>
+}>Not withdrawn</option>
         </select>
     </div>`
 

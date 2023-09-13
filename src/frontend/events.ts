@@ -19,7 +19,10 @@ import {
   SearchParams,
 } from '../common/types/search-api-types'
 import { defaultAllLanguagesOption, languageCode } from '../common/utils/lang'
-import { saveShowFieldsState } from './utils/localStorageService'
+import {
+  saveLayoutState,
+  saveShowFieldsState,
+} from './utils/localStorageService'
 
 declare const window: any
 
@@ -150,9 +153,17 @@ const handleEvent: SearchApiCallback = async function (event) {
           break
         case 'toggle-filters-btn':
           setState({ ...state, showFiltersPane: !state.showFiltersPane })
+          saveLayoutState({
+            showFiltersPane: state.showFiltersPane,
+            showFieldSet: state.showFieldSet,
+          })
           break
         case 'toggle-header-options-btn':
           setState({ ...state, showFieldSet: !state.showFieldSet })
+          saveLayoutState({
+            showFiltersPane: state.showFiltersPane,
+            showFieldSet: state.showFieldSet,
+          })
           break
         case 'search':
           // Tell GTM a search is starting
