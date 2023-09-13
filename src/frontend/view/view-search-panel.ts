@@ -442,7 +442,7 @@ const viewMainLinkSearch = () => `
       Search for pages that link to
     </label>
     <div class="govuk-hint">
-      Use full or partial URLs eg, https://www.gov.uk/tax-codes or tax-codes
+      Use full or partial URLs, for example: https://www.gov.uk/tax-codes or tax-codes
     </div>
     <input
         class="govuk-input"
