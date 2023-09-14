@@ -7,6 +7,12 @@ import {
 import { fieldFormat, fieldName } from './utils'
 import { viewPagination } from './view-pagination'
 
+const overlayElement = () => {
+  const el = document.createElement('div')
+  el.id = 'grid-overlay'
+  return el
+}
+
 const createAgGrid = () => {
   if (!state.searchResults || state.searchResults?.length <= 0) {
     return {}
@@ -69,6 +75,8 @@ const createAgGrid = () => {
     const colState = gridOptions.columnApi.getColumnState()
     saveGridColumnState(colState)
   })
+
+  gridDiv.appendChild(overlayElement())
 
   return { grid, gridOptions }
 }
