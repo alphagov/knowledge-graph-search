@@ -37,10 +37,7 @@ export const queryDescription = ({
   }
   if (searchParams.taxon !== '')
     clauses.push(
-      `belong to the ${makeBold(
-        searchParams.taxon,
-        includeMarkup
-      )} taxon (or its sub-taxons)`
+      `belong to the ${makeBold(searchParams.taxon, includeMarkup)} topic tag`
     )
   if (searchParams.publishingOrganisation !== '')
     clauses.push(

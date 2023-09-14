@@ -279,9 +279,6 @@ const viewPublishingOrgSelector = () => {
       <label class="govuk-label govuk-label--s" for="publishing-organisation">
         Search for publishing organisations
       </label>
-      <div class="govuk-hint">
-        Type the first letters of an organisation or select from the dropdown
-      </div>
 
       <select ${
         state.waiting && 'disabled="disabled"'
