@@ -76,8 +76,6 @@ const createAgGrid = () => {
     saveGridColumnState(colState)
   })
 
-  document.querySelector('ag-root-wrapper').setAttribute('scrollbarwidth', '8')
-
   gridDiv.appendChild(overlayElement())
 
   return { grid, gridOptions }
