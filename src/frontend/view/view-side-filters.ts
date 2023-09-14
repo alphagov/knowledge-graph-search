@@ -3,6 +3,7 @@ import {
   KeywordLocation,
   PublishingApplication,
   PublishingStatus,
+  SearchType,
 } from '../../common/types/search-api-types'
 import { state } from '../state'
 import { languageName } from '../../common/utils/lang'
@@ -247,6 +248,13 @@ const viewPublishingStatusSelector = () => `
     </div>`
 
 export const viewSideFilters = () => {
+  const limitedSearchTypes = [
+    SearchType.Link,
+    SearchType.Organisation,
+    SearchType.Taxon,
+  ]
+  const { searchType } = state.searchParams
+
   const submitButton = () => `
       <button id="side-filters-submit-btn" class="govuk-button" data-module="govuk-button" style="width: auto;">Apply filters</button>
     `
@@ -256,10 +264,18 @@ export const viewSideFilters = () => {
   return `
     <div class="side-filters">
       <h2 class="govuk-heading-m">Filters</h2>
-      ${viewEnableCaseSensitive()}
-      ${viewCombinatorRadios()}
-      ${viewExcludeWords()}
-      ${viewSelectKeywordLocation()}
+      ${
+        !limitedSearchTypes.includes(searchType)
+          ? viewEnableCaseSensitive()
+          : ''
+      }
+      ${!limitedSearchTypes.includes(searchType) ? viewCombinatorRadios() : ''}
+      ${!limitedSearchTypes.includes(searchType) ? viewExcludeWords() : ''}
+      ${
+        !limitedSearchTypes.includes(searchType)
+          ? viewSelectKeywordLocation()
+          : ''
+      }
       ${viewSelectPublishingOrganisations()}
       ${viewDocumentTypeSelector()}
       ${viewPublishingApplications()}
