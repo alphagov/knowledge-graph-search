@@ -13,19 +13,6 @@
     z-index: 99;
     opacity: 0;
     display: none;
-    animation: fade-out 0.2s ease-in-out;
-  }
-
-  @keyframes fade-out {
-    0% {
-      display: block;
-      opacity: 1;
-    }
-
-    100% {
-      display: none;
-      opacity: 0;
-    }
   }
 }
 
@@ -38,7 +25,6 @@
   pointer-events: all !important;
 }
 
-
 .ag-body-viewport-wrapper.ag-layout-normal {
   overflow-x: scroll;
   overflow-y: scroll;
@@ -50,6 +36,6 @@
 }
 ::-webkit-scrollbar-thumb {
   border-radius: 4px;
-  background-color: rgba(0,0,0,.5);
-  box-shadow: 0 0 1px rgba(255,255,255,.5);
+  background-color: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
 }
