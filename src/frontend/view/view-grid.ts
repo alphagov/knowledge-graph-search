@@ -1,6 +1,6 @@
 import { id } from '../../common/utils/utils'
 import { state } from '../state'
-import { formatDocumentType } from '../utils/formatters'
+import { formatDocumentType, formatPublishingApp } from '../utils/formatters'
 import {
   loadGridColumnState,
   saveGridColumnState,
@@ -30,10 +30,10 @@ const createAgGrid = () => {
     )
   )
 
-  const linkCellRenderer = (params) => params.value
   const cellRenderers = {
-    url: linkCellRenderer,
+    url: (p) => p.value,
     documentType: (p) => formatDocumentType(p.value),
+    publishing_app: (p) => formatPublishingApp(p.value),
   }
   const columnDefs = enabledFields.map((field) => {
     console.log({ field })
