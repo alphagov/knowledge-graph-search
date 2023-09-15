@@ -42,8 +42,8 @@ const viewCombinatorRadios = () => `
           All keywords
         </label>
         <div class="govuk-hint govuk-radios__hint">
-            Narrows search for example: cat, dog will search for pages that contain cat AND dog
-          </div>
+          Narrows search, for example: cat AND dog
+        </div>
       </div>
       <div class="govuk-radios__item">
         <input class="govuk-radios__input" id="side-filters-combinator-2" name="side-filters-combinator" type="radio" value="${
@@ -53,8 +53,8 @@ const viewCombinatorRadios = () => `
           Any keyword
         </label>
         <div class="govuk-hint govuk-radios__hint">
-            Expands search for example: cat, dog will search for pages that contain cat OR dog
-          </div>
+          Expands search, for example: cat OR dog
+        </div>
       </div>
     </div>
   </fieldset>
