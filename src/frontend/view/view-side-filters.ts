@@ -7,6 +7,7 @@ import {
 } from '../../common/types/search-api-types'
 import { state } from '../state'
 import { languageName } from '../../common/utils/lang'
+import { formatDocumentType } from '../utils/formatters'
 
 const viewEnableCaseSensitive = () => `
 <div class="govuk-form-group">
@@ -149,9 +150,7 @@ const viewDocumentTypeSelector = () => {
                 state.searchParams.documentType === documentType
                   ? 'selected'
                   : ''
-              }>${(
-                documentType.charAt(0).toUpperCase() + documentType.slice(1)
-              ).replace(/_/g, ' ')}</option>`
+              }>${formatDocumentType(documentType)}</option>`
           )
       )}
         </select>

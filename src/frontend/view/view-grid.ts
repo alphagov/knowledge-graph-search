@@ -1,5 +1,6 @@
 import { id } from '../../common/utils/utils'
 import { state } from '../state'
+import { formatDocumentType } from '../utils/formatters'
 import {
   loadGridColumnState,
   saveGridColumnState,
@@ -30,14 +31,21 @@ const createAgGrid = () => {
   )
 
   const linkCellRenderer = (params) => params.value
-  const columnDefs = enabledFields.map((field) => ({
-    field,
-    headerName: fieldName(field),
-    cellRenderer: field === 'url' ? linkCellRenderer : null,
-    resizable: true,
-    suppressSizeToFit: ['url', 'title'].includes(field),
-    width: ['url', 'title'].includes(field) ? 500 : null,
-  }))
+  const cellRenderers = {
+    url: linkCellRenderer,
+    documentType: (p) => formatDocumentType(p.value),
+  }
+  const columnDefs = enabledFields.map((field) => {
+    console.log({ field })
+    return {
+      field,
+      headerName: fieldName(field),
+      cellRenderer: cellRenderers[field] || null,
+      resizable: true,
+      suppressSizeToFit: ['url', 'title'].includes(field),
+      width: ['url', 'title'].includes(field) ? 500 : null,
+    }
+  })
 
   const gridOptions = {
     rowData,
