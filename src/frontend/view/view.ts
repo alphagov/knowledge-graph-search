@@ -278,6 +278,16 @@ const viewWaiting = () => `
   </div>
 `
 
+const viewCSVDownload = () => {
+  return `<div class="govuk-form-group">
+    <select class="govuk-select" id="side-filters-keyword-location" name="side-filters-keyword-location" style="width: 100%;">
+      <option value="Current results (${state.resultsPerPage})" disabled selected>Export data (csv)</option>
+      <option value="All results (${state.searchResults?.length})" selected>Export data (csv)</option>
+      <option value="" >All keyword locations</option>
+    </select>
+  </div>`
+}
+
 const viewResults = function () {
   if (state.searchResults) {
     const html = []
@@ -327,6 +337,7 @@ const viewResults = function () {
         <button class="govuk-button govuk-button--secondary" id="toggle-header-options-btn">${
           state.showFieldSet ? 'Hide header options' : 'Show header options'
         }</button>
+        ${viewCSVDownload()}
       </div>
       <div class="results-container-row-2-results">
         ${
