@@ -20,8 +20,8 @@ import {
 } from '../common/types/search-api-types'
 import { defaultAllLanguagesOption, languageCode } from '../common/utils/lang'
 import {
-  saveShowFieldsState,
-  saveLayoutState,
+  cacheShowFieldsState,
+  cacheLayoutState,
 } from './utils/localStorageService'
 
 declare const window: any
@@ -171,14 +171,14 @@ const handleEvent: SearchApiCallback = async function (event) {
           break
         case 'toggle-filters-btn':
           setState({ ...state, showFiltersPane: !state.showFiltersPane })
-          saveLayoutState({
+          cacheLayoutState({
             showFiltersPane: state.showFiltersPane,
             showFieldSet: state.showFieldSet,
           })
           break
         case 'toggle-header-options-btn':
           setState({ ...state, showFieldSet: !state.showFieldSet })
-          saveLayoutState({
+          cacheLayoutState({
             showFiltersPane: state.showFiltersPane,
             showFieldSet: state.showFieldSet,
           })
@@ -200,17 +200,17 @@ const handleEvent: SearchApiCallback = async function (event) {
           console.log('searchParams:', getQueryStringFromSearchParams())
           break
         case 'button-next-page':
-          state.skip = state.skip + state.resultsPerPage
+          state.skip = state.skip + state.pagination.resultsPerPage
           break
         case 'button-prev-page':
-          state.skip = Math.max(state.skip - state.resultsPerPage, 0)
+          state.skip = Math.max(state.skip - state.pagination.resultsPerPage, 0)
           break
         case 'toggleDisamBox':
           state.disamboxExpanded = !state.disamboxExpanded
           break
         case 'clear-all-headers':
           state.showFields = {}
-          saveShowFieldsState(state.showFields)
+          cacheShowFieldsState()
           break
         case 'check-all-headers':
           state.showFields = Object.keys(state.searchResults[0])
@@ -224,7 +224,7 @@ const handleEvent: SearchApiCallback = async function (event) {
             state.showFields.withdrawn_at = false
             state.showFields.withdrawn_explanation = false
           }
-          saveShowFieldsState(state.showFields)
+          cacheShowFieldsState()
           break
         default:
           fieldClicked = event.id ? event.id.match(/show-field-(.*)/) : null
@@ -232,7 +232,7 @@ const handleEvent: SearchApiCallback = async function (event) {
             state.showFields[fieldClicked[1]] = (<HTMLInputElement>(
               id(event.id)
             ))?.checked
-            saveShowFieldsState(state.showFields)
+            cacheShowFieldsState()
           } else {
             console.log('unknown DOM event received:', event)
           }
