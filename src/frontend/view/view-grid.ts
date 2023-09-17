@@ -2,8 +2,8 @@ import { id } from '../../common/utils/utils'
 import { state } from '../state'
 import { formatDocumentType, formatPublishingApp } from '../utils/formatters'
 import {
-  loadGridColumnState,
-  saveGridColumnState,
+  loadGridColumnStateFromCache,
+  cacheGridColumnState,
 } from '../utils/localStorageService'
 import { fieldFormat, fieldName } from './utils'
 import { viewPagination } from './view-pagination'
@@ -52,7 +52,7 @@ const createAgGrid = () => {
     },
     suppressDragLeaveHidesColumns: true,
     pagination: true,
-    paginationPageSize: state.resultsPerPage,
+    paginationPageSize: state.pagination.resultsPerPage,
     suppressPaginationPanel: true,
     domLayout: 'autoHeight',
     ensureDomOrder: true,
@@ -65,7 +65,7 @@ const createAgGrid = () => {
   /* eslint-disable */ // @ts-ignore
   const grid = new agGrid.Grid(gridDiv, gridOptions)
 
-  const cachedColumnState = loadGridColumnState()
+  const cachedColumnState = loadGridColumnStateFromCache()
   if (cachedColumnState) {
     // @ts-ignore
     gridOptions.columnApi.applyColumnState({
@@ -74,11 +74,20 @@ const createAgGrid = () => {
     })
   }
 
+  // For cached pagination, we need to set the current page after the grid has been initialised
+  if (
+    // @ts-ignore
+    state.pagination.currentPage !== gridOptions.api.paginationGetCurrentPage()
+  ) {
+    // @ts-ignore
+    gridOptions.api.paginationGoToPage(state.pagination.currentPage)
+  }
+
   // @ts-ignore
   gridOptions.api.addEventListener('columnMoved', () => {
     // @ts-ignore
     const colState = gridOptions.columnApi.getColumnState()
-    saveGridColumnState(colState)
+    cacheGridColumnState(colState)
   })
 
   gridDiv.appendChild(overlayElement())

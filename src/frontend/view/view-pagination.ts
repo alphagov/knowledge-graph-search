@@ -1,6 +1,7 @@
 import { id } from '../../common/utils/utils'
 import { state } from '../state'
 import config from '../config'
+import { cachePaginationState } from '../utils/localStorageService'
 
 const gridOverlayAnimation = () => {
   const overlay = document.getElementById('grid-overlay')
@@ -18,7 +19,7 @@ const gridOverlayAnimation = () => {
 
 // Prepare the grid height before updating its results per page
 const adjustGridHeight = (gridOptions, newResultsPerPage) => {
-  const oldResultsPerPage = state.resultsPerPage
+  const oldResultsPerPage = state.pagination.resultsPerPage
   const { maxResultsBeforeScrolling } = config.pagination
   if (newResultsPerPage > maxResultsBeforeScrolling) {
     let newGridHeight = 0
@@ -43,6 +44,8 @@ const bindPaginationEvents = (gridOptions, currentPage) => {
     document.querySelector(selector)?.addEventListener('click', function (e) {
       e.preventDefault()
       func()
+      state.pagination.currentPage = gridOptions.api.paginationGetCurrentPage()
+      cachePaginationState()
     })
 
   createPaginationBinding('.govuk-pagination__prev a', () =>
@@ -85,7 +88,8 @@ const bindResultsPerPageSelectEvents = (gridOptions) => {
     const selectedValue = (<HTMLSelectElement>event.target).value
     const newResultsPerPage = parseInt(selectedValue, 10)
     adjustGridHeight(gridOptions, newResultsPerPage)
-    state.resultsPerPage = newResultsPerPage
+    state.pagination.resultsPerPage = newResultsPerPage
+    cachePaginationState()
     gridOptions.api.paginationSetPageSize(newResultsPerPage)
     gridOverlayAnimation()
   })
@@ -230,7 +234,7 @@ const viewResultsPerPageSelector = () => {
     </label>
     <select class="govuk-select" id="resultsPerPage-select" name="resultsPerPageSelect">
     <option value="${minResultsPerPage}" ${
-    state.resultsPerPage === minResultsPerPage ? 'selected' : ''
+    state.pagination.resultsPerPage === minResultsPerPage ? 'selected' : ''
   }>${minResultsPerPage}</option>
       ${resultsPerPageOptions
         .filter(
@@ -240,7 +244,7 @@ const viewResultsPerPageSelector = () => {
         .map(
           (s) =>
             `<option value="${s}" ${
-              s === state.resultsPerPage ? 'selected' : ''
+              s === state.pagination.resultsPerPage ? 'selected' : ''
             }>${s}</option>`
         )}
     </select>

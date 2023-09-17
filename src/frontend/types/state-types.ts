@@ -10,7 +10,10 @@ export interface State {
   searchResults: any[] | null
   metaSearchResults: any[] | null
   skip: number
-  resultsPerPage: number
+  pagination: {
+    currentPage: number
+    resultsPerPage: number
+  }
   waiting: boolean
   disamboxExpanded: boolean
   showFields: any
