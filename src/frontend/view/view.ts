@@ -365,10 +365,15 @@ const viewResults = function () {
 
 const viewNoResults = () => {
   return `
-    <h1 tabindex="0" id="results-heading" class="govuk-heading-l">No results</h1>
-    <div class="govuk-body">for ${queryDescription({
-      searchParams: state.searchParams,
-    })} </div>
+    <div class="govuk-body govuk-inset-text">
+      <span class="govuk-!-font-weight-bold">No results</span> for ${queryDescription(
+        {
+          searchParams: state.searchParams,
+        }
+      )}
+      <p>Try a different keyword or adjust your filters</p>
+      <button class="govuk-button govuk-button--secondary" id="new-search-btn">New search</button>
+    </div>
   `
 }
 

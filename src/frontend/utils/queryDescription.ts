@@ -85,7 +85,7 @@ export const queryDescription = ({
   const prefix = waiting
     ? 'Searching for'
     : nbRecords
-    ? `${nbRecords} result${nbRecords > 1 ? 's' : ''} for`
+    ? `${makeBold(`${nbRecords} result${nbRecords > 1 ? 's' : ''}`, true)} for`
     : ''
   return `${prefix} pages that ${joinedClauses}`
 }

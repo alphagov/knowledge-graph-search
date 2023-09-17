@@ -1,5 +1,5 @@
 import { view } from './view/view'
-import { state, setQueryParamsFromQS, resetSearch } from './state'
+import { state, setQueryParamsFromQS, resetSearchState } from './state'
 import { searchButtonClicked, handleEvent } from './events'
 import { fetchWithTimeout, queryBackend } from './search-api'
 import config from './config'
@@ -42,7 +42,7 @@ const fetchInitialData = async function () {
     } else {
       state.systemErrorText = error
     }
-    resetSearch()
+    resetSearchState()
     return
   }
 

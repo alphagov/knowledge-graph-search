@@ -1,7 +1,7 @@
 import {
   state,
   searchState,
-  resetSearch,
+  resetSearchState,
   setState,
   initialSearchParams,
 } from './state'
@@ -54,7 +54,7 @@ const updateStateFromSideFilters = () => {
     document.querySelector(
       'input[name="side-filters-combinator"]:checked'
     ) as HTMLInputElement
-  ).value as Combinator
+  )?.value as Combinator
   state.searchParams.combinator = newCombinatorValue
 
   state.searchParams.documentType = (
@@ -138,7 +138,7 @@ const resetFilters = () => {
 }
 
 const handleSearchTabClick = (id: string) => {
-  resetSearch()
+  resetSearchState()
   const mapping = {
     'search-keyword': SearchType.Keyword,
     'search-links': SearchType.Link,
@@ -194,6 +194,10 @@ const handleEvent: SearchApiCallback = async function (event) {
           updateStateFromSearchFilters()
           state.searchResults = null
           searchButtonClicked()
+          break
+        case 'new-search-btn':
+          resetSearchState()
+          console.log('searchParams:', getQueryStringFromSearchParams())
           break
         case 'button-next-page':
           state.skip = state.skip + state.resultsPerPage
@@ -303,7 +307,7 @@ const searchButtonClicked = async function (): Promise<void> {
   }
 }
 
-const updateUrl = function () {
+const getQueryStringFromSearchParams = function () {
   if (!('URLSearchParams' in window)) {
     return
   }
@@ -392,12 +396,17 @@ const updateUrl = function () {
   fields.forEach(updateSearchParams)
 
   const newQueryString = searchParams.toString()
+  return newQueryString
+}
+
+const updateUrl = () => {
+  const newQueryString = getQueryStringFromSearchParams()
   const oldQueryString = location.search.slice(1)
 
   if (newQueryString !== oldQueryString) {
     let newRelativePathQuery = window.location.pathname
     if (newQueryString.length > 0) {
-      newRelativePathQuery += '?' + searchParams.toString()
+      newRelativePathQuery += '?' + newQueryString
     }
     history.pushState(null, '', newRelativePathQuery)
   }
