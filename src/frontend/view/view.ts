@@ -34,10 +34,10 @@ const view = () => {
       ${viewErrorBanner()}
       ${viewSearchTypeSelector()}
       ${viewMainLayout()}
-      <p class="govuk-body-s">
-        Searches do not include history mode content, Publisher GitHub smart answers or service domains.
-        Page views depend on cookie consent.
-      </p>
+      <div class="gov-inset-text">
+        Searches do not include history mode content, GitHub smart answers or service domains.
+        Page views depend on cookie consent. Data can be up to 24 hours delayed
+      </div>
       </div>`)
   }
 
