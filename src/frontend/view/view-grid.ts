@@ -35,17 +35,14 @@ const createAgGrid = () => {
     documentType: (p) => formatDocumentType(p.value),
     publishing_app: (p) => formatPublishingApp(p.value),
   }
-  const columnDefs = enabledFields.map((field) => {
-    console.log({ field })
-    return {
-      field,
-      headerName: fieldName(field),
-      cellRenderer: cellRenderers[field] || null,
-      resizable: true,
-      suppressSizeToFit: ['url', 'title'].includes(field),
-      width: ['url', 'title'].includes(field) ? 500 : null,
-    }
-  })
+  const columnDefs = enabledFields.map((field) => ({
+    field,
+    headerName: fieldName(field),
+    cellRenderer: cellRenderers[field] || null,
+    resizable: true,
+    suppressSizeToFit: ['url', 'title'].includes(field),
+    width: ['url', 'title'].includes(field) ? 500 : null,
+  }))
 
   const gridOptions = {
     rowData,

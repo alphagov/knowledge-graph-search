@@ -84,7 +84,9 @@ export const queryDescription = ({
 
   const prefix = waiting
     ? 'Searching for'
-    : `${nbRecords} result${nbRecords !== 0 ? 's' : ''} for`
+    : nbRecords
+    ? `${nbRecords} result${nbRecords > 1 ? 's' : ''} for`
+    : ''
   return `${prefix} pages that ${joinedClauses}`
 }
 
