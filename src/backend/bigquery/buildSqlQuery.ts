@@ -26,20 +26,22 @@ export const buildSqlQuery = function (
   }
   const contentToSearchString = contentToSearch.join(' || " " || ')
 
-  const textOccurrences =
+  const includeOccurrences =
     searchParams.searchType !== SearchType.Link &&
     searchParams.searchType !== SearchType.Advanced &&
-    !searchParams.taxon &&
-    !searchParams.publishingOrganisation &&
-    !searchParams.documentType &&
-    searchParams.keywordLocation !== KeywordLocation.Title &&
-    !searchParams.language
-      ? keywords.length === 1
-        ? `(
+    searchParams.keywordLocation !== KeywordLocation.Title
+  // !searchParams.taxon &&
+  // !searchParams.publishingOrganisation &&
+  // !searchParams.documentType &&
+  // !searchParams.language
+
+  const textOccurrences = includeOccurrences
+    ? keywords.length === 1
+      ? `(
     SELECT
     ARRAY_LENGTH(REGEXP_EXTRACT_ALL(LOWER(${contentToSearchString}), LOWER(r'(${keywords[0]})')))
   ) AS occurrences,`
-        : `
+      : `
   (
     ${keywords.map(
       (value) =>
@@ -49,7 +51,7 @@ export const buildSqlQuery = function (
         ) `
     )}
   ) AS occurrences,`
-      : ''
+    : ''
 
   const linkOccurrences =
     searchParams.searchType === SearchType.Link
