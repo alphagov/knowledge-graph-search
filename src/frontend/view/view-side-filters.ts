@@ -191,7 +191,7 @@ const viewTaxonSelector = () => `
         state.waiting && 'disabled="disabled"'
       } id="side-filters-taxon" class="autocomplete__input autocomplete__input--default" name="side-filters-taxon">
       <option value=""></option>
-      ${state.taxons
+      ${[...new Set(state.taxons)]
         .sort()
         .map(
           (taxon) =>
