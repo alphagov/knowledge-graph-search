@@ -1,3 +1,7 @@
+import {
+  KeywordLocation,
+  SearchType,
+} from '../../common/types/search-api-types'
 import { id } from '../../common/utils/utils'
 import { state } from '../state'
 import { formatDocumentType, formatPublishingApp } from '../utils/formatters'
@@ -19,8 +23,19 @@ const createAgGrid = () => {
     return {}
   }
   const currentPageRecords = state.searchResults
+
+  const excludeOccurrences =
+    state.searchParams.searchType === SearchType.Link ||
+    state.searchParams.searchType === SearchType.Language ||
+    state.searchParams.searchType === SearchType.Advanced ||
+    state.searchParams.keywordLocation === KeywordLocation.Title
+
+  const excludedFields = [excludeOccurrences ? 'occurrences' : '']
+
   const enabledFields = Object.entries(state.showFields)
-    .filter(([, v]) => v)
+    .filter(([field, enable]) => {
+      return enable && !excludedFields.includes(field as string)
+    })
     .map(([key]) => key)
 
   const rowData = currentPageRecords.map((record) =>
