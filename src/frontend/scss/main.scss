@@ -405,3 +405,15 @@ h2:focus-visible {
     }
   }
 }
+
+.pagination-select {
+  select,
+  label {
+    display: inline-block;
+  }
+
+  select {
+    min-width: auto;
+    margin: 0 10px;
+  }
+}
