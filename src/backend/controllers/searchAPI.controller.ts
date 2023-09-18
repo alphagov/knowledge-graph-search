@@ -7,6 +7,7 @@ import {
 
 import { SearchParams } from '../../common/types/search-api-types'
 import { getParams } from '../utils/getParams'
+import log from '../utils/logging'
 
 class SearchAPIController {
   public getInitData: RequestHandler = async (req, res) => {
@@ -14,6 +15,7 @@ class SearchAPIController {
       const response = await sendInitQuery()
       res.send(response)
     } catch (e) {
+      log.error({ error: e }, 'ERROR fetching init data')
       res.status(500).send(e)
     }
   }
@@ -24,6 +26,7 @@ class SearchAPIController {
       const data = await sendSearchQuery(params)
       res.send(data)
     } catch (e: any) {
+      log.error({ error: e }, 'ERROR fetching search data')
       res.status(500).send(e)
     }
   }
@@ -36,6 +39,7 @@ class SearchAPIController {
       if (e.status === 404) {
         res.status(e.status).send(e.message)
       } else {
+        log.error({ error: e }, 'ERROR fetching search taxon')
         res.status(500).send(e.message)
       }
     }
