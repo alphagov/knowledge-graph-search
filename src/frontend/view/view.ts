@@ -229,6 +229,7 @@ const viewSearchResultsTable = () => {
   const viewFieldSet = () => {
     const excludeList = ['hyperlinks']
 
+    console.log({ results: state.searchResults })
     return `
     <div class="govuk-fieldset header-options-container" ${
       state.waiting && 'disabled="disabled"'
