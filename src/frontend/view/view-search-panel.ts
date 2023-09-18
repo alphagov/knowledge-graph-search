@@ -9,34 +9,24 @@ import {
   SearchType,
 } from '../../common/types/search-api-types'
 
-export const viewAdvancedSearchPanel = (onTheSide = true) => {
-  const title = onTheSide
-    ? `<h2 class="govuk-heading-m">Advanced search</h2>`
-    : `<h1 class="govuk-heading-xl">Advanced search</h1>`
-  const inside = `
-      <form id="search-form" class="search-panel govuk-form">
-        <div class="search-mode-panel ${onTheSide ? '' : 'advanced-panel'}">
-          ${title}
-          ${viewKeywordsInput()}
-          ${viewCaseSensitiveSelector()}
-          ${viewKeywordsCombinator()}
-          ${viewExclusionsInput()}
-          ${viewLinkSearchInput()}
-          ${viewKeywordLocation()}
-          ${viewPublishingOrganisation()}
-          ${viewDocumentType()}
-          ${viewPublishingAppSelector()}
-          ${viewTaxonSelector()}
-          ${viewPublishingStatusSelector()}
-          ${viewLanguageSelector()}
-          ${viewSearchButton()}
-        </div>
-      </form>
-    `
-  const outsideWrap = (_inside) =>
-    onTheSide ? `<div class="side-filters">${_inside}</div>` : _inside
+const viewSearchPanel = () => {
+  const { searchType } = state.searchParams
+  const mapping = {
+    [SearchType.Keyword]: viewKeywordSearchPanel,
+    [SearchType.Link]: viewLinkSearchPanel,
+    [SearchType.Organisation]: viewOrganisationSearchPanel,
+    [SearchType.Taxon]: viewTaxonSearchPanel,
+    [SearchType.Language]: viewLanguageSearchPanel,
+    [SearchType.Advanced]: viewAdvancedSearchPanel,
+    [SearchType.Results]: viewAdvancedSearchPanel,
+  }
 
-  return outsideWrap(inside)
+  if (!(searchType in mapping)) {
+    console.error('viewSearchPanel: unknown value', searchType)
+    return null
+  }
+
+  return searchType in mapping ? mapping[searchType]() : console.error()
 }
 
 const viewKeywordSearchPanel = () => `
@@ -77,6 +67,36 @@ const viewKeywordSearchPanel = () => `
         </div>
       </form>
     `
+
+export const viewAdvancedSearchPanel = (onTheSide = true) => {
+  const title = onTheSide
+    ? `<h2 class="govuk-heading-m">Advanced search</h2>`
+    : `<h1 class="govuk-heading-xl">Advanced search</h1>`
+  const inside = `
+      <form id="search-form" class="search-panel govuk-form">
+        <div class="search-mode-panel ${onTheSide ? '' : 'advanced-panel'}">
+          ${title}
+          ${viewKeywordsInput()}
+          ${viewCaseSensitiveSelector()}
+          ${viewKeywordsCombinator()}
+          ${viewExclusionsInput()}
+          ${viewLinkSearchInput()}
+          ${viewKeywordLocation()}
+          ${viewPublishingOrganisation()}
+          ${viewDocumentType()}
+          ${viewPublishingAppSelector()}
+          ${viewTaxonSelector()}
+          ${viewPublishingStatusSelector()}
+          ${viewLanguageSelector()}
+          ${viewSearchButton()}
+        </div>
+      </form>
+    `
+  const outsideWrap = (_inside) =>
+    onTheSide ? `<div class="side-filters">${_inside}</div>` : _inside
+
+  return outsideWrap(inside)
+}
 
 const viewLinkSearchPanel = () => `
     <form id="search-form" class="search-panel govuk-form">
@@ -543,25 +563,5 @@ const viewExclusionsInput = () => `
   <input class="govuk-input" id="search-filters-excluded-keywords" name="search-filters-excluded-keywords" type="text" value="${state.searchParams.excludedWords}">
 </div>
 `
-
-const viewSearchPanel = () => {
-  const { searchType } = state.searchParams
-  const mapping = {
-    [SearchType.Advanced]: viewAdvancedSearchPanel,
-    [SearchType.Results]: viewAdvancedSearchPanel,
-    [SearchType.Keyword]: viewKeywordSearchPanel,
-    [SearchType.Link]: viewLinkSearchPanel,
-    [SearchType.Taxon]: viewTaxonSearchPanel,
-    [SearchType.Language]: viewLanguageSearchPanel,
-    [SearchType.Organisation]: viewOrganisationSearchPanel,
-  }
-
-  if (!(searchType in mapping)) {
-    console.error('viewSearchPanel: unknown value', searchType)
-    return null
-  }
-
-  return searchType in mapping ? mapping[searchType]() : console.error()
-}
 
 export { viewSearchPanel }
