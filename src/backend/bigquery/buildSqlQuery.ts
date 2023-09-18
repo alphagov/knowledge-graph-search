@@ -28,12 +28,13 @@ export const buildSqlQuery = function (
 
   const includeOccurrences =
     searchParams.searchType !== SearchType.Link &&
+    searchParams.searchType !== SearchType.Language &&
     searchParams.searchType !== SearchType.Advanced &&
     searchParams.keywordLocation !== KeywordLocation.Title
+  // !searchParams.language &&
   // !searchParams.taxon &&
   // !searchParams.publishingOrganisation &&
   // !searchParams.documentType &&
-  // !searchParams.language
 
   const textOccurrences = includeOccurrences
     ? keywords.length === 1
