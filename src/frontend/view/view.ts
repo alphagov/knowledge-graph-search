@@ -229,9 +229,6 @@ const viewSearchResultsTable = () => {
   const viewFieldSet = () => {
     const excludeList = ['hyperlinks']
 
-    if (state.searchParams.publishingStatus === PublishingStatus.NotWithdrawn) {
-      excludeList.push(...['withdrawn_at', 'withdrawn_explanation'])
-    }
     return `
     <div class="govuk-fieldset header-options-container" ${
       state.waiting && 'disabled="disabled"'

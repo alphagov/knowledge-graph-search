@@ -75,7 +75,7 @@ export const queryDescription = ({
       )}`
     )
 
-  clauses.push(`and sorted by ${makeBold('page views', includeMarkup)} (desc)`)
+  clauses.push(`are sorted by ${makeBold('page views', includeMarkup)} (desc)`)
 
   const joinedClauses =
     clauses.length === 1
