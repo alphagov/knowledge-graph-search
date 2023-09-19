@@ -414,7 +414,7 @@ const viewSearchButton = () => `
 `
 
 const viewMainLinkSearch = () => `
-  <div class="govuk-body">
+  <div class="govuk-form-group">
     <label class="govuk-label govuk-label--s" for="search-filters-link-search">
       Search for pages that link to
     </label>
