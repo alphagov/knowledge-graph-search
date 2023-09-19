@@ -1,59 +1,62 @@
+import { state } from '../state'
+
 const SHOWFIELDS_KEY = 'state.showFields'
 const LAYOUT_KEY = 'state.panels'
 const GRID_COLUMN_KEY = 'state.gridColumnState'
+const PAGINATION_KEY = 'state.pagination'
 
-export const saveShowFieldsState = (showFields: any) => {
-  try {
-    localStorage.setItem(SHOWFIELDS_KEY, JSON.stringify(showFields))
-  } catch (error) {
-    console.error('Failed to save layout state to localStorage:', error)
+export class LocalStorageService {
+  static saveItem = (key, value, description = '') => {
+    try {
+      localStorage.setItem(key, JSON.stringify(value))
+    } catch (error) {
+      console.error(
+        `Failed to save ${description} state to localStorage:`,
+        error
+      )
+    }
+  }
+
+  static loadItem = (key, description = '') => {
+    try {
+      const data = localStorage.getItem(key)
+      return data ? JSON.parse(data) : null
+    } catch (error) {
+      console.error(
+        `Failed to load ${description} state from localStorage:`,
+        error
+      )
+      return null
+    }
   }
 }
 
-export const loadShowFieldsState = () => {
-  try {
-    const data = localStorage.getItem(SHOWFIELDS_KEY)
-    return data ? JSON.parse(data) : null
-  } catch (error) {
-    console.error('Failed to load layout state from localStorage:', error)
-    return null
-  }
-}
+export const cacheShowFieldsState = () =>
+  LocalStorageService.saveItem(SHOWFIELDS_KEY, state.showFields, 'showFields')
+
+export const loadShowFieldsStateFromCache = () =>
+  LocalStorageService.loadItem(SHOWFIELDS_KEY, 'showFields')
 
 type LayoutState = { showFiltersPane: boolean; showFieldSet: boolean }
 
-export const saveLayoutState = (layoutState: LayoutState) => {
-  try {
-    localStorage.setItem(LAYOUT_KEY, JSON.stringify(layoutState))
-  } catch (error) {
-    console.error('Failed to save layout state to localStorage:', error)
-  }
-}
+export const cacheLayoutState = (layoutState: LayoutState) =>
+  LocalStorageService.saveItem(LAYOUT_KEY, layoutState, 'layout')
 
-export const loadLayoutState = () => {
-  try {
-    const data = localStorage.getItem(LAYOUT_KEY)
-    return data ? JSON.parse(data) : null
-  } catch (error) {
-    console.error('Failed to load layout state from localStorage:', error)
-    return null
-  }
-}
+export const loadLayoutStateFromCache = () =>
+  LocalStorageService.loadItem(LAYOUT_KEY, 'layout')
 
-export const saveGridColumnState = (gridColumnState: any) => {
-  try {
-    localStorage.setItem(GRID_COLUMN_KEY, JSON.stringify(gridColumnState))
-  } catch (error) {
-    console.error('Failed to save grid column state to localStorage:', error)
-  }
-}
+export const cacheGridColumnState = (gridColumnState: any) =>
+  LocalStorageService.saveItem(
+    GRID_COLUMN_KEY,
+    gridColumnState,
+    'gridColumnState'
+  )
 
-export const loadGridColumnState = () => {
-  try {
-    const data = localStorage.getItem(GRID_COLUMN_KEY)
-    return data ? JSON.parse(data) : null
-  } catch (error) {
-    console.error('Failed to load grid column state from localStorage:', error)
-    return null
-  }
-}
+export const loadGridColumnStateFromCache = () =>
+  LocalStorageService.loadItem(GRID_COLUMN_KEY, 'gridColumnState')
+
+export const cachePaginationState = () =>
+  LocalStorageService.saveItem(PAGINATION_KEY, state.pagination, 'pagination')
+
+export const loadPaginationStateFromCache = () =>
+  LocalStorageService.loadItem(PAGINATION_KEY, 'pagination')
