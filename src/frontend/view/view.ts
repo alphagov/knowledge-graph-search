@@ -306,17 +306,6 @@ const viewResults = function () {
       `)
     }
 
-    if (nbRecords > state.pagination.resultsPerPage) {
-      html.push(`
-        <p class="govuk-body">Showing results ${state.skip + 1} to ${Math.min(
-        nbRecords,
-        state.skip + state.pagination.resultsPerPage
-      )}, in descending popularity</p>
-        <a class="govuk-skip-link" href="#results-table">Skip to results</a>
-        <a class="govuk-skip-link" href="#search-form">Back to search filters</a>
-     `)
-    }
-
     // .results-comments
     html.push(`</div>`)
 
