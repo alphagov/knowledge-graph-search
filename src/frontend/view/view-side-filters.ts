@@ -28,8 +28,7 @@ const viewEnableCaseSensitive = () => `
 `
 
 const viewCombinatorRadios = () => `
-<div class="govuk-form-group">
-  <fieldset class="govuk-fieldset">
+  <fieldset class="govuk-fieldset side-filter-fieldset">
     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
         Search for
     </legend>
@@ -58,7 +57,6 @@ const viewCombinatorRadios = () => `
       </div>
     </div>
   </fieldset>
-</div>
 `
 
 const viewExcludeWords = () => `
@@ -193,7 +191,7 @@ const viewTaxonSelector = () => `
         state.waiting && 'disabled="disabled"'
       } id="side-filters-taxon" class="autocomplete__input autocomplete__input--default" name="side-filters-taxon">
       <option value=""></option>
-      ${state.taxons
+      ${[...new Set(state.taxons)]
         .sort()
         .map(
           (taxon) =>

@@ -227,8 +227,19 @@ const viewResultsPerPageSelector = () => {
   const { options: resultsPerPageOptions } = config.pagination
   const minResultsPerPage = Math.min(...resultsPerPageOptions)
 
+  const getPaginationString = () => {
+    const start =
+      state.pagination.currentPage * state.pagination.resultsPerPage + 1
+    const end =
+      state.pagination.currentPage * state.pagination.resultsPerPage +
+      state.pagination.resultsPerPage
+    const total = state.searchResults?.length || 0
+
+    return `${start} to ${end} of ${total}`
+  }
+
   return `
-  <div class="govuk-form-group">
+  <div class="govuk-form-group pagination-select">
     <label class="govuk-label" for="resultsPerPage-select">
       Results per page
     </label>
@@ -248,6 +259,7 @@ const viewResultsPerPageSelector = () => {
             }>${s}</option>`
         )}
     </select>
+    <span class="govuk-body">${getPaginationString()}</span>
   </div>
   `
 }

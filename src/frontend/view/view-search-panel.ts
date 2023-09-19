@@ -9,6 +9,65 @@ import {
   SearchType,
 } from '../../common/types/search-api-types'
 
+const viewSearchPanel = () => {
+  const { searchType } = state.searchParams
+  const mapping = {
+    [SearchType.Keyword]: viewKeywordSearchPanel,
+    [SearchType.Link]: viewLinkSearchPanel,
+    [SearchType.Organisation]: viewOrganisationSearchPanel,
+    [SearchType.Taxon]: viewTaxonSearchPanel,
+    [SearchType.Language]: viewLanguageSearchPanel,
+    [SearchType.Advanced]: viewAdvancedSearchPanel,
+    [SearchType.Results]: viewAdvancedSearchPanel,
+  }
+
+  if (!(searchType in mapping)) {
+    console.error('viewSearchPanel: unknown value', searchType)
+    return null
+  }
+
+  return mapping[searchType]()
+}
+
+const viewKeywordSearchPanel = () => `
+      <form id="search-form" class="search-panel govuk-form">
+        <div class="search-mode-panel">
+          <a class="govuk-skip-link" href="#results-table">Skip to results</a>
+          ${viewKeywordsInput()}
+          ${
+            state.searchResults
+              ? ''
+              : `<details class="govuk-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+              <span class="govuk-details__summary-text">
+                Search filters
+              </span>
+            </summary>
+            <div class="govuk-details__text">
+              <div class="search-filters-container">
+                <div class="search-filters-left-col keyword-search">
+                  ${viewCaseSensitiveSelector()}
+                  ${viewKeywordsCombinator(true)}
+                  ${viewExclusionsInput()}
+                  ${viewKeywordLocation()}
+                  ${viewPublishingOrganisation()}
+                </div>
+                <div class="search-filters-right-col keyword-search">
+                  ${viewDocumentType()}
+                  ${viewPublishingAppSelector()}
+                  ${viewTaxonSelector()}
+                  ${viewPublishingStatusSelector()}
+                  ${viewLanguageSelector()}
+                </div>
+              </div>
+            </div>
+          </details>`
+          }
+          ${viewSearchButton()}
+        </div>
+      </form>
+    `
+
 export const viewAdvancedSearchPanel = (onTheSide = true) => {
   const title = onTheSide
     ? `<h2 class="govuk-heading-m">Advanced search</h2>`
@@ -39,45 +98,6 @@ export const viewAdvancedSearchPanel = (onTheSide = true) => {
   return outsideWrap(inside)
 }
 
-const viewKeywordSearchPanel = () => `
-      <form id="search-form" class="search-panel govuk-form">
-        <div class="search-mode-panel">
-          <a class="govuk-skip-link" href="#results-table">Skip to results</a>
-          ${viewKeywordsInput()}
-          ${
-            state.searchResults
-              ? ''
-              : `<details class="govuk-details" data-module="govuk-details">
-            <summary class="govuk-details__summary">
-              <span class="govuk-details__summary-text">
-                Search filters
-              </span>
-            </summary>
-            <div class="govuk-details__text">
-              <div class="search-filters-container">
-                <div class="search-filters-left-col keyword-search">
-                  ${viewCaseSensitiveSelector()}
-                  ${viewKeywordsCombinator()}
-                  ${viewExclusionsInput()}
-                  ${viewKeywordLocation()}
-                  ${viewPublishingOrganisation()}
-                </div>
-                <div class="search-filters-right-col keyword-search">
-                  ${viewDocumentType()}
-                  ${viewPublishingAppSelector()}
-                  ${viewTaxonSelector()}
-                  ${viewPublishingStatusSelector()}
-                  ${viewLanguageSelector()}
-                </div>
-              </div>
-            </div>
-          </details>`
-          }
-          ${viewSearchButton()}
-        </div>
-      </form>
-    `
-
 const viewLinkSearchPanel = () => `
     <form id="search-form" class="search-panel govuk-form">
       <div class="search-mode-panel">
@@ -94,12 +114,12 @@ const viewLinkSearchPanel = () => `
           </summary>
           <div class="govuk-details__text">
             <div class="search-filters-container">
-              <div class="search-filters-left-col">
+              <div class="search-filters-left-col links-search">
               ${viewPublishingOrganisation()}
               ${viewPublishingAppSelector()}
               ${viewDocumentType()}
               </div>
-              <div class="search-filters-left-col">
+              <div class="search-filters-right-col links-search">
                 ${viewTaxonSelector()}
                 ${viewPublishingStatusSelector()}
                 ${viewLanguageSelector()}
@@ -134,7 +154,7 @@ const viewTaxonSearchPanel = () => `
                   ${viewPublishingStatusSelector()}
                   ${viewLanguageSelector()}
                 </div>
-                <div class="search-filters-left-col taxon-search">
+                <div class="search-filters-right-col taxon-search">
                   ${viewDocumentType()}
                   ${viewPublishingAppSelector()}
                 </div>
@@ -168,7 +188,7 @@ const viewLanguageSearchPanel = () => `
                   ${viewPublishingAppSelector()}
                   ${viewDocumentType()}
                 </div>
-                <div class="search-filters-left-col language-search">
+                <div class="search-filters-right-col language-search">
                   ${viewTaxonSelector()}
                   ${viewPublishingStatusSelector()}
                 </div>
@@ -202,7 +222,7 @@ const viewOrganisationSearchPanel = () => `
                   ${viewPublishingStatusSelector()}
                   ${viewDocumentType()}
                 </div>
-                <div class="search-filters-left-col organisation-search">
+                <div class="search-filters-right-col organisation-search">
                   ${viewTaxonSelector()}
                   ${viewLanguageSelector()}
                 </div>
@@ -344,7 +364,7 @@ const viewTaxonSelector = () => `
         state.waiting && 'disabled="disabled"'
       } id="search-filters-taxon" class="autocomplete__input autocomplete__input--default" name="search-filters-taxon">
       <option value=""></option>
-      ${state.taxons
+      ${[...new Set(state.taxons)]
         .sort()
         .map(
           (taxon) =>
@@ -460,8 +480,10 @@ const viewCaseSensitiveSelector = () => `
 </div>
 `
 
-const viewKeywordsCombinator = () => `
-<div class="govuk-form-group">
+const viewKeywordsCombinator = (withNegativeMargin = false) => `
+<div class="govuk-form-group" ${
+  withNegativeMargin ? `style="margin-top: -30px;"` : ''
+}>
   <fieldset class="govuk-fieldset">
     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
         Search for
@@ -543,25 +565,5 @@ const viewExclusionsInput = () => `
   <input class="govuk-input" id="search-filters-excluded-keywords" name="search-filters-excluded-keywords" type="text" value="${state.searchParams.excludedWords}">
 </div>
 `
-
-const viewSearchPanel = () => {
-  const { searchType } = state.searchParams
-  const mapping = {
-    [SearchType.Advanced]: viewAdvancedSearchPanel,
-    [SearchType.Results]: viewAdvancedSearchPanel,
-    [SearchType.Keyword]: viewKeywordSearchPanel,
-    [SearchType.Link]: viewLinkSearchPanel,
-    [SearchType.Taxon]: viewTaxonSearchPanel,
-    [SearchType.Language]: viewLanguageSearchPanel,
-    [SearchType.Organisation]: viewOrganisationSearchPanel,
-  }
-
-  if (!(searchType in mapping)) {
-    console.error('viewSearchPanel: unknown value', searchType)
-    return null
-  }
-
-  return searchType in mapping ? mapping[searchType]() : console.error()
-}
 
 export { viewSearchPanel }

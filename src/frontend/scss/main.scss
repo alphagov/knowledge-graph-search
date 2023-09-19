@@ -125,16 +125,17 @@ pre {
 
   .organisation-search,
   .taxon-search,
-  .language-search {
+  .language-search,
+  .links-search {
     display: grid;
-    grid-template-rows: 1fr 1fr 1fr;
+    grid-template-rows: 100px 100px 100px;
   }
 
   .search-filters-left-col {
     display: grid;
 
     &.keyword-search {
-      grid-template-rows: 16.66% 33.32% 16.66% 16.66% 16.66%;
+      grid-template-rows: 100px 200px 100px 100px 100px;
     }
   }
 
@@ -142,8 +143,12 @@ pre {
     display: grid;
 
     &.keyword-search {
-      grid-template-rows: 16.66% 16.66% 16.66% 16.66% 16.66%;
+      grid-template-rows: 100px 100px 100px 100px 100px;
     }
+  }
+
+  .autocomplete__menu {
+    z-index: 99;
   }
 }
 
@@ -392,6 +397,19 @@ h2:focus-visible {
         max-width: 175px;
         margin-bottom: 20px;
       }
+
+      .side-filter-fieldset {
+        margin-top: -30px;
+        margin-bottom: 30px;
+      }
+
+      .govuk-form-group {
+        height: 70px;
+
+        .autocomplete__menu {
+          z-index: 99;
+        }
+      }
     }
   }
 
@@ -404,4 +422,20 @@ h2:focus-visible {
       display: none;
     }
   }
+}
+
+.pagination-select {
+  select,
+  label {
+    display: inline-block;
+  }
+
+  select {
+    min-width: auto;
+    margin: 0 10px;
+  }
+}
+
+#clear-side-filters-link {
+  font-size: 19px;
 }

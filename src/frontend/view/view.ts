@@ -10,10 +10,7 @@ import { fieldName } from './utils'
 import { createAgGrid } from './view-grid'
 import { viewSideFilters } from './view-side-filters'
 import govukPostInitScripts from './postInitScripts'
-import {
-  PublishingStatus,
-  SearchType,
-} from '../../common/types/search-api-types'
+import { SearchType } from '../../common/types/search-api-types'
 import config from '../config'
 
 declare const window: any
@@ -229,9 +226,6 @@ const viewSearchResultsTable = () => {
   const viewFieldSet = () => {
     const excludeList = ['hyperlinks']
 
-    if (state.searchParams.publishingStatus === PublishingStatus.NotWithdrawn) {
-      excludeList.push(...['withdrawn_at', 'withdrawn_explanation'])
-    }
     return `
     <div class="govuk-fieldset header-options-container" ${
       state.waiting && 'disabled="disabled"'
@@ -306,17 +300,6 @@ const viewResults = function () {
           </strong>
         </div>
       `)
-    }
-
-    if (nbRecords > state.pagination.resultsPerPage) {
-      html.push(`
-        <p class="govuk-body">Showing results ${state.skip + 1} to ${Math.min(
-        nbRecords,
-        state.skip + state.pagination.resultsPerPage
-      )}, in descending popularity</p>
-        <a class="govuk-skip-link" href="#results-table">Skip to results</a>
-        <a class="govuk-skip-link" href="#search-form">Back to search filters</a>
-     `)
     }
 
     // .results-comments
