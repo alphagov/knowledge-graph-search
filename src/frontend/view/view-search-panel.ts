@@ -55,14 +55,14 @@ const viewKeywordSearchPanel = () => `
             </summary>
             <div class="govuk-details__text">
               <div class="search-filters-container">
-                <div class="search-filters-left-col">
+                <div class="search-filters-left-col keyword-search">
                   ${viewCaseSensitiveSelector()}
                   ${viewKeywordsCombinator()}
                   ${viewExclusionsInput()}
                   ${viewKeywordLocation()}
                   ${viewPublishingOrganisation()}
                 </div>
-                <div class="search-filters-left-col">
+                <div class="search-filters-right-col keyword-search">
                   ${viewDocumentType()}
                   ${viewPublishingAppSelector()}
                   ${viewTaxonSelector()}
@@ -129,12 +129,12 @@ const viewTaxonSearchPanel = () => `
             </summary>
             <div class="govuk-details__text">
               <div class="search-filters-container">
-                <div class="search-filters-left-col">
+                <div class="search-filters-left-col taxon-search">
                   ${viewPublishingOrganisation()}
                   ${viewPublishingStatusSelector()}
                   ${viewLanguageSelector()}
                 </div>
-                <div class="search-filters-left-col">
+                <div class="search-filters-left-col taxon-search">
                   ${viewDocumentType()}
                   ${viewPublishingAppSelector()}
                 </div>
@@ -163,12 +163,12 @@ const viewLanguageSearchPanel = () => `
             </summary>
             <div class="govuk-details__text">
               <div class="search-filters-container">
-                <div class="search-filters-left-col">
+                <div class="search-filters-left-col language-search">
                   ${viewPublishingOrganisation()}
                   ${viewPublishingAppSelector()}
                   ${viewDocumentType()}
                 </div>
-                <div class="search-filters-left-col">
+                <div class="search-filters-left-col language-search">
                   ${viewTaxonSelector()}
                   ${viewPublishingStatusSelector()}
                 </div>
@@ -197,12 +197,12 @@ const viewOrganisationSearchPanel = () => `
             </summary>
             <div class="govuk-details__text">
               <div class="search-filters-container">
-                <div class="search-filters-left-col">
+                <div class="search-filters-left-col organisation-search">
                   ${viewPublishingAppSelector()}
                   ${viewPublishingStatusSelector()}
                   ${viewDocumentType()}
                 </div>
-                <div class="search-filters-left-col">
+                <div class="search-filters-left-col organisation-search">
                   ${viewTaxonSelector()}
                   ${viewLanguageSelector()}
                 </div>
@@ -214,26 +214,6 @@ const viewOrganisationSearchPanel = () => `
         </div>
       </form>
     `
-
-const viewSearchPanel = () => {
-  const { searchType } = state.searchParams
-  const mapping = {
-    [SearchType.Advanced]: viewAdvancedSearchPanel,
-    [SearchType.Results]: viewAdvancedSearchPanel,
-    [SearchType.Keyword]: viewKeywordSearchPanel,
-    [SearchType.Link]: viewLinkSearchPanel,
-    [SearchType.Taxon]: viewTaxonSearchPanel,
-    [SearchType.Language]: viewLanguageSearchPanel,
-    [SearchType.Organisation]: viewOrganisationSearchPanel,
-  }
-
-  if (!(searchType in mapping)) {
-    console.error('viewSearchPanel: unknown value', searchType)
-    return null
-  }
-
-  return searchType in mapping ? mapping[searchType]() : console.error()
-}
 
 const viewKeywordLocation = () => `
 <div class="govuk-form-group">
@@ -279,9 +259,6 @@ const viewPublishingOrgSelector = () => {
       <label class="govuk-label govuk-label--s" for="publishing-organisation">
         Search for publishing organisations
       </label>
-      <div class="govuk-hint">
-        Type the first letters of an organisation or select from the dropdown
-      </div>
 
       <select ${
         state.waiting && 'disabled="disabled"'
@@ -437,12 +414,12 @@ const viewSearchButton = () => `
 `
 
 const viewMainLinkSearch = () => `
-  <div class="govuk-body">
+  <div class="govuk-form-group">
     <label class="govuk-label govuk-label--s" for="search-filters-link-search">
       Search for pages that link to
     </label>
     <div class="govuk-hint">
-      Use full or partial URLs eg, https://www.gov.uk/tax-codes or tax-codes
+      Use full or partial URLs, for example: https://www.gov.uk/tax-codes or tax-codes
     </div>
     <input
         class="govuk-input"
@@ -498,8 +475,8 @@ const viewKeywordsCombinator = () => `
           All keywords
         </label>
         <div class="govuk-hint govuk-radios__hint">
-            Narrows search for example: cat, dog will search for pages that contain cat AND dog
-          </div>
+          Narrows search, for example: cat AND dog
+        </div>
       </div>
       <div class="govuk-radios__item">
         <input class="govuk-radios__input" id="search-filters-combinator-2" name="search-filters-combinator" type="radio" value="${
@@ -509,8 +486,8 @@ const viewKeywordsCombinator = () => `
           Any keyword
         </label>
         <div class="govuk-hint govuk-radios__hint">
-            Expands search for example: cat, dog will search for pages that contain cat OR dog
-          </div>
+          Expands search, for example: cat OR dog
+        </div>
       </div>
     </div>
   </fieldset>
@@ -547,7 +524,7 @@ const viewKeywordsInput = () => `
   <div class="govuk-body">
     <label for="keyword" class="govuk-label govuk-label--s">Search for keywords</label>
     <div class="govuk-hint">
-      For example: cat, dog, &quot;Department for Education&quot;
+    Use quotes for phrases for example, "UK driving licence". Use commas to search for multiple keywords or phrases.
     </div>
     <input
       ${state.waiting && 'disabled="disabled"'}
@@ -566,5 +543,25 @@ const viewExclusionsInput = () => `
   <input class="govuk-input" id="search-filters-excluded-keywords" name="search-filters-excluded-keywords" type="text" value="${state.searchParams.excludedWords}">
 </div>
 `
+
+const viewSearchPanel = () => {
+  const { searchType } = state.searchParams
+  const mapping = {
+    [SearchType.Advanced]: viewAdvancedSearchPanel,
+    [SearchType.Results]: viewAdvancedSearchPanel,
+    [SearchType.Keyword]: viewKeywordSearchPanel,
+    [SearchType.Link]: viewLinkSearchPanel,
+    [SearchType.Taxon]: viewTaxonSearchPanel,
+    [SearchType.Language]: viewLanguageSearchPanel,
+    [SearchType.Organisation]: viewOrganisationSearchPanel,
+  }
+
+  if (!(searchType in mapping)) {
+    console.error('viewSearchPanel: unknown value', searchType)
+    return null
+  }
+
+  return searchType in mapping ? mapping[searchType]() : console.error()
+}
 
 export { viewSearchPanel }

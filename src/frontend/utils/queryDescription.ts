@@ -37,10 +37,7 @@ export const queryDescription = ({
   }
   if (searchParams.taxon !== '')
     clauses.push(
-      `belong to the ${makeBold(
-        searchParams.taxon,
-        includeMarkup
-      )} taxon (or its sub-taxons)`
+      `belong to the ${makeBold(searchParams.taxon, includeMarkup)} topic tag`
     )
   if (searchParams.publishingOrganisation !== '')
     clauses.push(
@@ -87,7 +84,9 @@ export const queryDescription = ({
 
   const prefix = waiting
     ? 'Searching for'
-    : `${nbRecords} result${nbRecords !== 0 ? 's' : ''} for`
+    : nbRecords
+    ? `${makeBold(`${nbRecords} result${nbRecords > 1 ? 's' : ''}`, true)} for`
+    : ''
   return `${prefix} pages that ${joinedClauses}`
 }
 

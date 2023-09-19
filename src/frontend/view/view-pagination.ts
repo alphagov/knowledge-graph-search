@@ -2,6 +2,20 @@ import { id } from '../../common/utils/utils'
 import { state } from '../state'
 import config from '../config'
 
+const gridOverlayAnimation = () => {
+  const overlay = document.getElementById('grid-overlay')
+  overlay.animate(
+    [
+      { opacity: 1, display: 'block' },
+      { opacity: 0, display: 'none' },
+    ],
+    {
+      duration: 500,
+      iterations: 1,
+    }
+  )
+}
+
 // Prepare the grid height before updating its results per page
 const adjustGridHeight = (gridOptions, newResultsPerPage) => {
   const oldResultsPerPage = state.resultsPerPage
@@ -34,9 +48,9 @@ const bindPaginationEvents = (gridOptions, currentPage) => {
   createPaginationBinding('.govuk-pagination__prev a', () =>
     gridOptions.api.paginationGoToPreviousPage()
   )
-  createPaginationBinding('.govuk-pagination__next a', () =>
+  createPaginationBinding('.govuk-pagination__next a', () => {
     gridOptions.api.paginationGoToNextPage()
-  )
+  })
   createPaginationBinding('.govuk-pagination__item.first-item a', () =>
     gridOptions.api.paginationGoToFirstPage()
   )
@@ -73,6 +87,7 @@ const bindResultsPerPageSelectEvents = (gridOptions) => {
     adjustGridHeight(gridOptions, newResultsPerPage)
     state.resultsPerPage = newResultsPerPage
     gridOptions.api.paginationSetPageSize(newResultsPerPage)
+    gridOverlayAnimation()
   })
 }
 
@@ -210,7 +225,7 @@ const viewResultsPerPageSelector = () => {
 
   return `
   <div class="govuk-form-group">
-    <label class="govuk-label" for="resultsPerPageSelect">
+    <label class="govuk-label" for="resultsPerPage-select">
       Results per page
     </label>
     <select class="govuk-select" id="resultsPerPage-select" name="resultsPerPageSelect">

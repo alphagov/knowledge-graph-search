@@ -3,9 +3,11 @@ import {
   KeywordLocation,
   PublishingApplication,
   PublishingStatus,
+  SearchType,
 } from '../../common/types/search-api-types'
 import { state } from '../state'
 import { languageName } from '../../common/utils/lang'
+import { formatDocumentType } from '../utils/formatters'
 
 const viewEnableCaseSensitive = () => `
 <div class="govuk-form-group">
@@ -40,8 +42,8 @@ const viewCombinatorRadios = () => `
           All keywords
         </label>
         <div class="govuk-hint govuk-radios__hint">
-            Narrows search for example: cat, dog will search for pages that contain cat AND dog
-          </div>
+          Narrows search, for example: cat AND dog
+        </div>
       </div>
       <div class="govuk-radios__item">
         <input class="govuk-radios__input" id="side-filters-combinator-2" name="side-filters-combinator" type="radio" value="${
@@ -51,8 +53,8 @@ const viewCombinatorRadios = () => `
           Any keyword
         </label>
         <div class="govuk-hint govuk-radios__hint">
-            Expands search for example: cat, dog will search for pages that contain cat OR dog
-          </div>
+          Expands search, for example: cat OR dog
+        </div>
       </div>
     </div>
   </fieldset>
@@ -148,9 +150,7 @@ const viewDocumentTypeSelector = () => {
                 state.searchParams.documentType === documentType
                   ? 'selected'
                   : ''
-              }>${(
-                documentType.charAt(0).toUpperCase() + documentType.slice(1)
-              ).replace(/_/g, ' ')}</option>`
+              }>${formatDocumentType(documentType)}</option>`
           )
       )}
         </select>
@@ -247,6 +247,13 @@ const viewPublishingStatusSelector = () => `
     </div>`
 
 export const viewSideFilters = () => {
+  const limitedSearchTypes = [
+    SearchType.Link,
+    SearchType.Organisation,
+    SearchType.Taxon,
+  ]
+  const { searchType } = state.searchParams
+
   const submitButton = () => `
       <button id="side-filters-submit-btn" class="govuk-button" data-module="govuk-button" style="width: auto;">Apply filters</button>
     `
@@ -256,10 +263,18 @@ export const viewSideFilters = () => {
   return `
     <div class="side-filters">
       <h2 class="govuk-heading-m">Filters</h2>
-      ${viewEnableCaseSensitive()}
-      ${viewCombinatorRadios()}
-      ${viewExcludeWords()}
-      ${viewSelectKeywordLocation()}
+      ${
+        !limitedSearchTypes.includes(searchType)
+          ? viewEnableCaseSensitive()
+          : ''
+      }
+      ${!limitedSearchTypes.includes(searchType) ? viewCombinatorRadios() : ''}
+      ${!limitedSearchTypes.includes(searchType) ? viewExcludeWords() : ''}
+      ${
+        !limitedSearchTypes.includes(searchType)
+          ? viewSelectKeywordLocation()
+          : ''
+      }
       ${viewSelectPublishingOrganisations()}
       ${viewDocumentTypeSelector()}
       ${viewPublishingApplications()}

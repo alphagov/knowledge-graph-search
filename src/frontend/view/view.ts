@@ -34,10 +34,10 @@ const view = () => {
       ${viewErrorBanner()}
       ${viewSearchTypeSelector()}
       ${viewMainLayout()}
-      <p class="govuk-body-s">
-        Searches do not include history mode content, Publisher GitHub smart answers or service domains.
-        Page views depend on cookie consent.
-      </p>
+      <div class="gov-inset-text">
+        Searches do not include history mode content, GitHub smart answers or service domains.
+        Page views depend on cookie consent. Data can be up to 24 hours delayed
+      </div>
       </div>`)
   }
 
@@ -365,10 +365,15 @@ const viewResults = function () {
 
 const viewNoResults = () => {
   return `
-    <h1 tabindex="0" id="results-heading" class="govuk-heading-l">No results</h1>
-    <div class="govuk-body">for ${queryDescription({
-      searchParams: state.searchParams,
-    })} </div>
+    <div class="govuk-body govuk-inset-text">
+      <span class="govuk-!-font-weight-bold">No results</span> for ${queryDescription(
+        {
+          searchParams: state.searchParams,
+        }
+      )}
+      <p>Try a different keyword or adjust your filters</p>
+      <button class="govuk-button govuk-button--secondary" id="new-search-btn">New search</button>
+    </div>
   `
 }
 

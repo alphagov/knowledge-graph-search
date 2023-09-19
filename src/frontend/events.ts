@@ -1,7 +1,7 @@
 import {
   state,
   searchState,
-  resetSearch,
+  resetSearchState,
   setState,
   initialSearchParams,
 } from './state'
@@ -20,8 +20,8 @@ import {
 } from '../common/types/search-api-types'
 import { defaultAllLanguagesOption, languageCode } from '../common/utils/lang'
 import {
-  saveLayoutState,
   saveShowFieldsState,
+  saveLayoutState,
 } from './utils/localStorageService'
 
 declare const window: any
@@ -54,7 +54,7 @@ const updateStateFromSideFilters = () => {
     document.querySelector(
       'input[name="side-filters-combinator"]:checked'
     ) as HTMLInputElement
-  ).value as Combinator
+  )?.value as Combinator
   state.searchParams.combinator = newCombinatorValue
 
   state.searchParams.documentType = (
@@ -103,6 +103,21 @@ const updateStateFromSearchFilters = () => {
 }
 
 const resetFilters = () => {
+  const getOriginalSearchTypeState = () => {
+    const mapping = {
+      [SearchType.Keyword]: 'selectedWords',
+      [SearchType.Link]: 'linkSearchUrl',
+      [SearchType.Organisation]: 'publishingOrganisation',
+      [SearchType.Taxon]: 'taxon',
+      [SearchType.Language]: 'language',
+    }
+
+    return {
+      [mapping[state.searchParams.searchType]]:
+        state.searchParams[mapping[state.searchParams.searchType]],
+    }
+  }
+
   const newSearchParams: SearchParams = {
     ...state.searchParams,
     combinator: initialSearchParams.combinator,
@@ -114,13 +129,16 @@ const resetFilters = () => {
     taxon: initialSearchParams.taxon,
     language: initialSearchParams.language,
     publishingStatus: initialSearchParams.publishingStatus,
+
+    // Ensure what's in the main search input is not reset
+    ...getOriginalSearchTypeState(),
   }
 
   state.searchParams = newSearchParams
 }
 
 const handleSearchTabClick = (id: string) => {
-  resetSearch()
+  resetSearchState()
   const mapping = {
     'search-keyword': SearchType.Keyword,
     'search-links': SearchType.Link,
@@ -176,6 +194,10 @@ const handleEvent: SearchApiCallback = async function (event) {
           updateStateFromSearchFilters()
           state.searchResults = null
           searchButtonClicked()
+          break
+        case 'new-search-btn':
+          resetSearchState()
+          console.log('searchParams:', getQueryStringFromSearchParams())
           break
         case 'button-next-page':
           state.skip = state.skip + state.resultsPerPage
@@ -285,7 +307,7 @@ const searchButtonClicked = async function (): Promise<void> {
   }
 }
 
-const updateUrl = function () {
+const getQueryStringFromSearchParams = function () {
   if (!('URLSearchParams' in window)) {
     return
   }
@@ -343,9 +365,9 @@ const updateUrl = function () {
     },
   }
 
-  const updateSearchParams = (key) => {
-    const item = config[key]
-    const value = state.searchParams[key]
+  const updateSearchParams = (field) => {
+    const item = config[field]
+    const value = state.searchParams[field]
 
     if (item.condition(value)) {
       searchParams.set(
@@ -355,80 +377,36 @@ const updateUrl = function () {
     }
   }
 
-  const mappings = {
-    [SearchType.Keyword]: [
-      'selectedWords',
-      'caseSensitive',
-      'combinator',
-      'excludedWords',
-      'keywordLocation',
-      'publishingOrganisation',
-      'documentType',
-      'publishingApplication',
-      'taxon',
-      'publishingStatus',
-      'language',
-      'searchType',
-    ],
-    [SearchType.Link]: [
-      'linkSearchUrl',
-      'publishingOrganisation',
-      'publishingApplication',
-      'documentType',
-      'taxon',
-      'publishingStatus',
-      'language',
-      'searchType',
-    ],
-    [SearchType.Organisation]: [
-      'publishingOrganisation',
-      'publishingApplication',
-      'searchType',
-    ],
-    [SearchType.Taxon]: [
-      'taxon',
-      'publishingOrganisation',
-      'publishingStatus',
-      'language',
-      'documentType',
-      'publishingApplication',
-      'searchType',
-    ],
-    [SearchType.Language]: [
-      'language',
-      'publishingOrganisation',
-      'publishingApplication',
-      'documentType',
-      'taxon',
-      'publishingStatus',
-      'searchType',
-    ],
-    [SearchType.Advanced]: [
-      'selectedWords',
-      'caseSensitive',
-      'combinator',
-      'excludedWords',
-      'linkSearchUrl',
-      'keywordLocation',
-      'publishingOrganisation',
-      'documentType',
-      'publishingApplication',
-      'taxon',
-      'publishingStatus',
-      'language',
-      'searchType',
-    ],
-  }
+  const fields = [
+    'selectedWords',
+    'caseSensitive',
+    'combinator',
+    'excludedWords',
+    'linkSearchUrl',
+    'keywordLocation',
+    'publishingOrganisation',
+    'documentType',
+    'publishingApplication',
+    'taxon',
+    'publishingStatus',
+    'language',
+    'searchType',
+  ]
 
-  mappings[state.searchParams.searchType].forEach(updateSearchParams)
+  fields.forEach(updateSearchParams)
 
   const newQueryString = searchParams.toString()
+  return newQueryString
+}
+
+const updateUrl = () => {
+  const newQueryString = getQueryStringFromSearchParams()
   const oldQueryString = location.search.slice(1)
 
   if (newQueryString !== oldQueryString) {
     let newRelativePathQuery = window.location.pathname
     if (newQueryString.length > 0) {
-      newRelativePathQuery += '?' + searchParams.toString()
+      newRelativePathQuery += '?' + newQueryString
     }
     history.pushState(null, '', newRelativePathQuery)
   }

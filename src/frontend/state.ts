@@ -177,7 +177,7 @@ const searchState = function (): { code: string; errors: string[] } {
   return { code: 'ready-to-search', errors }
 }
 
-const resetSearch = function (): void {
+const resetSearchState = function (): void {
   console.log('resetting search')
   state.searchParams.selectedWords = ''
   state.searchParams.excludedWords = ''
@@ -201,5 +201,5 @@ export {
   setState,
   setStateSearchParamsFromURL as setQueryParamsFromQS,
   searchState,
-  resetSearch,
+  resetSearchState,
 }

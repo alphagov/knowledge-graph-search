@@ -1,7 +1,18 @@
 import { id } from '../../common/utils/utils'
 import { state } from '../state'
+import { formatDocumentType, formatPublishingApp } from '../utils/formatters'
+import {
+  loadGridColumnState,
+  saveGridColumnState,
+} from '../utils/localStorageService'
 import { fieldFormat, fieldName } from './utils'
 import { viewPagination } from './view-pagination'
+
+const overlayElement = () => {
+  const el = document.createElement('div')
+  el.id = 'grid-overlay'
+  return el
+}
 
 const createAgGrid = () => {
   if (!state.searchResults || state.searchResults?.length <= 0) {
@@ -19,11 +30,15 @@ const createAgGrid = () => {
     )
   )
 
-  const linkCellRenderer = (params) => params.value
+  const cellRenderers = {
+    url: (p) => p.value,
+    documentType: (p) => formatDocumentType(p.value),
+    publishing_app: (p) => formatPublishingApp(p.value),
+  }
   const columnDefs = enabledFields.map((field) => ({
     field,
     headerName: fieldName(field),
-    cellRenderer: field === 'url' ? linkCellRenderer : null,
+    cellRenderer: cellRenderers[field] || null,
     resizable: true,
     suppressSizeToFit: ['url', 'title'].includes(field),
     width: ['url', 'title'].includes(field) ? 500 : null,
@@ -50,10 +65,23 @@ const createAgGrid = () => {
   /* eslint-disable */ // @ts-ignore
   const grid = new agGrid.Grid(gridDiv, gridOptions)
 
-  // window.addEventListener('resize', function () {
-  //   // @ts-ignore
-  //   gridOptions.api.sizeColumnsToFit()
-  // })
+  const cachedColumnState = loadGridColumnState()
+  if (cachedColumnState) {
+    // @ts-ignore
+    gridOptions.columnApi.applyColumnState({
+      state: cachedColumnState,
+      applyOrder: true,
+    })
+  }
+
+  // @ts-ignore
+  gridOptions.api.addEventListener('columnMoved', () => {
+    // @ts-ignore
+    const colState = gridOptions.columnApi.getColumnState()
+    saveGridColumnState(colState)
+  })
+
+  gridDiv.appendChild(overlayElement())
 
   return { grid, gridOptions }
 }
