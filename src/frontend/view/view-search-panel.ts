@@ -114,12 +114,12 @@ const viewLinkSearchPanel = () => `
           </summary>
           <div class="govuk-details__text">
             <div class="search-filters-container">
-              <div class="search-filters-left-col">
+              <div class="search-filters-left-col links-search">
               ${viewPublishingOrganisation()}
               ${viewPublishingAppSelector()}
               ${viewDocumentType()}
               </div>
-              <div class="search-filters-left-col">
+              <div class="search-filters-right-col links-search">
                 ${viewTaxonSelector()}
                 ${viewPublishingStatusSelector()}
                 ${viewLanguageSelector()}
@@ -154,7 +154,7 @@ const viewTaxonSearchPanel = () => `
                   ${viewPublishingStatusSelector()}
                   ${viewLanguageSelector()}
                 </div>
-                <div class="search-filters-left-col taxon-search">
+                <div class="search-filters-right-col taxon-search">
                   ${viewDocumentType()}
                   ${viewPublishingAppSelector()}
                 </div>
@@ -188,7 +188,7 @@ const viewLanguageSearchPanel = () => `
                   ${viewPublishingAppSelector()}
                   ${viewDocumentType()}
                 </div>
-                <div class="search-filters-left-col language-search">
+                <div class="search-filters-right-col language-search">
                   ${viewTaxonSelector()}
                   ${viewPublishingStatusSelector()}
                 </div>
@@ -222,7 +222,7 @@ const viewOrganisationSearchPanel = () => `
                   ${viewPublishingStatusSelector()}
                   ${viewDocumentType()}
                 </div>
-                <div class="search-filters-left-col organisation-search">
+                <div class="search-filters-right-col organisation-search">
                   ${viewTaxonSelector()}
                   ${viewLanguageSelector()}
                 </div>

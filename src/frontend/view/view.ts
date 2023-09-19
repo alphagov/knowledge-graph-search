@@ -10,10 +10,7 @@ import { fieldName } from './utils'
 import { createAgGrid } from './view-grid'
 import { viewSideFilters } from './view-side-filters'
 import govukPostInitScripts from './postInitScripts'
-import {
-  PublishingStatus,
-  SearchType,
-} from '../../common/types/search-api-types'
+import { SearchType } from '../../common/types/search-api-types'
 import config from '../config'
 
 declare const window: any
