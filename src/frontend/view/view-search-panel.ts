@@ -274,9 +274,9 @@ const viewPublishingOrgSelector = () => {
     )
     .join('')
   return `
-  <div class="govuk-body">
+  <div class="govuk-form-group">
     <div class="taxon-facet">
-      <label class="govuk-label govuk-label--s" for="publishing-organisation">
+      <label class="govuk-label govuk-label--s" for="search-filters-publishing-organisation">
         Search for publishing organisations
       </label>
 
@@ -543,7 +543,7 @@ const viewPublishingAppSelector = () => `
     </div>`
 
 const viewKeywordsInput = () => `
-  <div class="govuk-body">
+  <div class="govuk-form-group">
     <label for="keyword" class="govuk-label govuk-label--s">Search for keywords</label>
     <div class="govuk-hint">
     Use quotes for phrases for example, "UK driving licence". Use commas to search for multiple keywords or phrases.
