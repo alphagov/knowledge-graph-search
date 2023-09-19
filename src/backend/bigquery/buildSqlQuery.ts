@@ -31,10 +31,6 @@ export const buildSqlQuery = function (
     searchParams.searchType !== SearchType.Language &&
     searchParams.searchType !== SearchType.Advanced &&
     searchParams.keywordLocation !== KeywordLocation.Title
-  // !searchParams.language &&
-  // !searchParams.taxon &&
-  // !searchParams.publishingOrganisation &&
-  // !searchParams.documentType &&
 
   const textOccurrences = includeOccurrences
     ? keywords.length === 1
