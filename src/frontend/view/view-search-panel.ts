@@ -26,7 +26,7 @@ const viewSearchPanel = () => {
     return null
   }
 
-  return searchType in mapping ? mapping[searchType]() : console.error()
+  return mapping[searchType]()
 }
 
 const viewKeywordSearchPanel = () => `
