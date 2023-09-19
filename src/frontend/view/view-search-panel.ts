@@ -47,7 +47,7 @@ const viewKeywordSearchPanel = () => `
               <div class="search-filters-container">
                 <div class="search-filters-left-col keyword-search">
                   ${viewCaseSensitiveSelector()}
-                  ${viewKeywordsCombinator()}
+                  ${viewKeywordsCombinator(true)}
                   ${viewExclusionsInput()}
                   ${viewKeywordLocation()}
                   ${viewPublishingOrganisation()}
@@ -480,8 +480,10 @@ const viewCaseSensitiveSelector = () => `
 </div>
 `
 
-const viewKeywordsCombinator = () => `
-<div class="govuk-form-group">
+const viewKeywordsCombinator = (withNegativeMargin = false) => `
+<div class="govuk-form-group" ${
+  withNegativeMargin ? `style="margin-top: -30px;"` : ''
+}>
   <fieldset class="govuk-fieldset">
     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
         Search for
