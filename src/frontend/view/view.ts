@@ -12,10 +12,6 @@ import { viewSideFilters } from './view-side-filters'
 import govukPostInitScripts from './postInitScripts'
 import { SearchType } from '../../common/types/search-api-types'
 import config from '../config'
-import {
-  downloadAllPAgeResults,
-  downloadCurrentPageResults,
-} from '../utils/csvDownload'
 
 declare const window: any
 
@@ -84,10 +80,16 @@ const view = () => {
     handleEvent({ type: EventType.Dom, id: 'toggleDisamBox' })
   )
 
-  govukPostInitScripts()
+  id('csv-download-select')?.addEventListener('change', (event: Event) => {
+    const selectedValue = (event.target as HTMLSelectElement).value
+    const eventId =
+      selectedValue === 'all-results'
+        ? 'download-all-csv'
+        : 'download-current-csv'
+    handleEvent({ type: EventType.Dom, id: eventId })
+  })
 
-  global.downloadCurrentPageResults = downloadCurrentPageResults
-  global.downloadAllPAgeResults = downloadAllPAgeResults
+  govukPostInitScripts()
 }
 
 const viewSearchTypeSelector = () => `
@@ -286,11 +288,11 @@ const viewWaiting = () => `
 `
 
 const viewCSVDownload = () => {
-  return `<div class="govuk-form-group">
-    <select class="govuk-select" id="side-filters-keyword-location" name="side-filters-keyword-location" style="width: 100%;">
-      <option value="Current results (${state.pagination.resultsPerPage})" disabled selected>Export data (csv)</option>
-      <option value="All results (${state.searchResults?.length})" selected>Export data (csv)</option>
-      <option value="" >All keyword locations</option>
+  return `<div class="govuk-form-group csv-select-container">
+    <select class="govuk-select" id="csv-download-select" name="csv-download-select" style="width: 100%;">
+      <option value="" disabled selected >Export data (csv)</option>
+      <option value="current-results">Current results (${state.pagination.resultsPerPage})</option>
+      <option value="all-results">All results (${state.searchResults?.length})</option>
     </select>
   </div>`
 }
