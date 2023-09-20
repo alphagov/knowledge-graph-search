@@ -35,11 +35,10 @@ export default class CustomAgGridHeader {
     this.sortable = this.initialColDef.sortable
     this.sortingState = this.agParams.column.getColDef().sort || SortAction.NONE
 
-    // console.log({
-    //   enableSorting: this.agParams.enableSorting,
-    //   sortable: this.sortable,
-    //   fieldName: this.fieldName,
-    // })
+    console.log({
+      fieldName: this.fieldName,
+      sortingState: this.sortingState,
+    })
 
     this.eGui = document.createElement('div')
 
@@ -54,7 +53,10 @@ export default class CustomAgGridHeader {
         'sortChanged',
         this.onSortChangedListener
       )
-      this.onSortChanged()
+      // this.onSortChanged()
+      if (this.sortingState) {
+        this.agParams.setSort(this.sortingState, false)
+      }
     }
   }
 
