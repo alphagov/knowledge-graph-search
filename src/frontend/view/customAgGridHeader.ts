@@ -62,7 +62,7 @@ export default class CustomAgGridHeader {
 
   render() {
     this.eGui.innerHTML = `
-      <div class="customHeaderLabel ${this.getSortingClass()}">${
+      <div class="customHeaderLabel ${this.getSortingClass()}" role="presentation">${
       this.agParams.displayName
     }</div>
         `
