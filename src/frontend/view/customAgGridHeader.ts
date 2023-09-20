@@ -26,6 +26,7 @@ export default class CustomAgGridHeader {
   private sortable: boolean
 
   private onSortRequestedListener: (event: Event) => void
+  private onSortChangedListener: (event: Event) => void
 
   init(agParams: AgParams) {
     this.agParams = agParams
@@ -33,6 +34,12 @@ export default class CustomAgGridHeader {
     this.fieldName = this.initialColDef.field
     this.sortable = this.initialColDef.sortable
     this.sortingState = this.agParams.column.getColDef().sort || SortAction.NONE
+
+    // console.log({
+    //   enableSorting: this.agParams.enableSorting,
+    //   sortable: this.sortable,
+    //   fieldName: this.fieldName,
+    // })
 
     this.eGui = document.createElement('div')
 
@@ -42,6 +49,12 @@ export default class CustomAgGridHeader {
 
     if (this.agParams.enableSorting) {
       this.eHeaderLabel.addEventListener('click', this.notifySort.bind(this))
+      this.onSortChangedListener = this.onSortChanged.bind(this)
+      this.agParams.column.addEventListener(
+        'sortChanged',
+        this.onSortChangedListener
+      )
+      this.onSortChanged()
     }
   }
 
@@ -78,7 +91,6 @@ export default class CustomAgGridHeader {
     const sortSeq = [SortAction.DESC, SortAction.ASC, SortAction.NONE]
     const updatedSort = sortSeq[(sortSeq.indexOf(this.sortingState) + 1) % 3]
     this.agParams.setSort(updatedSort, e.shiftKey)
-    this.onSortChanged()
   }
 
   onSortChanged() {
