@@ -33,9 +33,6 @@ export default class CustomAgGridHeader {
     this.fieldName = this.initialColDef.field
     this.sortable = this.initialColDef.sortable
     this.sortingState = this.agParams.column.getColDef().sort || SortAction.NONE
-    if (this.fieldName === 'page_views') {
-      console.log({ initialSortingState: this.sortingState })
-    }
 
     this.eGui = document.createElement('div')
 
@@ -78,24 +75,18 @@ export default class CustomAgGridHeader {
   }
 
   notifySort(e: KeyboardEvent) {
-    console.log('notifySort()', { sortingState: this.sortingState })
     const sortSeq = [SortAction.DESC, SortAction.ASC, SortAction.NONE]
     const updatedSort = sortSeq[(sortSeq.indexOf(this.sortingState) + 1) % 3]
-    console.log({ updatedSort })
     this.agParams.setSort(updatedSort, e.shiftKey)
     this.onSortChanged()
   }
 
   onSortChanged() {
-    console.log('onSortChanged()')
     if (this.agParams.column.isSortAscending()) {
-      console.log('changed to asc')
       this.sortingState = SortAction.ASC
     } else if (this.agParams.column.isSortDescending()) {
-      console.log('changed to desc')
       this.sortingState = SortAction.DESC
     } else {
-      console.log('changed to none')
       this.sortingState = SortAction.NONE
     }
     this.updateState()
