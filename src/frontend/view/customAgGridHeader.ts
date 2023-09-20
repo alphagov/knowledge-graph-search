@@ -41,6 +41,8 @@ export default class CustomAgGridHeader {
     })
 
     this.eGui = document.createElement('div')
+    this.eGui.className = 'customHeaderContainer'
+    this.eGui.setAttribute('role', 'presentation')
 
     this.render()
 
