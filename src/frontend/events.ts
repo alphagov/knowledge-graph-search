@@ -23,6 +23,10 @@ import {
   cacheShowFieldsState,
   cacheLayoutState,
 } from './utils/localStorageService'
+import {
+  downloadAllPAgeResults,
+  downloadCurrentPageResults,
+} from './utils/csvDownload'
 
 declare const window: any
 
@@ -225,6 +229,12 @@ const handleEvent: SearchApiCallback = async function (event) {
             state.showFields.withdrawn_explanation = false
           }
           cacheShowFieldsState()
+          break
+        case 'download-all-csv':
+          downloadAllPAgeResults()
+          break
+        case 'download-current-csv':
+          downloadCurrentPageResults()
           break
         default:
           fieldClicked = event.id ? event.id.match(/show-field-(.*)/) : null

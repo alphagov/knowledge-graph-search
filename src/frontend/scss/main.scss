@@ -344,6 +344,7 @@ h2:focus-visible {
 
   .results-container-row-1-headers {
     display: flex;
+    align-items: center;
     padding-bottom: 20px;
 
     .hide-filters-button-container {
@@ -436,4 +437,10 @@ h2:focus-visible {
 
 #clear-side-filters-link {
   font-size: 19px;
+}
+
+.csv-select-container {
+  margin-top: 10px;
+  margin-bottom: 0;
+  margin-left: auto;
 }
