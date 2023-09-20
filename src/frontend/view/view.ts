@@ -12,6 +12,10 @@ import { viewSideFilters } from './view-side-filters'
 import govukPostInitScripts from './postInitScripts'
 import { SearchType } from '../../common/types/search-api-types'
 import config from '../config'
+import {
+  downloadAllPAgeResults,
+  downloadCurrentPageResults,
+} from '../utils/csvDownload'
 
 declare const window: any
 
@@ -81,6 +85,9 @@ const view = () => {
   )
 
   govukPostInitScripts()
+
+  global.downloadCurrentPageResults = downloadCurrentPageResults
+  global.downloadAllPAgeResults = downloadAllPAgeResults
 }
 
 const viewSearchTypeSelector = () => `
@@ -281,7 +288,7 @@ const viewWaiting = () => `
 const viewCSVDownload = () => {
   return `<div class="govuk-form-group">
     <select class="govuk-select" id="side-filters-keyword-location" name="side-filters-keyword-location" style="width: 100%;">
-      <option value="Current results (${state.resultsPerPage})" disabled selected>Export data (csv)</option>
+      <option value="Current results (${state.pagination.resultsPerPage})" disabled selected>Export data (csv)</option>
       <option value="All results (${state.searchResults?.length})" selected>Export data (csv)</option>
       <option value="" >All keyword locations</option>
     </select>
