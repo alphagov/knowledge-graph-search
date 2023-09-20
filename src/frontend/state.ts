@@ -47,7 +47,7 @@ const defaultShowFields = {
 }
 
 const defaultSortingState = {
-  page_views: SortAction.ASC,
+  page_views: SortAction.DESC,
 }
 
 const cachedLayout = loadLayoutStateFromCache()
