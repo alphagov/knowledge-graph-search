@@ -289,6 +289,9 @@ const viewWaiting = () => `
 
 const viewCSVDownload = () => {
   return `<div class="govuk-form-group csv-select-container">
+<label class="govuk-label govuk-visually-hidden" for="csv-download-select">
+    Download data
+  </label>
     <select class="govuk-select" id="csv-download-select" name="csv-download-select" style="width: 100%;">
       <option value="" disabled selected >Export data (csv)</option>
       <option value="current-results">Current results (${state.pagination.resultsPerPage})</option>
