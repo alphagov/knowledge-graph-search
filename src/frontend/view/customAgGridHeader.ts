@@ -35,11 +35,6 @@ export default class CustomAgGridHeader {
     this.sortable = this.initialColDef.sortable
     this.sortingState = this.agParams.column.getColDef().sort || SortAction.NONE
 
-    console.log({
-      fieldName: this.fieldName,
-      sortingState: this.sortingState,
-    })
-
     this.eGui = document.createElement('div')
     this.eGui.className = 'customHeaderContainer'
     this.eGui.setAttribute('role', 'presentation')

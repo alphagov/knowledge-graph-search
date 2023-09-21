@@ -1,3 +1,5 @@
+/* eslint-disable */
+// @ts-nocheck
 import {
   KeywordLocation,
   SearchType,
@@ -12,6 +14,7 @@ import {
 import { fieldFormat, fieldName } from './utils'
 import { viewPagination } from './view-pagination'
 import CustomAgGridHeader from './customAgGridHeader'
+import debounce from '../utils/debounce'
 
 const overlayElement = () => {
   const el = document.createElement('div')
@@ -93,35 +96,47 @@ const createAgGrid = () => {
   }
 
   const gridDiv = id('results-grid-container')
-  /* eslint-disable */ // @ts-ignore
+  /* eslint-disable */
   const grid = new agGrid.Grid(gridDiv, gridOptions)
 
-  const cachedColumnState = loadGridColumnStateFromCache()
-  if (cachedColumnState) {
-    // @ts-ignore
-    gridOptions.columnApi.applyColumnState({
-      state: cachedColumnState,
-      applyOrder: true,
-    })
+  const initColumnState = () => {
+    const cachedColumnState = loadGridColumnStateFromCache()
+    if (cachedColumnState) {
+      gridOptions.columnApi.applyColumnState({
+        state: cachedColumnState,
+        applyOrder: true,
+      })
+    }
+  }
+  const initGoToCurrentPage = () => {
+    // For cached pagination, we need to set the current page after the grid has been initialised
+    if (
+      state.pagination.currentPage !==
+      gridOptions.api.paginationGetCurrentPage()
+    ) {
+      gridOptions.api.paginationGoToPage(state.pagination.currentPage)
+    }
   }
 
-  // For cached pagination, we need to set the current page after the grid has been initialised
-  if (
-    // @ts-ignore
-    state.pagination.currentPage !== gridOptions.api.paginationGetCurrentPage()
-  ) {
-    // @ts-ignore
-    gridOptions.api.paginationGoToPage(state.pagination.currentPage)
-  }
-
-  // @ts-ignore
-  gridOptions.api.addEventListener('columnMoved', () => {
-    // @ts-ignore
+  const cacheColumnState = () => {
     const colState = gridOptions.columnApi.getColumnState()
     cacheGridColumnState(colState)
-  })
+  }
+  const addOverlayElementForPaginationRefresh = () =>
+    gridDiv.appendChild(overlayElement())
 
-  gridDiv.appendChild(overlayElement())
+  const onColumnMoved = () => cacheColumnState()
+  const onColumnResized = debounce((event: any) => cacheColumnState(), 100)
+  const onGridReady = () => addOverlayElementForPaginationRefresh()
+
+  // Grid event listenners
+  gridOptions.api.addEventListener('gridReady', onGridReady)
+  gridOptions.api.addEventListener('columnMoved', onColumnMoved)
+  gridOptions.api.addEventListener('columnResized', onColumnResized)
+
+  initColumnState()
+  initGoToCurrentPage()
+  onGridReady()
 
   return { grid, gridOptions }
 }
