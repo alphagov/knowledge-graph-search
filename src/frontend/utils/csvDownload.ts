@@ -49,10 +49,7 @@ export const convertToCSV = (data: { [key: string]: string | DateValue }[]) => {
   return [headers, ...rows].join('\n')
 }
 
-export const generateFileDownloadFromCSVString = (
-  csv: string,
-  filename,
-) => {
+export const generateFileDownloadFromCSVString = (csv: string, filename) => {
   const blob = new Blob([csv], { type: 'text/csv' })
   const url = window.URL.createObjectURL(blob)
 
