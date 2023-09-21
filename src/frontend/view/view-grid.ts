@@ -25,7 +25,6 @@ const createAgGrid = () => {
   const currentPageRecords = state.searchResults
 
   const excludeOccurrences =
-    state.searchParams.searchType === SearchType.Link ||
     state.searchParams.searchType === SearchType.Language ||
     state.searchParams.searchType === SearchType.Advanced ||
     state.searchParams.keywordLocation === KeywordLocation.Title
