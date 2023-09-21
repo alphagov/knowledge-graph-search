@@ -1,8 +1,13 @@
 import { view } from './view/view'
-import { state, setQueryParamsFromQS, resetSearch } from './state'
+import { state, setQueryParamsFromQS, resetSearchState } from './state'
 import { searchButtonClicked, handleEvent } from './events'
 import { fetchWithTimeout, queryBackend } from './search-api'
 import config from './config'
+import { defaultAllLanguagesOption } from '../common/utils/lang'
+import {
+  PublishingApplication,
+  PublishingStatus,
+} from '../common/types/search-api-types'
 
 //= =================================================
 // INIT
@@ -30,13 +35,14 @@ const fetchInitialData = async function () {
     state.taxons = dbInitResults.taxons
     state.organisations = dbInitResults.organisations
     state.locales = dbInitResults.locales
+    state.documentTypes = dbInitResults.documentTypes
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') {
       state.systemErrorText = 'It looks like the backend is not responding.'
     } else {
       state.systemErrorText = error
     }
-    resetSearch()
+    resetSearchState()
     return
   }
 
@@ -44,15 +50,21 @@ const fetchInitialData = async function () {
     setQueryParamsFromQS()
     state.searchResults = null
     view()
+
     // Find if we need to run a search
     if (
       state.searchParams.selectedWords !== '' ||
-      state.searchParams.selectedLocale !== '' ||
-      state.searchParams.selectedTaxon !== '' ||
-      state.searchParams.selectedOrganisation !== '' ||
-      state.searchParams.linkSearchUrl !== ''
+      (state.searchParams.language !== '' &&
+        state.searchParams.language !== defaultAllLanguagesOption) ||
+      state.searchParams.taxon !== '' ||
+      state.searchParams.publishingOrganisation !== '' ||
+      state.searchParams.linkSearchUrl !== '' ||
+      state.searchParams.documentType !== '' ||
+      state.searchParams.publishingApplication !== PublishingApplication.Any ||
+      state.searchParams.publishingStatus !== PublishingStatus.All
     ) {
       state.waiting = true
+      console.log('REQUERYING BACKEND')
       queryBackend(state.searchParams, handleEvent)
     }
   })

@@ -59,6 +59,9 @@ export const bigQuery = async function (userQuery: string, options?: any) {
     if (options.link) {
       params.link = options.link
     }
+    if (options.documentType) {
+      params.documentType = options.documentType
+    }
     if (options.selectedWordsWithoutQuotes !== undefined) {
       params.selected_words_without_quotes = options.selectedWordsWithoutQuotes
     }
@@ -78,22 +81,27 @@ export const bigQuery = async function (userQuery: string, options?: any) {
 //= ===== public ======
 
 const sendInitQuery = async function (): Promise<InitResults> {
-  let bqLocales: any, bqTaxons: any, bqOrganisations: any
+  let bqLocales: any, bqTaxons: any, bqOrganisations: any, bqDocumentTypes: any
   try {
-    ;[bqLocales, bqTaxons, bqOrganisations] = await Promise.all([
-      bigQuery(`
+    ;[bqLocales, bqTaxons, bqOrganisations, bqDocumentTypes] =
+      await Promise.all([
+        bigQuery(`
         SELECT DISTINCT locale
         FROM \`content.locale\`
         `),
-      bigQuery(`
+        bigQuery(`
         SELECT name
         FROM \`search.taxon\`
         `),
-      bigQuery(`
+        bigQuery(`
         SELECT DISTINCT title
         FROM \`graph.organisation\`
         `),
-    ])
+        bigQuery(`
+        SELECT DISTINCT document_type
+        FROM \`content.document_type\`
+        `),
+      ])
   } catch (error) {
     log.error(error, 'Error in sendInitQueryError')
   }
@@ -106,6 +114,9 @@ const sendInitQuery = async function (): Promise<InitResults> {
     taxons: bqTaxons.map((taxon: any) => taxon.name),
     organisations: bqOrganisations.map(
       (organisation: any) => organisation.title
+    ),
+    documentTypes: bqDocumentTypes.map(
+      (documentType: any) => documentType.document_type
     ),
   }
 }
@@ -173,9 +184,10 @@ const sendSearchQuery = async function (
   const keywords = splitKeywords(searchParams.selectedWords)
   const excludedKeywords = splitKeywords(searchParams.excludedWords)
   const query = buildSqlQuery(searchParams, keywords, excludedKeywords)
-  const locale = languageCode(searchParams.selectedLocale)
-  const taxon = searchParams.selectedTaxon
-  const organisation = searchParams.selectedOrganisation
+  const locale = languageCode(searchParams.language)
+  const taxon = searchParams.taxon
+  const organisation = searchParams.publishingOrganisation
+  const documentType = searchParams.documentType
   const selectedWordsWithoutQuotes = searchParams.selectedWords.replace(
     /"/g,
     ''
@@ -189,6 +201,7 @@ const sendSearchQuery = async function (
       taxon,
       organisation,
       link,
+      documentType,
     }),
   ]
 
@@ -200,13 +213,13 @@ const sendSearchQuery = async function (
     case SearchType.Taxon:
       results = await Promise.all(queries)
       bqMainResults = results[0]
-      bqMetaResults = await getTaxonInfo(searchParams.selectedTaxon)
+      bqMetaResults = await getTaxonInfo(searchParams.taxon)
       break
     case SearchType.Organisation:
       results = await Promise.all(queries)
       bqMainResults = results[0]
       bqMetaResults = await getOrganisationInfo(
-        searchParams.selectedOrganisation
+        searchParams.publishingOrganisation
       )
       break
     default:

@@ -1,10 +1,25 @@
 import { id } from '../../common/utils/utils'
 import { state } from '../state'
 import config from '../config'
+import { cachePaginationState } from '../utils/localStorageService'
+
+const gridOverlayAnimation = () => {
+  const overlay = document.getElementById('grid-overlay')
+  overlay.animate(
+    [
+      { opacity: 1, display: 'block' },
+      { opacity: 0, display: 'none' },
+    ],
+    {
+      duration: 500,
+      iterations: 1,
+    }
+  )
+}
 
 // Prepare the grid height before updating its results per page
 const adjustGridHeight = (gridOptions, newResultsPerPage) => {
-  const oldResultsPerPage = state.resultsPerPage
+  const oldResultsPerPage = state.pagination.resultsPerPage
   const { maxResultsBeforeScrolling } = config.pagination
   if (newResultsPerPage > maxResultsBeforeScrolling) {
     let newGridHeight = 0
@@ -29,14 +44,16 @@ const bindPaginationEvents = (gridOptions, currentPage) => {
     document.querySelector(selector)?.addEventListener('click', function (e) {
       e.preventDefault()
       func()
+      state.pagination.currentPage = gridOptions.api.paginationGetCurrentPage()
+      cachePaginationState()
     })
 
   createPaginationBinding('.govuk-pagination__prev a', () =>
     gridOptions.api.paginationGoToPreviousPage()
   )
-  createPaginationBinding('.govuk-pagination__next a', () =>
+  createPaginationBinding('.govuk-pagination__next a', () => {
     gridOptions.api.paginationGoToNextPage()
-  )
+  })
   createPaginationBinding('.govuk-pagination__item.first-item a', () =>
     gridOptions.api.paginationGoToFirstPage()
   )
@@ -71,8 +88,10 @@ const bindResultsPerPageSelectEvents = (gridOptions) => {
     const selectedValue = (<HTMLSelectElement>event.target).value
     const newResultsPerPage = parseInt(selectedValue, 10)
     adjustGridHeight(gridOptions, newResultsPerPage)
-    state.resultsPerPage = newResultsPerPage
+    state.pagination.resultsPerPage = newResultsPerPage
+    cachePaginationState()
     gridOptions.api.paginationSetPageSize(newResultsPerPage)
+    gridOverlayAnimation()
   })
 }
 
@@ -208,14 +227,25 @@ const viewResultsPerPageSelector = () => {
   const { options: resultsPerPageOptions } = config.pagination
   const minResultsPerPage = Math.min(...resultsPerPageOptions)
 
+  const getPaginationString = () => {
+    const start =
+      state.pagination.currentPage * state.pagination.resultsPerPage + 1
+    const end =
+      state.pagination.currentPage * state.pagination.resultsPerPage +
+      state.pagination.resultsPerPage
+    const total = state.searchResults?.length || 0
+
+    return `${start} to ${end} of ${total}`
+  }
+
   return `
-  <div class="govuk-form-group">
-    <label class="govuk-label" for="resultsPerPageSelect">
+  <div class="govuk-form-group pagination-select">
+    <label class="govuk-label" for="resultsPerPage-select">
       Results per page
     </label>
     <select class="govuk-select" id="resultsPerPage-select" name="resultsPerPageSelect">
     <option value="${minResultsPerPage}" ${
-    state.resultsPerPage === minResultsPerPage ? 'selected' : ''
+    state.pagination.resultsPerPage === minResultsPerPage ? 'selected' : ''
   }>${minResultsPerPage}</option>
       ${resultsPerPageOptions
         .filter(
@@ -225,10 +255,11 @@ const viewResultsPerPageSelector = () => {
         .map(
           (s) =>
             `<option value="${s}" ${
-              s === state.resultsPerPage ? 'selected' : ''
+              s === state.pagination.resultsPerPage ? 'selected' : ''
             }>${s}</option>`
         )}
     </select>
+    <span class="govuk-body">${getPaginationString()}</span>
   </div>
   `
 }

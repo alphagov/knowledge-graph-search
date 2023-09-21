@@ -1,3 +1,19 @@
+export enum UrlParams {
+  Combinator = 'combinator',
+  SearchType = 'search-type',
+  SelectedWords = 'selected-words',
+  ExcludedWords = 'excluded-words',
+  Taxon = 'taxon',
+  PublishingOrganisation = 'publishing-organisation',
+  CaseSensitive = 'case-sensitive',
+  DocumentType = 'document-type',
+  KeywordLocation = 'keyword-location',
+  LinkSearchUrl = 'link-search-url',
+  PublishingApplication = 'publishing-application',
+  PublishingStatus = 'publishing-status',
+  Language = 'language',
+}
+
 export enum SearchType {
   Keyword = 'keyword',
   Link = 'link',
@@ -14,7 +30,20 @@ export enum Combinator {
   NotSet = 'notset',
 }
 
-export enum SearchArea {
+export enum KeywordLocation {
+  All = 'all',
+  Title = 'title',
+  Description = 'description',
+  BodyContent = 'bodycontent',
+}
+
+export enum PublishingStatus {
+  Withdrawn = 'withdrawn',
+  NotWithdrawn = 'notWithdrawn',
+  All = 'all',
+}
+
+export enum PublishingApplication {
   Any = 'any',
   Whitehall = 'whitehall',
   Publisher = 'publisher',
@@ -24,17 +53,16 @@ export type SearchParams = {
   searchType: SearchType
   selectedWords: string // list of words to search
   excludedWords: string // list of words to exclude
-  selectedTaxon: string // taxon to search in
-  selectedOrganisation: string // organisation to search in
-  selectedLocale: string // the language to search for
+  taxon: string // taxon to search in
+  publishingOrganisation: string // organisation to search in
+  language: string // the language to search for
+  documentType: string // documentTypeto search in
   linkSearchUrl: string // URL to find all pages linking to
-  whereToSearch: {
-    title: boolean
-    text: boolean
-  } // what parts of the pages to search in
+  keywordLocation: KeywordLocation // what parts of the pages to search in
   combinator: Combinator // all keywords or any keywords
-  areaToSearch: SearchArea // whitehall, publisher, both
+  publishingApplication: PublishingApplication // whitehall, publisher, both
   caseSensitive: boolean // case sensitive keyword search?
+  publishingStatus: PublishingStatus // Withdrawn, not withdrawn etc.
 }
 
 export enum MetaResultType {
@@ -144,4 +172,5 @@ export type InitResults = {
   taxons: string[]
   locales: string[]
   organisations: string[]
+  documentTypes: string[]
 }

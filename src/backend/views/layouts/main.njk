@@ -28,6 +28,7 @@ j=d.createElement(s),dl=l!="dataLayer"?"&l="+l:"";j.async=true;j.src=
 
 <!--[if !IE 8]><!-->
 <link href="/main.css" rel="stylesheet" />
+<link href="/assets/aaccessible-autocomplete.min.css" rel="stylesheet">
 <!--<![endif]-->
 
 <!--[if IE 8]>
@@ -95,7 +96,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 {% block bodyEnd %}
   {% block scripts %}
   <script src="/assets/all.js"></script>
+  <script src="/assets/accessible-autocomplete.min.js"></script>
   <script>
+    window.havePostScriptsRun = false;
     window.GOVUKFrontend.initAll();
   </script>
 

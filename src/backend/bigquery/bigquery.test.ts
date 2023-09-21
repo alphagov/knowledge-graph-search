@@ -1,6 +1,9 @@
 import {
   Combinator,
-  SearchArea,
+  KeywordLocation,
+  PublishingApplication,
+  PublishingStatus,
+  SearchParams,
   SearchType,
 } from '../../common/types/search-api-types'
 import * as buildSqlQuery from './buildSqlQuery'
@@ -76,9 +79,16 @@ describe('[Function] sendInitQuery', () => {
       .mockResolvedValueOnce([
         [{ title: 'org1' }, { title: 'org2' }, { title: 'org3' }],
       ])
+      .mockResolvedValueOnce([
+        [
+          { document_type: 'dt1' },
+          { document_type: 'dt2' },
+          { document_type: 'dt3' },
+        ],
+      ])
     const result = await sendInitQuery()
 
-    expect(BigQuery.prototype.query).toHaveBeenCalledTimes(3)
+    expect(BigQuery.prototype.query).toHaveBeenCalledTimes(4)
 
     expect(BigQuery.prototype.query).toHaveBeenNthCalledWith(1, {
       query: `
@@ -109,25 +119,30 @@ describe('[Function] sendInitQuery', () => {
       locales: ['', 'en', 'cy', 'fr', 'de'],
       taxons: ['taxon1', 'taxon2', 'taxon3'],
       organisations: ['org1', 'org2', 'org3'],
+      documentTypes: ['dt1', 'dt2', 'dt3'],
     })
   })
 })
 
 describe('[Function] sendSearchQuery', () => {
-  const makeSearchParams = (options = {}) => ({
-    searchType: SearchType.Keyword,
-    selectedWords: 'keyword1 keyword2',
-    excludedWords: 'excluded1 excluded2',
-    selectedLocale: 'en',
-    selectedTaxon: 'taxon',
-    selectedOrganisation: 'organisation',
-    linkSearchUrl: 'link',
-    whereToSearch: { title: true, text: true },
-    combinator: Combinator.Any,
-    areaToSearch: SearchArea.Any,
-    caseSensitive: false,
-    ...options,
-  })
+  const makeSearchParams = (options = {}) =>
+    ({
+      searchType: SearchType.Advanced,
+      selectedWords: 'keyword1 keyword2',
+      excludedWords: 'excluded1 excluded2',
+      taxon: 'taxon',
+      publishingOrganisation: 'organisation',
+      language: 'en',
+      documentType: '',
+      linkSearchUrl: 'link',
+      keywordLocation: KeywordLocation.All,
+      combinator: Combinator.Any,
+      publishingApplication: PublishingApplication.Any,
+      caseSensitive: false,
+      publishingStatus: PublishingStatus.All,
+      ...options,
+    } as SearchParams)
+
   it('Calls the appropriate queries with default search type', async () => {
     jest.spyOn(buildSqlQuery, 'buildSqlQuery').mockReturnValue('query')
     ;(BigQuery.prototype.query as jest.Mock)
