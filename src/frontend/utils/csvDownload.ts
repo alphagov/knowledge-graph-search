@@ -71,7 +71,7 @@ export const generateFileDownloadFromCSVString = (
 export const downloadCurrentPageResults = () => {
   const results = getCurrentPageResults()
   const csv = convertToCSV(results)
-  generateFileDownloadFromCSVString(csv)
+  generateFileDownloadFromCSVString(csv, 'data-current-results.csv')
 }
 
 export const downloadAllPAgeResults = () => {
