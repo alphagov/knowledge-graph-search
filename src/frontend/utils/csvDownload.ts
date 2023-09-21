@@ -51,7 +51,7 @@ export const convertToCSV = (data: { [key: string]: string | DateValue }[]) => {
 
 export const generateFileDownloadFromCSVString = (
   csv: string,
-  filename = 'data.csv'
+  filename,
 ) => {
   const blob = new Blob([csv], { type: 'text/csv' })
   const url = window.URL.createObjectURL(blob)
