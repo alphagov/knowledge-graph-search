@@ -12,9 +12,18 @@ interface FrontendConfig {
   }
 }
 
+const isTestEnv = () => process.env.TESTING_ENV === 'true'
+
+function getEnableHMR() {
+  if (isTestEnv()) return false
+  return eval('(() => buildConfig.ENABLE_HMR)()')
+}
+
 const config: FrontendConfig = {
+  // @ts-ignore
   /* global buildConfig */ // buildConfig is hardcoded by webpack at build time
-  enableHMR: buildConfig.ENABLE_HMR,
+  // @ts-ignore
+  enableHMR: getEnableHMR(),
   pagination: {
     defaultResultsPerPage: 20,
     options: [10, 20, 50, 100, 200],
