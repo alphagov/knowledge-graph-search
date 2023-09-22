@@ -12,18 +12,14 @@ interface FrontendConfig {
   }
 }
 
-const isTestEnv = () => process.env.TESTING_ENV === 'true'
-
-function getEnableHMR() {
-  if (isTestEnv()) return false
-  return eval('(() => buildConfig.ENABLE_HMR)()')
-}
+const isTestEnv = () => typeof jest !== 'undefined'
 
 const config: FrontendConfig = {
   // @ts-ignore
+  // eslint-disable-next-line
   /* global buildConfig */ // buildConfig is hardcoded by webpack at build time
   // @ts-ignore
-  enableHMR: getEnableHMR(),
+  enableHMR: !isTestEnv() && buildConfig.ENABLE_HMR,
   pagination: {
     defaultResultsPerPage: 20,
     options: [10, 20, 50, 100, 200],

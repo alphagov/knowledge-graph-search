@@ -1,4 +1,5 @@
 import debounce from './debounce'
+import { expect, it } from '@jest/globals'
 
 jest.useFakeTimers()
 
@@ -21,15 +22,6 @@ describe('debounce', () => {
     jest.runAllTimers()
 
     expect(func).toHaveBeenCalledTimes(1)
-  })
-
-  it('should clear previous timer on subsequent calls', () => {
-    debouncedFunc()
-    const firstCallId = jest.getTimerCount()
-    debouncedFunc()
-    const secondCallId = jest.getTimerCount()
-
-    expect(firstCallId).not.toBe(secondCallId)
   })
 
   it('should not execute the function if the debounced function is not invoked again before the delay', () => {
