@@ -32,23 +32,29 @@ export const buildSqlQuery = function (
     searchParams.searchType !== SearchType.Advanced &&
     searchParams.keywordLocation !== KeywordLocation.Title
 
-  const textOccurrences = includeOccurrences
-    ? keywords.length === 1
-      ? `(
-    SELECT
-    ARRAY_LENGTH(REGEXP_EXTRACT_ALL(LOWER(${contentToSearchString}), LOWER(r'(${keywords[0]})')))
-  ) AS occurrences,`
-      : `
-  (
-    ${keywords.map(
-      (value) =>
-        `(
-          SELECT
-        ARRAY_LENGTH(REGEXP_EXTRACT_ALL(LOWER(${contentToSearchString}), LOWER(r'(${value})')))
-        ) `
-    )}
-  ) AS occurrences,`
-    : ''
+  let textOccurrences = ''
+
+  if (includeOccurrences && keywords?.length) {
+    if (keywords.length === 1) {
+      textOccurrences = `
+          (
+            SELECT
+            ARRAY_LENGTH(REGEXP_EXTRACT_ALL(LOWER(${contentToSearchString}), LOWER(r'(${keywords[0]})')))
+          ) AS occurrences,`
+    } else {
+      const mappedKeywords = keywords
+        .map(
+          (value) => `
+          (
+            SELECT
+            ARRAY_LENGTH(REGEXP_EXTRACT_ALL(LOWER(${contentToSearchString}), LOWER(r'(${value})')))
+          )`
+        )
+        .join(', ')
+
+      textOccurrences = `(${mappedKeywords}) AS occurrences,`
+    }
+  }
 
   const linkOccurrences =
     searchParams.searchType === SearchType.Link
@@ -146,6 +152,39 @@ export const buildSqlQuery = function (
       AND documentType = @documentType
     `
   }
+
+  console.log(`
+  SELECT
+    url,
+    title,
+    documentType,
+    contentId,
+    locale,
+    publishing_app,
+    first_published_at,
+    public_updated_at,
+    withdrawn_at,
+    withdrawn_explanation,
+    page_views,
+    taxons,
+    primary_organisation,
+    organisations AS all_organisations,
+    ${textOccurrences}
+    ${linkOccurrences}
+  FROM search.page
+  
+  ${publishingStatusClause}
+  ${includeClause}
+  ${excludeClause}
+  ${publishingAppClause}
+  ${localeClause}
+  ${taxonClause}
+  ${organisationClause}
+  ${linkClause}
+  ${documentTypeClause}
+  ORDER BY page_views DESC
+  LIMIT 10000
+`)
 
   return `
     SELECT
