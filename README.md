@@ -82,6 +82,42 @@ To run a single test file , use `--spec`. For instance:
 
 `cypress run --spec cypress/e2e/url.cy.ts`
 
+## Deployment
+
+### Staging Deployment
+
+Staging deployment is triggered automatically whenever a pull request is merged into the main branch.
+
+This is made possible by the deploy-staging GitHub Action.
+
+Steps:
+
+1. Create your feature/fix on a new branch.
+2. Create a PR targeting the main branch.
+3. Ensure the PR passes all the CI checks and has been approved
+4. Merge
+5. The action will deploy the changes. CloudRun revisions that have been deployed automatically start with the "main-" prefix.
+
+Manually:
+You can also trigger the workflow manually in the actions tab of the repo, by selecting the "deploy-staging" workflow.
+
+### Production Deployment
+
+Production deployments have to be triggered manually for security reasons.
+
+1. After testing the changes in the staging environment, create a PR of the main branch against the production branch.
+2. Review and approve the PR.
+3. Merge the PR.
+4. Wait for completion of the `create-release-tag` GitHub Action. It will create a new release and a tag in the GitHub repository for every production deployment.
+5. Once the release appears in the repository, manually run the production-deploy workflow. Select the `latest` tag from the `production` branch.
+6. (Optional) Write a custom description for the release in Github.
+
+### Please note:
+
+- Deployments from local machine should be limited to the development environment.
+- The deploy-staging GitHub Action will run again during the PR from main to production. This is expected and won't cause issues.
+- There may be a slight delay (usually less than a minute) before the new release appears in the repository after the create-release-tag action has completed.
+
 ## Deployment Steps
 
 1. Go to production site https://govgraphsearch.dev/ and view the source.
