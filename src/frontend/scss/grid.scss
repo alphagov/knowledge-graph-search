@@ -1,8 +1,10 @@
 .ag-theme-alpine {
   margin-bottom: 30px;
   font-family: 'GDS Transport', arial, sans-serif;
-  position: relative;
+}
 
+#grid-wrapper {
+  position: relative;
   #grid-overlay {
     position: absolute;
     top: 0;
