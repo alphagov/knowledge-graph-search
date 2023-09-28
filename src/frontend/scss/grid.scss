@@ -88,3 +88,12 @@
     }
   }
 }
+
+.ag-header-cell-moving {
+  .customHeaderLabel.sortable {
+    &::before,
+    &::after {
+      background-color: white;
+    }
+  }
+}
