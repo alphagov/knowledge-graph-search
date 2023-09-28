@@ -123,7 +123,7 @@ const createAgGrid = () => {
     cacheGridColumnState(colState)
   }
   const addOverlayElementForPaginationRefresh = () =>
-    gridDiv.appendChild(overlayElement())
+    id('grid-wrapper').appendChild(overlayElement())
 
   const onColumnMoved = () => cacheColumnState()
   const onColumnResized = debounce((event: any) => cacheColumnState(), 100)
