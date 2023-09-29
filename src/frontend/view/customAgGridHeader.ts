@@ -117,7 +117,7 @@ export default class CustomAgGridHeader {
     if (this.hasMultipleSort && this.colId in this.sortModel) {
       html = `${html} <div class="sort-index">${
         this.sortModel[this.colId].sortIndex + 1
-      })</div>`
+      }</div>`
     }
     this.eHeaderLabel.innerHTML = html
   }
