@@ -57,10 +57,10 @@ export default class CustomAgGridHeader {
       this.agParams.api.addEventListener('sortChanged', () => {
         this.updateText()
       })
-      // this.onSortChanged()
       if (this.sortingState) {
         this.agParams.setSort(this.sortingState, false)
       }
+      this.onSortChanged()
     }
   }
 
