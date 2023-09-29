@@ -95,5 +95,21 @@
     &::after {
       background-color: white;
     }
+
+    .sort-index {
+      background-color: white;
+    }
+  }
+}
+
+.customHeaderLabel.sortable {
+  position: relative;
+  .sort-index {
+    position: absolute;
+    right: 20px;
+    top: 0;
+    bottom: 0;
+    background-color: #f8f8f8;
+    z-index: 90;
   }
 }

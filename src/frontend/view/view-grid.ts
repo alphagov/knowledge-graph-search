@@ -81,6 +81,7 @@ const createAgGrid = () => {
     onPaginationChanged: function () {
       viewPagination(gridOptions)
     },
+    suppressColumnMoveAnimation: true,
     suppressDragLeaveHidesColumns: true,
     pagination: true,
     paginationPageSize: state.pagination.resultsPerPage,
