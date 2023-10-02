@@ -80,6 +80,15 @@ const view = () => {
     handleEvent({ type: EventType.Dom, id: 'toggleDisamBox' })
   )
 
+  id('csv-download-select')?.addEventListener('change', (event: Event) => {
+    const selectedValue = (event.target as HTMLSelectElement).value
+    const eventId =
+      selectedValue === 'all-results'
+        ? 'download-all-csv'
+        : 'download-current-csv'
+    handleEvent({ type: EventType.Dom, id: eventId })
+  })
+
   govukPostInitScripts()
 }
 
@@ -260,7 +269,9 @@ const viewSearchResultsTable = () => {
   }
   html.push(`<div class="govuk-body search-results-table-container">
   ${state.showFieldSet ? viewFieldSet() : ''}
-  <div id="results-grid-container" class="ag-theme-alpine"></div>
+  <div id="grid-wrapper">
+    <div id="results-grid-container" class="ag-theme-alpine"></div>
+  </div>
   <div id="pagination-container"></div>
   </div>`)
   return html.join('')
@@ -275,6 +286,19 @@ const viewWaiting = () => `
     <p class="govuk-body-s">Some queries may take up to a minute</p>
   </div>
 `
+
+const viewCSVDownload = () => {
+  return `<div class="govuk-form-group csv-select-container">
+<label class="govuk-label govuk-visually-hidden" for="csv-download-select">
+    Download data
+  </label>
+    <select class="govuk-select" id="csv-download-select" name="csv-download-select" style="width: 100%;">
+      <option value="" disabled selected >Export data (csv)</option>
+      <option value="current-results">Current results (${state.pagination.resultsPerPage})</option>
+      <option value="all-results">All results (${state.searchResults?.length})</option>
+    </select>
+  </div>`
+}
 
 const viewResults = function () {
   if (state.searchResults) {
@@ -325,6 +349,7 @@ const viewResults = function () {
         <button class="govuk-button govuk-button--secondary" id="toggle-header-options-btn">${
           state.showFieldSet ? 'Hide header options' : 'Show header options'
         }</button>
+        ${viewCSVDownload()}
       </div>
       <div class="results-container-row-2-results">
         ${
@@ -338,8 +363,6 @@ const viewResults = function () {
 
     html.push(resultsContainer)
 
-    html.push(`
-      <p class="govuk-body govuk-!-margin-top-6"><a class="govuk-link" href="/csv${window.location.search}" download="export.csv">Download all ${state.searchResults.length} records in CSV</a></p>`)
     return html.join('')
   } else {
     return ''

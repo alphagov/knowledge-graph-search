@@ -1,3 +1,5 @@
+/* eslint-disable */
+// @ts-nocheck
 import {
   KeywordLocation,
   SearchType,
@@ -11,6 +13,8 @@ import {
 } from '../utils/localStorageService'
 import { fieldFormat, fieldName } from './utils'
 import { viewPagination } from './view-pagination'
+import CustomAgGridHeader from './customAgGridHeader'
+import debounce from '../utils/debounce'
 
 const overlayElement = () => {
   const el = document.createElement('div')
@@ -49,6 +53,17 @@ const createAgGrid = () => {
     documentType: (p) => formatDocumentType(p.value),
     publishing_app: (p) => formatPublishingApp(p.value),
   }
+  const parsePageViews = (x) => (x.charAt(0) === '<' ? 0 : parseInt(x))
+
+  const sortConfig = {
+    page_views: {
+      sortable: true,
+      sort: state.sorting.page_views,
+      comparator: (a, b) => {
+        return parsePageViews(a) - parsePageViews(b)
+      },
+    },
+  }
   const columnDefs = enabledFields.map((field) => ({
     field,
     headerName: fieldName(field),
@@ -56,6 +71,8 @@ const createAgGrid = () => {
     resizable: true,
     suppressSizeToFit: ['url', 'title'].includes(field),
     width: ['url', 'title'].includes(field) ? 500 : null,
+    sortable: field !== 'contentId',
+    ...(sortConfig[field] || {}),
   }))
 
   const gridOptions = {
@@ -64,6 +81,7 @@ const createAgGrid = () => {
     onPaginationChanged: function () {
       viewPagination(gridOptions)
     },
+    suppressColumnMoveAnimation: true,
     suppressDragLeaveHidesColumns: true,
     pagination: true,
     paginationPageSize: state.pagination.resultsPerPage,
@@ -73,38 +91,60 @@ const createAgGrid = () => {
     enableCellTextSelection: true,
     alwaysShowHorizontalScroll: true,
     alwaysShowVerticalScroll: true,
+    components: {
+      agColumnHeader: CustomAgGridHeader,
+    },
   }
 
   const gridDiv = id('results-grid-container')
-  /* eslint-disable */ // @ts-ignore
+  /* eslint-disable */
   const grid = new agGrid.Grid(gridDiv, gridOptions)
 
-  const cachedColumnState = loadGridColumnStateFromCache()
-  if (cachedColumnState) {
-    // @ts-ignore
-    gridOptions.columnApi.applyColumnState({
-      state: cachedColumnState,
-      applyOrder: true,
-    })
+  const initColumnState = async (callBack) => {
+    const cachedColumnState = loadGridColumnStateFromCache()
+    if (cachedColumnState) {
+      gridOptions.columnApi.applyColumnState({
+        state: cachedColumnState,
+        applyOrder: true,
+      })
+    }
+    callBack()
+  }
+  const initGoToCurrentPage = () => {
+    // For cached pagination, we need to set the current page after the grid has been initialised
+    if (
+      state.pagination.currentPage !==
+      gridOptions.api.paginationGetCurrentPage()
+    ) {
+      gridOptions.api.paginationGoToPage(state.pagination.currentPage)
+    }
   }
 
-  // For cached pagination, we need to set the current page after the grid has been initialised
-  if (
-    // @ts-ignore
-    state.pagination.currentPage !== gridOptions.api.paginationGetCurrentPage()
-  ) {
-    // @ts-ignore
-    gridOptions.api.paginationGoToPage(state.pagination.currentPage)
-  }
-
-  // @ts-ignore
-  gridOptions.api.addEventListener('columnMoved', () => {
-    // @ts-ignore
+  const cacheColumnState = () => {
     const colState = gridOptions.columnApi.getColumnState()
     cacheGridColumnState(colState)
-  })
+  }
+  const addOverlayElementForPaginationRefresh = () =>
+    id('grid-wrapper').appendChild(overlayElement())
 
-  gridDiv.appendChild(overlayElement())
+  const onColumnMoved = () => cacheColumnState()
+  const onGridSort = () => cacheColumnState()
+  const onColumnResized = debounce((event: any) => cacheColumnState(), 100)
+  const onGridReady = () => {
+    addOverlayElementForPaginationRefresh()
+    addEventListenners()
+  }
+
+  const addEventListenners = () => {
+    // Grid event listenners
+    gridOptions.api.addEventListener('gridReady', onGridReady)
+    gridOptions.api.addEventListener('columnMoved', onColumnMoved)
+    gridOptions.api.addEventListener('columnResized', onColumnResized)
+    gridOptions.api.addEventListener('sortChanged', onGridSort)
+  }
+
+  initGoToCurrentPage()
+  initColumnState(onGridReady)
 
   return { grid, gridOptions }
 }
