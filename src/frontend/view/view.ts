@@ -363,8 +363,6 @@ const viewResults = function () {
 
     html.push(resultsContainer)
 
-    html.push(`
-      <p class="govuk-body govuk-!-margin-top-6"><a class="govuk-link" href="/csv${window.location.search}" download="export.csv">Download all ${state.searchResults.length} records in CSV</a></p>`)
     return html.join('')
   } else {
     return ''
