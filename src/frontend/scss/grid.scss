@@ -1,8 +1,10 @@
 .ag-theme-alpine {
   margin-bottom: 30px;
   font-family: 'GDS Transport', arial, sans-serif;
-  position: relative;
+}
 
+#grid-wrapper {
+  position: relative;
   #grid-overlay {
     position: absolute;
     top: 0;
@@ -84,5 +86,33 @@
       padding-left: 10px;
       background-color: #f8f8f8;
     }
+  }
+}
+
+.ag-header-cell-moving {
+  .customHeaderLabel.sortable {
+    &::before,
+    &::after {
+      background-color: white;
+    }
+
+    .sort-index {
+      background-color: white;
+    }
+  }
+}
+
+.customHeaderLabel.sortable {
+  position: relative;
+  .sort-index {
+    position: absolute;
+    right: 20px;
+    top: 3px;
+    bottom: 0;
+    background-color: #f8f8f8;
+    z-index: 90;
+    padding-left: 10px;
+    font-weight: 100;
+    font-size: 16px;
   }
 }

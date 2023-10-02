@@ -260,7 +260,9 @@ const viewSearchResultsTable = () => {
   }
   html.push(`<div class="govuk-body search-results-table-container">
   ${state.showFieldSet ? viewFieldSet() : ''}
-  <div id="results-grid-container" class="ag-theme-alpine"></div>
+  <div id="grid-wrapper">
+    <div id="results-grid-container" class="ag-theme-alpine"></div>
+  </div>
   <div id="pagination-container"></div>
   </div>`)
   return html.join('')

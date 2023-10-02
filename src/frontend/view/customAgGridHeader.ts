@@ -6,30 +6,34 @@ interface AgParams {
   displayName: string
   enableMenu: boolean
   enableSorting: boolean
+  api: any
   column: {
     isSortAscending: () => boolean
     isSortDescending: () => boolean
     addEventListener: (event: string, callback: any) => void
     removeEventListener: (event: string, callback: any) => void
     getColDef: () => any
+    getColId: () => string
   }
   setSort: (order: string, shift: boolean) => void
 }
 
 export default class CustomAgGridHeader {
-  private agParams!: AgParams
+  private agParams!: any
   private eGui!: HTMLElement
   private eHeaderLabel!: HTMLElement
   private sortingState: any
   private initialColDef: any
   private fieldName: string
   private sortable: boolean
+  private colId: string
 
   private onSortRequestedListener: (event: Event) => void
   private onSortChangedListener: (event: Event) => void
 
   init(agParams: AgParams) {
     this.agParams = agParams
+    this.colId = agParams.column.getColId()
     this.initialColDef = this.agParams.column.getColDef()
     this.fieldName = this.initialColDef.field
     this.sortable = this.initialColDef.sortable
@@ -50,19 +54,21 @@ export default class CustomAgGridHeader {
         'sortChanged',
         this.onSortChangedListener
       )
-      // this.onSortChanged()
+      this.agParams.api.addEventListener('sortChanged', () => {
+        this.updateText()
+      })
       if (this.sortingState) {
         this.agParams.setSort(this.sortingState, false)
       }
+      this.onSortChanged()
     }
   }
 
   render() {
     this.eGui.innerHTML = `
-      <div class="customHeaderLabel ${this.getSortingClass()}" role="presentation">${
-      this.agParams.displayName
-    }</div>
-        `
+      <div class="customHeaderLabel ${this.getSortingClass()}" role="presentation">
+        ${this.headerHtmlContent}
+      </div>`
   }
 
   getSortingClass() {
@@ -102,6 +108,23 @@ export default class CustomAgGridHeader {
     }
     this.updateState()
     this.updateSortingClass()
+    // this.updateText()
+  }
+
+  private get headerHtmlContent() {
+    let html = this.agParams.displayName
+
+    if (this.hasMultipleSort && this.colId in this.sortModel) {
+      html = `${html} <div class="sort-index" aria-hidden="true">${
+        this.sortModel[this.colId].sortIndex + 1
+      }</div>`
+    }
+
+    return html
+  }
+
+  updateText() {
+    this.eHeaderLabel.innerHTML = this.headerHtmlContent
   }
 
   updateState() {
@@ -118,5 +141,19 @@ export default class CustomAgGridHeader {
 
   destroy() {
     this.eHeaderLabel.removeEventListener('click', this.onSortRequestedListener)
+  }
+
+  private get sortModel() {
+    return this.agParams.columnApi
+      .getColumnState()
+      .filter((c) => c.sort !== null)
+      .reduce((acc, c) => {
+        const { colId, sortIndex, sort } = c
+        return { ...acc, [colId]: { sortIndex, sort } }
+      }, {})
+  }
+
+  private get hasMultipleSort() {
+    return Object.values(this.sortModel).length > 1
   }
 }
