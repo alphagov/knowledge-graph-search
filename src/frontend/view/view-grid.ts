@@ -108,7 +108,7 @@ const createAgGrid = () => {
         applyOrder: true,
       })
     }
-    setTimeout(callBack, 1000)
+    callBack()
   }
   const initGoToCurrentPage = () => {
     // For cached pagination, we need to set the current page after the grid has been initialised
@@ -130,16 +130,17 @@ const createAgGrid = () => {
   const onColumnMoved = () => cacheColumnState()
   const onGridSort = () => cacheColumnState()
   const onColumnResized = debounce((event: any) => cacheColumnState(), 100)
+  const onGridReady = () => {
+    addOverlayElementForPaginationRefresh()
+    addEventListenners()
+  }
+
   const addEventListenners = () => {
     // Grid event listenners
     gridOptions.api.addEventListener('gridReady', onGridReady)
     gridOptions.api.addEventListener('columnMoved', onColumnMoved)
     gridOptions.api.addEventListener('columnResized', onColumnResized)
     gridOptions.api.addEventListener('sortChanged', onGridSort)
-  }
-  const onGridReady = () => {
-    addOverlayElementForPaginationRefresh()
-    addEventListenners()
   }
 
   initGoToCurrentPage()

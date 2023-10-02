@@ -67,7 +67,7 @@ export default class CustomAgGridHeader {
   render() {
     this.eGui.innerHTML = `
       <div class="customHeaderLabel ${this.getSortingClass()}" role="presentation">
-        ${this.agParams.displayName}
+        ${this.headerHtmlContent}
       </div>`
   }
 
@@ -111,7 +111,7 @@ export default class CustomAgGridHeader {
     // this.updateText()
   }
 
-  updateText() {
+  private get headerHtmlContent() {
     let html = this.agParams.displayName
 
     if (this.hasMultipleSort && this.colId in this.sortModel) {
@@ -119,7 +119,12 @@ export default class CustomAgGridHeader {
         this.sortModel[this.colId].sortIndex + 1
       }</div>`
     }
-    this.eHeaderLabel.innerHTML = html
+
+    return html
+  }
+
+  updateText() {
+    this.eHeaderLabel.innerHTML = this.headerHtmlContent
   }
 
   updateState() {
