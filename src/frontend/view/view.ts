@@ -80,6 +80,15 @@ const view = () => {
     handleEvent({ type: EventType.Dom, id: 'toggleDisamBox' })
   )
 
+  id('csv-download-select')?.addEventListener('change', (event: Event) => {
+    const selectedValue = (event.target as HTMLSelectElement).value
+    const eventId =
+      selectedValue === 'all-results'
+        ? 'download-all-csv'
+        : 'download-current-csv'
+    handleEvent({ type: EventType.Dom, id: eventId })
+  })
+
   govukPostInitScripts()
 }
 
@@ -278,6 +287,19 @@ const viewWaiting = () => `
   </div>
 `
 
+const viewCSVDownload = () => {
+  return `<div class="govuk-form-group csv-select-container">
+<label class="govuk-label govuk-visually-hidden" for="csv-download-select">
+    Download data
+  </label>
+    <select class="govuk-select" id="csv-download-select" name="csv-download-select" style="width: 100%;">
+      <option value="" disabled selected >Export data (csv)</option>
+      <option value="current-results">Current results (${state.pagination.resultsPerPage})</option>
+      <option value="all-results">All results (${state.searchResults?.length})</option>
+    </select>
+  </div>`
+}
+
 const viewResults = function () {
   if (state.searchResults) {
     const html = []
@@ -327,6 +349,7 @@ const viewResults = function () {
         <button class="govuk-button govuk-button--secondary" id="toggle-header-options-btn">${
           state.showFieldSet ? 'Hide header options' : 'Show header options'
         }</button>
+        ${viewCSVDownload()}
       </div>
       <div class="results-container-row-2-results">
         ${
