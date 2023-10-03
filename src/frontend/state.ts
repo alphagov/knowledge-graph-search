@@ -50,47 +50,51 @@ const defaultSortingState = {
   page_views: SortAction.DESC,
 }
 
-const cachedLayout = loadLayoutStateFromCache()
-const cachedPagination = loadPaginationStateFromCache()
-let state: State = {
-  searchParams: JSON.parse(JSON.stringify(initialSearchParams)), // deep copy
-  taxons: [], // list of names of all the taxons
-  locales: [], // all the languages found in the content store
-  organisations: [], // list of names of all the organisations
-  systemErrorText: null,
-  documentTypes: [],
-  userErrors: [], // error codes due to user not entering valid search criteria
-  searchResults: null,
-  metaSearchResults: null,
-  skip: 0, // where to start the pagination (number of results)
-  pagination: {
-    resultsPerPage: config.pagination.defaultResultsPerPage, // number of results per page
-    currentPage: 1, // current page number
-  },
-  showFields: loadShowFieldsStateFromCache() || defaultShowFields, // what result columns to show
-  waiting: false, // whether we're waiting for a request to return,
-  disamboxExpanded: false, // if there's a resizeable disamb meta box, whether it's expanded or not
-  showFiltersPane: true,
-  showFieldSet: true,
-  sorting: defaultSortingState,
-}
-if (cachedLayout) {
-  const { showFiltersPane, showFieldSet } = loadLayoutStateFromCache()
-  state = {
-    ...state,
-    showFiltersPane,
-    showFieldSet,
-  }
-}
-if (cachedPagination) {
-  state = {
-    ...state,
-    pagination: cachedPagination,
-  }
-}
-
-const setState = (newState) => {
+let state: State
+const setState = (newState: State) => {
   state = newState
+}
+const initState = () => {
+  const cachedLayout = loadLayoutStateFromCache()
+  const cachedPagination = loadPaginationStateFromCache()
+  let newState: State = {
+    searchParams: JSON.parse(JSON.stringify(initialSearchParams)), // deep copy
+    taxons: [], // list of names of all the taxons
+    locales: [], // all the languages found in the content store
+    organisations: [], // list of names of all the organisations
+    systemErrorText: null,
+    documentTypes: [],
+    userErrors: [], // error codes due to user not entering valid search criteria
+    searchResults: null,
+    metaSearchResults: null,
+    skip: 0, // where to start the pagination (number of results)
+    pagination: {
+      resultsPerPage: config.pagination.defaultResultsPerPage, // number of results per page
+      currentPage: 1, // current page number
+    },
+    showFields: loadShowFieldsStateFromCache() || defaultShowFields, // what result columns to show
+    waiting: false, // whether we're waiting for a request to return,
+    disamboxExpanded: false, // if there's a resizeable disamb meta box, whether it's expanded or not
+    showFiltersPane: true,
+    showFieldSet: true,
+    sorting: defaultSortingState,
+  }
+  if (cachedLayout) {
+    const { showFiltersPane, showFieldSet } = loadLayoutStateFromCache()
+    newState = {
+      ...newState,
+      showFiltersPane,
+      showFieldSet,
+    }
+  }
+  if (cachedPagination) {
+    newState = {
+      ...newState,
+      pagination: cachedPagination,
+    }
+  }
+
+  setState(newState)
 }
 
 const setStateSearchParamsFromURL = function (): void {
@@ -214,6 +218,7 @@ const resetSearchState = function (): void {
 
 export {
   state,
+  initState,
   setState,
   setStateSearchParamsFromURL as setQueryParamsFromQS,
   searchState,
