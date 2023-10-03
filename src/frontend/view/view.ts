@@ -393,7 +393,6 @@ const viewNoResults = () => {
           searchParams: state.searchParams,
         }
       )}
-      <p>Try a different keyword or adjust your filters</p>
       ${
         newUrl
           ? `<p>Try searching for <a href="${newUrl}" class="govuk-link">any of your keywords</a>.</p>`
