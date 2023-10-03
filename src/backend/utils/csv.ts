@@ -48,7 +48,8 @@ const csvFieldFormatters: Record<string, any> = {
   },
   page_views: {
     name: 'Page views',
-    format: (val: string): string => (val ? parseInt(val).toString() : '<5'),
+    format: (val: string): string =>
+      val ? parseInt(val).toString() : 'less than 5',
   },
   withdrawn_at: {
     name: 'Withdrawn at',
