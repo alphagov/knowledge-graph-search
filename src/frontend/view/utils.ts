@@ -70,7 +70,7 @@ export const fieldFormatters: Record<Field, any> = {
   },
   page_views: {
     name: 'Views (7days)',
-    format: (val: string) => (val ? parseInt(val).toString() : '<5'),
+    format: (val: string) => (val ? parseInt(val).toString() : 'less than 5'),
   },
   withdrawn_at: {
     name: 'Withdrawn at',
