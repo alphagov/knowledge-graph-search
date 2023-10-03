@@ -397,7 +397,7 @@ const viewNoResults = () => {
       ${
         newUrl
           ? `<p>Try searching for <a href="${newUrl}" class="govuk-link">any of your keywords</a>.</p>`
-          : ''
+          : '<p>Try a different keyword or adjust your filters.</p>'
       }
       <button class="govuk-button govuk-button--secondary" id="new-search-btn">New search</button>
     </div>
