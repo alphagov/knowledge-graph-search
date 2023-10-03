@@ -1,5 +1,10 @@
 import { view } from './view/view'
-import { state, setQueryParamsFromQS, resetSearchState } from './state'
+import {
+  state,
+  setQueryParamsFromQS,
+  resetSearchState,
+  initState,
+} from './state'
 import { searchButtonClicked, handleEvent } from './events'
 import { fetchWithTimeout, queryBackend } from './search-api'
 import config from './config'
@@ -75,6 +80,7 @@ const fetchInitialData = async function () {
 //= =================================================
 
 const initWithoutHMR = async () => {
+  initState()
   await fetchInitialData()
   if (!state.systemErrorText) {
     setQueryParamsFromQS()
@@ -87,6 +93,7 @@ const initWithoutHMR = async () => {
 }
 
 const initWithHMR = async () => {
+  initState()
   const { hasStateInCache, setStateFromCache } = require('./utils/hmr')
   const stateInCache = await hasStateInCache()
   if (stateInCache) {
