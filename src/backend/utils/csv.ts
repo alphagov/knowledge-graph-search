@@ -57,7 +57,7 @@ const csvFieldFormatters: Record<string, any> = {
   },
   withdrawn_explanation: {
     name: 'Withdrawn reason',
-    format: (text: string) => text || 'n/a',
+    format: (text: string) => text || 'No data available',
   },
 }
 
