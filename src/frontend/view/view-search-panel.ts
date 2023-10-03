@@ -358,7 +358,7 @@ const viewDocumentType = () => {
 const viewTaxonSelector = () => `
     <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
       <label class="govuk-label govuk-label--s" for="search-filters-taxon">
-        Topic tags
+        Search for topic tags
       </label>
       <select ${
         state.waiting && 'disabled="disabled"'
@@ -403,7 +403,7 @@ const viewPublishingStatusSelector = () => `
 const viewLanguageSelector = () => `
     <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
       <label class="govuk-label govuk-label--s" for="search-filters-language">
-        Languages
+        Search for languages
       </label>
       <select ${
         state.waiting && 'disabled="disabled"'

@@ -10,7 +10,7 @@ import { languageName } from '../../common/utils/lang'
 import { formatDocumentType } from '../utils/formatters'
 
 const viewEnableCaseSensitive = () => `
-<div class="govuk-form-group">
+<div class="govuk-form-group side-filter-case-sensitive">
   <div class="govuk-checkboxes govuk-checkboxes--small">
     <div class="govuk-checkboxes__item">
       <input

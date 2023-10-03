@@ -1,5 +1,5 @@
 import { queryDescription } from '../utils/queryDescription'
-import { id } from '../../common/utils/utils'
+import { id, splitKeywords } from '../../common/utils/utils'
 import { state, searchState } from '../state'
 import { handleEvent } from '../events'
 import { viewMetaResults } from './view-metabox'
@@ -10,7 +10,11 @@ import { fieldName } from './utils'
 import { createAgGrid } from './view-grid'
 import { viewSideFilters } from './view-side-filters'
 import govukPostInitScripts from './postInitScripts'
-import { SearchType } from '../../common/types/search-api-types'
+import {
+  Combinator,
+  SearchType,
+  UrlParams,
+} from '../../common/types/search-api-types'
 import config from '../config'
 
 declare const window: any
@@ -370,6 +374,18 @@ const viewResults = function () {
 }
 
 const viewNoResults = () => {
+  const multipleKeywords =
+    (splitKeywords(state.searchParams.selectedWords) || []).length > 1
+  const isAllKeywordsCombinator =
+    state.searchParams.combinator === Combinator.All
+
+  let newUrl: string | null = null
+  if (multipleKeywords && isAllKeywordsCombinator) {
+    const currentUrl = new URL(window.location.href)
+    const newSearchParams = new URLSearchParams(currentUrl.search)
+    newSearchParams.set(UrlParams.Combinator, Combinator.Any)
+    newUrl = `?${newSearchParams.toString()}`
+  }
   return `
     <div class="govuk-body govuk-inset-text">
       <span class="govuk-!-font-weight-bold">No results</span> for ${queryDescription(
@@ -377,7 +393,11 @@ const viewNoResults = () => {
           searchParams: state.searchParams,
         }
       )}
-      <p>Try a different keyword or adjust your filters</p>
+      ${
+        newUrl
+          ? `<p>Try searching for <a href="${newUrl}" class="govuk-link">any of your keywords</a>.</p>`
+          : '<p>Try a different keyword or adjust your filters.</p>'
+      }
       <button class="govuk-button govuk-button--secondary" id="new-search-btn">New search</button>
     </div>
   `
