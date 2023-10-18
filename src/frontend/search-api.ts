@@ -10,7 +10,7 @@ import {
 import { defaultAllLanguagesOption, languageCode } from '../common/utils/lang'
 import { EventType, SearchApiCallback } from './types/event-types'
 
-const makeQueryString = function (searchParams: SearchParams): string {
+const makeURLfromSearchParams = function (searchParams: SearchParams): string {
   const usp = new URLSearchParams()
   if (searchParams.searchType !== SearchType.Keyword)
     usp.set(UrlParams.SearchType, searchParams.searchType)
@@ -86,7 +86,7 @@ const queryBackend: (
   callback({ type: EventType.SearchRunning })
   searchParams.selectedWords = searchParams.selectedWords.replace(/[“”]/g, '"')
   searchParams.excludedWords = searchParams.excludedWords.replace(/[“”]/g, '"')
-  const url = `/search?${makeQueryString(searchParams)}`
+  const url = `/search?${makeURLfromSearchParams(searchParams)}`
 
   let apiResults: SearchResults
   try {
@@ -171,4 +171,8 @@ const buildMetaboxInfo = async function (info: any) {
   }
 }
 
-export { makeQueryString, fetchWithTimeout, queryBackend }
+export {
+  makeURLfromSearchParams as makeQueryString,
+  fetchWithTimeout,
+  queryBackend,
+}

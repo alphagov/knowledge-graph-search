@@ -8,7 +8,7 @@ export const formatNames = (array: []) =>
 export const formatDateTime = (date: any) =>
   date?.value
     ? `${date.value.slice(0, 10)} at ${date.value.slice(11, 16)}`
-    : 'n/a'
+    : 'No data available'
 
 const splitKeywords = function (keywords: string): string[] {
   const wordsToIgnore = ['of', 'for', 'the', 'or', 'and']
@@ -70,7 +70,7 @@ export const fieldFormatters: Record<Field, any> = {
   },
   page_views: {
     name: 'Views (7days)',
-    format: (val: string) => (val ? parseInt(val).toString() : '<5'),
+    format: (val: string) => (val ? parseInt(val).toString() : 'less than 5'),
   },
   withdrawn_at: {
     name: 'Withdrawn at',
@@ -78,7 +78,7 @@ export const fieldFormatters: Record<Field, any> = {
   },
   withdrawn_explanation: {
     name: 'Withdrawn reason',
-    format: (text: string) => text || 'n/a',
+    format: (text: string) => text || 'No data available',
   },
   occurrences: {
     name: 'Occurrences',

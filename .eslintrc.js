@@ -20,6 +20,7 @@ module.exports = {
   plugins: ['@typescript-eslint', 'import', 'cypress', 'jest'],
   rules: {
     // Add custom rules here
+    '@typescript-eslint/ban-ts-comment': 'off',
     'no-eval': 'off',
     'import/no-unresolved': 'error',
     'no-unused-vars': 'off',

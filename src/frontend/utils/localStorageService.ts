@@ -6,7 +6,7 @@ const GRID_COLUMN_KEY = 'state.gridColumnState'
 const PAGINATION_KEY = 'state.pagination'
 
 export class LocalStorageService {
-  static saveItem = (key, value, description = '') => {
+  static saveItem = (key: string, value: any, description = '') => {
     try {
       localStorage.setItem(key, JSON.stringify(value))
     } catch (error) {
@@ -17,7 +17,7 @@ export class LocalStorageService {
     }
   }
 
-  static loadItem = (key, description = '') => {
+  static loadItem = (key: string, description = '') => {
     try {
       const data = localStorage.getItem(key)
       return data ? JSON.parse(data) : null
