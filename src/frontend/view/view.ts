@@ -98,10 +98,13 @@ const view = () => {
   govukPostInitScripts()
 }
 
-const isTabSelected = (tab: SearchType) => state.searchParams.searchType === tab ? 'true' : 'false'
-const isTabClassSelected = (tab: SearchType) => state.searchParams.searchType === tab ? 'govuk-tabs__list-item--selected' : ''
+const isTabSelected = (tab: SearchType) =>
+  state.searchParams.searchType === tab ? 'true' : 'false'
+const isTabClassSelected = (tab: SearchType) =>
+  state.searchParams.searchType === tab ? 'govuk-tabs__list-item--selected' : ''
 
-const tabs = [{
+const tabs = [
+  {
     id: 'search-keywords',
     label: 'Keywords',
     searchType: SearchType.Keyword,
@@ -130,14 +133,18 @@ const tabs = [{
     id: 'search-adv',
     label: 'Advanced',
     searchType: SearchType.Advanced,
-  }]
-
+  },
+]
 
 const viewSearchTypeSelector = () => `
   <span class="govuk-tabs__title">Search for</span>
   <ul class="govuk-tabs__list" role="tablist">
-    ${tabs.map((tab, index) =>
-        `<li role="presentation" class="govuk-tabs__list-item ${isTabClassSelected(tab.searchType)}">
+    ${tabs
+      .map(
+        (tab) =>
+          `<li role="presentation" class="govuk-tabs__list-item ${isTabClassSelected(
+            tab.searchType
+          )}">
           <a class="govuk-tabs__tab"
             href="#${tab.id}"
             id="${tab.id}"
@@ -153,9 +160,13 @@ const viewSearchTypeSelector = () => `
 
 const viewMainLayout = () => {
   const result = []
-  const tabpanel = tabs.find(tab => tab.searchType === state.searchParams.searchType).id
+  const tabpanel = tabs.find(
+    (tab) => tab.searchType === state.searchParams.searchType
+  ).id
 
-  result.push(`<div class="govuk-tabs__panel govuk-!-padding-top-4" id="tab-${tabpanel}" role="tabpanel" aria-labelledby="${tabpanel}">`)
+  result.push(
+    `<div class="govuk-tabs__panel govuk-!-padding-top-4" id="tab-${tabpanel}" role="tabpanel" aria-labelledby="${tabpanel}">`
+  )
 
   if (state.searchParams.searchType === 'advanced') {
     if (!state.searchResults) {
