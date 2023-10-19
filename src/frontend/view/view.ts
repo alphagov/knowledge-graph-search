@@ -31,14 +31,16 @@ const view = () => {
     state.systemErrorText
       ? (pageContent.innerHTML = `${viewDataBaseError()}`)
       : (pageContent.innerHTML = `
-      <div class="govuk-main-wrapper" id="main-content">
-      ${viewErrorBanner()}
-      ${viewSearchTypeSelector()}
-      ${viewMainLayout()}
-      <div class="govuk-inset-text">
-        Searches do not include history mode content, GitHub smart answers or service domains.
-        Page views depend on cookie consent. Data can be up to 24 hours delayed.
-      </div>
+      <div class="govuk-main-wrapper govuk-!-padding-top-0" id="main-content">
+        ${viewErrorBanner()}
+        <div class="govuk-tabs" data-module="govuk-tabs" id="govuk-tabs">
+          ${viewSearchTypeSelector()}
+          ${viewMainLayout()}
+        </div>
+        <div class="govuk-inset-text">
+          Searches do not include history mode content, GitHub smart answers or service domains.
+          Page views depend on cookie consent. Data can be up to 24 hours delayed.
+        </div>
       </div>`)
   }
 
@@ -96,69 +98,65 @@ const view = () => {
   govukPostInitScripts()
 }
 
+const isTabSelected = (tab: SearchType) => state.searchParams.searchType === tab ? 'true' : 'false'
+const isTabClassSelected = (tab: SearchType) => state.searchParams.searchType === tab ? 'govuk-tabs__list-item--selected' : ''
+
+const tabs = [{
+    id: 'search-keywords',
+    label: 'Keywords',
+    searchType: SearchType.Keyword,
+  },
+  {
+    id: 'search-links',
+    label: 'Links',
+    searchType: SearchType.Link,
+  },
+  {
+    id: 'search-orgs',
+    label: 'Organisations',
+    searchType: SearchType.Organisation,
+  },
+  {
+    id: 'search-taxons',
+    label: 'Topic tags',
+    searchType: SearchType.Taxon,
+  },
+  {
+    id: 'search-langs',
+    label: 'Languages',
+    searchType: SearchType.Language,
+  },
+  {
+    id: 'search-adv',
+    label: 'Advanced',
+    searchType: SearchType.Advanced,
+  }]
+
+
 const viewSearchTypeSelector = () => `
-  <div class="govuk-tabs" data-module="govuk-tabs">
   <span class="govuk-tabs__title">Search for</span>
-  <ul class="govuk-tabs__list">
-    <li class="govuk-tabs__list-item ${
-      state.searchParams.searchType === SearchType.Keyword
-        ? 'govuk-tabs__list-item--selected'
-        : ''
-    }">
-      <a class="govuk-tabs__tab" href="#search-keywords" id="search-keywords">
-      Keywords
-      </a>
-    </li>
-    <li class="govuk-tabs__list-item ${
-      state.searchParams.searchType === SearchType.Link
-        ? 'govuk-tabs__list-item--selected'
-        : ''
-    }">
-      <a class="govuk-tabs__tab" href="#search-links" id="search-links">
-      Links
-      </a>
-    </li>
-    <li class="govuk-tabs__list-item ${
-      state.searchParams.searchType === SearchType.Organisation
-        ? 'govuk-tabs__list-item--selected'
-        : ''
-    }">
-      <a class="govuk-tabs__tab" href="#search-orgs" id="search-orgs">
-      Organisations
-      </a>
-    </li>
-    <li class="govuk-tabs__list-item ${
-      state.searchParams.searchType === SearchType.Taxon
-        ? 'govuk-tabs__list-item--selected'
-        : ''
-    }">
-      <a class="govuk-tabs__tab" href="#search-taxons" id="search-taxons">
-      Topic tags
-      </a>
-    </li>
-    <li class="govuk-tabs__list-item ${
-      state.searchParams.searchType === 'language'
-        ? 'govuk-tabs__list-item--selected'
-        : ''
-    }">
-      <a class="govuk-tabs__tab" href="#search-langs" id="search-langs">
-      Languages
-      </a>
-    </li>
-    <li class="govuk-tabs__list-item ${
-      state.searchParams.searchType === SearchType.Advanced
-        ? 'govuk-tabs__list-item--selected'
-        : ''
-    }">
-      <a class="govuk-tabs__tab" href="#search-adv" id="search-adv">
-      Advanced
-      </a>
-    </li>
-  </ul>
-</div>`
+  <ul class="govuk-tabs__list" role="tablist">
+    ${tabs.map((tab, index) =>
+        `<li role="presentation" class="govuk-tabs__list-item ${isTabClassSelected(tab.searchType)}">
+          <a class="govuk-tabs__tab"
+            href="#${tab.id}"
+            id="${tab.id}"
+            role="tab"
+            aria-controls="tab-${tab.id}"
+            aria-selected="${isTabSelected(tab.searchType)}">
+            ${tab.label}
+          </a>
+        </li>`
+      )
+      .join('')}
+  </ul>`
 
 const viewMainLayout = () => {
   const result = []
+  const tabpanel = tabs.find(tab => tab.searchType === state.searchParams.searchType).id
+
+  result.push(`<div class="govuk-tabs__panel govuk-!-padding-top-4" id="tab-${tabpanel}" role="tabpanel" aria-labelledby="${tabpanel}">`)
+
   if (state.searchParams.searchType === 'advanced') {
     if (!state.searchResults) {
       result.push(`
@@ -181,6 +179,7 @@ const viewMainLayout = () => {
       ${viewSearchResults()}
     `)
   }
+  result.push(`</div>`)
   return result.join('')
 }
 
@@ -240,11 +239,14 @@ const viewSearchResultsTable = () => {
     const excludeList = ['hyperlinks']
 
     return `
-    <div class="govuk-fieldset header-options-container" ${
+    <div class="govuk-form-group header-options-container" ${
       state.waiting && 'disabled="disabled"'
     }>
+    <fieldset class="govuk-fieldset">
       <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-        Customise table headers
+        <h1 class="govuk-fieldset__heading">
+          Customise table headers
+        </h1>
       </legend>
       <p class="govuk-body">
         <a class="govuk-link" id="clear-all-headers" href="javascript:void(0)">Clear all headers</a>
@@ -268,7 +270,8 @@ const viewSearchResultsTable = () => {
         )
         .join('')}
       </div>
-    </div>
+    </fieldset>
+  </div>
   `
   }
   html.push(`<div class="govuk-body search-results-table-container">
