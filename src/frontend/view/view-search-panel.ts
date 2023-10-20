@@ -32,7 +32,6 @@ const viewSearchPanel = () => {
 const viewKeywordSearchPanel = () => `
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
-          <a class="govuk-skip-link" href="#results-table">Skip to results</a>
           ${viewKeywordsInput()}
           ${
             state.searchResults
@@ -101,7 +100,6 @@ export const viewAdvancedSearchPanel = (onTheSide = true) => {
 const viewLinkSearchPanel = () => `
     <form id="search-form" class="search-panel govuk-form">
       <div class="search-mode-panel">
-        <a class="govuk-skip-link" href="#results-table">Skip to results</a>
         ${viewMainLinkSearch()}
         ${
           state.searchResults
@@ -136,7 +134,6 @@ const viewLinkSearchPanel = () => `
 const viewTaxonSearchPanel = () => `
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
-          <a class="govuk-skip-link" href="#results-table">Skip to results</a>
           ${viewTaxonSelector()}
           ${
             state.searchResults
@@ -170,7 +167,6 @@ const viewTaxonSearchPanel = () => `
 const viewLanguageSearchPanel = () => `
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
-          <a class="govuk-skip-link" href="#results-table">Skip to results</a>
           ${viewLanguageSelector()}
           ${
             state.searchResults
@@ -204,7 +200,6 @@ const viewLanguageSearchPanel = () => `
 const viewOrganisationSearchPanel = () => `
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
-          <a class="govuk-skip-link" href="#results-table">Skip to results</a>
           ${viewPublishingOrgSelector()}
           ${
             state.searchResults
