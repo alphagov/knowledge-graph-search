@@ -29,7 +29,6 @@ export const buildSqlQuery = function (
   const includeOccurrences =
     searchParams.searchType !== SearchType.Link &&
     searchParams.searchType !== SearchType.Language &&
-    searchParams.searchType !== SearchType.Advanced &&
     searchParams.keywordLocation !== KeywordLocation.Title
 
   let textOccurrences = ''
@@ -39,7 +38,7 @@ export const buildSqlQuery = function (
       textOccurrences = `
           (
             SELECT
-            ARRAY_LENGTH(REGEXP_EXTRACT_ALL(LOWER(${contentToSearchString}), LOWER(r'(${keywords[0]})')))
+            ARRAY_LENGTH(REGEXP_EXTRACT_ALL(LOWER(${contentToSearchString}), LOWER(r'(${keywords[0].replace(/'/g, "\\'")})')))
           ) AS occurrences,`
     } else {
       const mappedKeywords = keywords
@@ -172,7 +171,7 @@ export const buildSqlQuery = function (
     ${textOccurrences}
     ${linkOccurrences}
   FROM search.page
-  
+
   ${publishingStatusClause}
   ${includeClause}
   ${excludeClause}
@@ -205,7 +204,7 @@ export const buildSqlQuery = function (
       ${textOccurrences}
       ${linkOccurrences}
     FROM search.page
-    
+
     ${publishingStatusClause}
     ${includeClause}
     ${excludeClause}
