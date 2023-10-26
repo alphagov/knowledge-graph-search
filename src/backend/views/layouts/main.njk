@@ -68,7 +68,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 {% block main %}
   <div class="govuk-width-container {{ containerClasses }}">
     {% block beforeContent %}{% endblock %}
-    <main class="govuk-main-wrapper {{ mainClasses }}" id="main-content" role="main"{% if mainLang %} lang="{{ mainLang }}"{% endif %}>
+    <main class="govuk-main-wrapper {{ mainClasses }}" role="main"{% if mainLang %} lang="{{ mainLang }}"{% endif %}>
       {% if hideFeedbackSurvey === true %}
       {% include "../partials/phaseBanner.njk" %}
       {% else %}
