@@ -38,7 +38,10 @@ export const buildSqlQuery = function (
       textOccurrences = `
           (
             SELECT
-            ARRAY_LENGTH(REGEXP_EXTRACT_ALL(LOWER(${contentToSearchString}), LOWER(r'(${keywords[0].replace(/'/g, "\\'")})')))
+            ARRAY_LENGTH(REGEXP_EXTRACT_ALL(LOWER(${contentToSearchString}), LOWER(r'(${keywords[0].replace(
+        /'/g,
+        "\\'"
+      )})')))
           ) AS occurrences,`
     } else {
       const mappedKeywords = keywords
