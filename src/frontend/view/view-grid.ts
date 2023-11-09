@@ -30,7 +30,6 @@ const createAgGrid = () => {
 
   const excludeOccurrences =
     state.searchParams.searchType === SearchType.Language ||
-    state.searchParams.searchType === SearchType.Advanced ||
     state.searchParams.keywordLocation === KeywordLocation.Title
 
   const excludedFields = [excludeOccurrences ? 'occurrences' : '']
