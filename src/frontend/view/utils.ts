@@ -98,3 +98,11 @@ export const fieldFormat = function (
   const f = fieldFormatters[key]
   return f && f.format ? f.format(val) : val
 }
+
+export const dispatchCustomEvent = (name: string, data: any) => {
+  const prefix = 'custom-'
+  const eventName = `${prefix}${name}`
+  const event = new CustomEvent(eventName, { detail: data })
+
+  window.dispatchEvent(event)
+}
