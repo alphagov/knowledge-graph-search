@@ -8,6 +8,13 @@ describe('[Function] splitKeywords', () => {
     const result = splitKeywords(searchString)
     expect(result).toEqual(expected)
   })
+  it('should handle the empty string', () => {
+    const searchString: string = ''
+    const expected: string[] = []
+
+    const result = splitKeywords(searchString)
+    expect(result).toEqual(expected)
+  })
   it('should handle quoted strings', () => {
     const searchString = '"test1 test2" test3'
     const expected = ['test1 test2', 'test3']
