@@ -181,10 +181,14 @@ const searchState = function (): { code: string; errors: string[] } {
   if (
     state.searchParams.selectedWords === '' &&
     state.searchParams.excludedWords === '' &&
+    (state.searchParams.language === '' ||
+      state.searchParams.language === defaultAllLanguagesOption) &&
     state.searchParams.taxon === '' &&
     state.searchParams.publishingOrganisation === '' &&
-    state.searchParams.language === '' &&
-    state.searchParams.linkSearchUrl === ''
+    state.searchParams.linkSearchUrl === '' &&
+    state.searchParams.documentType === '' &&
+    state.searchParams.publishingApplication === PublishingApplication.Any &&
+    state.searchParams.publishingStatus === PublishingStatus.All
   ) {
     return { code: 'initial', errors }
   }

@@ -9,7 +9,7 @@ describe('[Function] splitKeywords', () => {
     expect(result).toEqual(expected)
   })
   it('should handle the empty string', () => {
-    const searchString: string = ''
+    const searchString = ''
     const expected: string[] = []
 
     const result = splitKeywords(searchString)
