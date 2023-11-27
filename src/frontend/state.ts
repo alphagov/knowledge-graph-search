@@ -165,6 +165,21 @@ const setStateSearchParamsFromURL = function (): void {
   )
 }
 
+const searchStateIsUnset = function (): boolean {
+  return (
+    state.searchParams.selectedWords === '' &&
+    state.searchParams.excludedWords === '' &&
+    (state.searchParams.language === '' ||
+      state.searchParams.language === defaultAllLanguagesOption) &&
+    state.searchParams.taxon === '' &&
+    state.searchParams.publishingOrganisation === '' &&
+    state.searchParams.linkSearchUrl === '' &&
+    state.searchParams.documentType === '' &&
+    state.searchParams.publishingApplication === PublishingApplication.Any &&
+    state.searchParams.publishingStatus === PublishingStatus.All
+  )
+}
+
 const searchState = function (): { code: string; errors: string[] } {
   // Find out what to display depending on state
   // returns an object with a "code" field
@@ -178,18 +193,7 @@ const searchState = function (): { code: string; errors: string[] } {
 
   if (state.waiting) return { code: 'waiting', errors }
 
-  if (
-    state.searchParams.selectedWords === '' &&
-    state.searchParams.excludedWords === '' &&
-    (state.searchParams.language === '' ||
-      state.searchParams.language === defaultAllLanguagesOption) &&
-    state.searchParams.taxon === '' &&
-    state.searchParams.publishingOrganisation === '' &&
-    state.searchParams.linkSearchUrl === '' &&
-    state.searchParams.documentType === '' &&
-    state.searchParams.publishingApplication === PublishingApplication.Any &&
-    state.searchParams.publishingStatus === PublishingStatus.All
-  ) {
+  if (searchStateIsUnset()) {
     return { code: 'initial', errors }
   }
 
