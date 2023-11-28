@@ -74,8 +74,7 @@ const view = () => {
     event.preventDefault()
     // Tell GTM the form was submitted
     window.dataLayer = window.dataLayer || []
-    window.dataLayer.push({
-      event: 'formSubmission',
+    dispatchCustomGAEvent('formSubmission', {
       formType: 'Search',
       formPosition: 'Page',
     })

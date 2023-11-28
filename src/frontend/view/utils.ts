@@ -100,14 +100,11 @@ export const fieldFormat = function (
 }
 
 export const dispatchCustomGAEvent = (name: string, detail: any = {}) => {
-  const prefix = 'custom-'
-  const eventName = `${prefix}${name}`
-
   // @ts-ignore
   if (window.dataLayer) {
     // @ts-ignore
     window.dataLayer.push({
-      event: eventName,
+      event: name,
       ...detail,
     })
   }
