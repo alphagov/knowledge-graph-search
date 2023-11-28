@@ -6,7 +6,7 @@ import { viewMetaResults } from './view-metabox'
 import { viewAdvancedSearchPanel, viewSearchPanel } from './view-search-panel'
 import { EventType } from '../types/event-types'
 import { USER_ERRORS } from '../enums/constants'
-import { dispatchCustomEvent, fieldName } from './utils'
+import { dispatchCustomGAEvent, fieldName } from './utils'
 import { createAgGrid } from './view-grid'
 import { viewSideFilters } from './view-side-filters'
 import govukPostInitScripts from './postInitScripts'
@@ -92,7 +92,7 @@ const view = () => {
       selectedValue === 'all-results'
         ? 'download-all-csv'
         : 'download-current-csv'
-    dispatchCustomEvent(eventId, {})
+    dispatchCustomGAEvent(eventId, {})
     handleEvent({ type: EventType.Dom, id: eventId })
   })
 
