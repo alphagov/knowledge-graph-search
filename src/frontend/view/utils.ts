@@ -99,10 +99,13 @@ export const fieldFormat = function (
   return f && f.format ? f.format(val) : val
 }
 
-export const dispatchCustomEvent = (name: string, data: any) => {
-  const prefix = 'custom-'
-  const eventName = `${prefix}${name}`
-  const event = new CustomEvent(eventName, { detail: data })
-
-  window.dispatchEvent(event)
+export const dispatchCustomGAEvent = (name: string, detail: any = {}) => {
+  // @ts-ignore
+  if (window.dataLayer) {
+    // @ts-ignore
+    window.dataLayer.push({
+      event: name,
+      ...detail,
+    })
+  }
 }

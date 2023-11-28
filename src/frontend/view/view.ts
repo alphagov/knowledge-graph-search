@@ -6,7 +6,7 @@ import { viewMetaResults } from './view-metabox'
 import { viewAdvancedSearchPanel, viewSearchPanel } from './view-search-panel'
 import { EventType } from '../types/event-types'
 import { USER_ERRORS } from '../enums/constants'
-import { dispatchCustomEvent, fieldName } from './utils'
+import { dispatchCustomGAEvent, fieldName } from './utils'
 import { createAgGrid } from './view-grid'
 import { viewSideFilters } from './view-side-filters'
 import govukPostInitScripts from './postInitScripts'
@@ -74,8 +74,7 @@ const view = () => {
     event.preventDefault()
     // Tell GTM the form was submitted
     window.dataLayer = window.dataLayer || []
-    window.dataLayer.push({
-      event: 'formSubmission',
+    dispatchCustomGAEvent('formSubmission', {
       formType: 'Search',
       formPosition: 'Page',
     })
@@ -92,7 +91,7 @@ const view = () => {
       selectedValue === 'all-results'
         ? 'download-all-csv'
         : 'download-current-csv'
-    dispatchCustomEvent(eventId, {})
+    dispatchCustomGAEvent(eventId, {})
     handleEvent({ type: EventType.Dom, id: eventId })
   })
 
