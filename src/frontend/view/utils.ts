@@ -109,3 +109,16 @@ export const dispatchCustomGAEvent = (name: string, detail: any = {}) => {
     })
   }
 }
+
+export const sortOrder = function (key: string) {
+  const sortOrderFormatters: Record<string, any> = {
+    asc: {
+      name: 'ascending',
+    },
+    desc: {
+      name: 'descending',
+    },
+  }
+  const s = sortOrderFormatters[key]
+  return s ? s.name : key
+}

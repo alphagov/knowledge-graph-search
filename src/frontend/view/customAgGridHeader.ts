@@ -1,5 +1,6 @@
 import { state } from '../state'
 import { SortAction } from '../types/state-types'
+import { sortDescription } from '../utils/queryDescription'
 
 interface AgParams {
   menuIcon: string
@@ -108,7 +109,11 @@ export default class CustomAgGridHeader {
     }
     this.updateState()
     this.updateSortingClass()
-    // this.updateText()
+
+    // Ideally we'd update the query description via handleEvent(), but doing so
+    // creates an infinite loop. Instead, we update the element directly.
+    const description = document.getElementById('sort-description')
+    description.textContent = sortDescription(this.sortModel)
   }
 
   private get headerHtmlContent() {
