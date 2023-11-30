@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import SignonController from '../controllers/signon.controller'
 import SearchController from '../controllers/search.controller'
 import SearchAPIController from '../controllers/searchAPI.controller'
 import InfoBoxController from '../controllers/infoBox.controller'
@@ -10,6 +11,7 @@ import { auth } from '../middleware/auth'
 
 class IndexRoute implements Routes {
   public router = Router()
+  public signonController = new SignonController()
   public searchController = new SearchController()
   public searchAPIController = new SearchAPIController()
   public infoBoxController = new InfoBoxController()
@@ -22,6 +24,8 @@ class IndexRoute implements Routes {
   }
 
   private initializeRoutes() {
+    this.router.get(Route.signon, auth(), this.signonController.signon)
+
     this.router.get(Route.search, auth(), this.searchController.search)
 
     this.router.get(

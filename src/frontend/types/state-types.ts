@@ -1,5 +1,6 @@
 import { SearchParams } from '../../common/types/search-api-types'
 import { CSVDownloadType } from '../state'
+import { SignonProfileData } from '../../backend/constants/types'
 
 export type Field =
   | 'url'
@@ -52,4 +53,5 @@ export interface State {
   sorting: Partial<Record<Field, SortAction>>
   CSVDownloadType: CSVDownloadType
   phoneNumberError: boolean | null
+  signonProfileData?: SignonProfileData
 }

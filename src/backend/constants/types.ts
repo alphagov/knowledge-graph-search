@@ -12,3 +12,9 @@ export type SignonProfileData = {
     organisation_content_id: string
   }
 }
+
+export type SignonProfile = {
+  accessToken: string
+  profileData: SignonProfileData
+  refreshToken: string
+}
