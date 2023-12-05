@@ -27,16 +27,23 @@ const prefix = (keywords?: string[]) => `
     organisations AS all_organisations,
     ${
       keywords?.length
-        ? `(
-    (
-    SELECT
-    ARRAY_LENGTH(REGEXP_EXTRACT_ALL(LOWER(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, "")), LOWER(r'(${keywords[0]})')))
-    ),
-    (
-    SELECT
-    ARRAY_LENGTH(REGEXP_EXTRACT_ALL(LOWER(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, "")), LOWER(r'(${keywords[1]})')))
-    )) AS occurrences,`
-        : ''
+        ? `[
+             STRUCT(
+               @keyword0 AS keyword,
+               DIV(
+                 (SELECT (LENGTH(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, "")) - LENGTH(REPLACE(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @keyword0, '')))),
+                 LENGTH(@keyword0)
+               ) AS occurrences
+             ), STRUCT(
+               @keyword1 AS keyword,
+               DIV(
+                 (SELECT (LENGTH(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, "")) - LENGTH(REPLACE(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @keyword1, '')))),
+                 LENGTH(@keyword1)
+               ) AS occurrences
+             )
+           ] AS occurrences,`
+        : `[
+           ] AS occurrences,`
     }
     FROM search.pageWHERE TRUE`
 
@@ -86,11 +93,11 @@ describe('buildSqlQuery', () => {
   })
 
   it('has include clause if keywords are provided', () => {
-    const searchParams: SearchParams = makeParams()
+    const searchParams: SearchParams = makeParams({ caseSensitive: true })
     const keywords: string[] = ['test1', 'test2']
     const excludedKeywords: string[] = []
     const query = buildSqlQuery(searchParams, keywords, excludedKeywords)
-    const expectedClauses = `\nAND (CONTAINS_SUBSTR(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @keyword0) OR CONTAINS_SUBSTR(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @keyword1))`
+    const expectedClauses = `\nAND (STRPOS(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @keyword0) <> 0 OR STRPOS(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @keyword1) <> 0)`
     const expected = expectedQuery(expectedClauses, keywords)
     expect(queryFmt(query)).toEqual(queryFmt(expected))
   })
@@ -227,7 +234,7 @@ describe('buildSqlQuery', () => {
     expect(queryFmt(query)).toEqual(queryFmt(expected))
   })
 
-  it('can mix all the clauses togetuer', () => {
+  it('can mix all the clauses together', () => {
     const searchParams: SearchParams = makeParams({
       caseSensitive: true,
       publishingApplication: 'whitehall',

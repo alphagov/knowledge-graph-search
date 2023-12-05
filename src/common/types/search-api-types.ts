@@ -174,3 +174,8 @@ export type InitResults = {
   organisations: string[]
   documentTypes: string[]
 }
+
+export type Occurrence = {
+  keyword: string[]
+  occurrences: number[]
+}
