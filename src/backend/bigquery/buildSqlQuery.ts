@@ -27,19 +27,15 @@ export const buildSqlQuery = function (
   const contentToSearchString = contentToSearch.join(' || " " || ')
 
   const includeOccurrences =
-    searchParams.searchType !== SearchType.Link &&
     searchParams.searchType !== SearchType.Language &&
     searchParams.keywordLocation !== KeywordLocation.Title
 
-  let textOccurrences = ''
-
+  let occurrences = ''
   if (includeOccurrences) {
     // For counting occurences of substrings, see https://stackoverflow.com/a/2906296/937932
-    textOccurrences = `[
-         ${[...Array(keywords.length).keys()]
-           .map(
-             (index) =>
-               `STRUCT(
+    const textOccurrences = [...Array(keywords.length).keys()].map(
+      (index) =>
+        `STRUCT(
                  @keyword${index} AS keyword,
                 ${
                   searchParams.caseSensitive
@@ -53,18 +49,21 @@ export const buildSqlQuery = function (
                        ) AS occurrences`
                 }
                )`
-           )
-           .join(', ')}
-       ] AS occurrences,`
-  }
+    )
 
-  const linkOccurrences =
-    searchParams.searchType === SearchType.Link
-      ? `(
-        SELECT
-        COUNT(1) FROM UNNEST(hyperlinks) as hyperlink WHERE CONTAINS_SUBSTR(hyperlink.link_url, @link)
-      ) AS occurrences,`
-      : ''
+    const linkOccurrences =
+      searchParams.linkSearchUrl === ''
+        ? []
+        : [
+            `STRUCT(
+          @link AS keyword,
+          (SELECT COUNT(1) FROM UNNEST(hyperlinks) as hyperlink WHERE CONTAINS_SUBSTR(hyperlink.link_url, @link)) AS occurrences)`,
+          ]
+
+    occurrences = `[${[...textOccurrences, ...linkOccurrences].join(
+      ', '
+    )}] AS occurrences,`
+  }
 
   const includeClause =
     keywords.length === 0
@@ -171,8 +170,7 @@ export const buildSqlQuery = function (
     taxons,
     primary_organisation,
     organisations AS all_organisations,
-    ${textOccurrences}
-    ${linkOccurrences}
+    ${occurrences}
   FROM search.page
 
   ${publishingStatusClause}
@@ -204,8 +202,7 @@ export const buildSqlQuery = function (
       taxons,
       primary_organisation,
       organisations AS all_organisations,
-      ${textOccurrences}
-      ${linkOccurrences}
+      ${occurrences}
     FROM search.page
 
     ${publishingStatusClause}
