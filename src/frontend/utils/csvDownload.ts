@@ -38,7 +38,6 @@ export const convertToCSV = (data: { [key: string]: string | DateValue }[]) => {
           return ''
         }
         if (typeof value === 'object') {
-          console.log(value)
           value = (value as DateValue)?.value || value.toString()
         }
         return '"' + value.toString().replace(/"/g, '""') + '"'

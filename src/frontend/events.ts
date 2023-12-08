@@ -287,21 +287,8 @@ const searchButtonClicked = async function (): Promise<void> {
   const searchStatus = searchState()
   switch (searchStatus.code) {
     case 'ready-to-search':
-      if (
-        state.searchParams.selectedWords !== '' ||
-        (state.searchParams.language !== '' &&
-          state.searchParams.language !== defaultAllLanguagesOption) ||
-        state.searchParams.taxon !== '' ||
-        state.searchParams.publishingOrganisation !== '' ||
-        state.searchParams.linkSearchUrl !== '' ||
-        state.searchParams.documentType !== '' ||
-        state.searchParams.publishingApplication !==
-          PublishingApplication.Any ||
-        state.searchParams.publishingStatus !== PublishingStatus.All
-      ) {
-        state.waiting = true
-        queryBackend(state.searchParams, handleEvent)
-      }
+      state.waiting = true
+      queryBackend(state.searchParams, handleEvent)
       break
     case 'error':
       state.userErrors = searchStatus.errors

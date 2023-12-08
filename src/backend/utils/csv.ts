@@ -59,6 +59,7 @@ const csvFieldFormatters: Record<string, any> = {
     name: 'Withdrawn reason',
     format: (text: string) => text || 'No data available',
   },
+  occurrences: { name: 'Occurrences' },
 }
 
 // generate a human-readable string depending on the type of field

@@ -6,7 +6,7 @@ import { viewMetaResults } from './view-metabox'
 import { viewAdvancedSearchPanel, viewSearchPanel } from './view-search-panel'
 import { EventType } from '../types/event-types'
 import { USER_ERRORS } from '../enums/constants'
-import { fieldName } from './utils'
+import { dispatchCustomGAEvent, fieldName } from './utils'
 import { createAgGrid } from './view-grid'
 import { viewSideFilters } from './view-side-filters'
 import govukPostInitScripts from './postInitScripts'
@@ -38,7 +38,7 @@ const view = () => {
           ${viewMainLayout()}
         </div>
         <div class="govuk-inset-text">
-          Searches do not include history mode content, GitHub smart answers or service domains.
+          Searches do not include GitHub smart answers or service domains.
           Page views depend on cookie consent. Data can be up to 24 hours delayed.
         </div>
       </div>`)
@@ -74,8 +74,7 @@ const view = () => {
     event.preventDefault()
     // Tell GTM the form was submitted
     window.dataLayer = window.dataLayer || []
-    window.dataLayer.push({
-      event: 'formSubmission',
+    dispatchCustomGAEvent('formSubmission', {
       formType: 'Search',
       formPosition: 'Page',
     })
@@ -92,6 +91,7 @@ const view = () => {
       selectedValue === 'all-results'
         ? 'download-all-csv'
         : 'download-current-csv'
+    dispatchCustomGAEvent(eventId, {})
     handleEvent({ type: EventType.Dom, id: eventId })
   })
 

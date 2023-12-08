@@ -1,6 +1,6 @@
 import { languageName } from '../../common/utils/lang'
-import { state } from '../state'
 import { Field } from '../types/state-types'
+import { Occurrence } from '../../common/types/search-api-types'
 
 export const formatNames = (array: []) =>
   [...new Set(array)].map((x) => `“${x}”`).join(', ')
@@ -10,33 +10,18 @@ export const formatDateTime = (date: any) =>
     ? `${date.value.slice(0, 10)} at ${date.value.slice(11, 16)}`
     : 'No data available'
 
-const splitKeywords = function (keywords: string): string[] {
-  const wordsToIgnore = ['of', 'for', 'the', 'or', 'and']
-  const regexp = /[^\s,"]+|"([^"]*)"/gi
-  const output = []
-  let match: RegExpExecArray | null
-  do {
-    match = regexp.exec(keywords)
-    if (match) {
-      output.push(match[1] ? match[1] : match[0])
-    }
-  } while (match)
-  return output.filter((d) => d.length > 0 && !wordsToIgnore.includes(d))
-}
-
-const formatOccurrences = (obj: any) =>
-  obj && Object.values(obj)?.length > 1
-    ? `Total (${Object.values(obj).reduce(
-        (partialSum: any, a: any) => partialSum + a,
+export const formatOccurrences = (occurrences: [Occurrence]) =>
+  occurrences.length > 1
+    ? `Total (${occurrences.reduce(
+        (partialSum: any, occurrence: Occurrence) =>
+          partialSum + occurrence.occurrences,
         0
-      )}),
-      ${Object.values(obj)
+      )}), ${occurrences
         .map(
-          (x, i) =>
-            `${splitKeywords(state.searchParams.selectedWords)[i]} (${x})`
+          (occurrence) => `${occurrence.keyword} (${occurrence.occurrences})`
         )
         .join(', ')}`
-    : `${obj}`
+    : `${occurrences[0].occurrences}`
 
 export const fieldFormatters: Record<Field, any> = {
   url: {
@@ -97,4 +82,15 @@ export const fieldFormat = function (
 ): string {
   const f = fieldFormatters[key]
   return f && f.format ? f.format(val) : val
+}
+
+export const dispatchCustomGAEvent = (name: string, detail: any = {}) => {
+  // @ts-ignore
+  if (window.dataLayer) {
+    // @ts-ignore
+    window.dataLayer.push({
+      event: name,
+      ...detail,
+    })
+  }
 }
