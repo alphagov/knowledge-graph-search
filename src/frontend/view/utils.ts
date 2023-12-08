@@ -10,18 +10,23 @@ export const formatDateTime = (date: any) =>
     ? `${date.value.slice(0, 10)} at ${date.value.slice(11, 16)}`
     : 'No data available'
 
-export const formatOccurrences = (occurrences: [Occurrence]) =>
-  occurrences.length > 1
-    ? `Total (${occurrences.reduce(
-        (partialSum: any, occurrence: Occurrence) =>
-          partialSum + occurrence.occurrences,
-        0
-      )}), ${occurrences
-        .map(
-          (occurrence) => `${occurrence.keyword} (${occurrence.occurrences})`
-        )
-        .join(', ')}`
-    : `${occurrences[0].occurrences}`
+export const formatOccurrences = (occurrences: Occurrence[]) => {
+  if (occurrences.length === 0) {
+    return ''
+  }
+  if (occurrences.length === 1) {
+    return `${occurrences[0].occurrences}`
+  }
+  const occurencesSum = occurrences.reduce(
+    (partialSum: any, occurrence: Occurrence) =>
+      partialSum + occurrence.occurrences,
+    0
+  )
+  const occurencesFormatted = occurrences
+    .map((occurrence) => `${occurrence.keyword} (${occurrence.occurrences})`)
+    .join(', ')
+  return `Total (${occurencesSum}), ${occurencesFormatted}`
+}
 
 export const fieldFormatters: Record<Field, any> = {
   url: {
