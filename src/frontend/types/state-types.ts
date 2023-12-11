@@ -44,4 +44,5 @@ export interface State {
   showFieldSet: boolean
   documentTypes: string[]
   sorting: Partial<Record<Field, SortAction>>
+  CSVDownloadType: string
 }

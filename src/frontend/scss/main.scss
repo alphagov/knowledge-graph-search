@@ -443,4 +443,17 @@ h2:focus-visible {
   margin-top: 10px;
   margin-bottom: 0;
   margin-left: auto;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .govuk-select {
+    margin-right: 20px;
+  }
+
+  #csv-download-btn {
+    margin: 0 0 3px 0;
+    flex-shrink: 0;
+  }
 }

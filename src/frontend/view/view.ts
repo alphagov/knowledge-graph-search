@@ -1,6 +1,6 @@
 import { queryDescription } from '../utils/queryDescription'
 import { id, splitKeywords } from '../../common/utils/utils'
-import { state, searchState } from '../state'
+import { state, searchState, CSVDownloadType } from '../state'
 import { handleEvent } from '../events'
 import { viewMetaResults } from './view-metabox'
 import { viewAdvancedSearchPanel, viewSearchPanel } from './view-search-panel'
@@ -85,10 +85,21 @@ const view = () => {
     handleEvent({ type: EventType.Dom, id: 'toggleDisamBox' })
   )
 
-  id('csv-download-select')?.addEventListener('change', (event: Event) => {
-    const selectedValue = (event.target as HTMLSelectElement).value
+  id('csv-download-select')?.addEventListener('change', (e) => {
+    const downloadType = (e.target as HTMLSelectElement)
+      .value as CSVDownloadType
+    handleEvent({
+      type: EventType.Dom,
+      id: `download-type-${downloadType}`,
+    })
+  })
+
+  id('csv-download-btn')?.addEventListener('click', (e) => {
+    e.preventDefault()
+    const selectedValue = state.CSVDownloadType
+
     const eventId =
-      selectedValue === 'all-results'
+      selectedValue === CSVDownloadType.ALL
         ? 'download-all-csv'
         : 'download-current-csv'
     dispatchCustomGAEvent(eventId, {})
@@ -311,10 +322,14 @@ const viewCSVDownload = () => {
     Download data
   </label>
     <select class="govuk-select" id="csv-download-select" name="csv-download-select" style="width: 100%;">
-      <option value="" disabled selected >Export data (csv)</option>
-      <option value="current-results">Current results (${state.pagination.resultsPerPage})</option>
-      <option value="all-results">All results (${state.searchResults?.length})</option>
+      <option value="${CSVDownloadType.CURRENT}" ${
+    state.CSVDownloadType === CSVDownloadType.CURRENT ? 'selected' : ''
+  }>Current results (${state.pagination.resultsPerPage})</option>
+      <option value="${CSVDownloadType.ALL}" ${
+    state.CSVDownloadType === CSVDownloadType.ALL ? 'selected' : ''
+  }>All results (${state.searchResults?.length})</option>
     </select>
+    <button class="govuk-button govuk-button--secondary" id="csv-download-btn">Download CSV</button>
   </div>`
 }
 
