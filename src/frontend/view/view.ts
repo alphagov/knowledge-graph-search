@@ -266,7 +266,7 @@ const viewSearchResultsTable = () => {
     }>
     <fieldset class="govuk-fieldset">
       <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-        <h1 class="govuk-fieldset__heading">
+        <h2 class="govuk-fieldset__heading">
           Customise table headers
         </h1>
       </legend>
