@@ -308,10 +308,10 @@ const viewSearchResultsTable = () => {
 
 const viewWaiting = () => `
   <div aria-live="polite" role="region">
-    <div class="govuk-body">${queryDescription({
+    <h1 class="govuk-body">${queryDescription({
       searchParams: state.searchParams,
       waiting: true,
-    })}</div>
+    })}</h1>
     <p class="govuk-body-s">Some queries may take up to a minute</p>
   </div>
 `
@@ -342,20 +342,20 @@ const viewResults = function () {
     html.push(`<div class="results-comments">`)
     if (nbRecords < 10000) {
       html.push(
-        `<div class="govuk-body">${queryDescription({
+        `<h1 class="govuk-body">${queryDescription({
           searchParams: state.searchParams,
           nbRecords,
-        })}</div>`
+        })}</h1>`
       )
     } else {
       html.push(`
-        <div class="govuk-warning-text">
+        <h1 class="govuk-warning-text">
           <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
           <strong class="govuk-warning-text__text">
             <span class="govuk-warning-text__assistive">Warning</span>
             There are more than 10000 results. Try to narrow down your search.
           </strong>
-        </div>
+        </h1>
       `)
     }
 
@@ -416,7 +416,7 @@ const viewNoResults = () => {
     newUrl = `?${newSearchParams.toString()}`
   }
   return `
-    <div class="govuk-body govuk-inset-text">
+    <h1 class="govuk-body govuk-inset-text">
       <span class="govuk-!-font-weight-bold">No results</span> for ${queryDescription(
         {
           searchParams: state.searchParams,
@@ -428,7 +428,7 @@ const viewNoResults = () => {
           : '<p>Try a different keyword or adjust your filters.</p>'
       }
       <button class="govuk-button govuk-button--secondary" id="new-search-btn">New search</button>
-    </div>
+    </h1>
   `
 }
 
