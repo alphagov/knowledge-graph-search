@@ -31,6 +31,7 @@ export const initialSearchParams: SearchParams = {
   language: defaultAllLanguagesOption,
   documentType: '',
   linkSearchUrl: '',
+  phoneNumber: '',
   keywordLocation: KeywordLocation.All,
   combinator: Combinator.All,
   publishingApplication: PublishingApplication.Any,
@@ -174,6 +175,7 @@ const searchStateIsUnset = function (): boolean {
     state.searchParams.taxon === '' &&
     state.searchParams.publishingOrganisation === '' &&
     state.searchParams.linkSearchUrl === '' &&
+    state.searchParams.phoneNumber === '' &&
     state.searchParams.documentType === '' &&
     state.searchParams.publishingApplication === PublishingApplication.Any &&
     state.searchParams.publishingStatus === PublishingStatus.All
@@ -215,6 +217,7 @@ const resetSearchState = function (): void {
   state.searchParams.keywordLocation = KeywordLocation.All
   state.searchParams.caseSensitive = false
   state.searchParams.linkSearchUrl = ''
+  state.searchParams.phoneNumber = ''
   state.skip = 0 // reset to first page
   state.searchParams.publishingApplication = PublishingApplication.Any
   state.searchResults = null

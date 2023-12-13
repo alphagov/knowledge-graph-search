@@ -41,6 +41,8 @@ export const getParams = (req: express.Request): SearchParams => {
   )
   const linkSearchUrl =
     sanitiseInput(req.query[UrlParams.LinkSearchUrl] as string) || ''
+  const phoneNumber =
+    sanitiseInput(req.query[UrlParams.PhoneNumber] as string) || ''
 
   const publishingStatus = sanitiseInput(
     req.query[UrlParams.PublishingStatus] as string
@@ -59,6 +61,7 @@ export const getParams = (req: express.Request): SearchParams => {
     keywordLocation,
     publishingApplication,
     linkSearchUrl,
+    phoneNumber,
     publishingStatus,
   }
 }

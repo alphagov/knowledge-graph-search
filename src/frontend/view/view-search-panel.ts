@@ -14,6 +14,7 @@ const viewSearchPanel = () => {
   const mapping = {
     [SearchType.Keyword]: viewKeywordSearchPanel,
     [SearchType.Link]: viewLinkSearchPanel,
+    [SearchType.PhoneNumber]: viewPhoneNumberSearchPanel,
     [SearchType.Organisation]: viewOrganisationSearchPanel,
     [SearchType.Taxon]: viewTaxonSearchPanel,
     [SearchType.Language]: viewLanguageSearchPanel,
@@ -80,6 +81,7 @@ export const viewAdvancedSearchPanel = (onTheSide = true) => {
           ${viewKeywordsCombinator()}
           ${viewExclusionsInput()}
           ${viewLinkSearchInput()}
+          ${viewPhoneNumberSearchInput()}
           ${viewKeywordLocation()}
           ${viewPublishingOrganisation()}
           ${viewDocumentType()}
@@ -101,6 +103,40 @@ const viewLinkSearchPanel = () => `
     <form id="search-form" class="search-panel govuk-form">
       <div class="search-mode-panel">
         ${viewMainLinkSearch()}
+        ${
+          state.searchResults
+            ? ''
+            : `<details class="govuk-details" data-module="govuk-details">
+          <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+              Search filters
+            </span>
+          </summary>
+          <div class="govuk-details__text">
+            <div class="search-filters-container">
+              <div class="search-filters-left-col links-search">
+              ${viewPublishingOrganisation()}
+              ${viewPublishingAppSelector()}
+              ${viewDocumentType()}
+              </div>
+              <div class="search-filters-right-col links-search">
+                ${viewTaxonSelector()}
+                ${viewPublishingStatusSelector()}
+                ${viewLanguageSelector()}
+              </div>
+            </div>
+          </div>
+        </details>`
+        }
+        ${viewSearchButton()}
+      </div>
+    </form>
+  `
+
+const viewPhoneNumberSearchPanel = () => `
+    <form id="search-form" class="search-panel govuk-form">
+      <div class="search-mode-panel">
+        ${viewMainPhoneNumberSearch()}
         ${
           state.searchResults
             ? ''
@@ -454,6 +490,35 @@ const viewLinkSearchInput = () => `
       Use full or partial URLs for example, https://www.gov.uk/tax-codes or tax-codes
     </div>
   <input class="govuk-input" id="search-filters-link-search" name="search-filters-link-search" type="text" value="${state.searchParams.linkSearchUrl}">
+</div>
+`
+
+const viewMainPhoneNumberSearch = () => `
+  <div class="govuk-form-group">
+    <label class="govuk-label govuk-label--s" for="search-filters-phone-number-search">
+      Search for pages that contain the phone number
+    </label>
+    <div class="govuk-hint">
+      Enter the phone number in any format, with or without spaces or other symbols
+    </div>
+    <input
+        class="govuk-input"
+        id="search-filters-phone-number-search"
+        ${state.waiting && 'disabled="disabled"'}
+        value="${state.searchParams.phoneNumber}"
+     />
+  </div>
+`
+
+const viewPhoneNumberSearchInput = () => `
+<div class="govuk-form-group">
+  <label class="govuk-label govuk-label--s" for="search-filters-phone-number-search">
+  Search for pages that contain the phone number
+  </label>
+  <div class="govuk-hint">
+      Enter the phone number in any format, with or without spaces or other symbols
+    </div>
+  <input class="govuk-input" id="search-filters-phone-number-search" name="search-filters-phone-number-search" type="text" value="${state.searchParams.phoneNumber}">
 </div>
 `
 

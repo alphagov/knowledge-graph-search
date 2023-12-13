@@ -59,6 +59,9 @@ export const bigQuery = async function (userQuery: string, options?: any) {
     if (options.link) {
       params.link = options.link
     }
+    if (options.phoneNumber) {
+      params.phoneNumber = options.phoneNumber
+    }
     if (options.documentType) {
       params.documentType = options.documentType
     }
@@ -193,6 +196,7 @@ const sendSearchQuery = async function (
     ''
   )
   const link = searchParams.linkSearchUrl
+  const phoneNumber = searchParams.phoneNumber
   const queries = [
     bigQuery(query, {
       keywords,
@@ -201,6 +205,7 @@ const sendSearchQuery = async function (
       taxon,
       organisation,
       link,
+      phoneNumber,
       documentType,
     }),
   ]

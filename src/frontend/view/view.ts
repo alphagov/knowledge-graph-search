@@ -115,6 +115,11 @@ const tabs = [
     searchType: SearchType.Link,
   },
   {
+    id: 'search-phone-numbers',
+    label: 'Phone numbers',
+    searchType: SearchType.PhoneNumber,
+  },
+  {
     id: 'search-orgs',
     label: 'Organisations',
     searchType: SearchType.Organisation,
