@@ -64,6 +64,10 @@ export const queryDescription = ({
     clauses.push(
       `link to ${makeBold(searchParams.linkSearchUrl, includeMarkup)}`
     )
+  if (searchParams.phoneNumber !== '')
+    clauses.push(
+      `mention the phone number ${makeBold(searchParams.phoneNumber, includeMarkup)}`
+    )
   if (
     searchParams.publishingApplication === PublishingApplication.Whitehall ||
     searchParams.publishingApplication === PublishingApplication.Publisher

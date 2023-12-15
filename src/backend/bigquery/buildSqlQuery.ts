@@ -65,8 +65,8 @@ export const buildSqlQuery = function (
         ? []
         : [
             `STRUCT(
-          @phone_number AS keyword,
-          (SELECT COUNT(1) FROM UNNEST(phone_numbers) as phone_number WHERE phone_number = @phone_number)) AS occurrences)`,
+          @phoneNumber AS keyword,
+          (SELECT COUNT(1) FROM UNNEST(phone_numbers) as phone_number WHERE phone_number = @phoneNumber) AS occurrences)`,
           ]
 
     occurrences = `[${[...textOccurrences, ...linkOccurrences, ...phoneNumberOccurrences].join(
@@ -163,7 +163,7 @@ export const buildSqlQuery = function (
       AND EXISTS
         (
           SELECT 1 FROM UNNEST (phone_numbers) AS phone_number
-          WHERE phone_number = @phone_number
+          WHERE phone_number = @phoneNumber
         )
     `
   }

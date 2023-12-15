@@ -42,6 +42,8 @@ const makeURLfromSearchParams = function (searchParams: SearchParams): string {
     usp.set(UrlParams.Combinator, searchParams.combinator)
   if (searchParams.linkSearchUrl !== '')
     usp.set(UrlParams.LinkSearchUrl, searchParams.linkSearchUrl)
+  if (searchParams.phoneNumber !== '')
+    usp.set(UrlParams.PhoneNumber, searchParams.phoneNumber)
   usp.set(UrlParams.PublishingStatus, searchParams.publishingStatus)
   return usp.toString()
 }

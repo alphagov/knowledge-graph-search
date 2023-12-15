@@ -126,6 +126,10 @@ const setStateSearchParamsFromURL = function (): void {
     'linkSearchUrl',
     UrlParams.LinkSearchUrl
   )
+  state.searchParams.phoneNumber = getURLParamOrFallback(
+    'phoneNumber',
+    UrlParams.PhoneNumber
+  )
   state.searchParams.taxon = getURLParamOrFallback('taxon', UrlParams.Taxon)
   state.searchParams.publishingOrganisation = getURLParamOrFallback(
     'publishingOrganisation',
