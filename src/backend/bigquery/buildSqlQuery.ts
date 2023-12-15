@@ -69,9 +69,11 @@ export const buildSqlQuery = function (
           (SELECT COUNT(1) FROM UNNEST(phone_numbers) as phone_number WHERE phone_number = @phoneNumber) AS occurrences)`,
           ]
 
-    occurrences = `[${[...textOccurrences, ...linkOccurrences, ...phoneNumberOccurrences].join(
-      ', '
-    )}] AS occurrences,`
+    occurrences = `[${[
+      ...textOccurrences,
+      ...linkOccurrences,
+      ...phoneNumberOccurrences,
+    ].join(', ')}] AS occurrences,`
   }
 
   const includeClause =

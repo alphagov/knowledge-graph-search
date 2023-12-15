@@ -5,7 +5,7 @@ import {
   setState,
   initialSearchParams,
 } from './state'
-import { id, getFormInputValue } from '../common/utils/utils'
+import { id, getFormInputValue, getPhoneNumber } from '../common/utils/utils'
 import { view } from './view/view'
 import { queryBackend } from './search-api'
 import { EventType, SearchApiCallback } from './types/event-types'
@@ -82,7 +82,7 @@ const updateStateFromSearchFilters = () => {
   state.searchParams.linkSearchUrl = getFormInputValue(
     'search-filters-link-search'
   )
-  state.searchParams.phoneNumber = getFormInputValue(
+  state.searchParams.phoneNumber = getPhoneNumber(
     'search-filters-phone-number-search'
   )
   state.searchParams.excludedWords = getFormInputValue(

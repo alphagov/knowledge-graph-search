@@ -66,7 +66,10 @@ export const queryDescription = ({
     )
   if (searchParams.phoneNumber !== '')
     clauses.push(
-      `mention the phone number ${makeBold(searchParams.phoneNumber, includeMarkup)}`
+      `mention the phone number ${makeBold(
+        searchParams.phoneNumber,
+        includeMarkup
+      )}`
     )
   if (
     searchParams.publishingApplication === PublishingApplication.Whitehall ||

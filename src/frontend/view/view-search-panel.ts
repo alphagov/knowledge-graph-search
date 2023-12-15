@@ -499,7 +499,7 @@ const viewMainPhoneNumberSearch = () => `
       Search for pages that contain the phone number
     </label>
     <div class="govuk-hint">
-      Enter the phone number in any format, with or without spaces or other symbols
+      Enter the phone number in any format, with or without spaces or other symbols. It will be standardised when the 'search' button is used.
     </div>
     <input
         class="govuk-input"
@@ -516,7 +516,7 @@ const viewPhoneNumberSearchInput = () => `
   Search for pages that contain the phone number
   </label>
   <div class="govuk-hint">
-      Enter the phone number in any format, with or without spaces or other symbols
+      Enter the phone number in any format, with or without spaces or other symbols. It will be standardised when the 'search' button is used.
     </div>
   <input class="govuk-input" id="search-filters-phone-number-search" name="search-filters-phone-number-search" type="text" value="${state.searchParams.phoneNumber}">
 </div>

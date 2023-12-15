@@ -1,5 +1,10 @@
 // todo: split into separate files and add tests
 
+import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber'
+
+const PNF = PhoneNumberFormat
+const phoneUtil: PhoneNumberUtil = PhoneNumberUtil.getInstance()
+
 const id = (x: string): HTMLElement | null => document.getElementById(x)
 
 const tagBody = '(?:[^"\'>]|"[^"]*"|\'[^\']*\')*'
@@ -24,6 +29,15 @@ const tagOrComment = new RegExp(
 
 const getFormInputValue = (inputId: string): string =>
   sanitiseInput((<HTMLInputElement>id(inputId))?.value)
+
+const getPhoneNumber = (inputId: string): string =>
+  phoneUtil.format(
+    phoneUtil.parseAndKeepRawInput(
+      (<HTMLInputElement>id(inputId))?.value,
+      'GB'
+    ),
+    PNF.E164
+  )
 
 const sanitiseInput = function (text: string | undefined): string {
   // remove text that could lead to script injections
@@ -56,4 +70,11 @@ const splitKeywords = function (keywords: string): string[] {
   return output.filter((d) => d.length > 0 && !wordsToIgnore.includes(d))
 }
 
-export { id, sanitiseInput, sanitiseOutput, getFormInputValue, splitKeywords }
+export {
+  id,
+  sanitiseInput,
+  sanitiseOutput,
+  getFormInputValue,
+  getPhoneNumber,
+  splitKeywords,
+}
