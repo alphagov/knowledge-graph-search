@@ -30,14 +30,27 @@ const tagOrComment = new RegExp(
 const getFormInputValue = (inputId: string): string =>
   sanitiseInput((<HTMLInputElement>id(inputId))?.value)
 
-const getPhoneNumber = (inputId: string): string =>
-  phoneUtil.format(
-    phoneUtil.parseAndKeepRawInput(
-      (<HTMLInputElement>id(inputId))?.value,
-      'GB'
-    ),
-    PNF.E164
-  )
+// TODO: Support many phone numbers at once.  Available distributions of
+// libphonenumber don't support this, so we would have to require users to
+// separate numbers by delimiters.
+const getPhoneNumber = function (phoneNumberElementId: string): { phoneNumber: string, error: boolean } {
+    let phoneNumber: string = (<HTMLInputElement>id(phoneNumberElementId))?.value
+    let parsedPhoneNumber: string
+    try {
+      return {
+        phoneNumber: parsedPhoneNumber = phoneUtil.format(
+          phoneUtil.parseAndKeepRawInput(
+            phoneNumber,
+            'GB'
+          ),
+          PNF.E164
+          ),
+        error: false
+      }
+    } catch {
+      return { phoneNumber: phoneNumber, error: true }
+    }
+}
 
 const sanitiseInput = function (text: string | undefined): string {
   // remove text that could lead to script injections

@@ -493,22 +493,30 @@ const viewLinkSearchInput = () => `
 </div>
 `
 
-const viewMainPhoneNumberSearch = () => `
-  <div class="govuk-form-group">
-    <label class="govuk-label govuk-label--s" for="search-filters-phone-number-search">
-      Search for pages that contain the phone number
-    </label>
-    <div class="govuk-hint">
-      Enter the phone number in any format, with or without spaces or other symbols. It will be standardised when the 'search' button is used.
+const viewMainPhoneNumberSearch = function (): string {
+  console.log('phoneNumber: ', state.searchParams.phoneNumber)
+  return `
+    <div class="govuk-form-group">
+      <label class="govuk-label govuk-label--s" for="search-filters-phone-number-search">
+        Search for pages that contain the phone number
+      </label>
+      <div class="govuk-hint">
+        Enter a single, valid phone number in any format, with or without spaces or other symbols. It will be standardised when the 'search' button is used.
+      </div>
+      ${state.invalidPhoneNumber ? `
+      <p id="phone-number-error" class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span> Enter a single, valid phone number.
+      </p>
+      ` : ''}
+      <input
+          class="govuk-input ${state.invalidPhoneNumber ? 'govuk-input--error' : ''}"
+          id="search-filters-phone-number-search"
+          ${state.waiting && 'disabled="disabled"'}
+          value="${state.searchParams.phoneNumber}"
+       />
     </div>
-    <input
-        class="govuk-input"
-        id="search-filters-phone-number-search"
-        ${state.waiting && 'disabled="disabled"'}
-        value="${state.searchParams.phoneNumber}"
-     />
-  </div>
-`
+  `
+}
 
 const viewPhoneNumberSearchInput = () => `
 <div class="govuk-form-group">
@@ -516,9 +524,21 @@ const viewPhoneNumberSearchInput = () => `
   Search for pages that contain the phone number
   </label>
   <div class="govuk-hint">
-      Enter the phone number in any format, with or without spaces or other symbols. It will be standardised when the 'search' button is used.
+      Enter a single, valid phone number in any format, with or without spaces or other symbols. It will be standardised when the 'search' button is used.
     </div>
-  <input class="govuk-input" id="search-filters-phone-number-search" name="search-filters-phone-number-search" type="text" value="${state.searchParams.phoneNumber}">
+  ${state.invalidPhoneNumber ? `
+  <p id="phone-number-error" class="govuk-error-message">
+    <span class="govuk-visually-hidden">Error:</span> Enter a single, valid phone number.
+  </p>
+  ` : ''}
+  <input
+      class="govuk-input ${state.invalidPhoneNumber ? 'govuk-input--error' : ''}"
+      id="search-filters-phone-number-search"
+      name="search-filters-phone-number-search"
+      type="text"
+      ${state.waiting && 'disabled="disabled"'}
+      value="${state.searchParams.phoneNumber}"
+   />
 </div>
 `
 

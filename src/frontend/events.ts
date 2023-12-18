@@ -82,9 +82,11 @@ const updateStateFromSearchFilters = () => {
   state.searchParams.linkSearchUrl = getFormInputValue(
     'search-filters-link-search'
   )
-  state.searchParams.phoneNumber = getPhoneNumber(
+  const { phoneNumber, error } = getPhoneNumber(
     'search-filters-phone-number-search'
   )
+  state.searchParams.phoneNumber = phoneNumber
+  state.invalidPhoneNumber = error
   state.searchParams.excludedWords = getFormInputValue(
     'search-filters-excluded-keywords'
   )

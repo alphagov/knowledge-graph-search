@@ -79,6 +79,7 @@ const initState = () => {
     showFiltersPane: true,
     showFieldSet: true,
     sorting: defaultSortingState,
+    invalidPhoneNumber: false,
   }
   if (cachedLayout) {
     const { showFiltersPane, showFieldSet } = loadLayoutStateFromCache()
@@ -192,7 +193,7 @@ const searchState = function (): { code: string; errors: string[] } {
   // "no-results": there was a search but no results were returned
   // "results": there was a search and there are results to display
   // "initial": there weren't any search criteria specified
-  // "errors": the user didn't specify a valid query. In this case
+  // "error": the user didn't specify a valid query. In this case
   //   we add a "errors" field containing an array with values
   // "waiting": there's a query running
   const errors: string[] = []
