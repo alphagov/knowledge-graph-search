@@ -4,6 +4,7 @@ import {
   resetSearchState,
   setState,
   initialSearchParams,
+  CSVDownloadType,
 } from './state'
 import { id, getFormInputValue } from '../common/utils/utils'
 import { view } from './view/view'
@@ -235,6 +236,13 @@ const handleEvent: SearchApiCallback = async function (event) {
           break
         case 'download-current-csv':
           downloadCurrentPageResults()
+          break
+        case `download-type-${CSVDownloadType.CURRENT}`:
+          state.CSVDownloadType = CSVDownloadType.CURRENT
+          break
+        case `download-type-${CSVDownloadType.ALL}`:
+          state.CSVDownloadType = CSVDownloadType.ALL
+          window._state = state
           break
         default:
           fieldClicked = event.id ? event.id.match(/show-field-(.*)/) : null

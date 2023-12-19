@@ -22,6 +22,11 @@ import {
 // it easier to reset to those initial
 // values only while keeping the rest of the state
 
+export enum CSVDownloadType {
+  CURRENT = 'current',
+  ALL = 'all',
+}
+
 export const initialSearchParams: SearchParams = {
   searchType: SearchType.Keyword,
   selectedWords: '',
@@ -78,6 +83,7 @@ const initState = () => {
     showFiltersPane: true,
     showFieldSet: true,
     sorting: defaultSortingState,
+    CSVDownloadType: CSVDownloadType.ALL,
   }
   if (cachedLayout) {
     const { showFiltersPane, showFieldSet } = loadLayoutStateFromCache()
