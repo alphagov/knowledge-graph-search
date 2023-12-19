@@ -21,7 +21,7 @@ export class URLCellRenderer {
     this.registerEventsListenners()
   }
 
-  registerEventsListenners() {
+  registerEventsListeners() {
     document.addEventListener('keydown', (event) => {
       if (
         !['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(
