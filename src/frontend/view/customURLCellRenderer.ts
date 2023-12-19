@@ -18,7 +18,7 @@ export class URLCellRenderer {
     this.eGui.innerHTML = `<a class="govuk-link" key=${this.getUniqueKey()} href="${
       params.value
     }">${params.value}</a>`
-    this.registerEventsListenners()
+    this.registerEventsListeners()
   }
 
   registerEventsListeners() {
