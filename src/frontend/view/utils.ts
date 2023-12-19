@@ -31,7 +31,7 @@ export const formatOccurrences = (occurrences: Occurrence[]) => {
 export const fieldFormatters: Record<Field, any> = {
   url: {
     name: 'URL',
-    format: (url: string) => `<a class="govuk-link" href="${url}">${url}</a>`,
+    format: (url: string) => url,
   },
   title: { name: 'Title' },
   locale: { name: 'Language', format: languageName },

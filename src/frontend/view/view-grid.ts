@@ -15,6 +15,7 @@ import { fieldFormat, fieldName } from './utils'
 import { viewPagination } from './view-pagination'
 import CustomAgGridHeader from './customAgGridHeader'
 import debounce from '../utils/debounce'
+import { URLCellRenderer } from './customURLCellRenderer'
 
 const overlayElement = () => {
   const el = document.createElement('div')
@@ -48,7 +49,7 @@ const createAgGrid = () => {
   )
 
   const cellRenderers = {
-    url: (p) => p.value,
+    url: URLCellRenderer,
     documentType: (p) => formatDocumentType(p.value),
     publishing_app: (p) => formatPublishingApp(p.value),
   }
