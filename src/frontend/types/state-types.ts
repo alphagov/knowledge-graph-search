@@ -1,4 +1,5 @@
 import { SearchParams } from '../../common/types/search-api-types'
+import { CSVDownloadType } from '../state'
 
 export type Field =
   | 'url'
@@ -44,5 +45,5 @@ export interface State {
   showFieldSet: boolean
   documentTypes: string[]
   sorting: Partial<Record<Field, SortAction>>
-  CSVDownloadType: string
+  CSVDownloadType: CSVDownloadType
 }

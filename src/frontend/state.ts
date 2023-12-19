@@ -83,7 +83,7 @@ const initState = () => {
     showFiltersPane: true,
     showFieldSet: true,
     sorting: defaultSortingState,
-    CSVDownloadType: 'all',
+    CSVDownloadType: CSVDownloadType.ALL,
   }
   if (cachedLayout) {
     const { showFiltersPane, showFieldSet } = loadLayoutStateFromCache()

@@ -241,7 +241,6 @@ const handleEvent: SearchApiCallback = async function (event) {
           state.CSVDownloadType = CSVDownloadType.CURRENT
           break
         case `download-type-${CSVDownloadType.ALL}`:
-          console.log('Setting to all')
           state.CSVDownloadType = CSVDownloadType.ALL
           window._state = state
           break
