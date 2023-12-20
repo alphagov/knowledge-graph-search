@@ -62,6 +62,7 @@ const setState = (newState: State) => {
 const initState = () => {
   const cachedLayout = loadLayoutStateFromCache()
   const cachedPagination = loadPaginationStateFromCache()
+  const showFields = loadShowFieldsStateFromCache() || defaultShowFields
   let newState: State = {
     searchParams: JSON.parse(JSON.stringify(initialSearchParams)), // deep copy
     taxons: [], // list of names of all the taxons
@@ -77,7 +78,8 @@ const initState = () => {
       resultsPerPage: config.pagination.defaultResultsPerPage, // number of results per page
       currentPage: 1, // current page number
     },
-    showFields: loadShowFieldsStateFromCache() || defaultShowFields, // what result columns to show
+    stagedShowFields: showFields,
+    showFields, // what result columns to show
     waiting: false, // whether we're waiting for a request to return,
     disamboxExpanded: false, // if there's a resizeable disamb meta box, whether it's expanded or not
     showFiltersPane: true,
