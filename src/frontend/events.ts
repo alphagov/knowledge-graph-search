@@ -215,6 +215,7 @@ const handleEvent: SearchApiCallback = async function (event) {
           break
         case 'clear-all-headers':
           state.showFields = {}
+          state.stagedShowFields = {}
           cacheShowFieldsState()
           break
         case 'check-all-headers':
@@ -229,6 +230,7 @@ const handleEvent: SearchApiCallback = async function (event) {
             state.showFields.withdrawn_at = false
             state.showFields.withdrawn_explanation = false
           }
+          state.stagedShowFields = state.showFields
           cacheShowFieldsState()
           break
         case 'download-all-csv':
@@ -244,16 +246,20 @@ const handleEvent: SearchApiCallback = async function (event) {
           state.CSVDownloadType = CSVDownloadType.ALL
           window._state = state
           break
+        case 'submit-all-headers':
+          state.showFields = state.stagedShowFields
+          cacheShowFieldsState()
+          break
         default:
           fieldClicked = event.id ? event.id.match(/show-field-(.*)/) : null
           if (fieldClicked && event.id) {
-            state.showFields[fieldClicked[1]] = (<HTMLInputElement>(
+            state.stagedShowFields[fieldClicked[1]] = (<HTMLInputElement>(
               id(event.id)
             ))?.checked
-            cacheShowFieldsState()
           } else {
             console.log('unknown DOM event received:', event)
           }
+          return // don't update the view
       }
       break
 

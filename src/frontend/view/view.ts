@@ -283,7 +283,7 @@ const viewSearchResultsTable = () => {
               <input class="govuk-checkboxes__input"
                       data-interactive="true"
                       type="checkbox" id="show-field-${key}"
-                ${state.showFields[key] ? 'checked' : ''}/>
+                ${state.stagedShowFields[key] ? 'checked' : ''}/>
               <label for="show-field-${key}" class="govuk-label govuk-checkboxes__label">${fieldName(
                 key
               )}</label>
@@ -292,6 +292,7 @@ const viewSearchResultsTable = () => {
         )
         .join('')}
       </div>
+      <button class="govuk-button govuk-button--secondary" id="submit-all-headers">Submit</button>
     </fieldset>
   </div>
   `

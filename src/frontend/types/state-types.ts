@@ -40,6 +40,7 @@ export interface State {
   }
   waiting: boolean
   disamboxExpanded: boolean
+  stagedShowFields: any
   showFields: any
   showFiltersPane: boolean
   showFieldSet: boolean
