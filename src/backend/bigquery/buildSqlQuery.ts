@@ -60,9 +60,20 @@ export const buildSqlQuery = function (
           (SELECT COUNT(1) FROM UNNEST(hyperlinks) as hyperlink WHERE CONTAINS_SUBSTR(hyperlink.link_url, @link)) AS occurrences)`,
           ]
 
-    occurrences = `[${[...textOccurrences, ...linkOccurrences].join(
-      ', '
-    )}] AS occurrences,`
+    const phoneNumberOccurrences =
+      searchParams.phoneNumber === undefined || searchParams.phoneNumber === ''
+        ? []
+        : [
+            `STRUCT(
+          @phoneNumber AS keyword,
+          (SELECT COUNT(1) FROM UNNEST(phone_numbers) as phone_number WHERE phone_number = @phoneNumber) AS occurrences)`,
+          ]
+
+    occurrences = `[${[
+      ...textOccurrences,
+      ...linkOccurrences,
+      ...phoneNumberOccurrences,
+    ].join(', ')}] AS occurrences,`
   }
 
   const includeClause =
@@ -147,6 +158,18 @@ export const buildSqlQuery = function (
     `
   }
 
+  let phoneNumberClause = ''
+  if (searchParams.phoneNumber && searchParams.phoneNumber !== '') {
+    // Phone number search: exact matches only of phone numbers in standard E.164 form
+    phoneNumberClause = `
+      AND EXISTS
+        (
+          SELECT 1 FROM UNNEST (phone_numbers) AS phone_number
+          WHERE phone_number = @phoneNumber
+        )
+    `
+  }
+
   let documentTypeClause = ''
   if (searchParams.documentType !== '') {
     documentTypeClause = `
@@ -181,6 +204,7 @@ export const buildSqlQuery = function (
   ${taxonClause}
   ${organisationClause}
   ${linkClause}
+  ${phoneNumberClause}
   ${documentTypeClause}
   ORDER BY page_views DESC
   LIMIT 10000
@@ -213,6 +237,7 @@ export const buildSqlQuery = function (
     ${taxonClause}
     ${organisationClause}
     ${linkClause}
+    ${phoneNumberClause}
     ${documentTypeClause}
     ORDER BY page_views DESC
     LIMIT 10000
