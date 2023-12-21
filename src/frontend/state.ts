@@ -36,6 +36,7 @@ export const initialSearchParams: SearchParams = {
   language: defaultAllLanguagesOption,
   documentType: '',
   linkSearchUrl: '',
+  phoneNumber: '',
   keywordLocation: KeywordLocation.All,
   combinator: Combinator.All,
   publishingApplication: PublishingApplication.Any,
@@ -86,6 +87,7 @@ const initState = () => {
     showFieldSet: true,
     sorting: defaultSortingState,
     CSVDownloadType: CSVDownloadType.ALL,
+    phoneNumberError: false,
   }
   if (cachedLayout) {
     const { showFiltersPane, showFieldSet } = loadLayoutStateFromCache()
@@ -132,6 +134,10 @@ const setStateSearchParamsFromURL = function (): void {
   state.searchParams.linkSearchUrl = getURLParamOrFallback(
     'linkSearchUrl',
     UrlParams.LinkSearchUrl
+  )
+  state.searchParams.phoneNumber = getURLParamOrFallback(
+    'phoneNumber',
+    UrlParams.PhoneNumber
   )
   state.searchParams.taxon = getURLParamOrFallback('taxon', UrlParams.Taxon)
   state.searchParams.publishingOrganisation = getURLParamOrFallback(
@@ -182,6 +188,7 @@ const searchStateIsUnset = function (): boolean {
     state.searchParams.taxon === '' &&
     state.searchParams.publishingOrganisation === '' &&
     state.searchParams.linkSearchUrl === '' &&
+    state.searchParams.phoneNumber === '' &&
     state.searchParams.documentType === '' &&
     state.searchParams.publishingApplication === PublishingApplication.Any &&
     state.searchParams.publishingStatus === PublishingStatus.All
@@ -194,7 +201,7 @@ const searchState = function (): { code: string; errors: string[] } {
   // "no-results": there was a search but no results were returned
   // "results": there was a search and there are results to display
   // "initial": there weren't any search criteria specified
-  // "errors": the user didn't specify a valid query. In this case
+  // "error": the user didn't specify a valid query. In this case
   //   we add a "errors" field containing an array with values
   // "waiting": there's a query running
   const errors: string[] = []
@@ -223,6 +230,7 @@ const resetSearchState = function (): void {
   state.searchParams.keywordLocation = KeywordLocation.All
   state.searchParams.caseSensitive = false
   state.searchParams.linkSearchUrl = ''
+  state.searchParams.phoneNumber = ''
   state.skip = 0 // reset to first page
   state.searchParams.publishingApplication = PublishingApplication.Any
   state.searchResults = null

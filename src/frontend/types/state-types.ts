@@ -33,7 +33,7 @@ export interface State {
   taxons: string[]
   organisations: string[]
   locales: string[]
-  systemErrorText: string | null
+  systemErrorText: any
   userErrors: string[]
   searchResults: any[] | null
   metaSearchResults: any[] | null
@@ -51,4 +51,5 @@ export interface State {
   documentTypes: string[]
   sorting: Partial<Record<Field, SortAction>>
   CSVDownloadType: CSVDownloadType
+  phoneNumberError: boolean | null
 }

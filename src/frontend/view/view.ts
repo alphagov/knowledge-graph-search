@@ -126,6 +126,11 @@ const tabs = [
     searchType: SearchType.Link,
   },
   {
+    id: 'search-phone-numbers',
+    label: 'Phone numbers',
+    searchType: SearchType.PhoneNumber,
+  },
+  {
     id: 'search-orgs',
     label: 'Organisations',
     searchType: SearchType.Organisation,
@@ -208,7 +213,11 @@ const viewMainLayout = () => {
 const viewDataBaseError = () => {
   const html = []
   let errorText = ''
-  switch (state.systemErrorText) {
+  switch (state.systemErrorText.message) {
+    case 'BAD_REQUEST':
+      errorText =
+        "The search could not be performed. This is usually because a phone number couldn't be parsed."
+      break
     case 'TIMEOUT':
       errorText =
         'The database took too long to respond. This is usually due to too many query results. Please try a more precise query.'

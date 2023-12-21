@@ -42,6 +42,8 @@ const makeURLfromSearchParams = function (searchParams: SearchParams): string {
     usp.set(UrlParams.Combinator, searchParams.combinator)
   if (searchParams.linkSearchUrl !== '')
     usp.set(UrlParams.LinkSearchUrl, searchParams.linkSearchUrl)
+  if (searchParams.phoneNumber !== '')
+    usp.set(UrlParams.PhoneNumber, searchParams.phoneNumber)
   usp.set(UrlParams.PublishingStatus, searchParams.publishingStatus)
   return usp.toString()
 }
@@ -57,6 +59,10 @@ const fetchWithTimeout = async function (url: string, timeoutSeconds = 60) {
     },
     signal: controller.signal,
   })
+
+  if (fetchResult.status === 400) {
+    throw new Error('BAD_REQUEST')
+  }
 
   if (fetchResult.status === 401) {
     // Reload the page to trigger server-side authentication

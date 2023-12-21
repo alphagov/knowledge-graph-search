@@ -12,7 +12,7 @@ export default function govukPostInitScripts() {
   // init autocomplete inputs
   eval(`
     var autocomplete = document.querySelectorAll('select.autocomplete__input');
-  
+
     var placeholderMapping = {
       'side-filters-publishing-application': 'a publishing application',
       'search-filters-publishing-application': 'a publishing application',
@@ -27,7 +27,7 @@ export default function govukPostInitScripts() {
     }
 
     var getPlaceholder = (id) => 'Start typing ' + placeholderMapping[id] || "a " + id
-  
+
     autocomplete.forEach(el => {
       var id = el.getAttribute('id')
         if(document.querySelector('#'+id)){

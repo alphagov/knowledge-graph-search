@@ -33,6 +33,15 @@ const getFormInputValue = (inputId: string): string =>
 // TODO: Support many phone numbers at once.  Available distributions of
 // libphonenumber don't support this, so we would have to require users to
 // separate numbers by delimiters.
+const getPhoneNumber = function (phoneNumberElementId: string): {
+  phoneNumber: string
+  error: boolean
+} {
+  const phoneNumber: string = (<HTMLInputElement>id(phoneNumberElementId))
+    ?.value
+  return parsePhoneNumber(phoneNumber)
+}
+
 const parsePhoneNumber = function (phoneNumber: string): {
   phoneNumber: string
   error: boolean
@@ -88,6 +97,7 @@ export {
   sanitiseInput,
   sanitiseOutput,
   getFormInputValue,
+  getPhoneNumber,
   parsePhoneNumber,
   splitKeywords,
 }
