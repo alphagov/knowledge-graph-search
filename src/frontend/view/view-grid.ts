@@ -81,19 +81,26 @@ const createAgGrid = () => {
     const KEY_TAB = 'Tab'
     const key = params.event.key
 
-    console.log('In suppressKeyboardEvent', {
-      key,
-      'params.column.getId()': params.column.getId(),
-      params,
-    })
-
-    if (window.lastN1Params) {
-      window.lastN2Params = window.lastN1Params
-    }
-    window.lastN1Params = params
-    window.latestParams = [window.lastN1Params, window.lastN2Params]
-
     if ([key, key.toUpperCase()].includes(KEY_TAB)) {
+      return true
+    }
+
+    return false
+  }
+
+  const suppressHeaderKeyboardEvent = (params): boolean => {
+    const KEY_TAB = 'Tab'
+    const key = params.event.key
+
+    const colNames = gridOptions.columnApi
+      .getAllDisplayedColumns()
+      .map((col) => col.colId)
+    const lastCol = colNames[colNames.length - 1]
+
+    if (
+      [key, key.toUpperCase()].includes(KEY_TAB) &&
+      params.column.getId() === lastCol
+    ) {
       return true
       // return params.column.getId() === 'url'
     }
@@ -106,6 +113,7 @@ const createAgGrid = () => {
     columnDefs,
     defaultColDef: {
       suppressKeyboardEvent,
+      suppressHeaderKeyboardEvent,
     },
     onPaginationChanged: function () {
       viewPagination(gridOptions)
