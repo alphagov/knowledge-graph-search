@@ -75,28 +75,6 @@ const createAgGrid = () => {
     ...(sortConfig[field] || {}),
   }))
 
-  function diffObjects(
-    obj1: Record<string, any>,
-    obj2: Record<string, any>
-  ): ObjectDifference[] {
-    const allKeys = new Set([...Object.keys(obj1), ...Object.keys(obj2)])
-    const differences: ObjectDifference[] = []
-
-    allKeys.forEach((key) => {
-      if (obj1[key] !== obj2[key]) {
-        differences.push({
-          key: key,
-          value1: obj1.hasOwnProperty(key) ? obj1[key] : undefined,
-          value2: obj2.hasOwnProperty(key) ? obj2[key] : undefined,
-        })
-      }
-    })
-
-    return differences
-  }
-
-  window.diffobj = diffObjects
-
   const suppressKeyboardEvent = (
     params: SuppressKeyboardEventParams
   ): boolean => {
@@ -113,10 +91,6 @@ const createAgGrid = () => {
       window.lastN2Params = window.lastN1Params
     }
     window.lastN1Params = params
-    window.latestDiff = diffObjects(
-      window.lastN1Params,
-      window.lastN2Params || {}
-    )
     window.latestParams = [window.lastN1Params, window.lastN2Params]
 
     if ([key, key.toUpperCase()].includes(KEY_TAB)) {
