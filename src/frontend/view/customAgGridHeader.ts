@@ -124,10 +124,20 @@ export default class CustomAgGridHeader {
         this.sortModel[this.colId].sortIndex + 1
       }</div>`
     }
-    html = `${html}
-    <span class="icon-desc" aria-hidden="true">▼</span>
-    <span class="icon-asc" aria-hidden="true">▲</span>
-    `
+    if (this.sortingState === SortAction.NONE) {
+      html += `
+      <span class="icon-desc" aria-hidden="true">▼</span>
+      <span class="icon-asc" aria-hidden="true">▲</span>`
+    } else if (this.sortingState === SortAction.ASC) {
+      html += `
+      <span class="icon-asc" aria-hidden="true">▲</span>
+      `
+    } else if (this.sortingState === SortAction.DESC) {
+      html += `
+      <span class="icon-desc" aria-hidden="true">▼</span>
+      `
+    }
+
     return html
   }
 
