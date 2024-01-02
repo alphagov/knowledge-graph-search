@@ -38,7 +38,7 @@ const viewKeywordSearchPanel = () => `
             state.searchResults
               ? ''
               : `<details class="govuk-details" data-module="govuk-details">
-            <summary class="govuk-details__summary">
+            <summary class="govuk-details__summary" role="button">
               <span class="govuk-details__summary-text">
                 Search filters
               </span>
@@ -107,7 +107,7 @@ const viewLinkSearchPanel = () => `
           state.searchResults
             ? ''
             : `<details class="govuk-details" data-module="govuk-details">
-          <summary class="govuk-details__summary">
+          <summary class="govuk-details__summary" role="button">
             <span class="govuk-details__summary-text">
               Search filters
             </span>
@@ -175,7 +175,7 @@ const viewTaxonSearchPanel = () => `
             state.searchResults
               ? ''
               : `<details class="govuk-details" data-module="govuk-details">
-            <summary class="govuk-details__summary">
+            <summary class="govuk-details__summary" role="button">
               <span class="govuk-details__summary-text">
                 Search filters
               </span>
@@ -208,7 +208,7 @@ const viewLanguageSearchPanel = () => `
             state.searchResults
               ? ''
               : `<details class="govuk-details" data-module="govuk-details">
-            <summary class="govuk-details__summary">
+            <summary class="govuk-details__summary" role="button">
               <span class="govuk-details__summary-text">
                 Search filters
               </span>
@@ -241,7 +241,7 @@ const viewOrganisationSearchPanel = () => `
             state.searchResults
               ? ''
               : `<details class="govuk-details" data-module="govuk-details">
-            <summary class="govuk-details__summary">
+            <summary class="govuk-details__summary" role="button">
               <span class="govuk-details__summary-text">
                 Search filters
               </span>
