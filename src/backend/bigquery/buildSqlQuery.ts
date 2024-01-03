@@ -155,39 +155,6 @@ export const buildSqlQuery = function (
     `
   }
 
-  console.log(`
-  SELECT
-    url,
-    title,
-    documentType,
-    contentId,
-    locale,
-    publishing_app,
-    first_published_at,
-    public_updated_at,
-    withdrawn_at,
-    withdrawn_explanation,
-    page_views,
-    taxons,
-    primary_organisation,
-    organisations AS all_organisations,
-    ${textOccurrences}
-    ${linkOccurrences}
-  FROM search.page
-
-  ${publishingStatusClause}
-  ${includeClause}
-  ${excludeClause}
-  ${publishingAppClause}
-  ${localeClause}
-  ${taxonClause}
-  ${organisationClause}
-  ${linkClause}
-  ${documentTypeClause}
-  ORDER BY page_views DESC
-  LIMIT 10000
-`)
-
   return `
     SELECT
       url,
