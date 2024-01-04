@@ -24,6 +24,10 @@ export enum SortAction {
   NONE = '',
 }
 
+export type Sorting = Partial<
+  Record<Field, { sortIndex: number; sort: SortAction }>
+>
+
 export interface State {
   searchParams: SearchParams
   taxons: string[]

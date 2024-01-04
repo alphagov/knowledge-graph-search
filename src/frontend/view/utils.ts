@@ -77,7 +77,7 @@ export const fieldFormatters: Record<Field, any> = {
 }
 
 export const fieldName = function (key: string) {
-  const f = fieldFormatters[key]
+  const f = fieldFormatters[<Field>key]
   return f ? f.name : key
 }
 
@@ -85,7 +85,7 @@ export const fieldFormat = function (
   key: string,
   val: string | number
 ): string {
-  const f = fieldFormatters[key]
+  const f = fieldFormatters[<Field>key]
   return f && f.format ? f.format(val) : val
 }
 
@@ -98,4 +98,17 @@ export const dispatchCustomGAEvent = (name: string, detail: any = {}) => {
       ...detail,
     })
   }
+}
+
+export const sortOrder = function (key: string) {
+  const sortOrderFormatters: Record<string, any> = {
+    asc: {
+      name: 'ascending',
+    },
+    desc: {
+      name: 'descending',
+    },
+  }
+  const s = sortOrderFormatters[key]
+  return s ? s.name : key
 }
