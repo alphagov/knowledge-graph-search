@@ -21,7 +21,7 @@ import {
 // dummy comment
 
 const signon = async function () {
-  state.signonProfileData = await fetchWithTimeout('/signon')
+  state.signonProfileData = await fetchWithTimeout('/me')
 }
 
 const getInitialData = async function () {

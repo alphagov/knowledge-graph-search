@@ -6,7 +6,7 @@ interface Routes {
 }
 
 export enum Route {
-  signon = '/signon',
+  me = '/me',
   search = '/',
   getInitData = '/get-init-data',
   searchApi = '/search',
