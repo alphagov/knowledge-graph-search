@@ -170,6 +170,10 @@ h2:focus-visible {
   .results-comments {
     display: inline-block;
     flex-basis: 50%;
+
+    @media (max-width: 1315px) {
+      flex-basis: 100%;
+    }
   }
 }
 
@@ -343,9 +347,19 @@ h2:focus-visible {
     align-items: center;
     padding-bottom: 20px;
 
-    .hide-filters-button-container {
+    @media (max-width: 1315px) {
+      flex-wrap: wrap;
+    }
+
+    .hide-panel-button-container {
       width: calc($side-filters-width + $side-filters-margin-right);
       padding-right: 0;
+
+      @media screen and (max-width: 1315px) {
+        order: 2;
+        width: unset;
+        padding-right: 16px;
+      }
     }
   }
 
@@ -413,7 +427,7 @@ h2:focus-visible {
   }
 
   &.hide-filters {
-    .hide-filters-button-container {
+    .hide-panel-button-container {
       width: unset;
       padding-right: 16px;
     }
@@ -448,12 +462,28 @@ h2:focus-visible {
   justify-content: center;
   align-items: center;
 
+  @media (max-width: 1315px) {
+    order: 1;
+    flex-basis: 100%;
+    justify-content: flex-start;
+  }
+
   .govuk-select {
     margin-right: 20px;
+
+    @media (max-width: 1315px) {
+      margin-right: 0;
+      flex-basis: 45%;
+    }
   }
 
   #csv-download-btn {
     margin: 0 0 3px 0;
     flex-shrink: 0;
+
+    @media (max-width: 1315px) {
+      flex-basis: 35%;
+      min-width: 40px;
+    }
   }
 }

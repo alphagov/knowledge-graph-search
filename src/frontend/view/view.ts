@@ -375,14 +375,16 @@ const viewResults = function () {
       state.showFiltersPane ? '' : 'hide-filters'
     }">
       <div class='results-container-row-1-headers'>
-        <div class="hide-filters-button-container">
+        <div class="hide-panel-button-container">
           <button id="toggle-filters-btn" class="govuk-button govuk-button--secondary">${
             state.showFiltersPane ? 'Hide Filters' : 'Show Filters'
           }</button>
         </div>
-        <button class="govuk-button govuk-button--secondary" id="toggle-header-options-btn">${
-          state.showFieldSet ? 'Hide header options' : 'Show header options'
-        }</button>
+        <div class="hide-panel-button-container">
+          <button class="govuk-button govuk-button--secondary" id="toggle-header-options-btn">${
+            state.showFieldSet ? 'Hide header options' : 'Show header options'
+          }</button>
+        </div>
         ${viewCSVDownload()}
       </div>
       <div class="results-container-row-2-results">
