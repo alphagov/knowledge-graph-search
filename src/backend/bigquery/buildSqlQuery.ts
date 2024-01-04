@@ -33,29 +33,29 @@ export const buildSqlQuery = function (
 
   let textOccurrences = ''
 
-  if (includeOccurrences && keywords?.length) {
-    if (keywords.length === 1) {
-      textOccurrences = `
-          (
-            SELECT
-            ARRAY_LENGTH(REGEXP_EXTRACT_ALL(LOWER(${contentToSearchString}), LOWER(r'(${keywords[0].replace(
-        /'/g,
-        "\\'"
-      )})')))
-          ) AS occurrences,`
-    } else {
-      const mappedKeywords = keywords
-        .map(
-          (value) => `
-          (
-            SELECT
-            ARRAY_LENGTH(REGEXP_EXTRACT_ALL(LOWER(${contentToSearchString}), LOWER(r'(${value})')))
-          )`
-        )
-        .join(', ')
-
-      textOccurrences = `(${mappedKeywords}) AS occurrences,`
-    }
+  if (includeOccurrences) {
+    // For counting occurences of substrings, see https://stackoverflow.com/a/2906296/937932
+    textOccurrences = `[
+         ${[...Array(keywords.length).keys()]
+           .map(
+             (index) =>
+               `STRUCT(
+                 @keyword${index} AS keyword,
+                ${
+                  searchParams.caseSensitive
+                    ? `DIV(
+                         (SELECT (LENGTH(${contentToSearchString}) - LENGTH(REPLACE(${contentToSearchString}, @keyword${index}, '')))),
+                         LENGTH(@keyword${index})
+                       ) AS occurrences`
+                    : `DIV(
+                         (SELECT (LENGTH(${contentToSearchString}) - LENGTH(REPLACE(LOWER(${contentToSearchString}), LOWER(@keyword${index}), '')))),
+                         LENGTH(@keyword${index})
+                       ) AS occurrences`
+                }
+               )`
+           )
+           .join(', ')}
+       ] AS occurrences,`
   }
 
   const linkOccurrences =
