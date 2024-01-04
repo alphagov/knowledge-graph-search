@@ -365,6 +365,11 @@ h2:focus-visible {
 
   .results-container-row-2-results {
     display: flex;
+
+    @media (max-width: 1315px) {
+      flex-direction: column;
+    }
+
     .govuk-body {
       flex: 1;
     }
@@ -399,6 +404,11 @@ h2:focus-visible {
       box-sizing: border-box;
 
       border: 1px solid #c4c4c4;
+
+      @media (max-width: 1315px) {
+        margin-bottom: 20px;
+        margin-right: 0;
+      }
 
       &.closed {
         display: none;
