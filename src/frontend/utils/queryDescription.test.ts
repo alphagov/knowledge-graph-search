@@ -1,4 +1,5 @@
-import { queryDescription } from './queryDescription'
+import { queryDescription, sortDescription } from './queryDescription'
+import { Sorting, SortAction } from '../types/state-types'
 import {
   Combinator,
   KeywordLocation,
@@ -28,6 +29,7 @@ const DEFAULT_SEARCH_PARAMS: SearchParams = {
   language: '',
   documentType: '',
   linkSearchUrl: '',
+  phoneNumber: '',
   keywordLocation: KeywordLocation.BodyContent,
   combinator: Combinator.All,
   publishingApplication: PublishingApplication.Whitehall,
@@ -175,7 +177,7 @@ describe('queryDescription', () => {
     }
     const description = queryDescription(params)
     expect(description).toContain(
-      'Searching for pages that  contain <span class="govuk-!-font-weight-bold">test</span>'
+      'Searching for pages that contain <span class="govuk-!-font-weight-bold">test</span>'
     )
   })
 
@@ -189,7 +191,15 @@ describe('queryDescription', () => {
     }
     const description = queryDescription(params)
     expect(description).toContain(
-      '<span class="govuk-!-font-weight-bold">5 results</span> for pages that  contain <span class="govuk-!-font-weight-bold">test</span>'
+      '<span class="govuk-!-font-weight-bold">5 results</span> for pages that contain <span class="govuk-!-font-weight-bold">test</span>'
     )
+  })
+
+  it('should describe the sort order', () => {
+    const sorting: Sorting = {
+      page_views: { sortIndex: 0, sort: SortAction.DESC },
+    }
+    const description = sortDescription(sorting)
+    expect(description).toContain(', sorted by "Views (7days)" (descending)')
   })
 })

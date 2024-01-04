@@ -64,6 +64,7 @@ const fetchInitialData = async function () {
       state.searchParams.taxon !== '' ||
       state.searchParams.publishingOrganisation !== '' ||
       state.searchParams.linkSearchUrl !== '' ||
+      state.searchParams.phoneNumber !== '' ||
       state.searchParams.documentType !== '' ||
       state.searchParams.publishingApplication !== PublishingApplication.Any ||
       state.searchParams.publishingStatus !== PublishingStatus.All

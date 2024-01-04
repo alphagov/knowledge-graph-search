@@ -1,6 +1,6 @@
 import { queryDescription } from '../utils/queryDescription'
 import { id, splitKeywords } from '../../common/utils/utils'
-import { state, searchState } from '../state'
+import { state, searchState, CSVDownloadType } from '../state'
 import { handleEvent } from '../events'
 import { viewMetaResults } from './view-metabox'
 import { viewAdvancedSearchPanel, viewSearchPanel } from './view-search-panel'
@@ -85,10 +85,21 @@ const view = () => {
     handleEvent({ type: EventType.Dom, id: 'toggleDisamBox' })
   )
 
-  id('csv-download-select')?.addEventListener('change', (event: Event) => {
-    const selectedValue = (event.target as HTMLSelectElement).value
+  id('csv-download-select')?.addEventListener('change', (e) => {
+    const downloadType = (e.target as HTMLSelectElement)
+      .value as CSVDownloadType
+    handleEvent({
+      type: EventType.Dom,
+      id: `download-type-${downloadType}`,
+    })
+  })
+
+  id('csv-download-btn')?.addEventListener('click', (e) => {
+    e.preventDefault()
+    const selectedValue = state.CSVDownloadType
+
     const eventId =
-      selectedValue === 'all-results'
+      selectedValue === CSVDownloadType.ALL
         ? 'download-all-csv'
         : 'download-current-csv'
     dispatchCustomGAEvent(eventId, {})
@@ -113,6 +124,11 @@ const tabs = [
     id: 'search-links',
     label: 'Links',
     searchType: SearchType.Link,
+  },
+  {
+    id: 'search-phone-numbers',
+    label: 'Phone numbers',
+    searchType: SearchType.PhoneNumber,
   },
   {
     id: 'search-orgs',
@@ -197,7 +213,11 @@ const viewMainLayout = () => {
 const viewDataBaseError = () => {
   const html = []
   let errorText = ''
-  switch (state.systemErrorText) {
+  switch (state.systemErrorText.message) {
+    case 'BAD_REQUEST':
+      errorText =
+        "The search could not be performed. This is usually because a phone number couldn't be parsed."
+      break
     case 'TIMEOUT':
       errorText =
         'The database took too long to respond. This is usually due to too many query results. Please try a more precise query.'
@@ -255,7 +275,7 @@ const viewSearchResultsTable = () => {
     }>
     <fieldset class="govuk-fieldset">
       <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-        <h1 class="govuk-fieldset__heading">
+        <h2 class="govuk-fieldset__heading">
           Customise table headers
         </h1>
       </legend>
@@ -272,7 +292,7 @@ const viewSearchResultsTable = () => {
               <input class="govuk-checkboxes__input"
                       data-interactive="true"
                       type="checkbox" id="show-field-${key}"
-                ${state.showFields[key] ? 'checked' : ''}/>
+                ${state.stagedShowFields[key] ? 'checked' : ''}/>
               <label for="show-field-${key}" class="govuk-label govuk-checkboxes__label">${fieldName(
                 key
               )}</label>
@@ -281,6 +301,7 @@ const viewSearchResultsTable = () => {
         )
         .join('')}
       </div>
+      <button class="govuk-button govuk-button--secondary" id="submit-all-headers">Submit</button>
     </fieldset>
   </div>
   `
@@ -297,10 +318,10 @@ const viewSearchResultsTable = () => {
 
 const viewWaiting = () => `
   <div aria-live="polite" role="region">
-    <div class="govuk-body">${queryDescription({
+    <h1 class="govuk-body">${queryDescription({
       searchParams: state.searchParams,
       waiting: true,
-    })}</div>
+    })}</h1>
     <p class="govuk-body-s">Some queries may take up to a minute</p>
   </div>
 `
@@ -311,10 +332,14 @@ const viewCSVDownload = () => {
     Download data
   </label>
     <select class="govuk-select" id="csv-download-select" name="csv-download-select" style="width: 100%;">
-      <option value="" disabled selected >Export data (csv)</option>
-      <option value="current-results">Current results (${state.pagination.resultsPerPage})</option>
-      <option value="all-results">All results (${state.searchResults?.length})</option>
+      <option value="${CSVDownloadType.CURRENT}" ${
+    state.CSVDownloadType === CSVDownloadType.CURRENT ? 'selected' : ''
+  }>Current results (${state.pagination.resultsPerPage})</option>
+      <option value="${CSVDownloadType.ALL}" ${
+    state.CSVDownloadType === CSVDownloadType.ALL ? 'selected' : ''
+  }>All results (${state.searchResults?.length})</option>
     </select>
+    <button class="govuk-button govuk-button--secondary" id="csv-download-btn">Download CSV</button>
   </div>`
 }
 
@@ -327,20 +352,20 @@ const viewResults = function () {
     html.push(`<div class="results-comments">`)
     if (nbRecords < 10000) {
       html.push(
-        `<div class="govuk-body">${queryDescription({
+        `<h1 class="govuk-body">${queryDescription({
           searchParams: state.searchParams,
           nbRecords,
-        })}</div>`
+        })}</h1>`
       )
     } else {
       html.push(`
-        <div class="govuk-warning-text">
+        <h1 class="govuk-warning-text">
           <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
           <strong class="govuk-warning-text__text">
             <span class="govuk-warning-text__assistive">Warning</span>
             There are more than 10000 results. Try to narrow down your search.
           </strong>
-        </div>
+        </h1>
       `)
     }
 
@@ -359,14 +384,16 @@ const viewResults = function () {
       state.showFiltersPane ? '' : 'hide-filters'
     }">
       <div class='results-container-row-1-headers'>
-        <div class="hide-filters-button-container">
+        <div class="hide-panel-button-container">
           <button id="toggle-filters-btn" class="govuk-button govuk-button--secondary">${
             state.showFiltersPane ? 'Hide Filters' : 'Show Filters'
           }</button>
         </div>
-        <button class="govuk-button govuk-button--secondary" id="toggle-header-options-btn">${
-          state.showFieldSet ? 'Hide header options' : 'Show header options'
-        }</button>
+        <div class="hide-panel-button-container">
+          <button class="govuk-button govuk-button--secondary" id="toggle-header-options-btn">${
+            state.showFieldSet ? 'Hide header options' : 'Show header options'
+          }</button>
+        </div>
         ${viewCSVDownload()}
       </div>
       <div class="results-container-row-2-results">
@@ -401,7 +428,7 @@ const viewNoResults = () => {
     newUrl = `?${newSearchParams.toString()}`
   }
   return `
-    <div class="govuk-body govuk-inset-text">
+    <h1 class="govuk-body govuk-inset-text">
       <span class="govuk-!-font-weight-bold">No results</span> for ${queryDescription(
         {
           searchParams: state.searchParams,
@@ -413,7 +440,7 @@ const viewNoResults = () => {
           : '<p>Try a different keyword or adjust your filters.</p>'
       }
       <button class="govuk-button govuk-button--secondary" id="new-search-btn">New search</button>
-    </div>
+    </h1>
   `
 }
 

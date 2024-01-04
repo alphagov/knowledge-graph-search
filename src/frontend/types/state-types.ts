@@ -1,4 +1,5 @@
 import { SearchParams } from '../../common/types/search-api-types'
+import { CSVDownloadType } from '../state'
 
 export type Field =
   | 'url'
@@ -23,12 +24,16 @@ export enum SortAction {
   NONE = '',
 }
 
+export type Sorting = Partial<
+  Record<Field, { sortIndex: number; sort: SortAction }>
+>
+
 export interface State {
   searchParams: SearchParams
   taxons: string[]
   organisations: string[]
   locales: string[]
-  systemErrorText: string | null
+  systemErrorText: any
   userErrors: string[]
   searchResults: any[] | null
   metaSearchResults: any[] | null
@@ -39,9 +44,12 @@ export interface State {
   }
   waiting: boolean
   disamboxExpanded: boolean
+  stagedShowFields: any
   showFields: any
   showFiltersPane: boolean
   showFieldSet: boolean
   documentTypes: string[]
   sorting: Partial<Record<Field, SortAction>>
+  CSVDownloadType: CSVDownloadType
+  phoneNumberError: boolean | null
 }

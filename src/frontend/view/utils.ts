@@ -10,23 +10,28 @@ export const formatDateTime = (date: any) =>
     ? `${date.value.slice(0, 10)} at ${date.value.slice(11, 16)}`
     : 'No data available'
 
-export const formatOccurrences = (occurrences: [Occurrence]) =>
-  occurrences.length > 1
-    ? `Total (${occurrences.reduce(
-        (partialSum: any, occurrence: Occurrence) =>
-          partialSum + occurrence.occurrences,
-        0
-      )}), ${occurrences
-        .map(
-          (occurrence) => `${occurrence.keyword} (${occurrence.occurrences})`
-        )
-        .join(', ')}`
-    : `${occurrences[0].occurrences}`
+export const formatOccurrences = (occurrences: Occurrence[]) => {
+  if (occurrences.length === 0) {
+    return ''
+  }
+  if (occurrences.length === 1) {
+    return `${occurrences[0].occurrences}`
+  }
+  const occurencesSum = occurrences.reduce(
+    (partialSum: any, occurrence: Occurrence) =>
+      partialSum + occurrence.occurrences,
+    0
+  )
+  const occurencesFormatted = occurrences
+    .map((occurrence) => `${occurrence.keyword} (${occurrence.occurrences})`)
+    .join(', ')
+  return `Total (${occurencesSum}), ${occurencesFormatted}`
+}
 
 export const fieldFormatters: Record<Field, any> = {
   url: {
     name: 'URL',
-    format: (url: string) => `<a class="govuk-link" href="${url}">${url}</a>`,
+    format: (url: string) => url,
   },
   title: { name: 'Title' },
   locale: { name: 'Language', format: languageName },
@@ -72,7 +77,7 @@ export const fieldFormatters: Record<Field, any> = {
 }
 
 export const fieldName = function (key: string) {
-  const f = fieldFormatters[key]
+  const f = fieldFormatters[<Field>key]
   return f ? f.name : key
 }
 
@@ -80,7 +85,7 @@ export const fieldFormat = function (
   key: string,
   val: string | number
 ): string {
-  const f = fieldFormatters[key]
+  const f = fieldFormatters[<Field>key]
   return f && f.format ? f.format(val) : val
 }
 
@@ -93,4 +98,17 @@ export const dispatchCustomGAEvent = (name: string, detail: any = {}) => {
       ...detail,
     })
   }
+}
+
+export const sortOrder = function (key: string) {
+  const sortOrderFormatters: Record<string, any> = {
+    asc: {
+      name: 'ascending',
+    },
+    desc: {
+      name: 'descending',
+    },
+  }
+  const s = sortOrderFormatters[key]
+  return s ? s.name : key
 }

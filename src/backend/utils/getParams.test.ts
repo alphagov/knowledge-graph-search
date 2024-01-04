@@ -22,6 +22,7 @@ describe('getParams', () => {
         'publishing-application': 'some publishing-application',
         'link-search-url': 'some link-search-url',
         'document-type': 'some document-type',
+        'phone-number': 'some phone-number',
         'publishing-status': 'some publishing-status',
       },
     } as unknown as Request
@@ -37,6 +38,7 @@ describe('getParams', () => {
       documentType: 'some document-type',
       keywordLocation: 'some keyword-location',
       linkSearchUrl: 'some link-search-url',
+      phoneNumber: 'some phone-number',
       publishingApplication: 'some publishing-application',
       publishingStatus: 'some publishing-status',
       language: 'some language',
@@ -68,6 +70,7 @@ describe('getParams', () => {
       combinator: 'all',
       excludedWords: '',
       linkSearchUrl: '',
+      phoneNumber: '',
       searchType: 'keyword',
       language: '',
       publishingOrganisation: '',

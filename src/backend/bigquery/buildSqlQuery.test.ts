@@ -9,7 +9,7 @@ import {
 import { buildSqlQuery } from './buildSqlQuery'
 import { expect } from '@jest/globals'
 
-const prefix = (keywords?: string[]) => `
+const prefix = (keywords?: string[], link?: string) => `
   SELECT
     url,
     title,
@@ -25,10 +25,9 @@ const prefix = (keywords?: string[]) => `
     taxons,
     primary_organisation,
     organisations AS all_organisations,
-    ${
+    [${
       keywords?.length
-        ? `[
-             STRUCT(
+        ? `STRUCT(
                @keyword0 AS keyword,
                DIV(
                  (SELECT (LENGTH(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, "")) - LENGTH(REPLACE(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @keyword0, '')))),
@@ -40,19 +39,23 @@ const prefix = (keywords?: string[]) => `
                  (SELECT (LENGTH(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, "")) - LENGTH(REPLACE(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @keyword1, '')))),
                  LENGTH(@keyword1)
                ) AS occurrences
-             )
-           ] AS occurrences,`
-        : `[
-           ] AS occurrences,`
-    }
+             )`
+        : ''
+    }${keywords?.length && link !== undefined ? ', ' : ''}${
+  link !== undefined
+    ? `STRUCT(
+      @link AS keyword,
+      (SELECT COUNT(1) FROM UNNEST(hyperlinks) as hyperlink WHERE CONTAINS_SUBSTR(hyperlink.link_url, @link)) AS occurrences)`
+    : ''
+}] AS occurrences,
     FROM search.pageWHERE TRUE`
 
 const SUFFIX = `
   ORDER BY page_views DESC
   LIMIT 10000`
 
-const expectedQuery = (clauses: string, keywords?: string[]) =>
-  `${prefix(keywords)}${clauses}${SUFFIX}`
+const expectedQuery = (clauses: string, keywords?: string[], link?: string) =>
+  `${prefix(keywords, link)}${clauses}${SUFFIX}`
 
 // This test util is used to remove from a string:
 // - leading and trailing whitespace
@@ -215,8 +218,9 @@ describe('buildSqlQuery', () => {
   })
 
   it('can filter by any hyperlink', () => {
+    const link = 'whatever'
     const searchParams: SearchParams = makeParams({
-      linkSearchUrl: 'whatever',
+      linkSearchUrl: link,
     })
     const keywords: string[] = []
     const excludedKeywords: string[] = []
@@ -229,19 +233,20 @@ describe('buildSqlQuery', () => {
       WHERE CONTAINS_SUBSTR(link.link_url, @link)
     )
     `
-    const expected = expectedQuery(expectedClauses, keywords)
+    const expected = expectedQuery(expectedClauses, keywords, link)
 
     expect(queryFmt(query)).toEqual(queryFmt(expected))
   })
 
   it('can mix all the clauses together', () => {
+    const link = 'whatever'
     const searchParams: SearchParams = makeParams({
       caseSensitive: true,
       publishingApplication: 'whitehall',
       language: 'whatever',
       taxon: 'whatever',
       publishingOrganisation: 'whatever',
-      linkSearchUrl: 'whatever',
+      linkSearchUrl: link,
     })
     const keywords: string[] = ['test1', 'test2']
     const excludedKeywords: string[] = ['excluded1', 'excluded2']
@@ -269,7 +274,7 @@ describe('buildSqlQuery', () => {
       WHERE CONTAINS_SUBSTR(link.link_url, @link)
     )
   `
-    const expected = expectedQuery(expectedClauses, keywords)
+    const expected = expectedQuery(expectedClauses, keywords, link)
 
     expect(queryFmt(query)).toEqual(queryFmt(expected))
   })
