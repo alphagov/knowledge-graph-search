@@ -44,47 +44,60 @@
 .customHeaderContainer {
   width: 100%;
 }
+
 .customHeaderLabel {
   font-weight: normal;
   position: relative;
 
   &.sortable {
     cursor: pointer;
+    position: relative;
+
+    .sort-index {
+      position: absolute;
+      right: 20px;
+      top: 3px;
+      bottom: 0;
+      background-color: #f8f8f8;
+      z-index: 90;
+      padding-left: 10px;
+      font-weight: 100;
+      font-size: 16px;
+    }
 
     &.sorting-active {
       color: black;
       font-weight: bold;
 
-      &.sorting-desc::before {
+      &.sorting-desc .icon-desc {
         color: black;
       }
-      &.sorting-asc::after {
+      &.sorting-asc .icon-asc {
         color: black;
       }
     }
 
-    &:hover {
-      text-decoration: underline;
-    }
-    &::before {
-      content: ' ▼';
+    .icon-desc,
+    .icon-asc {
       position: absolute;
-      right: 0px;
-      bottom: -1px;
       font-size: 12px;
-      color: lightgray;
+      color: #474747;
       padding-left: 10px;
       background-color: #f8f8f8;
     }
-    &::after {
-      content: ' ▲';
-      position: absolute;
+
+    .icon-desc {
+      right: 0px;
+      bottom: -2px;
+    }
+
+    .icon-asc {
       right: 0px;
       top: -1px;
-      font-size: 12px;
-      color: lightgray;
-      padding-left: 10px;
-      background-color: #f8f8f8;
+    }
+
+    &:hover {
+      text-decoration: underline;
     }
   }
 }
@@ -102,17 +115,6 @@
   }
 }
 
-.customHeaderLabel.sortable {
-  position: relative;
-  .sort-index {
-    position: absolute;
-    right: 20px;
-    top: 3px;
-    bottom: 0;
-    background-color: #f8f8f8;
-    z-index: 90;
-    padding-left: 10px;
-    font-weight: 100;
-    font-size: 16px;
-  }
+.visually-hidden {
+  display: none;
 }
