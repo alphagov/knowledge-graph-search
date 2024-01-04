@@ -9,6 +9,7 @@ export enum UrlParams {
   DocumentType = 'document-type',
   KeywordLocation = 'keyword-location',
   LinkSearchUrl = 'link-search-url',
+  PhoneNumber = 'phone-number',
   PublishingApplication = 'publishing-application',
   PublishingStatus = 'publishing-status',
   Language = 'language',
@@ -17,6 +18,7 @@ export enum UrlParams {
 export enum SearchType {
   Keyword = 'keyword',
   Link = 'link',
+  PhoneNumber = 'phone-number',
   Organisation = 'organisation',
   Taxon = 'taxon',
   Language = 'language',
@@ -58,6 +60,7 @@ export type SearchParams = {
   language: string // the language to search for
   documentType: string // documentTypeto search in
   linkSearchUrl: string // URL to find all pages linking to
+  phoneNumber: string // the phone number to search for
   keywordLocation: KeywordLocation // what parts of the pages to search in
   combinator: Combinator // all keywords or any keywords
   publishingApplication: PublishingApplication // whitehall, publisher, both

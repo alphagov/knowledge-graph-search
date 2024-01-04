@@ -29,6 +29,7 @@ const DEFAULT_SEARCH_PARAMS: SearchParams = {
   language: '',
   documentType: '',
   linkSearchUrl: '',
+  phoneNumber: '',
   keywordLocation: KeywordLocation.BodyContent,
   combinator: Combinator.All,
   publishingApplication: PublishingApplication.Whitehall,

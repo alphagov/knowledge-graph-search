@@ -6,7 +6,7 @@ import {
   initialSearchParams,
   CSVDownloadType,
 } from './state'
-import { id, getFormInputValue } from '../common/utils/utils'
+import { id, getFormInputValue, getPhoneNumber } from '../common/utils/utils'
 import { view } from './view/view'
 import { queryBackend } from './search-api'
 import { EventType, SearchApiCallback } from './types/event-types'
@@ -83,6 +83,13 @@ const updateStateFromSearchFilters = () => {
   state.searchParams.linkSearchUrl = getFormInputValue(
     'search-filters-link-search'
   )
+  const { phoneNumber, error } = getPhoneNumber(
+    'search-filters-phone-number-search'
+  )
+  if (phoneNumber !== undefined) {
+    state.searchParams.phoneNumber = phoneNumber
+    state.phoneNumberError = error
+  }
   state.searchParams.excludedWords = getFormInputValue(
     'search-filters-excluded-keywords'
   )
@@ -112,6 +119,7 @@ const resetFilters = () => {
     const mapping = {
       [SearchType.Keyword]: 'selectedWords',
       [SearchType.Link]: 'linkSearchUrl',
+      [SearchType.PhoneNumber]: 'phoneNumber',
       [SearchType.Organisation]: 'publishingOrganisation',
       [SearchType.Taxon]: 'taxon',
       [SearchType.Language]: 'language',
@@ -147,6 +155,7 @@ const handleSearchTabClick = (id: string) => {
   const mapping = {
     'search-keyword': SearchType.Keyword,
     'search-links': SearchType.Link,
+    'search-phone-numbers': SearchType.PhoneNumber,
     'search-taxons': SearchType.Taxon,
     'search-orgs': SearchType.Organisation,
     'search-langs': SearchType.Language,
@@ -198,7 +207,9 @@ const handleEvent: SearchApiCallback = async function (event) {
 
           updateStateFromSearchFilters()
           state.searchResults = null
-          searchButtonClicked()
+          if (!state.phoneNumberError) {
+            searchButtonClicked()
+          }
           break
         case 'new-search-btn':
           resetSearchState()
@@ -370,6 +381,10 @@ const getQueryStringFromSearchParams = function () {
       condition: (v) => v !== '',
       param: UrlParams.LinkSearchUrl,
     },
+    phoneNumber: {
+      condition: (v) => v !== '',
+      param: UrlParams.PhoneNumber,
+    },
     searchType: {
       condition: (v) => v !== SearchType.Keyword,
       param: UrlParams.SearchType,
@@ -394,6 +409,7 @@ const getQueryStringFromSearchParams = function () {
     'combinator',
     'excludedWords',
     'linkSearchUrl',
+    'phoneNumber',
     'keywordLocation',
     'publishingOrganisation',
     'documentType',
