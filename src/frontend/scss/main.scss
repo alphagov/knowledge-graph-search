@@ -382,6 +382,10 @@ h2:focus-visible {
       .header-options-checkboxes-container {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
+
+        @media (max-width: 1315px) {
+          grid-template-columns: repeat(2, 1fr);
+        }
       }
     }
 
@@ -494,6 +498,7 @@ h2:focus-visible {
     @media (max-width: 1315px) {
       flex-basis: 35%;
       min-width: 40px;
+      margin-left: 10px;
     }
   }
 }
