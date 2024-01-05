@@ -113,7 +113,9 @@ export default class CustomAgGridHeader {
     // Ideally we'd update the query description via handleEvent(), but doing so
     // creates an infinite loop. Instead, we update the element directly.
     const description = document.getElementById('sort-description')
-    description.textContent = sortDescription(this.sortModel)
+    if (description) {
+      description.textContent = sortDescription(this.sortModel)
+    }
   }
 
   private get headerHtmlContent() {
