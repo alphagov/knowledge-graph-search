@@ -317,7 +317,7 @@ const viewSearchResultsTable = () => {
 }
 
 const viewWaiting = () => `
-  <div aria-live="polite" role="region">
+  <div aria-live="polite" role="region" role="status" aria-live="assertive">
     <h1 class="govuk-body">${queryDescription({
       searchParams: state.searchParams,
       waiting: true,
@@ -352,14 +352,16 @@ const viewResults = function () {
     html.push(`<div class="results-comments">`)
     if (nbRecords < 10000) {
       html.push(
-        `<h1 class="govuk-body">${queryDescription({
-          searchParams: state.searchParams,
-          nbRecords,
-        })}</h1>`
+        `<h1 class="govuk-body" role="status" aria-live="assertive">${queryDescription(
+          {
+            searchParams: state.searchParams,
+            nbRecords,
+          }
+        )}</h1>`
       )
     } else {
       html.push(`
-        <h1 class="govuk-warning-text">
+        <h1 class="govuk-warning-text" role="status" aria-live="assertive">
           <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
           <strong class="govuk-warning-text__text">
             <span class="govuk-warning-text__assistive">Warning</span>
@@ -428,7 +430,7 @@ const viewNoResults = () => {
     newUrl = `?${newSearchParams.toString()}`
   }
   return `
-    <h1 class="govuk-body govuk-inset-text">
+    <h1 class="govuk-body govuk-inset-text" role="status" aria-live="assertive">
       <span class="govuk-!-font-weight-bold">No results</span> for ${queryDescription(
         {
           searchParams: state.searchParams,
