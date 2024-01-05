@@ -1,6 +1,8 @@
 .ag-theme-alpine {
   margin-bottom: 30px;
   font-family: 'GDS Transport', arial, sans-serif;
+  --ag-input-focus-border-color: blue;
+  --ag-range-selection-border-color: blue;
 }
 
 #grid-wrapper {
