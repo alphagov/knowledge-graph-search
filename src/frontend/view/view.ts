@@ -77,6 +77,7 @@ const view = () => {
     dispatchCustomGAEvent('formSubmission', {
       formType: 'Search',
       formPosition: 'Page',
+      userOrganisation: state.signonProfileData.user.organisation_slug,
     })
     handleEvent({ type: EventType.Dom, id: 'search' })
   })

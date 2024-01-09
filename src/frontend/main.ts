@@ -20,6 +20,10 @@ import {
 
 // dummy comment
 
+const signon = async function () {
+  state.signonProfileData = await fetchWithTimeout('/me')
+}
+
 const getInitialData = async function () {
   console.log('retrieving taxons, locales and organisations')
   const apiResponse = await fetchWithTimeout('/get-init-data')
@@ -82,6 +86,7 @@ const fetchInitialData = async function () {
 
 const initWithoutHMR = async () => {
   initState()
+  await signon()
   await fetchInitialData()
   if (!state.systemErrorText) {
     setQueryParamsFromQS()
