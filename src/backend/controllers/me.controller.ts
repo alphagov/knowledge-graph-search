@@ -2,12 +2,12 @@ import { RequestHandler } from 'express'
 import { SignonProfile } from '../constants/types'
 
 class MeController {
-  public me: RequestHandler = (req, res, next) => {
+  public me: RequestHandler = (req, res) => {
+    let profile: SignonProfile | any = {}
     if (req?.user) {
-      const profile = req?.user as SignonProfile
-      return res.json(profile.profileData || {})
+      profile = req?.user as SignonProfile
     }
-    next()
+    return res.json(profile?.profileData || {})
   }
 }
 
