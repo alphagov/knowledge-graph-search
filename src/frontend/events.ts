@@ -203,6 +203,7 @@ const handleEvent: SearchApiCallback = async function (event) {
             event: 'formSubmission',
             formType: 'Search',
             formPosition: 'Page',
+            userOrganisation: state.signonProfileData.user.organisation_slug,
           })
 
           updateStateFromSearchFilters()

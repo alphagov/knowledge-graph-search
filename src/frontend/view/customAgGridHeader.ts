@@ -113,7 +113,9 @@ export default class CustomAgGridHeader {
     // Ideally we'd update the query description via handleEvent(), but doing so
     // creates an infinite loop. Instead, we update the element directly.
     const description = document.getElementById('sort-description')
-    description.textContent = sortDescription(this.sortModel)
+    if (description) {
+      description.textContent = sortDescription(this.sortModel)
+    }
   }
 
   private get headerHtmlContent() {
@@ -123,6 +125,19 @@ export default class CustomAgGridHeader {
       html = `${html} <div class="sort-index" aria-hidden="true">${
         this.sortModel[this.colId].sortIndex + 1
       }</div>`
+    }
+    if (this.sortingState === SortAction.NONE) {
+      html += `
+      <span class="icon-desc" aria-hidden="true">▼</span>
+      <span class="icon-asc" aria-hidden="true">▲</span>`
+    } else if (this.sortingState === SortAction.ASC) {
+      html += `
+      <span class="icon-asc" aria-hidden="true">▲</span>
+      `
+    } else if (this.sortingState === SortAction.DESC) {
+      html += `
+      <span class="icon-desc" aria-hidden="true">▼</span>
+      `
     }
 
     return html
