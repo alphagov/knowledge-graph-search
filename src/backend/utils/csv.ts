@@ -34,6 +34,10 @@ const csvFieldFormatters: Record<string, any> = {
     name: 'Last major update',
     format: formatDateTime,
   },
+  publisher_updated_at: {
+    name: 'Last update in the Publisher app',
+    format: formatDateTime,
+  },
   taxons: {
     name: 'Topic tags',
     format: formatNames,

@@ -11,6 +11,7 @@ export type Field =
   | 'publishing_app'
   | 'first_published_at'
   | 'public_updated_at'
+  | 'publisher_updated_at'
   | 'taxons'
   | 'primary_organisation'
   | 'all_organisations'
