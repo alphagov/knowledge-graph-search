@@ -6,14 +6,12 @@ import {
   Organisation,
   Person,
   Role,
-  MetaResultType,
   MetaResult,
   MainResult,
   SearchParams,
   SearchResults,
   SearchType,
   InitResults,
-  BankHoliday,
 } from '../../common/types/search-api-types'
 import { splitKeywords } from '../../common/utils/utils'
 import { languageCode } from '../../common/utils/lang'
@@ -140,23 +138,6 @@ const getOrganisationInfo = async function (
   )
 }
 
-const getBankHolidayInfo = async function (
-  name: string
-): Promise<BankHoliday[]> {
-  const bqBankHolidays: BankHoliday[] = await bigQuery(
-    `SELECT * FROM search.bank_holiday WHERE lower(name) = lower(@name);`,
-    { name }
-  )
-  return bqBankHolidays.map((bqBankHoliday: BankHoliday) => {
-    return {
-      type: MetaResultType.BankHoliday,
-      name: bqBankHoliday.name,
-      dates: bqBankHoliday.dates.map((date: any) => date.value),
-      divisions: bqBankHoliday.divisions,
-    }
-  })
-}
-
 const getTransactionInfo = async function (
   name: string
 ): Promise<Transaction[]> {
@@ -256,7 +237,6 @@ const sendSearchQuery = async function (
 }
 
 export {
-  getBankHolidayInfo,
   getTransactionInfo,
   getOrganisationInfo,
   getPersonInfo,

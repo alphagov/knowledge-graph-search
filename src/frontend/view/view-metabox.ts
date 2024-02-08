@@ -4,7 +4,6 @@ import {
   Taxon,
   Organisation,
   Transaction,
-  BankHoliday,
 } from '../../common/types/search-api-types'
 
 const viewDetails = (
@@ -143,30 +142,6 @@ const viewRolePersons = (persons: any[]): string => {
 
   return `${currentsHtml} ${previousHtml}`
 }
-
-const viewBankHolidayDetails = function (holiday: BankHoliday): string {
-  const datesDetails: string = viewDetails(
-    'dates',
-    holiday.dates.sort().reverse(),
-    (date) => date
-  )
-  const divisionDetails: string = viewDetails(
-    'Observed in',
-    holiday.divisions.sort(),
-    (division) => division
-  )
-  return `${datesDetails}${divisionDetails}`
-}
-
-const viewBankHoliday = (record: BankHoliday): string => `
-  <div class="meta-results-panel">
-    <h2 class="govuk-heading-m">
-      ${record.name}
-    </h2>
-    <p class="govuk-body">Bank holiday</p>
-    ${viewBankHolidayDetails(record)}
-  </div>
-`
 
 const viewPerson = (record: any): string => `
   <div class="meta-results-panel">
@@ -375,8 +350,6 @@ const viewMetaResults = function (): string {
 
   const record = state.metaSearchResults[0]
   switch (record.type) {
-    case 'BankHoliday':
-      return viewBankHoliday(record)
     case 'Organisation':
       return viewOrg(record)
     case 'Person':

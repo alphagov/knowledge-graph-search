@@ -14,7 +14,6 @@ export enum Route {
   downloadCSV = '/csv',
   infoBoxOrganisation = '/organisation',
   infoBoxRole = '/role',
-  infoBoxBankHoliday = '/bank-holiday',
   infoBoxTransaction = '/transaction',
   infoBoxPerson = '/person',
   login = '/login',

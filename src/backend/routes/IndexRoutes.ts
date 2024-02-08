@@ -61,12 +61,6 @@ class IndexRoute implements Routes {
     )
 
     this.router.get(
-      Route.infoBoxBankHoliday,
-      auth(),
-      this.infoBoxController.infoBoxBankHoliday
-    )
-
-    this.router.get(
       Route.infoBoxTransaction,
       auth(),
       this.infoBoxController.infoBoxTransaction

@@ -21,12 +21,6 @@ describe('Infobox results', () => {
     cy.contains('div.meta-results-panel p', 'GOV.UK Taxon')
   })
 
-  it('Shows the BankHoliday infobox', () => {
-    cy.visit('?selected-words=%22Boxing+Day%22&search-in-text=false')
-    cy.contains('div.meta-results-panel h2', 'Boxing Day')
-    cy.contains('div.meta-results-panel p', 'Bank holiday')
-  })
-
   /*
   it('Shows the Organisation infobox', () => {
     cy.visit('?selected-words=%22Ministry+of+Defence%22&search-in-text=false')
