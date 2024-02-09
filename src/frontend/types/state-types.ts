@@ -37,14 +37,12 @@ export interface State {
   systemErrorText: any
   userErrors: string[]
   searchResults: any[] | null
-  metaSearchResults: any[] | null
   skip: number
   pagination: {
     currentPage: number
     resultsPerPage: number
   }
   waiting: boolean
-  disamboxExpanded: boolean
   stagedShowFields: any
   showFields: any
   showFiltersPane: boolean

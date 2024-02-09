@@ -158,11 +158,6 @@ h2:focus-visible {
   outline: none;
 }
 
-.advanced-layout .meta-results-panel {
-  float: none;
-  max-width: unset;
-}
-
 .before-results-container {
   display: flex;
   width: 100%;
@@ -174,30 +169,6 @@ h2:focus-visible {
     @media (max-width: 1315px) {
       flex-basis: 100%;
     }
-  }
-}
-
-.meta-results-panel {
-  flex-basis: 80%;
-  max-height: 300px;
-  overflow-y: scroll;
-  border: 3px solid black;
-  padding: 20px 20px 4px 20px;
-  h1 {
-    margin: 0;
-  }
-
-  &--collapsed {
-    max-height: 170px;
-    overflow: hidden;
-  }
-
-  #meta-results-expand {
-    position: relative;
-    top: 16px;
-    left: 40%;
-    padding: 0 2px 0 2px;
-    border: 1px solid black;
   }
 }
 

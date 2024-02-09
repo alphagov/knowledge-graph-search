@@ -222,9 +222,6 @@ const handleEvent: SearchApiCallback = async function (event) {
         case 'button-prev-page':
           state.skip = Math.max(state.skip - state.pagination.resultsPerPage, 0)
           break
-        case 'toggleDisamBox':
-          state.disamboxExpanded = !state.disamboxExpanded
-          break
         case 'clear-all-headers':
           state.showFields = {}
           state.stagedShowFields = {}
@@ -280,10 +277,9 @@ const handleEvent: SearchApiCallback = async function (event) {
       state.waiting = true
       break
     case EventType.SearchApiCallbackOk:
-      state.searchResults = event.results?.main.sort(
+      state.searchResults = event.results?.sort(
         (a: any, b: any) => b.page_views - a.page_views
       )
-      state.metaSearchResults = event.results?.meta
       state.waiting = false
       state.systemErrorText = null
       break

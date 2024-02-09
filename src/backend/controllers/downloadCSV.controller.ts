@@ -10,7 +10,7 @@ class DownloadCSVController {
     const params: SearchParams = getParams(req)
     try {
       const data = await sendSearchQuery(params)
-      const csvData = csvStringify(data.main)
+      const csvData = csvStringify(data)
       res.set('Content-Type', 'text/csv')
       res.send(csvData)
     } catch (error) {

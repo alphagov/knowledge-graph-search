@@ -1,19 +1,9 @@
 // todo: split into models
 
 import {
-  Transaction,
-  Taxon,
-  Organisation,
-  Person,
-  Role,
-  MetaResultType,
-  MetaResult,
-  MainResult,
   SearchParams,
   SearchResults,
-  SearchType,
   InitResults,
-  BankHoliday,
 } from '../../common/types/search-api-types'
 import { splitKeywords } from '../../common/utils/utils'
 import { languageCode } from '../../common/utils/lang'
@@ -64,9 +54,6 @@ export const bigQuery = async function (userQuery: string, options?: any) {
     }
     if (options.documentType) {
       params.documentType = options.documentType
-    }
-    if (options.selectedWordsWithoutQuotes !== undefined) {
-      params.selected_words_without_quotes = options.selectedWordsWithoutQuotes
     }
   }
 
@@ -124,62 +111,6 @@ const sendInitQuery = async function (): Promise<InitResults> {
   }
 }
 
-const getTaxonInfo = async function (name: string): Promise<Taxon[]> {
-  return await bigQuery(
-    `SELECT "Taxon" as type, * FROM search.taxon WHERE lower(name) = lower(@name);`,
-    { name }
-  )
-}
-
-const getOrganisationInfo = async function (
-  name: string
-): Promise<Organisation[]> {
-  return await bigQuery(
-    `SELECT "Organisation" as type, * FROM search.organisation WHERE lower(name) = lower(@name);`,
-    { name }
-  )
-}
-
-const getBankHolidayInfo = async function (
-  name: string
-): Promise<BankHoliday[]> {
-  const bqBankHolidays: BankHoliday[] = await bigQuery(
-    `SELECT * FROM search.bank_holiday WHERE lower(name) = lower(@name);`,
-    { name }
-  )
-  return bqBankHolidays.map((bqBankHoliday: BankHoliday) => {
-    return {
-      type: MetaResultType.BankHoliday,
-      name: bqBankHoliday.name,
-      dates: bqBankHoliday.dates.map((date: any) => date.value),
-      divisions: bqBankHoliday.divisions,
-    }
-  })
-}
-
-const getTransactionInfo = async function (
-  name: string
-): Promise<Transaction[]> {
-  return await bigQuery(
-    `SELECT "Transaction" as type, * FROM search.transaction WHERE lower(name) = lower(@name);`,
-    { name }
-  )
-}
-
-const getRoleInfo = async function (name: string): Promise<Role[]> {
-  return await bigQuery(
-    `SELECT "Role" as type, * FROM search.role WHERE lower(name) = lower(@name);`,
-    { name }
-  )
-}
-
-const getPersonInfo = async function (name: string): Promise<Person[]> {
-  return await bigQuery(
-    `SELECT "Person" as type, * FROM search.person WHERE lower(name) = lower(@name);`,
-    { name }
-  )
-}
-
 // keywords as used here must be exactly the same set of combinedWords as used by the function containDescription.
 const sendSearchQuery = async function (
   searchParams: SearchParams
@@ -191,10 +122,6 @@ const sendSearchQuery = async function (
   const taxon = searchParams.taxon
   const organisation = searchParams.publishingOrganisation
   const documentType = searchParams.documentType
-  const selectedWordsWithoutQuotes = searchParams.selectedWords.replace(
-    /"/g,
-    ''
-  )
   const link = searchParams.linkSearchUrl
   const phoneNumber = searchParams.phoneNumber
   const queries = [
@@ -210,58 +137,9 @@ const sendSearchQuery = async function (
     }),
   ]
 
-  let bqMetaResults: MetaResult[] = []
-  let bqMainResults: MainResult[] = []
-  let results: unknown[][]
+  const results: unknown[][] = await Promise.all(queries)
 
-  switch (searchParams.searchType) {
-    case SearchType.Taxon:
-      results = await Promise.all(queries)
-      bqMainResults = results[0]
-      bqMetaResults = await getTaxonInfo(searchParams.taxon)
-      break
-    case SearchType.Organisation:
-      results = await Promise.all(queries)
-      bqMainResults = results[0]
-      bqMetaResults = await getOrganisationInfo(
-        searchParams.publishingOrganisation
-      )
-      break
-    default:
-      if (
-        selectedWordsWithoutQuotes &&
-        selectedWordsWithoutQuotes.length > 5 &&
-        selectedWordsWithoutQuotes.includes(' ')
-      ) {
-        queries.push(
-          bigQuery(
-            `SELECT *
-         FROM search.thing
-         WHERE CONTAINS_SUBSTR(name, @selected_words_without_quotes)
-         ;`,
-            { selectedWordsWithoutQuotes }
-          )
-        )
-      }
-      results = await Promise.all(queries)
-      bqMainResults = results[0]
-      bqMetaResults = results.length > 1 ? (results[1] as MetaResult[]) : []
-      break
-  }
-  const result: SearchResults = {
-    main: bqMainResults,
-    meta: bqMetaResults,
-  }
-  return result
+  return results[0]
 }
 
-export {
-  getBankHolidayInfo,
-  getTransactionInfo,
-  getOrganisationInfo,
-  getPersonInfo,
-  getRoleInfo,
-  getTaxonInfo,
-  sendInitQuery,
-  sendSearchQuery,
-}
+export { sendInitQuery, sendSearchQuery }

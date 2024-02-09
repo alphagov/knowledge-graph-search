@@ -25,9 +25,7 @@ const config: FrontendConfig = {
     options: [10, 20, 50, 100, 200],
     maxResultsBeforeScrolling: 20,
   },
-  featureFlags: {
-    enableInfoBox: false,
-  },
+  featureFlags: {},
 }
 
 export default config

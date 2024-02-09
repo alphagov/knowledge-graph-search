@@ -1,9 +1,5 @@
 import { RequestHandler } from 'express'
-import {
-  sendInitQuery,
-  sendSearchQuery,
-  getTaxonInfo,
-} from '../bigquery/bigquery'
+import { sendInitQuery, sendSearchQuery } from '../bigquery/bigquery'
 
 import { SearchParams } from '../../common/types/search-api-types'
 import { getParams } from '../utils/getParams'
@@ -38,20 +34,6 @@ class SearchAPIController {
     } catch (e: any) {
       log.error({ error: e }, 'ERROR fetching search data')
       res.status(500).send(e)
-    }
-  }
-
-  public searchTaxon: RequestHandler = async (req, res) => {
-    try {
-      const data = await getTaxonInfo(req.query.name as string)
-      res.send(data)
-    } catch (e: any) {
-      if (e.status === 404) {
-        res.status(e.status).send(e.message)
-      } else {
-        log.error({ error: e }, 'ERROR fetching search taxon')
-        res.status(500).send(e.message)
-      }
     }
   }
 }

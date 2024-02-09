@@ -73,7 +73,6 @@ const initState = () => {
     documentTypes: [],
     userErrors: [], // error codes due to user not entering valid search criteria
     searchResults: null,
-    metaSearchResults: null,
     skip: 0, // where to start the pagination (number of results)
     pagination: {
       resultsPerPage: config.pagination.defaultResultsPerPage, // number of results per page
@@ -82,7 +81,6 @@ const initState = () => {
     stagedShowFields: showFields,
     showFields, // what result columns to show
     waiting: false, // whether we're waiting for a request to return,
-    disamboxExpanded: false, // if there's a resizeable disamb meta box, whether it's expanded or not
     showFiltersPane: true,
     showFieldSet: true,
     sorting: defaultSortingState,
