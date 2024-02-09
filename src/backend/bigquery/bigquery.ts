@@ -1,7 +1,6 @@
 // todo: split into models
 
 import {
-  MainResult,
   SearchParams,
   SearchResults,
   InitResults,
@@ -138,16 +137,9 @@ const sendSearchQuery = async function (
     }),
   ]
 
-  let bqMainResults: MainResult[] = []
-  let results: unknown[][]
+  const results: unknown[][] = await Promise.all(queries)
 
-  results = await Promise.all(queries)
-  bqMainResults = results[0]
-
-  const result: SearchResults = {
-    main: bqMainResults,
-  }
-  return result
+  return results[0]
 }
 
 export { sendInitQuery, sendSearchQuery }

@@ -69,11 +69,7 @@ export type SearchParams = {
 }
 
 // a search can return a variable number of records of any type
-export type MainResult = unknown
-
-export type SearchResults = {
-  main: MainResult[]
-}
+export type SearchResults = unknown[]
 
 export type InitResults = {
   taxons: string[]

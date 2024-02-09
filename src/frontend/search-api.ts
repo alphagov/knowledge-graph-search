@@ -104,13 +104,12 @@ const queryBackend: (
     callback({ type: EventType.SearchApiCallbackFail, error })
     return
   }
-  let { main } = apiResults
 
   // TODO: find another way than using a callback function to get rid of the eslint error
   // eslint-disable-next-line n/no-callback-literal
   callback({
     type: EventType.SearchApiCallbackOk,
-    results: { main },
+    results: apiResults,
   })
 }
 

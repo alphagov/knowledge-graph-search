@@ -277,7 +277,7 @@ const handleEvent: SearchApiCallback = async function (event) {
       state.waiting = true
       break
     case EventType.SearchApiCallbackOk:
-      state.searchResults = event.results?.main.sort(
+      state.searchResults = event.results?.sort(
         (a: any, b: any) => b.page_views - a.page_views
       )
       state.waiting = false
