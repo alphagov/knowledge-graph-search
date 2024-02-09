@@ -2,7 +2,6 @@ import { queryDescription } from '../utils/queryDescription'
 import { id, splitKeywords } from '../../common/utils/utils'
 import { state, searchState, CSVDownloadType } from '../state'
 import { handleEvent } from '../events'
-import { viewMetaResults } from './view-metabox'
 import { viewAdvancedSearchPanel, viewSearchPanel } from './view-search-panel'
 import { EventType } from '../types/event-types'
 import { USER_ERRORS } from '../enums/constants'
@@ -15,7 +14,6 @@ import {
   SearchType,
   UrlParams,
 } from '../../common/types/search-api-types'
-import config from '../config'
 
 declare const window: any
 
@@ -81,10 +79,6 @@ const view = () => {
     })
     handleEvent({ type: EventType.Dom, id: 'search' })
   })
-
-  id('meta-results-expand')?.addEventListener('click', () =>
-    handleEvent({ type: EventType.Dom, id: 'toggleDisamBox' })
-  )
 
   id('csv-download-select')?.addEventListener('change', (e) => {
     const downloadType = (e.target as HTMLSelectElement)
@@ -375,10 +369,6 @@ const viewResults = function () {
     // .results-comments
     html.push(`</div>`)
 
-    if (config.featureFlags.enableInfoBox) {
-      html.push(viewMetaResults())
-    }
-
     // .before-results-container
     html.push(`</div>`)
 
@@ -476,12 +466,7 @@ const viewSearchResults = () => {
           search: document.title,
           resultsFound: false,
         })
-
-      return [
-        config.featureFlags.enableInfoBox ? viewMetaResults() : '',
-        viewNoResults(),
-      ].join('')
-
+      return viewNoResults()
     default:
       document.title = serviceName
       return ''

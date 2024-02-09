@@ -42,7 +42,6 @@ describe('[Function] bigQuery', () => {
       taxon: 'taxon',
       organisation: 'organisation',
       link: 'link',
-      selectedWordsWithoutQuotes: 'selectedWordsWithoutQuotes',
     }
     ;(BigQuery.prototype.query as jest.Mock).mockResolvedValue([1, 2, 3])
     await bigQuery('query', options)
@@ -61,7 +60,6 @@ describe('[Function] bigQuery', () => {
         taxon: 'taxon',
         organisation: 'organisation',
         link: 'link',
-        selected_words_without_quotes: 'selectedWordsWithoutQuotes',
       },
     })
   })
@@ -149,7 +147,7 @@ describe('[Function] sendSearchQuery', () => {
       .mockResolvedValueOnce(['Some result'])
       .mockResolvedValueOnce(['Some result'])
     await sendSearchQuery(makeSearchParams())
-    expect(BigQuery.prototype.query).toHaveBeenCalledTimes(2)
+    expect(BigQuery.prototype.query).toHaveBeenCalledTimes(1)
     expect(BigQuery.prototype.query).toHaveBeenNthCalledWith(1, {
       query: 'query',
       location: 'europe-west2',
@@ -162,16 +160,6 @@ describe('[Function] sendSearchQuery', () => {
         locale: 'en',
         organisation: 'organisation',
         taxon: 'taxon',
-      },
-    })
-    expect(BigQuery.prototype.query).toHaveBeenNthCalledWith(2, {
-      query: `SELECT *
-         FROM search.thing
-         WHERE CONTAINS_SUBSTR(name, @selected_words_without_quotes)
-         ;`,
-      location: 'europe-west2',
-      params: {
-        selected_words_without_quotes: 'keyword1 keyword2',
       },
     })
   })
@@ -181,7 +169,7 @@ describe('[Function] sendSearchQuery', () => {
       .mockResolvedValueOnce(['Some result'])
       .mockResolvedValueOnce(['Some result'])
     await sendSearchQuery(makeSearchParams({ searchType: SearchType.Taxon }))
-    expect(BigQuery.prototype.query).toHaveBeenCalledTimes(2)
+    expect(BigQuery.prototype.query).toHaveBeenCalledTimes(1)
     expect(BigQuery.prototype.query).toHaveBeenNthCalledWith(1, {
       query: 'query',
       location: 'europe-west2',
@@ -195,11 +183,6 @@ describe('[Function] sendSearchQuery', () => {
         organisation: 'organisation',
         taxon: 'taxon',
       },
-    })
-    expect(BigQuery.prototype.query).toHaveBeenNthCalledWith(2, {
-      query: `SELECT "Taxon" as type, * FROM search.taxon WHERE lower(name) = lower(@name);`,
-      location: 'europe-west2',
-      params: { name: 'taxon' },
     })
   })
   it('Calls the appropriate queries with Organisation search type', async () => {
@@ -210,7 +193,7 @@ describe('[Function] sendSearchQuery', () => {
     await sendSearchQuery(
       makeSearchParams({ searchType: SearchType.Organisation })
     )
-    expect(BigQuery.prototype.query).toHaveBeenCalledTimes(2)
+    expect(BigQuery.prototype.query).toHaveBeenCalledTimes(1)
     expect(BigQuery.prototype.query).toHaveBeenNthCalledWith(1, {
       query: 'query',
       location: 'europe-west2',
@@ -224,11 +207,6 @@ describe('[Function] sendSearchQuery', () => {
         organisation: 'organisation',
         taxon: 'taxon',
       },
-    })
-    expect(BigQuery.prototype.query).toHaveBeenNthCalledWith(2, {
-      query: `SELECT "Organisation" as type, * FROM search.organisation WHERE lower(name) = lower(@name);`,
-      location: 'europe-west2',
-      params: { name: 'organisation' },
     })
   })
 })
