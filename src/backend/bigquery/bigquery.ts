@@ -77,19 +77,19 @@ const sendInitQuery = async function (): Promise<InitResults> {
       await Promise.all([
         bigQuery(`
         SELECT DISTINCT locale
-        FROM \`content.locale\`
+        FROM \`search.locale\`
         `),
         bigQuery(`
-        SELECT name
+        SELECT DISTINCT name
         FROM \`search.taxon\`
         `),
         bigQuery(`
         SELECT DISTINCT title
-        FROM \`graph.organisation\`
+        FROM \`search.organisation\`
         `),
         bigQuery(`
         SELECT DISTINCT document_type
-        FROM \`content.document_type\`
+        FROM \`search.document_type\`
         `),
       ])
   } catch (error) {
