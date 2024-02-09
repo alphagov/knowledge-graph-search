@@ -91,14 +91,14 @@ describe('[Function] sendInitQuery', () => {
     expect(BigQuery.prototype.query).toHaveBeenNthCalledWith(1, {
       query: `
         SELECT DISTINCT locale
-        FROM \`content.locale\`
+        FROM \`search.locale\`
         `,
       location: 'europe-west2',
       params: {},
     })
     expect(BigQuery.prototype.query).toHaveBeenNthCalledWith(2, {
       query: `
-        SELECT name
+        SELECT DISTINCT name
         FROM \`search.taxon\`
         `,
       location: 'europe-west2',
@@ -107,7 +107,7 @@ describe('[Function] sendInitQuery', () => {
     expect(BigQuery.prototype.query).toHaveBeenNthCalledWith(3, {
       query: `
         SELECT DISTINCT title
-        FROM \`graph.organisation\`
+        FROM \`search.organisation\`
         `,
       location: 'europe-west2',
       params: {},
