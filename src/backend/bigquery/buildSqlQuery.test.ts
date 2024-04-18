@@ -19,6 +19,7 @@ const prefix = (keywords?: string[], link?: string) => `
     publishing_app,
     first_published_at,
     public_updated_at,
+    publisher_updated_at,
     withdrawn_at,
     withdrawn_explanation,
     page_views,
