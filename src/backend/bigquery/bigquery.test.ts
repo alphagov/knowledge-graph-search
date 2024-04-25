@@ -3,6 +3,7 @@ import {
   KeywordLocation,
   PublishingApplication,
   PublishingStatus,
+  PoliticalStatus,
   SearchParams,
   SearchType,
 } from '../../common/types/search-api-types'
@@ -84,9 +85,16 @@ describe('[Function] sendInitQuery', () => {
           { document_type: 'dt3' },
         ],
       ])
+      .mockResolvedValueOnce([
+        [
+          { government: 'gov1' },
+          { government: 'gov2' },
+          { government: 'gov3' },
+        ],
+      ])
     const result = await sendInitQuery()
 
-    expect(BigQuery.prototype.query).toHaveBeenCalledTimes(4)
+    expect(BigQuery.prototype.query).toHaveBeenCalledTimes(5)
 
     expect(BigQuery.prototype.query).toHaveBeenNthCalledWith(1, {
       query: `
@@ -112,12 +120,29 @@ describe('[Function] sendInitQuery', () => {
       location: 'europe-west2',
       params: {},
     })
+    expect(BigQuery.prototype.query).toHaveBeenNthCalledWith(4, {
+      query: `
+        SELECT DISTINCT document_type
+        FROM \`search.document_type\`
+        `,
+      location: 'europe-west2',
+      params: {},
+    })
+    expect(BigQuery.prototype.query).toHaveBeenNthCalledWith(5, {
+      query: `
+        SELECT DISTINCT government
+        FROM \`search.government\`
+        `,
+      location: 'europe-west2',
+      params: {},
+    })
 
     expect(result).toEqual({
       locales: ['', 'en', 'cy', 'fr', 'de'],
       taxons: ['taxon1', 'taxon2', 'taxon3'],
       organisations: ['org1', 'org2', 'org3'],
       documentTypes: ['dt1', 'dt2', 'dt3'],
+      governments: ['gov1', 'gov2', 'gov3'],
     })
   })
 })
@@ -138,6 +163,8 @@ describe('[Function] sendSearchQuery', () => {
       publishingApplication: PublishingApplication.Any,
       caseSensitive: false,
       publishingStatus: PublishingStatus.All,
+      politicalStatus: PoliticalStatus.Any,
+      government: '',
       ...options,
     } as SearchParams)
 
@@ -154,6 +181,7 @@ describe('[Function] sendSearchQuery', () => {
       params: {
         excluded_keyword0: 'excluded1',
         excluded_keyword1: 'excluded2',
+        politicalStatus: 'any',
         keyword0: 'keyword1',
         keyword1: 'keyword2',
         link: 'link',
@@ -176,6 +204,7 @@ describe('[Function] sendSearchQuery', () => {
       params: {
         excluded_keyword0: 'excluded1',
         excluded_keyword1: 'excluded2',
+        politicalStatus: 'any',
         keyword0: 'keyword1',
         keyword1: 'keyword2',
         link: 'link',
@@ -200,6 +229,7 @@ describe('[Function] sendSearchQuery', () => {
       params: {
         excluded_keyword0: 'excluded1',
         excluded_keyword1: 'excluded2',
+        politicalStatus: 'any',
         keyword0: 'keyword1',
         keyword1: 'keyword2',
         link: 'link',

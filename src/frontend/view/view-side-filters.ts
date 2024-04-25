@@ -3,6 +3,7 @@ import {
   KeywordLocation,
   PublishingApplication,
   PublishingStatus,
+  PoliticalStatus,
   SearchType,
 } from '../../common/types/search-api-types'
 import { state } from '../state'
@@ -244,6 +245,60 @@ const viewPublishingStatusSelector = () => `
         </select>
     </div>`
 
+const viewPoliticalStatusSelector = () => `
+      <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+        <label class="govuk-label govuk-label--s" for="side-filters-political-status">
+          Political status
+        </label>
+        <select ${
+          state.waiting && 'disabled="disabled"'
+        } id="side-filters-political-status" class="govuk-select" name="side-filters-political-status" style="width: 100%;">
+          <option value="${PoliticalStatus.Any}" ${
+  state.searchParams.politicalStatus === PoliticalStatus.Any ? 'selected' : ''
+}>All statuses</option>
+          <option value="${PoliticalStatus.Political}" ${
+  state.searchParams.politicalStatus === PoliticalStatus.Political
+    ? 'selected'
+    : ''
+}>Political</option>
+          <option value="${PoliticalStatus.NotPolitical}" ${
+  state.searchParams.politicalStatus === PoliticalStatus.NotPolitical
+    ? 'selected'
+    : ''
+}>Not political</option>
+        </select>
+    </div>`
+
+const viewGovernmentSelector = () => {
+  const html = [
+    `
+    <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+      <label class="govuk-label govuk-label--s" for="side-filters-government">
+        Government
+      </label>
+      <select ${
+        state.waiting && 'disabled="disabled"'
+      } id="side-filters-government" class="autocomplete__input autocomplete__input--default" name="side-filters-government">
+      <option value="" ></option>
+  `,
+  ]
+
+  html.push(`
+      ${html.push(
+        ...state.governments
+          .sort()
+          .map(
+            (government) =>
+              `<option value="${government}" ${
+                state.searchParams.government === government ? 'selected' : ''
+              }>${government}</option>`
+          )
+      )}
+        </select>
+    </div>`)
+  return html.join('')
+}
+
 export const viewSideFilters = () => {
   const limitedSearchTypes = [
     SearchType.Link,
@@ -279,6 +334,8 @@ export const viewSideFilters = () => {
       ${viewTaxonSelector()}
       ${viewLanguageSelector()}
       ${viewPublishingStatusSelector()}
+      ${viewPoliticalStatusSelector()}
+      ${viewGovernmentSelector()}
       ${submitButton()}
       ${viewClearFilters()}
     </div>

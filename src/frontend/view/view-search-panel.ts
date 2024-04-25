@@ -6,6 +6,7 @@ import {
   KeywordLocation,
   PublishingApplication,
   PublishingStatus,
+  PoliticalStatus,
   SearchType,
 } from '../../common/types/search-api-types'
 
@@ -58,6 +59,8 @@ const viewKeywordSearchPanel = () => `
                   ${viewTaxonSelector()}
                   ${viewPublishingStatusSelector()}
                   ${viewLanguageSelector()}
+                  ${viewPoliticalStatusSelector()}
+                  ${viewGovernmentSelector()}
                 </div>
               </div>
             </div>
@@ -89,6 +92,8 @@ export const viewAdvancedSearchPanel = (onTheSide = true) => {
           ${viewTaxonSelector()}
           ${viewPublishingStatusSelector()}
           ${viewLanguageSelector()}
+          ${viewPoliticalStatusSelector()}
+          ${viewGovernmentSelector()}
           ${viewSearchButton()}
         </div>
       </form>
@@ -123,6 +128,8 @@ const viewLinkSearchPanel = () => `
                 ${viewTaxonSelector()}
                 ${viewPublishingStatusSelector()}
                 ${viewLanguageSelector()}
+                ${viewPoliticalStatusSelector()}
+                ${viewGovernmentSelector()}
               </div>
             </div>
           </div>
@@ -157,6 +164,8 @@ const viewPhoneNumberSearchPanel = () => `
                 ${viewTaxonSelector()}
                 ${viewPublishingStatusSelector()}
                 ${viewLanguageSelector()}
+                ${viewPoliticalStatusSelector()}
+                ${viewGovernmentSelector()}
               </div>
             </div>
           </div>
@@ -190,6 +199,8 @@ const viewTaxonSearchPanel = () => `
                 <div class="search-filters-right-col taxon-search">
                   ${viewDocumentType()}
                   ${viewPublishingAppSelector()}
+                  ${viewPoliticalStatusSelector()}
+                  ${viewGovernmentSelector()}
                 </div>
               </div>
             </div>
@@ -223,6 +234,8 @@ const viewLanguageSearchPanel = () => `
                 <div class="search-filters-right-col language-search">
                   ${viewTaxonSelector()}
                   ${viewPublishingStatusSelector()}
+                  ${viewPoliticalStatusSelector()}
+                  ${viewGovernmentSelector()}
                 </div>
               </div>
             </div>
@@ -256,6 +269,8 @@ const viewOrganisationSearchPanel = () => `
                 <div class="search-filters-right-col organisation-search">
                   ${viewTaxonSelector()}
                   ${viewLanguageSelector()}
+                  ${viewPoliticalStatusSelector()}
+                  ${viewGovernmentSelector()}
                 </div>
               </div>
             </div>
@@ -379,6 +394,36 @@ const viewDocumentType = () => {
               }>${(
                 documentType.charAt(0).toUpperCase() + documentType.slice(1)
               ).replace(/_/g, ' ')}</option>`
+          )
+      )}
+        </select>
+    </div>`)
+  return html.join('')
+}
+
+const viewGovernmentSelector = () => {
+  const html = [
+    `
+    <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+      <label class="govuk-label govuk-label--s" for="search-filters-government">
+        Government
+      </label>
+      <select ${
+        state.waiting && 'disabled="disabled"'
+      } id="search-filters-government" class="autocomplete__input autocomplete__input--default" name="search-filters-government">
+      <option value="" ></option>
+  `,
+  ]
+
+  html.push(`
+      ${html.push(
+        ...state.governments
+          .sort()
+          .map(
+            (government) =>
+              `<option value="${government}" ${
+                state.searchParams.government === government ? 'selected' : ''
+              }>${government}</option>`
           )
       )}
         </select>
@@ -628,6 +673,30 @@ const viewPublishingAppSelector = () => `
     ? 'selected'
     : ''
 }>Whitehall (specialist)</option>
+        </select>
+    </div>`
+
+const viewPoliticalStatusSelector = () => `
+      <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+        <label class="govuk-label govuk-label--s" for="search-filters-political-status">
+          Political status
+        </label>
+        <select ${
+          state.waiting && 'disabled="disabled"'
+        } id="search-filters-political-status" class="govuk-select" name="search-filters-political-status" style="width: 100%;">
+          <option value="${PoliticalStatus.Any}" ${
+  state.searchParams.politicalStatus === PoliticalStatus.Any ? 'selected' : ''
+}>Any</option>
+          <option value="${PoliticalStatus.Political}" ${
+  state.searchParams.politicalStatus === PoliticalStatus.Political
+    ? 'selected'
+    : ''
+}>Political</option>
+          <option value="${PoliticalStatus.NotPolitical}" ${
+  state.searchParams.politicalStatus === PoliticalStatus.NotPolitical
+    ? 'selected'
+    : ''
+}>Not political</option>
         </select>
     </div>`
 

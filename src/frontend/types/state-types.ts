@@ -18,6 +18,8 @@ export type Field =
   | 'withdrawn_at'
   | 'withdrawn_explanation'
   | 'occurrences'
+  | 'government'
+  | 'is_political'
 
 export enum SortAction {
   DESC = 'desc',
@@ -34,6 +36,7 @@ export interface State {
   taxons: string[]
   organisations: string[]
   locales: string[]
+  governments: string[]
   systemErrorText: any
   userErrors: string[]
   searchResults: any[] | null

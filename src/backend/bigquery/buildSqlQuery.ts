@@ -3,6 +3,7 @@ import {
   KeywordLocation,
   PublishingApplication,
   PublishingStatus,
+  PoliticalStatus,
   SearchParams,
   SearchType,
 } from '../../common/types/search-api-types'
@@ -177,38 +178,19 @@ export const buildSqlQuery = function (
     `
   }
 
-  console.log(`
-  SELECT
-    url,
-    title,
-    documentType,
-    contentId,
-    locale,
-    publishing_app,
-    first_published_at,
-    public_updated_at,
-    withdrawn_at,
-    withdrawn_explanation,
-    page_views,
-    taxons,
-    primary_organisation,
-    organisations AS all_organisations,
-    ${occurrences}
-  FROM search.page
+  let politicalStatusClause = ''
+  if (searchParams.politicalStatus !== PoliticalStatus.Any) {
+    politicalStatusClause = `
+      AND is_political = (@politicalStatus = 'political')
+    `
+  }
 
-  ${publishingStatusClause}
-  ${includeClause}
-  ${excludeClause}
-  ${publishingAppClause}
-  ${localeClause}
-  ${taxonClause}
-  ${organisationClause}
-  ${linkClause}
-  ${phoneNumberClause}
-  ${documentTypeClause}
-  ORDER BY page_views DESC
-  LIMIT 10000
-`)
+  let governmentClause = ''
+  if (searchParams.government !== '') {
+    governmentClause = `
+      AND government = @government
+    `
+  }
 
   return `
     SELECT
@@ -226,6 +208,8 @@ export const buildSqlQuery = function (
       taxons,
       primary_organisation,
       organisations AS all_organisations,
+      government,
+      is_political,
       ${occurrences}
     FROM search.page
 
@@ -239,6 +223,8 @@ export const buildSqlQuery = function (
     ${linkClause}
     ${phoneNumberClause}
     ${documentTypeClause}
+    ${politicalStatusClause}
+    ${governmentClause}
     ORDER BY page_views DESC
     LIMIT 10000
   `

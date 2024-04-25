@@ -55,6 +55,12 @@ export const bigQuery = async function (userQuery: string, options?: any) {
     if (options.documentType) {
       params.documentType = options.documentType
     }
+    if (options.politicalStatus) {
+      params.politicalStatus = options.politicalStatus
+    }
+    if (options.government) {
+      params.government = options.government
+    }
   }
 
   const bqOptions = {
@@ -71,9 +77,13 @@ export const bigQuery = async function (userQuery: string, options?: any) {
 //= ===== public ======
 
 const sendInitQuery = async function (): Promise<InitResults> {
-  let bqLocales: any, bqTaxons: any, bqOrganisations: any, bqDocumentTypes: any
+  let bqLocales: any,
+    bqTaxons: any,
+    bqOrganisations: any,
+    bqDocumentTypes: any,
+    bqGovernments: any
   try {
-    ;[bqLocales, bqTaxons, bqOrganisations, bqDocumentTypes] =
+    ;[bqLocales, bqTaxons, bqOrganisations, bqDocumentTypes, bqGovernments] =
       await Promise.all([
         bigQuery(`
         SELECT DISTINCT locale
@@ -90,6 +100,10 @@ const sendInitQuery = async function (): Promise<InitResults> {
         bigQuery(`
         SELECT DISTINCT document_type
         FROM \`search.document_type\`
+        `),
+        bigQuery(`
+        SELECT DISTINCT title
+        FROM \`search.government\`
         `),
       ])
   } catch (error) {
@@ -108,6 +122,7 @@ const sendInitQuery = async function (): Promise<InitResults> {
     documentTypes: bqDocumentTypes.map(
       (documentType: any) => documentType.document_type
     ),
+    governments: bqGovernments.map((government: any) => government.title),
   }
 }
 
@@ -124,6 +139,8 @@ const sendSearchQuery = async function (
   const documentType = searchParams.documentType
   const link = searchParams.linkSearchUrl
   const phoneNumber = searchParams.phoneNumber
+  const government = searchParams.government
+  const politicalStatus = searchParams.politicalStatus
   const queries = [
     bigQuery(query, {
       keywords,
@@ -134,6 +151,8 @@ const sendSearchQuery = async function (
       link,
       phoneNumber,
       documentType,
+      government,
+      politicalStatus,
     }),
   ]
 
