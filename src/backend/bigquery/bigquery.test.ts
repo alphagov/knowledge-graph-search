@@ -86,11 +86,7 @@ describe('[Function] sendInitQuery', () => {
         ],
       ])
       .mockResolvedValueOnce([
-        [
-          { government: 'gov1' },
-          { government: 'gov2' },
-          { government: 'gov3' },
-        ],
+        [{ title: 'gov1' }, { title: 'gov2' }, { title: 'gov3' }],
       ])
     const result = await sendInitQuery()
 
@@ -130,7 +126,7 @@ describe('[Function] sendInitQuery', () => {
     })
     expect(BigQuery.prototype.query).toHaveBeenNthCalledWith(5, {
       query: `
-        SELECT DISTINCT government
+        SELECT DISTINCT title
         FROM \`search.government\`
         `,
       location: 'europe-west2',
