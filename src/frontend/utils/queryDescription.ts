@@ -3,6 +3,7 @@ import { fieldName, sortOrder } from '../view/utils'
 import {
   KeywordLocation,
   PublishingApplication,
+  PoliticalStatus,
   PublishingStatus,
   SearchParams,
 } from '../../common/types/search-api-types'
@@ -83,6 +84,22 @@ export const queryDescription = ({
         includeMarkup
       )}`
     )
+  if (searchParams.politicalStatus !== PoliticalStatus.Any) {
+    const status = {
+      [PoliticalStatus.Political]: 'political',
+      [PoliticalStatus.NotPolitical]: 'not political',
+    }[searchParams.politicalStatus]
+    clauses.push(`are ${makeBold(status, includeMarkup)}`)
+  }
+
+  if (searchParams.government !== '') {
+    clauses.push(
+      `were published by the ${makeBold(
+        searchParams.government,
+        includeMarkup
+      )}`
+    )
+  }
 
   const joinedClauses =
     clauses.length === 1

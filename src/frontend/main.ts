@@ -12,6 +12,7 @@ import { defaultAllLanguagesOption } from '../common/utils/lang'
 import {
   PublishingApplication,
   PublishingStatus,
+  PoliticalStatus,
 } from '../common/types/search-api-types'
 
 //= =================================================
@@ -45,6 +46,7 @@ const fetchInitialData = async function () {
     state.organisations = dbInitResults.organisations
     state.locales = dbInitResults.locales
     state.documentTypes = dbInitResults.documentTypes
+    state.governments = dbInitResults.governments
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') {
       state.systemErrorText = 'It looks like the backend is not responding.'
@@ -71,7 +73,9 @@ const fetchInitialData = async function () {
       state.searchParams.phoneNumber !== '' ||
       state.searchParams.documentType !== '' ||
       state.searchParams.publishingApplication !== PublishingApplication.Any ||
-      state.searchParams.publishingStatus !== PublishingStatus.All
+      state.searchParams.publishingStatus !== PublishingStatus.All ||
+      state.searchParams.politicalStatus !== PoliticalStatus.Any ||
+      state.searchParams.government !== ''
     ) {
       state.waiting = true
       console.log('REQUERYING BACKEND')

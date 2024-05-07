@@ -5,6 +5,7 @@ import {
   KeywordLocation,
   PublishingApplication,
   PublishingStatus,
+  PoliticalStatus,
   SearchParams,
   SearchType,
 } from '../../common/types/search-api-types'
@@ -35,6 +36,8 @@ const DEFAULT_SEARCH_PARAMS: SearchParams = {
   publishingApplication: PublishingApplication.Whitehall,
   caseSensitive: false,
   publishingStatus: PublishingStatus.NotWithdrawn,
+  politicalStatus: PoliticalStatus.Any,
+  government: '',
 }
 
 const makeParams = (overrides: PartialSearchParams = {}): SearchParams => {
@@ -133,6 +136,19 @@ describe('queryDescription', () => {
     const description = queryDescription(params)
     expect(description).toContain(
       'are published using <span class="govuk-!-font-weight-bold">whitehall</span>'
+    )
+  })
+
+  it('should handle politicalStatus', () => {
+    const params = {
+      searchParams: makeParams({
+        politicalStatus: PoliticalStatus.NotPolitical,
+      }),
+      includeMarkup: true,
+    }
+    const description = queryDescription(params)
+    expect(description).toContain(
+      'are <span class="govuk-!-font-weight-bold">not political</span>'
     )
   })
 

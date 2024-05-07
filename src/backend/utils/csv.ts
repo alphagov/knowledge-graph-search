@@ -60,6 +60,8 @@ const csvFieldFormatters: Record<string, any> = {
     format: (text: string) => text || 'No data available',
   },
   occurrences: { name: 'Occurrences' },
+  government: { name: 'Government' },
+  is_political: { name: 'Is political' },
 }
 
 // generate a human-readable string depending on the type of field

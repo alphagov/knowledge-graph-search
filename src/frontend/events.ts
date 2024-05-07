@@ -13,6 +13,7 @@ import { EventType, SearchApiCallback } from './types/event-types'
 import {
   SearchType,
   PublishingApplication,
+  PoliticalStatus,
   Combinator,
   KeywordLocation,
   UrlParams,
@@ -54,6 +55,12 @@ const updateStateFromSideFilters = () => {
   state.searchParams.publishingApplication = getFormInputValue(
     'side-filters-publishing-application'
   ) as PublishingApplication
+
+  state.searchParams.politicalStatus = getFormInputValue(
+    'side-filters-political-status'
+  ) as PoliticalStatus
+
+  state.searchParams.government = getFormInputValue('side-filters-government')
 
   const newCombinatorValue = (
     document.querySelector(
@@ -106,7 +113,11 @@ const updateStateFromSearchFilters = () => {
   state.searchParams.publishingApplication = getFormInputValue(
     'search-filters-publishing-application'
   ) as PublishingApplication
+  state.searchParams.politicalStatus = getFormInputValue(
+    'search-filters-political-status'
+  ) as PoliticalStatus
   state.searchParams.taxon = getFormInputValue('search-filters-taxon')
+  state.searchParams.government = getFormInputValue('search-filters-government')
   state.searchParams.publishingStatus =
     (getFormInputValue(
       'search-filters-publishing-status'
@@ -137,10 +148,12 @@ const resetFilters = () => {
     excludedWords: initialSearchParams.excludedWords,
     keywordLocation: initialSearchParams.keywordLocation,
     publishingApplication: initialSearchParams.publishingApplication,
+    politicalStatus: initialSearchParams.politicalStatus,
     publishingOrganisation: initialSearchParams.publishingOrganisation,
     documentType: initialSearchParams.documentType,
     taxon: initialSearchParams.taxon,
     language: initialSearchParams.language,
+    government: initialSearchParams.government,
     publishingStatus: initialSearchParams.publishingStatus,
 
     // Ensure what's in the main search input is not reset
@@ -361,6 +374,11 @@ const getQueryStringFromSearchParams = function () {
       condition: (v) => v !== PublishingApplication.Any,
       param: UrlParams.PublishingApplication,
     },
+    politicalStatus: {
+      condition: (v) => v !== PoliticalStatus.Any,
+      param: UrlParams.PoliticalStatus,
+    },
+    government: { condition: (v) => v, param: UrlParams.Government },
     combinator: {
       condition: (v) => v !== Combinator.All,
       param: UrlParams.Combinator,
@@ -413,6 +431,7 @@ const getQueryStringFromSearchParams = function () {
     'publishingApplication',
     'taxon',
     'publishingStatus',
+    'politicalStatus',
     'language',
     'searchType',
   ]
