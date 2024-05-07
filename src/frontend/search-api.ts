@@ -2,6 +2,7 @@ import {
   SearchParams,
   SearchType,
   PublishingApplication,
+  PoliticalStatus,
   Combinator,
   SearchResults,
   UrlParams,
@@ -45,6 +46,12 @@ const makeURLfromSearchParams = function (searchParams: SearchParams): string {
   if (searchParams.phoneNumber !== '')
     usp.set(UrlParams.PhoneNumber, searchParams.phoneNumber)
   usp.set(UrlParams.PublishingStatus, searchParams.publishingStatus)
+  if (searchParams.politicalStatus !== PoliticalStatus.Any) {
+    usp.set(UrlParams.PoliticalStatus, searchParams.politicalStatus)
+  }
+  if (searchParams.government !== '') {
+    usp.set(UrlParams.Government, searchParams.government)
+  }
   return usp.toString()
 }
 

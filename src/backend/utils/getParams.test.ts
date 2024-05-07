@@ -24,6 +24,8 @@ describe('getParams', () => {
         'document-type': 'some document-type',
         'phone-number': 'some phone-number',
         'publishing-status': 'some publishing-status',
+        'political-status': 'political',
+        government: 'some government',
       },
     } as unknown as Request
 
@@ -42,6 +44,8 @@ describe('getParams', () => {
       publishingApplication: 'some publishing-application',
       publishingStatus: 'some publishing-status',
       language: 'some language',
+      politicalStatus: 'political',
+      government: 'some government',
     })
   })
 
@@ -61,6 +65,8 @@ describe('getParams', () => {
         'link-search-url': '',
         'document-type': '',
         'publishing-status': '',
+        'is-political': '',
+        government: '',
       },
     } as unknown as Request
 
@@ -79,6 +85,8 @@ describe('getParams', () => {
       selectedWords: '',
       keywordLocation: 'all',
       documentType: '',
+      politicalStatus: 'any',
+      government: '',
     })
   })
 })

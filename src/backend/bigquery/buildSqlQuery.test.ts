@@ -5,6 +5,7 @@ import {
   SearchType,
   KeywordLocation,
   PublishingStatus,
+  PoliticalStatus,
 } from '../../common/types/search-api-types'
 import { buildSqlQuery } from './buildSqlQuery'
 import { expect } from '@jest/globals'
@@ -25,6 +26,8 @@ const prefix = (keywords?: string[], link?: string) => `
     taxons,
     primary_organisation,
     organisations AS all_organisations,
+    government,
+    is_political,
     [${
       keywords?.length
         ? `STRUCT(
@@ -82,6 +85,8 @@ const makeParams = (opts = {}) =>
     publishingApplication: PublishingApplication.Any,
     caseSensitive: false,
     publishingStatus: PublishingStatus.All,
+    government: '',
+    politicalStatus: PoliticalStatus.Any,
     ...opts,
   } as SearchParams)
 
@@ -159,6 +164,34 @@ describe('buildSqlQuery', () => {
     query = buildSqlQuery(searchParams, keywords, excludedKeywords)
     expectedClauses = `\nAND publishing_app = "whitehall"`
     expected = expectedQuery(expectedClauses, keywords)
+
+    expect(queryFmt(query)).toEqual(queryFmt(expected))
+  })
+
+  it('can filter by political status', () => {
+    const searchParams: SearchParams = makeParams({
+      politicalStatus: 'not-political',
+    })
+    const keywords: string[] = []
+    const excludedKeywords: string[] = []
+
+    const query = buildSqlQuery(searchParams, keywords, excludedKeywords)
+    const expectedClauses = `\nAND is_political = (@politicalStatus = 'political')`
+    const expected = expectedQuery(expectedClauses, keywords)
+
+    expect(queryFmt(query)).toEqual(queryFmt(expected))
+  })
+
+  it('can filter by government', () => {
+    const searchParams: SearchParams = makeParams({
+      government: '2015 Conservative government',
+    })
+    const keywords: string[] = []
+    const excludedKeywords: string[] = []
+
+    const query = buildSqlQuery(searchParams, keywords, excludedKeywords)
+    const expectedClauses = `\nAND government = @government`
+    const expected = expectedQuery(expectedClauses, keywords)
 
     expect(queryFmt(query)).toEqual(queryFmt(expected))
   })
@@ -243,10 +276,12 @@ describe('buildSqlQuery', () => {
     const searchParams: SearchParams = makeParams({
       caseSensitive: true,
       publishingApplication: 'whitehall',
+      politicalStatus: 'political',
       language: 'whatever',
       taxon: 'whatever',
       publishingOrganisation: 'whatever',
       linkSearchUrl: link,
+      government: '2015 Conservative government',
     })
     const keywords: string[] = ['test1', 'test2']
     const excludedKeywords: string[] = ['excluded1', 'excluded2']
@@ -273,6 +308,8 @@ describe('buildSqlQuery', () => {
       SELECT 1 FROM UNNEST (hyperlinks) AS link
       WHERE CONTAINS_SUBSTR(link.link_url, @link)
     )
+  AND is_political = (@politicalStatus = 'political')
+  AND government = @government
   `
     const expected = expectedQuery(expectedClauses, keywords, link)
 

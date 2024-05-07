@@ -13,6 +13,8 @@ export enum UrlParams {
   PublishingApplication = 'publishing-application',
   PublishingStatus = 'publishing-status',
   Language = 'language',
+  PoliticalStatus = 'political-status',
+  Government = 'government',
 }
 
 export enum SearchType {
@@ -51,6 +53,12 @@ export enum PublishingApplication {
   Publisher = 'publisher',
 }
 
+export enum PoliticalStatus {
+  Any = 'any',
+  Political = 'political',
+  NotPolitical = 'notPolitical',
+}
+
 export type SearchParams = {
   searchType: SearchType
   selectedWords: string // list of words to search
@@ -66,6 +74,8 @@ export type SearchParams = {
   publishingApplication: PublishingApplication // whitehall, publisher, both
   caseSensitive: boolean // case sensitive keyword search?
   publishingStatus: PublishingStatus // Withdrawn, not withdrawn etc.
+  politicalStatus: PoliticalStatus // page is politial: true, false, null
+  government: string // government that published the page.
 }
 
 // a search can return a variable number of records of any type
@@ -76,6 +86,7 @@ export type InitResults = {
   locales: string[]
   organisations: string[]
   documentTypes: string[]
+  governments: string[]
 }
 
 export type Occurrence = {

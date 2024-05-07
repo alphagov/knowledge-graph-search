@@ -4,6 +4,7 @@ import {
   SearchParams,
   Combinator,
   PublishingApplication,
+  PoliticalStatus,
   KeywordLocation,
   UrlParams,
   PublishingStatus,
@@ -42,6 +43,8 @@ export const initialSearchParams: SearchParams = {
   publishingApplication: PublishingApplication.Any,
   caseSensitive: false, // whether the keyword search is case sensitive
   publishingStatus: PublishingStatus.All,
+  politicalStatus: PoliticalStatus.Any,
+  government: '',
 }
 
 const defaultShowFields = {
@@ -71,6 +74,7 @@ const initState = () => {
     organisations: [], // list of names of all the organisations
     systemErrorText: null,
     documentTypes: [],
+    governments: [],
     userErrors: [], // error codes due to user not entering valid search criteria
     searchResults: null,
     skip: 0, // where to start the pagination (number of results)
@@ -175,6 +179,16 @@ const setStateSearchParamsFromURL = function (): void {
     'publishingStatus',
     UrlParams.PublishingStatus
   )
+
+  state.searchParams.politicalStatus = getURLParamOrFallback(
+    'politicalStatus',
+    UrlParams.PoliticalStatus
+  )
+
+  state.searchParams.government = getURLParamOrFallback(
+    'government',
+    UrlParams.Government
+  )
 }
 
 const searchStateIsUnset = function (): boolean {
@@ -189,7 +203,9 @@ const searchStateIsUnset = function (): boolean {
     state.searchParams.phoneNumber === '' &&
     state.searchParams.documentType === '' &&
     state.searchParams.publishingApplication === PublishingApplication.Any &&
-    state.searchParams.publishingStatus === PublishingStatus.All
+    state.searchParams.publishingStatus === PublishingStatus.All &&
+    state.searchParams.politicalStatus === PoliticalStatus.Any &&
+    state.searchParams.government === ''
   )
 }
 
@@ -236,6 +252,8 @@ const resetSearchState = function (): void {
   state.searchParams.combinator = Combinator.All
   state.searchParams.publishingStatus = PublishingStatus.All
   state.searchParams.documentType = ''
+  state.searchParams.politicalStatus = PoliticalStatus.Any
+  state.searchParams.government = ''
 }
 
 export {

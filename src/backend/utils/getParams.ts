@@ -7,6 +7,7 @@ import {
   KeywordLocation,
   UrlParams,
   PublishingStatus,
+  PoliticalStatus,
 } from '../../common/types/search-api-types'
 import { sanitiseInput } from '../../common/utils/utils'
 
@@ -47,6 +48,12 @@ export const getParams = (req: express.Request): SearchParams => {
   const publishingStatus = sanitiseInput(
     req.query[UrlParams.PublishingStatus] as string
   ) as PublishingStatus
+  const politicalStatus = <PoliticalStatus>(
+    (sanitiseInput(req.query[UrlParams.PoliticalStatus] as string) ||
+      PoliticalStatus.Any)
+  )
+  const government =
+    sanitiseInput(req.query[UrlParams.Government] as string) || ''
 
   return {
     searchType,
@@ -63,6 +70,8 @@ export const getParams = (req: express.Request): SearchParams => {
     linkSearchUrl,
     phoneNumber,
     publishingStatus,
+    politicalStatus,
+    government,
   }
 }
 
