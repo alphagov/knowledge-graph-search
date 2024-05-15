@@ -136,6 +136,17 @@ export const buildSqlQuery = function (
     `
   }
 
+  let personClause = ''
+  if (searchParams.person !== '') {
+    personClause = `
+      AND EXISTS
+        (
+          SELECT 1 FROM UNNEST (people) AS person
+          WHERE person = @person
+        )
+    `
+  }
+
   let organisationClause = ''
   if (searchParams.publishingOrganisation !== '') {
     organisationClause = `
@@ -206,6 +217,7 @@ export const buildSqlQuery = function (
       withdrawn_explanation,
       page_views,
       taxons,
+      people,
       primary_organisation,
       organisations AS all_organisations,
       government,
@@ -219,6 +231,7 @@ export const buildSqlQuery = function (
     ${publishingAppClause}
     ${localeClause}
     ${taxonClause}
+    ${personClause}
     ${organisationClause}
     ${linkClause}
     ${phoneNumberClause}

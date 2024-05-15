@@ -204,6 +204,27 @@ const viewTaxonSelector = () => `
         </select>
     </div>`
 
+const viewPersonSelector = () => `
+    <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+      <label class="govuk-label govuk-label--s" for="side-filters-person">
+        Topic tags
+      </label>
+      <select ${
+        state.waiting && 'disabled="disabled"'
+      } id="side-filters-person" class="autocomplete__input autocomplete__input--default" name="side-filters-person">
+      <option value=""></option>
+      ${[...new Set(state.people)]
+        .sort()
+        .map(
+          (person) =>
+            `<option value="${person}" ${
+              state.searchParams.person === person ? 'selected' : ''
+            }>${person}</option>`
+        )
+        .join('')}
+        </select>
+    </div>`
+
 const viewLanguageSelector = () => `
     <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
       <label class="govuk-label govuk-label--s" for="side-filters-language">
@@ -304,6 +325,7 @@ export const viewSideFilters = () => {
     SearchType.Link,
     SearchType.Organisation,
     SearchType.Taxon,
+    SearchType.Person,
   ]
   const { searchType } = state.searchParams
 
@@ -332,6 +354,7 @@ export const viewSideFilters = () => {
       ${viewDocumentTypeSelector()}
       ${viewPublishingApplications()}
       ${viewTaxonSelector()}
+      ${viewPersonSelector()}
       ${viewLanguageSelector()}
       ${viewPublishingStatusSelector()}
       ${viewPoliticalStatusSelector()}

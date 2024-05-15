@@ -50,6 +50,10 @@ export const fieldFormatters: Record<Field, any> = {
     name: 'Topic tags',
     format: formatNames,
   },
+  people: {
+    name: 'People',
+    format: (x: string) => x,
+  },
   primary_organisation: {
     name: 'Primary publishing organisation',
     format: (x: string) => x,

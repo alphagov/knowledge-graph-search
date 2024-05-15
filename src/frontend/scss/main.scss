@@ -121,6 +121,7 @@ pre {
 
   .organisation-search,
   .taxon-search,
+  .person-search,
   .language-search,
   .links-search {
     display: grid;
@@ -182,6 +183,10 @@ h2:focus-visible {
 }
 
 #taxon-label {
+  background: white;
+}
+
+#person-label {
   background: white;
 }
 

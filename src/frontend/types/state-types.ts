@@ -12,6 +12,7 @@ export type Field =
   | 'first_published_at'
   | 'public_updated_at'
   | 'taxons'
+  | 'people'
   | 'primary_organisation'
   | 'all_organisations'
   | 'page_views'
@@ -34,6 +35,7 @@ export type Sorting = Partial<
 export interface State {
   searchParams: SearchParams
   taxons: string[]
+  people: string[]
   organisations: string[]
   locales: string[]
   governments: string[]

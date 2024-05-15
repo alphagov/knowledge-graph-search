@@ -43,6 +43,9 @@ export const bigQuery = async function (userQuery: string, options?: any) {
     if (options.taxon) {
       params.taxon = options.taxon
     }
+    if (options.person) {
+      params.person = options.person
+    }
     if (options.organisation) {
       params.organisation = options.organisation
     }
@@ -79,33 +82,44 @@ export const bigQuery = async function (userQuery: string, options?: any) {
 const sendInitQuery = async function (): Promise<InitResults> {
   let bqLocales: any,
     bqTaxons: any,
+    bqPeople: any,
     bqOrganisations: any,
     bqDocumentTypes: any,
     bqGovernments: any
   try {
-    ;[bqLocales, bqTaxons, bqOrganisations, bqDocumentTypes, bqGovernments] =
-      await Promise.all([
-        bigQuery(`
+    ;[
+      bqLocales,
+      bqTaxons,
+      bqPeople,
+      bqOrganisations,
+      bqDocumentTypes,
+      bqGovernments,
+    ] = await Promise.all([
+      bigQuery(`
         SELECT DISTINCT locale
         FROM \`search.locale\`
         `),
-        bigQuery(`
+      bigQuery(`
         SELECT DISTINCT name
         FROM \`search.taxon\`
         `),
-        bigQuery(`
+      bigQuery(`
+        SELECT DISTINCT title
+        FROM \`search.person\`
+        `),
+      bigQuery(`
         SELECT DISTINCT title
         FROM \`search.organisation\`
         `),
-        bigQuery(`
+      bigQuery(`
         SELECT DISTINCT document_type
         FROM \`search.document_type\`
         `),
-        bigQuery(`
+      bigQuery(`
         SELECT DISTINCT title
         FROM \`search.government\`
         `),
-      ])
+    ])
   } catch (error) {
     log.error(error, 'Error in sendInitQueryError')
   }
@@ -116,6 +130,7 @@ const sendInitQuery = async function (): Promise<InitResults> {
         .filter((locale: string) => locale !== 'en' && locale !== 'cy')
     ),
     taxons: bqTaxons.map((taxon: any) => taxon.name),
+    people: bqPeople.map((person: any) => person.title),
     organisations: bqOrganisations.map(
       (organisation: any) => organisation.title
     ),
@@ -135,6 +150,7 @@ const sendSearchQuery = async function (
   const query = buildSqlQuery(searchParams, keywords, excludedKeywords)
   const locale = languageCode(searchParams.language)
   const taxon = searchParams.taxon
+  const person = searchParams.person
   const organisation = searchParams.publishingOrganisation
   const documentType = searchParams.documentType
   const link = searchParams.linkSearchUrl
@@ -147,6 +163,7 @@ const sendSearchQuery = async function (
       excludedKeywords,
       locale,
       taxon,
+      person,
       organisation,
       link,
       phoneNumber,

@@ -11,6 +11,7 @@ export enum Route {
   getInitData = '/get-init-data',
   searchApi = '/search',
   searchTaxon = '/taxon',
+  searchPerson = '/person',
   downloadCSV = '/csv',
   login = '/login',
   loginCallback = '/auth/gds/callback',

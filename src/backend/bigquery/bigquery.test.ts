@@ -41,6 +41,7 @@ describe('[Function] bigQuery', () => {
       name: 'name',
       locale: 'locale',
       taxon: 'taxon',
+      person: 'person',
       organisation: 'organisation',
       link: 'link',
     }
@@ -59,6 +60,7 @@ describe('[Function] bigQuery', () => {
         name: 'name',
         locale: 'locale',
         taxon: 'taxon',
+        person: 'person',
         organisation: 'organisation',
         link: 'link',
       },
@@ -76,6 +78,9 @@ describe('[Function] sendInitQuery', () => {
         [{ name: 'taxon1' }, { name: 'taxon2' }, { name: 'taxon3' }],
       ])
       .mockResolvedValueOnce([
+        [{ name: 'person1' }, { name: 'person2' }, { name: 'person3' }],
+      ])
+      .mockResolvedValueOnce([
         [{ title: 'org1' }, { title: 'org2' }, { title: 'org3' }],
       ])
       .mockResolvedValueOnce([
@@ -90,7 +95,7 @@ describe('[Function] sendInitQuery', () => {
       ])
     const result = await sendInitQuery()
 
-    expect(BigQuery.prototype.query).toHaveBeenCalledTimes(5)
+    expect(BigQuery.prototype.query).toHaveBeenCalledTimes(6)
 
     expect(BigQuery.prototype.query).toHaveBeenNthCalledWith(1, {
       query: `
@@ -104,6 +109,14 @@ describe('[Function] sendInitQuery', () => {
       query: `
         SELECT DISTINCT name
         FROM \`search.taxon\`
+        `,
+      location: 'europe-west2',
+      params: {},
+    })
+    expect(BigQuery.prototype.query).toHaveBeenNthCalledWith(2, {
+      query: `
+        SELECT DISTINCT title
+        FROM \`search.person\`
         `,
       location: 'europe-west2',
       params: {},
@@ -136,6 +149,7 @@ describe('[Function] sendInitQuery', () => {
     expect(result).toEqual({
       locales: ['', 'en', 'cy', 'fr', 'de'],
       taxons: ['taxon1', 'taxon2', 'taxon3'],
+      people: ['person1', 'person2', 'person3'],
       organisations: ['org1', 'org2', 'org3'],
       documentTypes: ['dt1', 'dt2', 'dt3'],
       governments: ['gov1', 'gov2', 'gov3'],
@@ -150,6 +164,7 @@ describe('[Function] sendSearchQuery', () => {
       selectedWords: 'keyword1 keyword2',
       excludedWords: 'excluded1 excluded2',
       taxon: 'taxon',
+      person: 'person',
       publishingOrganisation: 'organisation',
       language: 'en',
       documentType: '',
@@ -184,6 +199,7 @@ describe('[Function] sendSearchQuery', () => {
         locale: 'en',
         organisation: 'organisation',
         taxon: 'taxon',
+        person: 'person',
       },
     })
   })
@@ -207,6 +223,31 @@ describe('[Function] sendSearchQuery', () => {
         locale: 'en',
         organisation: 'organisation',
         taxon: 'taxon',
+        person: 'person',
+      },
+    })
+  })
+  it('Calls the appropriate queries with Person search type', async () => {
+    jest.spyOn(buildSqlQuery, 'buildSqlQuery').mockReturnValue('query')
+    ;(BigQuery.prototype.query as jest.Mock)
+      .mockResolvedValueOnce(['Some result'])
+      .mockResolvedValueOnce(['Some result'])
+    await sendSearchQuery(makeSearchParams({ searchType: SearchType.Person }))
+    expect(BigQuery.prototype.query).toHaveBeenCalledTimes(1)
+    expect(BigQuery.prototype.query).toHaveBeenNthCalledWith(1, {
+      query: 'query',
+      location: 'europe-west2',
+      params: {
+        excluded_keyword0: 'excluded1',
+        excluded_keyword1: 'excluded2',
+        politicalStatus: 'any',
+        keyword0: 'keyword1',
+        keyword1: 'keyword2',
+        link: 'link',
+        locale: 'en',
+        organisation: 'organisation',
+        taxon: 'taxon',
+        person: 'person',
       },
     })
   })
@@ -232,6 +273,7 @@ describe('[Function] sendSearchQuery', () => {
         locale: 'en',
         organisation: 'organisation',
         taxon: 'taxon',
+        person: 'person',
       },
     })
   })

@@ -24,6 +24,7 @@ const prefix = (keywords?: string[], link?: string) => `
     withdrawn_explanation,
     page_views,
     taxons,
+    people,
     primary_organisation,
     organisations AS all_organisations,
     government,
@@ -76,6 +77,7 @@ const makeParams = (opts = {}) =>
     selectedWords: '',
     excludedWords: '',
     taxon: '',
+    person: '',
     publishingOrganisation: '',
     language: '',
     documentType: '',
@@ -230,6 +232,26 @@ describe('buildSqlQuery', () => {
     expect(queryFmt(query)).toEqual(queryFmt(expected))
   })
 
+  it('can filter by any person', () => {
+    const searchParams: SearchParams = makeParams({
+      person: 'whoever',
+    })
+    const keywords: string[] = []
+    const excludedKeywords: string[] = []
+
+    const query = buildSqlQuery(searchParams, keywords, excludedKeywords)
+    const expectedClauses = `
+    AND EXISTS
+    (
+      SELECT 1 FROM UNNEST (people) AS person
+      WHERE person = @person
+    )
+    `
+    const expected = expectedQuery(expectedClauses, keywords)
+
+    expect(queryFmt(query)).toEqual(queryFmt(expected))
+  })
+
   it('can filter by any organisation', () => {
     const searchParams: SearchParams = makeParams({
       publishingOrganisation: 'whatever',
@@ -279,6 +301,7 @@ describe('buildSqlQuery', () => {
       politicalStatus: 'political',
       language: 'whatever',
       taxon: 'whatever',
+      person: 'whoever',
       publishingOrganisation: 'whatever',
       linkSearchUrl: link,
       government: '2015 Conservative government',
@@ -297,6 +320,11 @@ describe('buildSqlQuery', () => {
     (
       SELECT 1 FROM UNNEST (taxons) AS taxon
       WHERE taxon = @taxon
+    )
+  AND EXISTS
+    (
+      SELECT 1 FROM UNNEST (people) AS person
+      WHERE person = @person
     )
   AND EXISTS
     (
