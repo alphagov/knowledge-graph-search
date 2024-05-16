@@ -33,6 +33,7 @@ export const initialSearchParams: SearchParams = {
   selectedWords: '',
   excludedWords: '',
   taxon: '',
+  person: '',
   publishingOrganisation: '',
   language: defaultAllLanguagesOption,
   documentType: '',
@@ -70,6 +71,7 @@ const initState = () => {
   let newState: State = {
     searchParams: JSON.parse(JSON.stringify(initialSearchParams)), // deep copy
     taxons: [], // list of names of all the taxons
+    people: [], // list of names of all people
     locales: [], // all the languages found in the content store
     organisations: [], // list of names of all the organisations
     systemErrorText: null,
@@ -142,6 +144,7 @@ const setStateSearchParamsFromURL = function (): void {
     UrlParams.PhoneNumber
   )
   state.searchParams.taxon = getURLParamOrFallback('taxon', UrlParams.Taxon)
+  state.searchParams.person = getURLParamOrFallback('person', UrlParams.Person)
   state.searchParams.publishingOrganisation = getURLParamOrFallback(
     'publishingOrganisation',
     UrlParams.PublishingOrganisation
@@ -198,6 +201,7 @@ const searchStateIsUnset = function (): boolean {
     (state.searchParams.language === '' ||
       state.searchParams.language === defaultAllLanguagesOption) &&
     state.searchParams.taxon === '' &&
+    state.searchParams.person === '' &&
     state.searchParams.publishingOrganisation === '' &&
     state.searchParams.linkSearchUrl === '' &&
     state.searchParams.phoneNumber === '' &&
@@ -239,6 +243,7 @@ const resetSearchState = function (): void {
   state.searchParams.selectedWords = ''
   state.searchParams.excludedWords = ''
   state.searchParams.taxon = ''
+  state.searchParams.person = ''
   state.searchParams.publishingOrganisation = ''
   state.searchParams.language = defaultAllLanguagesOption
   state.searchParams.keywordLocation = KeywordLocation.All

@@ -38,6 +38,10 @@ const csvFieldFormatters: Record<string, any> = {
     name: 'Topic tags',
     format: formatNames,
   },
+  people: {
+    name: 'People',
+    format: identity,
+  },
   primary_organisation: {
     name: 'Primary publishing organisation',
     format: identity,

@@ -26,10 +26,11 @@ const signon = async function () {
 }
 
 const getInitialData = async function () {
-  console.log('retrieving taxons, locales and organisations')
+  console.log('retrieving taxons, people, locales and organisations')
   const apiResponse = await fetchWithTimeout('/get-init-data')
   if (
     apiResponse.taxons.length === 0 ||
+    apiResponse.people.length === 0 ||
     apiResponse.locales.length === 3 ||
     apiResponse.organisations.length === 0
   ) {
@@ -43,6 +44,7 @@ const fetchInitialData = async function () {
   try {
     const dbInitResults = await getInitialData()
     state.taxons = dbInitResults.taxons
+    state.people = dbInitResults.people
     state.organisations = dbInitResults.organisations
     state.locales = dbInitResults.locales
     state.documentTypes = dbInitResults.documentTypes
@@ -68,6 +70,7 @@ const fetchInitialData = async function () {
       (state.searchParams.language !== '' &&
         state.searchParams.language !== defaultAllLanguagesOption) ||
       state.searchParams.taxon !== '' ||
+      state.searchParams.person !== '' ||
       state.searchParams.publishingOrganisation !== '' ||
       state.searchParams.linkSearchUrl !== '' ||
       state.searchParams.phoneNumber !== '' ||

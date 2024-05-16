@@ -136,6 +136,11 @@ const tabs = [
     searchType: SearchType.Taxon,
   },
   {
+    id: 'search-people',
+    label: 'People',
+    searchType: SearchType.Person,
+  },
+  {
     id: 'search-langs',
     label: 'Languages',
     searchType: SearchType.Language,

@@ -21,6 +21,7 @@ export const getParams = (req: express.Request): SearchParams => {
   const excludedWords =
     sanitiseInput(req.query[UrlParams.ExcludedWords] as string) || ''
   const taxon = sanitiseInput(req.query[UrlParams.Taxon] as string) || ''
+  const person = sanitiseInput(req.query[UrlParams.Person] as string) || ''
   const publishingOrganisation =
     sanitiseInput(req.query[UrlParams.PublishingOrganisation] as string) || ''
   const language = sanitiseInput(req.query[UrlParams.Language] as string) || ''
@@ -60,6 +61,7 @@ export const getParams = (req: express.Request): SearchParams => {
     selectedWords,
     excludedWords,
     taxon,
+    person,
     publishingOrganisation,
     language,
     documentType,

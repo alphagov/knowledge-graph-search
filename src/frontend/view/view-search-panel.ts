@@ -18,6 +18,7 @@ const viewSearchPanel = () => {
     [SearchType.PhoneNumber]: viewPhoneNumberSearchPanel,
     [SearchType.Organisation]: viewOrganisationSearchPanel,
     [SearchType.Taxon]: viewTaxonSearchPanel,
+    [SearchType.Person]: viewPersonSearchPanel,
     [SearchType.Language]: viewLanguageSearchPanel,
     [SearchType.Advanced]: viewAdvancedSearchPanel,
     [SearchType.Results]: viewAdvancedSearchPanel,
@@ -57,6 +58,7 @@ const viewKeywordSearchPanel = () => `
                   ${viewDocumentType()}
                   ${viewPublishingAppSelector()}
                   ${viewTaxonSelector()}
+                  ${viewPersonSelector()}
                   ${viewPublishingStatusSelector()}
                   ${viewLanguageSelector()}
                   ${viewPoliticalStatusSelector()}
@@ -90,6 +92,7 @@ export const viewAdvancedSearchPanel = (onTheSide = true) => {
           ${viewDocumentType()}
           ${viewPublishingAppSelector()}
           ${viewTaxonSelector()}
+          ${viewPersonSelector()}
           ${viewPublishingStatusSelector()}
           ${viewLanguageSelector()}
           ${viewPoliticalStatusSelector()}
@@ -126,6 +129,7 @@ const viewLinkSearchPanel = () => `
               </div>
               <div class="search-filters-right-col links-search">
                 ${viewTaxonSelector()}
+                ${viewPersonSelector()}
                 ${viewPublishingStatusSelector()}
                 ${viewLanguageSelector()}
                 ${viewPoliticalStatusSelector()}
@@ -162,6 +166,7 @@ const viewPhoneNumberSearchPanel = () => `
               </div>
               <div class="search-filters-right-col links-search">
                 ${viewTaxonSelector()}
+                ${viewPersonSelector()}
                 ${viewPublishingStatusSelector()}
                 ${viewLanguageSelector()}
                 ${viewPoliticalStatusSelector()}
@@ -211,6 +216,41 @@ const viewTaxonSearchPanel = () => `
       </form>
     `
 
+const viewPersonSearchPanel = () => `
+      <form id="search-form" class="search-panel govuk-form">
+        <div class="search-mode-panel">
+          ${viewPersonSelector()}
+          ${
+            state.searchResults
+              ? ''
+              : `<details class="govuk-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+              <span class="govuk-details__summary-text">
+                Search filters
+              </span>
+            </summary>
+            <div class="govuk-details__text">
+              <div class="search-filters-container">
+                <div class="search-filters-left-col person-search">
+                  ${viewPublishingOrganisation()}
+                  ${viewPublishingStatusSelector()}
+                  ${viewLanguageSelector()}
+                </div>
+                <div class="search-filters-right-col person-search">
+                  ${viewDocumentType()}
+                  ${viewPublishingAppSelector()}
+                  ${viewPoliticalStatusSelector()}
+                  ${viewGovernmentSelector()}
+                </div>
+              </div>
+            </div>
+          </details>`
+          }
+          ${viewSearchButton()}
+        </div>
+      </form>
+    `
+
 const viewLanguageSearchPanel = () => `
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
@@ -233,6 +273,7 @@ const viewLanguageSearchPanel = () => `
                 </div>
                 <div class="search-filters-right-col language-search">
                   ${viewTaxonSelector()}
+                  ${viewPersonSelector()}
                   ${viewPublishingStatusSelector()}
                   ${viewPoliticalStatusSelector()}
                   ${viewGovernmentSelector()}
@@ -268,6 +309,7 @@ const viewOrganisationSearchPanel = () => `
                 </div>
                 <div class="search-filters-right-col organisation-search">
                   ${viewTaxonSelector()}
+                  ${viewPersonSelector()}
                   ${viewLanguageSelector()}
                   ${viewPoliticalStatusSelector()}
                   ${viewGovernmentSelector()}
@@ -447,6 +489,27 @@ const viewTaxonSelector = () => `
             `<option value="${taxon}" ${
               state.searchParams.taxon === taxon ? 'selected' : ''
             }>${taxon}</option>`
+        )
+        .join('')}
+        </select>
+    </div>`
+
+const viewPersonSelector = () => `
+    <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+      <label class="govuk-label govuk-label--s" for="search-filters-person">
+        People
+      </label>
+      <select ${
+        state.waiting && 'disabled="disabled"'
+      } id="search-filters-person" class="autocomplete__input autocomplete__input--default" name="search-filters-person">
+      <option value=""></option>
+      ${[...new Set(state.people)]
+        .sort()
+        .map(
+          (person) =>
+            `<option value="${person}" ${
+              state.searchParams.person === person ? 'selected' : ''
+            }>${person}</option>`
         )
         .join('')}
         </select>

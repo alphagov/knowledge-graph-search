@@ -40,6 +40,7 @@ const updateStateFromSideFilters = () => {
     'side-filters-excluded-keywords'
   )
   state.searchParams.taxon = getFormInputValue('side-filters-taxon')
+  state.searchParams.person = getFormInputValue('side-filters-person')
   state.searchParams.publishingOrganisation = getFormInputValue(
     'side-filters-publishing-organisation'
   )
@@ -117,6 +118,7 @@ const updateStateFromSearchFilters = () => {
     'search-filters-political-status'
   ) as PoliticalStatus
   state.searchParams.taxon = getFormInputValue('search-filters-taxon')
+  state.searchParams.person = getFormInputValue('search-filters-person')
   state.searchParams.government = getFormInputValue('search-filters-government')
   state.searchParams.publishingStatus =
     (getFormInputValue(
@@ -133,6 +135,7 @@ const resetFilters = () => {
       [SearchType.PhoneNumber]: 'phoneNumber',
       [SearchType.Organisation]: 'publishingOrganisation',
       [SearchType.Taxon]: 'taxon',
+      [SearchType.Person]: 'person',
       [SearchType.Language]: 'language',
     }
 
@@ -152,6 +155,7 @@ const resetFilters = () => {
     publishingOrganisation: initialSearchParams.publishingOrganisation,
     documentType: initialSearchParams.documentType,
     taxon: initialSearchParams.taxon,
+    person: initialSearchParams.person,
     language: initialSearchParams.language,
     government: initialSearchParams.government,
     publishingStatus: initialSearchParams.publishingStatus,
@@ -170,6 +174,7 @@ const handleSearchTabClick = (id: string) => {
     'search-links': SearchType.Link,
     'search-phone-numbers': SearchType.PhoneNumber,
     'search-taxons': SearchType.Taxon,
+    'search-people': SearchType.Person,
     'search-orgs': SearchType.Organisation,
     'search-langs': SearchType.Language,
     'search-adv': SearchType.Advanced,
@@ -370,6 +375,7 @@ const getQueryStringFromSearchParams = function () {
     },
     documentType: { condition: (v) => v, param: UrlParams.DocumentType },
     taxon: { condition: (v) => v !== '', param: UrlParams.Taxon },
+    person: { condition: (v) => v !== '', param: UrlParams.Person },
     publishingApplication: {
       condition: (v) => v !== PublishingApplication.Any,
       param: UrlParams.PublishingApplication,
@@ -430,6 +436,7 @@ const getQueryStringFromSearchParams = function () {
     'documentType',
     'publishingApplication',
     'taxon',
+    'person',
     'publishingStatus',
     'politicalStatus',
     'language',

@@ -42,6 +42,10 @@ export const queryDescription = ({
     clauses.push(
       `belong to the ${makeBold(searchParams.taxon, includeMarkup)} topic tag`
     )
+  if (searchParams.person !== '')
+    clauses.push(
+      `are associated with ${makeBold(searchParams.person, includeMarkup)}`
+    )
   if (searchParams.publishingOrganisation !== '')
     clauses.push(
       `are published by the ${makeBold(

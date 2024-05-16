@@ -4,6 +4,7 @@ export enum UrlParams {
   SelectedWords = 'selected-words',
   ExcludedWords = 'excluded-words',
   Taxon = 'taxon',
+  Person = 'person',
   PublishingOrganisation = 'publishing-organisation',
   CaseSensitive = 'case-sensitive',
   DocumentType = 'document-type',
@@ -23,6 +24,7 @@ export enum SearchType {
   PhoneNumber = 'phone-number',
   Organisation = 'organisation',
   Taxon = 'taxon',
+  Person = 'person',
   Language = 'language',
   Advanced = 'advanced',
   Results = 'results',
@@ -64,6 +66,7 @@ export type SearchParams = {
   selectedWords: string // list of words to search
   excludedWords: string // list of words to exclude
   taxon: string // taxon to search in
+  person: string // person whose pages to search
   publishingOrganisation: string // organisation to search in
   language: string // the language to search for
   documentType: string // documentTypeto search in
@@ -83,6 +86,7 @@ export type SearchResults = unknown[]
 
 export type InitResults = {
   taxons: string[]
+  people: string[]
   locales: string[]
   organisations: string[]
   documentTypes: string[]

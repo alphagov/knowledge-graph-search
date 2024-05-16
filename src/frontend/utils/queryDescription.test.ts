@@ -26,6 +26,7 @@ const DEFAULT_SEARCH_PARAMS: SearchParams = {
   selectedWords: '',
   excludedWords: '',
   taxon: '',
+  person: '',
   publishingOrganisation: '',
   language: '',
   documentType: '',
@@ -84,6 +85,19 @@ describe('queryDescription', () => {
     const description = queryDescription(params)
     expect(description).toContain(
       'belong to the <span class="govuk-!-font-weight-bold">science</span> topic tag'
+    )
+  })
+
+  it('should generate description for person', () => {
+    const params = {
+      searchParams: makeParams({
+        person: 'The Rt Hon Rishi Sunak MP',
+      }),
+      includeMarkup: true,
+    }
+    const description = queryDescription(params)
+    expect(description).toContain(
+      'are associated with <span class="govuk-!-font-weight-bold">The Rt Hon Rishi Sunak MP</span>'
     )
   })
 

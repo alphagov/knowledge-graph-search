@@ -20,6 +20,7 @@ const makeURLfromSearchParams = function (searchParams: SearchParams): string {
   if (searchParams.excludedWords !== '')
     usp.set(UrlParams.ExcludedWords, searchParams.excludedWords)
   if (searchParams.taxon !== '') usp.set(UrlParams.Taxon, searchParams.taxon)
+  if (searchParams.person !== '') usp.set(UrlParams.Person, searchParams.person)
   if (searchParams.publishingOrganisation !== '')
     usp.set(
       UrlParams.PublishingOrganisation,
