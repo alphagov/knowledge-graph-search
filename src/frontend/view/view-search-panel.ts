@@ -113,16 +113,17 @@ const viewLinkSearchPanel = () => `
             ? ''
             : `<details class="govuk-details" data-module="govuk-details">
           <summary class="govuk-details__summary">
-            <span class="govuk-details__summary-text">
-              Search filters
-            </span>
+          <span class="govuk-details__summary-text">
+          Search filters
+          </span>
           </summary>
           <div class="govuk-details__text">
-            <div class="search-filters-container">
-              <div class="search-filters-left-col links-search">
-              ${viewPublishingOrganisation()}
-              ${viewPublishingAppSelector()}
-              ${viewDocumentType()}
+          <div class="search-filters-container">
+          <div class="search-filters-left-col links-search">
+          ${viewLinksExactMatchSelector()}
+          ${viewPublishingOrganisation()}
+          ${viewPublishingAppSelector()}
+          ${viewDocumentType()}
               </div>
               <div class="search-filters-right-col links-search">
                 ${viewTaxonSelector()}
@@ -609,6 +610,24 @@ const viewCaseSensitiveSelector = () => `
           ${state.searchParams.caseSensitive ? 'checked' : ''}
       />
       <label for="search-filters-case-sensitive" class="govuk-label govuk-checkboxes__label">Enable case sensitive</label>
+    </div>
+  </div>
+</div>
+`
+
+const viewLinksExactMatchSelector = () => `
+<div class="govuk-form-group">
+  <div class="govuk-checkboxes govuk-checkboxes--small">
+    <div class="govuk-checkboxes__item">
+      <input
+          class="govuk-checkboxes__input"
+          ${state.waiting && 'disabled="disabled"'}
+          type="checkbox"
+          id="search-filters-links-exact-match"
+          name="search-filters-links-exact-match"
+          ${state.searchParams.linksExactMatch ? 'checked' : ''}
+      />
+      <label for="search-filters-links-exact-match" class="govuk-label govuk-checkboxes__label">Exact matches only</label>
     </div>
   </div>
 </div>

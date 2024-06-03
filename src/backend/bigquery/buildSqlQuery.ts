@@ -157,14 +157,13 @@ export const buildSqlQuery = function (
             SELECT 1 FROM UNNEST (hyperlinks) AS link
             WHERE
             @link = link.link_url
-            OR @link = CONCAT('http://www.gov.uk', link.link_url)
-            OR @link = CONCAT('http://www.gov.uk/', link.link_url)
-            OR @link = CONCAT('https://www.gov.uk', link.link_url)
-            OR @link = CONCAT('https://www.gov.uk/', link.link_url)
+            OR CONCAT('http://www.gov.uk', @link) = link.link_url
+            OR CONCAT('http://www.gov.uk', @link) = link.link_url
+            OR CONCAT('https://www.gov.uk', @link) = link.link_url
+            OR CONCAT('https://www.gov.uk', @link) = link.link_url
           )
       `
-    }
-    else {
+    } else {
       linkClause = `
         AND EXISTS
           (
@@ -173,6 +172,7 @@ export const buildSqlQuery = function (
           )
       `
     }
+  }
 
   let phoneNumberClause = ''
   if (searchParams.phoneNumber && searchParams.phoneNumber !== '') {

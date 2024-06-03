@@ -80,6 +80,9 @@ const updateStateFromSearchFilters = () => {
   state.searchParams.caseSensitive = (<HTMLInputElement>(
     id('search-filters-case-sensitive')
   ))?.checked
+  state.searchParams.linksExactMatch = (<HTMLInputElement>(
+    id('search-filters-links-exact-match')
+  ))?.checked
   const newCombinatorValue =
     ((
       document.querySelector(
@@ -216,7 +219,8 @@ const handleEvent: SearchApiCallback = async function (event) {
             event: 'formSubmission',
             formType: 'Search',
             formPosition: 'Page',
-            userOrganisation: state.signonProfileData.user.organisation_slug,
+            userOrganisation:
+              state.signonProfileData?.user?.organisation_slug || '',
           })
 
           updateStateFromSearchFilters()

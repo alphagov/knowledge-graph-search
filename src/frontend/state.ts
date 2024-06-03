@@ -45,6 +45,7 @@ export const initialSearchParams: SearchParams = {
   publishingStatus: PublishingStatus.All,
   politicalStatus: PoliticalStatus.Any,
   government: '',
+  linksExactMatch: false,
 }
 
 const defaultShowFields = {

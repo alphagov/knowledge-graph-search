@@ -15,6 +15,7 @@ export enum UrlParams {
   Language = 'language',
   PoliticalStatus = 'political-status',
   Government = 'government',
+  LinksExactMatch = 'links-exact-match',
 }
 
 export enum SearchType {
