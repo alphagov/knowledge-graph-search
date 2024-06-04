@@ -46,6 +46,7 @@ describe('getParams', () => {
       language: 'some language',
       politicalStatus: 'political',
       government: 'some government',
+      linksExactMatch: false,
     })
   })
 
@@ -87,6 +88,7 @@ describe('getParams', () => {
       documentType: '',
       politicalStatus: 'any',
       government: '',
+      linksExactMatch: false,
     })
   })
 })
