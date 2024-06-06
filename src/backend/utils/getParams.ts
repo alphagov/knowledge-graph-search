@@ -2,7 +2,6 @@ import * as express from 'express'
 import {
   SearchParams,
   Combinator,
-  PublishingApplication,
   SearchType,
   KeywordLocation,
   UrlParams,
@@ -31,9 +30,8 @@ export const getParams = (req: express.Request): SearchParams => {
     (req.query[UrlParams.KeywordLocation] as string as KeywordLocation) ||
     KeywordLocation.All
 
-  const publishingApplication = <PublishingApplication>(
-    ((req.query[UrlParams.PublishingApplication] as string) ||
-      PublishingApplication.Any)
+  const publishingApplication = <string>(
+    ((req.query[UrlParams.PublishingApplication] as string) || '')
   )
   const linkSearchUrl = (req.query[UrlParams.LinkSearchUrl] as string) || ''
   const phoneNumber = (req.query[UrlParams.PhoneNumber] as string) || ''
@@ -57,7 +55,7 @@ export const getParams = (req: express.Request): SearchParams => {
     caseSensitive,
     combinator,
     keywordLocation,
-    publishingApplication,
+    publishingApp: publishingApplication,
     linkSearchUrl,
     phoneNumber,
     publishingStatus,

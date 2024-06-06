@@ -55,4 +55,5 @@ export interface State {
   CSVDownloadType: CSVDownloadType
   phoneNumberError: boolean | null
   signonProfileData?: SignonProfileData
+  publishingApps: string[]
 }

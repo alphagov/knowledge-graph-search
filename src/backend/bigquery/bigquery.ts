@@ -61,6 +61,9 @@ export const bigQuery = async function (userQuery: string, options?: any) {
     if (options.government) {
       params.government = options.government
     }
+    if (options.publishingApp) {
+      params.publishingApp = options.publishingApp
+    }
   }
 
   const bqOptions = {
@@ -84,33 +87,39 @@ const sendInitQuery = async function (): Promise<InitResults> {
     bqGovernments: any,
     bqPublishingApps: any
   try {
-    ;[bqLocales, bqTaxons, bqOrganisations, bqDocumentTypes, bqGovernments, bqPublishingApps] =
-      await Promise.all([
-        bigQuery(`
+    ;[
+      bqLocales,
+      bqTaxons,
+      bqOrganisations,
+      bqDocumentTypes,
+      bqGovernments,
+      bqPublishingApps,
+    ] = await Promise.all([
+      bigQuery(`
         SELECT DISTINCT locale
         FROM \`search.locale\`
         `),
-        bigQuery(`
+      bigQuery(`
         SELECT DISTINCT name
         FROM \`search.taxon\`
         `),
-        bigQuery(`
+      bigQuery(`
         SELECT DISTINCT title
         FROM \`search.organisation\`
         `),
-        bigQuery(`
+      bigQuery(`
         SELECT DISTINCT document_type
         FROM \`search.document_type\`
         `),
-        bigQuery(`
+      bigQuery(`
         SELECT DISTINCT title
         FROM \`search.government\`
         `),
-        bigQuery(`
+      bigQuery(`
         SELECT DISTINCT publishing_app
         FROM \`search.publishing_app\`
         `),
-      ])
+    ])
   } catch (error) {
     log.error(error, 'Error in sendInitQueryError')
   }
@@ -128,7 +137,9 @@ const sendInitQuery = async function (): Promise<InitResults> {
       (documentType: any) => documentType.document_type
     ),
     governments: bqGovernments.map((government: any) => government.title),
-    publishingApps: bqPublishingApps.map((publishingApp: any) => publishingApp.publishing_app),
+    publishingApps: bqPublishingApps.map(
+      (publishingApp: any) => publishingApp.publishing_app
+    ),
   }
 }
 
@@ -147,6 +158,8 @@ const sendSearchQuery = async function (
   const phoneNumber = searchParams.phoneNumber
   const government = searchParams.government
   const politicalStatus = searchParams.politicalStatus
+  const publishingApp = searchParams.publishingApp
+  console.log({ searchParams })
   const queries = [
     bigQuery(query, {
       keywords,
@@ -159,6 +172,7 @@ const sendSearchQuery = async function (
       documentType,
       government,
       politicalStatus,
+      publishingApp,
     }),
   ]
 

@@ -1,16 +1,17 @@
 import { sanitiseOutput } from '../../common/utils/utils'
 import { state } from '../state'
 import { languageName } from '../../common/utils/lang'
+import { formatPublishingApp } from '../utils/formatters'
 import {
   Combinator,
   KeywordLocation,
-  PublishingApplication,
   PublishingStatus,
   PoliticalStatus,
   SearchType,
 } from '../../common/types/search-api-types'
 
 const viewSearchPanel = () => {
+  console.log({ 'state.publishingApps': state.publishingApps })
   const { searchType } = state.searchParams
   const mapping = {
     [SearchType.Keyword]: viewKeywordSearchPanel,
@@ -677,21 +678,19 @@ const viewPublishingAppSelector = () => `
         <select ${
           state.waiting && 'disabled="disabled"'
         } id="search-filters-publishing-application" class="govuk-select" name="search-filters-publishing-application" style="width: 100%;">
-          <option value="${PublishingApplication.Any}" ${
-  state.searchParams.publishingApplication === PublishingApplication.Any
-    ? 'selected'
-    : ''
-}>All publishing applications</option>
-          <option value="${PublishingApplication.Publisher}" ${
-  state.searchParams.publishingApplication === PublishingApplication.Publisher
-    ? 'selected'
-    : ''
-}>Publisher (mainstream)</option>
-          <option value="${PublishingApplication.Whitehall}" ${
-  state.searchParams.publishingApplication === PublishingApplication.Whitehall
-    ? 'selected'
-    : ''
-}>Whitehall (specialist)</option>
+        <option value="" ${
+          state.searchParams.publishingApp === '' ? 'selected' : ''
+        }>Any</option>
+        ${state.publishingApps
+          .sort()
+          .map(
+            (publishingApp) =>
+              `<option value="${publishingApp}" ${
+                state.searchParams.publishingApp === publishingApp
+                  ? 'selected'
+                  : ''
+              }>${formatPublishingApp(publishingApp)}</option>`
+          )}
         </select>
     </div>`
 

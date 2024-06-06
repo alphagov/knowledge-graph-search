@@ -2,7 +2,6 @@ import { Sorting } from '../types/state-types'
 import { fieldName, sortOrder } from '../view/utils'
 import {
   KeywordLocation,
-  PublishingApplication,
   PoliticalStatus,
   PublishingStatus,
   SearchParams,
@@ -81,13 +80,10 @@ export const queryDescription = ({
         includeMarkup
       )}`
     )
-  if (
-    searchParams.publishingApplication === PublishingApplication.Whitehall ||
-    searchParams.publishingApplication === PublishingApplication.Publisher
-  )
+  if (searchParams.publishingApp !== '')
     clauses.push(
       `are published using ${makeBold(
-        searchParams.publishingApplication,
+        searchParams.publishingApp,
         includeMarkup
       )}`
     )

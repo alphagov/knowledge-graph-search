@@ -1,7 +1,6 @@
 import {
   SearchParams,
   SearchType,
-  PublishingApplication,
   PoliticalStatus,
   Combinator,
   SearchResults,
@@ -38,8 +37,8 @@ const makeURLfromSearchParams = function (searchParams: SearchParams): string {
   if (searchParams.documentType)
     usp.set(UrlParams.DocumentType, searchParams.documentType)
 
-  if (searchParams.publishingApplication !== PublishingApplication.Any) {
-    usp.set(UrlParams.PublishingApplication, searchParams.publishingApplication)
+  if (searchParams.publishingApp !== '') {
+    usp.set(UrlParams.PublishingApplication, searchParams.publishingApp)
   }
   if (searchParams.combinator !== Combinator.All)
     usp.set(UrlParams.Combinator, searchParams.combinator)

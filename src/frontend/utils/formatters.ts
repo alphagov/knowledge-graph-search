@@ -4,5 +4,12 @@ export const formatDocumentType = (documentType: string) =>
     ' '
   )
 
-export const formatPublishingApp = (publishingApp: string) =>
-  publishingApp.charAt(0).toUpperCase() + publishingApp.slice(1)
+/*
+ * First letter of each word capitalised and all underscores and dashes replaced with spaces.
+ */
+export const formatPublishingApp = (phrase: string) =>
+  phrase
+    .replace(/[-_]/g, ' ')
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
