@@ -41,7 +41,7 @@ describe('getParams', () => {
       keywordLocation: 'some keyword-location',
       linkSearchUrl: 'some link-search-url',
       phoneNumber: 'some phone-number',
-      publishingApplication: 'some publishing-application',
+      publishingApp: 'some publishing-application',
       publishingStatus: 'some publishing-status',
       language: 'some language',
       politicalStatus: 'political',
@@ -72,7 +72,7 @@ describe('getParams', () => {
     } as unknown as Request
 
     expect(getParams(req)).toStrictEqual({
-      publishingApplication: 'any',
+      publishingApp: '',
       caseSensitive: true,
       combinator: 'all',
       excludedWords: '',

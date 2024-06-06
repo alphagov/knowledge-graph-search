@@ -1,7 +1,6 @@
 import {
   SearchParams,
   Combinator,
-  PublishingApplication,
   SearchType,
   KeywordLocation,
   PublishingStatus,
@@ -82,7 +81,7 @@ const makeParams = (opts = {}) =>
     linkSearchUrl: '',
     keywordLocation: KeywordLocation.All,
     combinator: Combinator.Any,
-    publishingApplication: PublishingApplication.Any,
+    publishingApp: '',
     caseSensitive: false,
     publishingStatus: PublishingStatus.All,
     government: '',
@@ -149,20 +148,20 @@ describe('buildSqlQuery', () => {
 
   it('can filter by publishing app', () => {
     let searchParams: SearchParams = makeParams({
-      publishingApplication: 'publisher',
+      publishingApp: 'publisher',
     })
     const keywords: string[] = []
     const excludedKeywords: string[] = []
 
     let query = buildSqlQuery(searchParams, keywords, excludedKeywords)
-    let expectedClauses = `\nAND publishing_app = "publisher"`
+    let expectedClauses = `\nAND publishing_app = @publishingApp`
     let expected = expectedQuery(expectedClauses, keywords)
 
     expect(queryFmt(query)).toEqual(queryFmt(expected))
 
-    searchParams = makeParams({ publishingApplication: 'whitehall' })
+    searchParams = makeParams({ publishingApp: 'whitehall' })
     query = buildSqlQuery(searchParams, keywords, excludedKeywords)
-    expectedClauses = `\nAND publishing_app = "whitehall"`
+    expectedClauses = `\nAND publishing_app = @publishingApp`
     expected = expectedQuery(expectedClauses, keywords)
 
     expect(queryFmt(query)).toEqual(queryFmt(expected))
@@ -275,7 +274,7 @@ describe('buildSqlQuery', () => {
     const link = 'whatever'
     const searchParams: SearchParams = makeParams({
       caseSensitive: true,
-      publishingApplication: 'whitehall',
+      publishingApp: 'whitehall',
       politicalStatus: 'political',
       language: 'whatever',
       taxon: 'whatever',
@@ -291,7 +290,7 @@ describe('buildSqlQuery', () => {
     const expectedClauses = `
   AND (STRPOS(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @keyword0) <> 0 OR STRPOS(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @keyword1) <> 0)
   AND NOT (STRPOS(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @excluded_keyword0) <> 0 OR STRPOS(IFNULL(page.title, "") || " " || IFNULL(page.text, "") || " " || IFNULL(page.description, ""), @excluded_keyword1) <> 0)
-  AND publishing_app = "whitehall"
+  AND publishing_app = @publishingApp
   AND locale = @locale
   AND EXISTS
     (

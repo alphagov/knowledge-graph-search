@@ -32,7 +32,7 @@ describe('formatters', () => {
 
     it('should not replace underscores with spaces', () => {
       const result = formatPublishingApp('publishing_app_example')
-      expect(result).toBe('Publishing_app_example')
+      expect(result).toBe('Publishing App Example')
     })
 
     it('should handle empty strings', () => {

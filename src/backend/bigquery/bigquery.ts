@@ -159,7 +159,6 @@ const sendSearchQuery = async function (
   const government = searchParams.government
   const politicalStatus = searchParams.politicalStatus
   const publishingApp = searchParams.publishingApp
-  console.log({ searchParams })
   const queries = [
     bigQuery(query, {
       keywords,
