@@ -81,9 +81,10 @@ const sendInitQuery = async function (): Promise<InitResults> {
     bqTaxons: any,
     bqOrganisations: any,
     bqDocumentTypes: any,
-    bqGovernments: any
+    bqGovernments: any,
+    bqPublishingApps: any
   try {
-    ;[bqLocales, bqTaxons, bqOrganisations, bqDocumentTypes, bqGovernments] =
+    ;[bqLocales, bqTaxons, bqOrganisations, bqDocumentTypes, bqGovernments, bqPublishingApps] =
       await Promise.all([
         bigQuery(`
         SELECT DISTINCT locale
@@ -105,6 +106,10 @@ const sendInitQuery = async function (): Promise<InitResults> {
         SELECT DISTINCT title
         FROM \`search.government\`
         `),
+        bigQuery(`
+        SELECT DISTINCT publishing_app
+        FROM \`search.publishing_app\`
+        `),
       ])
   } catch (error) {
     log.error(error, 'Error in sendInitQueryError')
@@ -123,6 +128,7 @@ const sendInitQuery = async function (): Promise<InitResults> {
       (documentType: any) => documentType.document_type
     ),
     governments: bqGovernments.map((government: any) => government.title),
+    publishingApps: bqPublishingApps.map((publishingApp: any) => publishingApp.publishing_app),
   }
 }
 

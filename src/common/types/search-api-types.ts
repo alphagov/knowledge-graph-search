@@ -89,6 +89,7 @@ export type InitResults = {
   organisations: string[]
   documentTypes: string[]
   governments: string[]
+  publishingApps: string[]
 }
 
 export type Occurrence = {
