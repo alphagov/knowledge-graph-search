@@ -63,10 +63,16 @@ export const queryDescription = ({
     clauses.push(
       `are in ${makeBold(languageName(searchParams.language), includeMarkup)}`
     )
-  if (searchParams.linkSearchUrl !== '')
-    clauses.push(
-      `link to ${makeBold(searchParams.linkSearchUrl, includeMarkup)}`
-    )
+  if (searchParams.linkSearchUrl !== '') {
+    let clause = `link to ${makeBold(
+      searchParams.linkSearchUrl,
+      includeMarkup
+    )}`
+    if (searchParams.linksExactMatch) {
+      clause = `${clause} (exact match)`
+    }
+    clauses.push(clause)
+  }
   if (searchParams.phoneNumber !== '')
     clauses.push(
       `mention the phone number ${makeBold(

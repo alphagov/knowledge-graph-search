@@ -36,6 +36,9 @@ const updateStateFromSideFilters = () => {
   state.searchParams.caseSensitive = (<HTMLInputElement>(
     id('side-filters-case-sensitive')
   ))?.checked
+  state.searchParams.linksExactMatch = (<HTMLInputElement>(
+    id('side-filters-links-exact-match')
+  ))?.checked
   state.searchParams.excludedWords = getFormInputValue(
     'side-filters-excluded-keywords'
   )
@@ -364,6 +367,11 @@ const getQueryStringFromSearchParams = function () {
       param: UrlParams.CaseSensitive,
       transform: (v) => v.toString(),
     },
+    linksExactMatch: {
+      condition: (v) => v,
+      param: UrlParams.LinksExactMatch,
+      transform: (v) => v.toString(),
+    },
     publishingOrganisation: {
       condition: (v) => v,
       param: UrlParams.PublishingOrganisation,
@@ -425,6 +433,7 @@ const getQueryStringFromSearchParams = function () {
   const fields = [
     'selectedWords',
     'caseSensitive',
+    'linksExactMatch',
     'combinator',
     'excludedWords',
     'linkSearchUrl',

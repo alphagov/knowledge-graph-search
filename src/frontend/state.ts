@@ -157,6 +157,10 @@ const setStateSearchParamsFromURL = function (): void {
     'caseSensitive',
     UrlParams.CaseSensitive
   )
+  state.searchParams.linksExactMatch = getURLParamOrFallback(
+    'linksExactMatch',
+    UrlParams.LinksExactMatch
+  )
   state.searchParams.publishingApplication = getURLParamOrFallback(
     'publishingApplication',
     UrlParams.PublishingApplication
