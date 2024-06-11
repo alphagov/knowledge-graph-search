@@ -377,17 +377,17 @@ const getQueryStringFromSearchParams = function () {
       param: UrlParams.PublishingOrganisation,
     },
     keywordLocation: {
-      condition: (v) => v !== KeywordLocation.All,
+      condition: (v) => v && v !== KeywordLocation.All && v !== '',
       param: UrlParams.KeywordLocation,
     },
     documentType: { condition: (v) => v, param: UrlParams.DocumentType },
     taxon: { condition: (v) => v !== '', param: UrlParams.Taxon },
     publishingApplication: {
-      condition: (v) => v !== PublishingApplication.Any,
+      condition: (v) => v && v !== PublishingApplication.Any && v !== '',
       param: UrlParams.PublishingApplication,
     },
     politicalStatus: {
-      condition: (v) => v !== PoliticalStatus.Any,
+      condition: (v) => v && v !== PoliticalStatus.Any && v !== '',
       param: UrlParams.PoliticalStatus,
     },
     government: { condition: (v) => v, param: UrlParams.Government },

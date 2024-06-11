@@ -91,7 +91,10 @@ export const queryDescription = ({
         includeMarkup
       )}`
     )
-  if (searchParams.politicalStatus !== PoliticalStatus.Any) {
+  if (
+    searchParams.politicalStatus &&
+    searchParams.politicalStatus !== PoliticalStatus.Any
+  ) {
     const status = {
       [PoliticalStatus.Political]: 'political',
       [PoliticalStatus.NotPolitical]: 'not political',
