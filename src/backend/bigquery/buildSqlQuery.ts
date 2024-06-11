@@ -155,7 +155,12 @@ export const buildSqlQuery = function (
         AND EXISTS
           (
             SELECT 1 FROM UNNEST (hyperlinks) AS link
-            WHERE @link = link.link_url
+            WHERE
+            @link = link.link_url
+            OR CONCAT('http://www.gov.uk', @link) = link.link_url
+            OR CONCAT('http://www.gov.uk/', @link) = link.link_url
+            OR CONCAT('https://www.gov.uk', @link) = link.link_url
+            OR CONCAT('https://www.gov.uk/', @link) = link.link_url
           )
       `
     } else {
