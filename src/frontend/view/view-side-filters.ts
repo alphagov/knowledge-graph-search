@@ -345,11 +345,7 @@ export const viewSideFilters = () => {
           ? viewSelectKeywordLocation()
           : ''
       }
-      ${
-        searchType === SearchType.Link
-          ? viewLinksExactMatchSelector()
-          : ''
-      }
+      ${searchType === SearchType.Link ? viewLinksExactMatchSelector() : ''}
       ${viewSelectPublishingOrganisations()}
       ${viewDocumentTypeSelector()}
       ${viewPublishingApplications()}
