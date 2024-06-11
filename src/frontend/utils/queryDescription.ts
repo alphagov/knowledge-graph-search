@@ -64,10 +64,11 @@ export const queryDescription = ({
       `are in ${makeBold(languageName(searchParams.language), includeMarkup)}`
     )
   if (searchParams.linkSearchUrl !== '') {
-    let clause = `link to ${makeBold(
-      searchParams.linkSearchUrl,
-      includeMarkup
-    )}`
+    const isSlug = searchParams.linkSearchUrl.startsWith('/')
+    const formattedLink = isSlug
+      ? `https://www.gov.uk${searchParams.linkSearchUrl}`
+      : searchParams.linkSearchUrl
+    let clause = `link to ${makeBold(formattedLink, includeMarkup)}`
     if (searchParams.linksExactMatch) {
       clause = `${clause} (exact match)`
     }
