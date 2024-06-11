@@ -88,7 +88,11 @@ describe('[Function] sendInitQuery', () => {
         [{ title: 'gov1' }, { title: 'gov2' }, { title: 'gov3' }],
       ])
       .mockResolvedValueOnce([
-        [{ publishing_app: 'app`' }, { publishing_app: 'app2' }, { publishing_app: 'app3' }],
+        [
+          { publishing_app: 'app`' },
+          { publishing_app: 'app2' },
+          { publishing_app: 'app3' },
+        ],
       ])
     const result = await sendInitQuery()
 

@@ -382,7 +382,7 @@ const getQueryStringFromSearchParams = function () {
     documentType: { condition: (v) => v, param: UrlParams.DocumentType },
     taxon: { condition: (v) => v !== '', param: UrlParams.Taxon },
     publishingApp: {
-      condition: (v) => v && v !== "any" && v !== '',
+      condition: (v) => v && v !== 'any' && v !== '',
       param: UrlParams.PublishingApplication,
     },
     politicalStatus: {

@@ -7,7 +7,7 @@ import {
 } from '../../common/types/search-api-types'
 import { state } from '../state'
 import { languageName } from '../../common/utils/lang'
-import { formatDocumentType } from '../utils/formatters'
+import { formatDocumentType, formatPublishingApp } from '../utils/formatters'
 
 const viewEnableCaseSensitive = () => `
 <div class="govuk-form-group side-filter-case-sensitive">

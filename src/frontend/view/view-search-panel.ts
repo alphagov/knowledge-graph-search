@@ -11,7 +11,6 @@ import {
 } from '../../common/types/search-api-types'
 
 const viewSearchPanel = () => {
-  console.log({ 'state.publishingApps': state.publishingApps })
   const { searchType } = state.searchParams
   const mapping = {
     [SearchType.Keyword]: viewKeywordSearchPanel,
