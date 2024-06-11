@@ -193,7 +193,7 @@ const viewPublishingApplications = () => `
                 state.searchParams.publishingApp === publishingApp
                   ? 'selected'
                   : ''
-              }</option>`
+              }>${formatPublishingApp(publishingApp)}</option>`
           )}
         </select>
     </div>`
