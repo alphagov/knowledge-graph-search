@@ -10,7 +10,6 @@ const id = (x: string): HTMLElement | null => document.getElementById(x)
 const getFormInputValue = (inputId: string): string =>
   (<HTMLInputElement>id(inputId))?.value
 
-
 // TODO: Support many phone numbers at once.  Available distributions of
 // libphonenumber don't support this, so we would have to require users to
 // separate numbers by delimiters.
