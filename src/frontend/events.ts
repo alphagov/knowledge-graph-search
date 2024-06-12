@@ -12,7 +12,6 @@ import { queryBackend } from './search-api'
 import { EventType, SearchApiCallback } from './types/event-types'
 import {
   SearchType,
-  PublishingApplication,
   PoliticalStatus,
   Combinator,
   KeywordLocation,
@@ -55,9 +54,9 @@ const updateStateFromSideFilters = () => {
     'side-filters-publishing-status'
   ) as PublishingStatus
 
-  state.searchParams.publishingApplication = getFormInputValue(
+  state.searchParams.publishingApp = getFormInputValue(
     'side-filters-publishing-application'
-  ) as PublishingApplication
+  ) as string
 
   state.searchParams.politicalStatus = getFormInputValue(
     'side-filters-political-status'
@@ -116,9 +115,9 @@ const updateStateFromSearchFilters = () => {
     getFormInputValue('search-filters-document-type').charAt(0).toLowerCase() +
     getFormInputValue('search-filters-document-type').slice(1)
   ).replace(/ /g, '_')
-  state.searchParams.publishingApplication = getFormInputValue(
+  state.searchParams.publishingApp = getFormInputValue(
     'search-filters-publishing-application'
-  ) as PublishingApplication
+  ) as string
   state.searchParams.politicalStatus = getFormInputValue(
     'search-filters-political-status'
   ) as PoliticalStatus
@@ -153,7 +152,7 @@ const resetFilters = () => {
     combinator: initialSearchParams.combinator,
     excludedWords: initialSearchParams.excludedWords,
     keywordLocation: initialSearchParams.keywordLocation,
-    publishingApplication: initialSearchParams.publishingApplication,
+    publishingApp: initialSearchParams.publishingApp,
     politicalStatus: initialSearchParams.politicalStatus,
     publishingOrganisation: initialSearchParams.publishingOrganisation,
     documentType: initialSearchParams.documentType,
@@ -382,8 +381,8 @@ const getQueryStringFromSearchParams = function () {
     },
     documentType: { condition: (v) => v, param: UrlParams.DocumentType },
     taxon: { condition: (v) => v !== '', param: UrlParams.Taxon },
-    publishingApplication: {
-      condition: (v) => v && v !== PublishingApplication.Any && v !== '',
+    publishingApp: {
+      condition: (v) => v && v !== 'any' && v !== '',
       param: UrlParams.PublishingApplication,
     },
     politicalStatus: {
@@ -441,7 +440,7 @@ const getQueryStringFromSearchParams = function () {
     'keywordLocation',
     'publishingOrganisation',
     'documentType',
-    'publishingApplication',
+    'publishingApp',
     'taxon',
     'publishingStatus',
     'politicalStatus',

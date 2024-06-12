@@ -1,7 +1,6 @@
 import {
   Combinator,
   KeywordLocation,
-  PublishingApplication,
   PublishingStatus,
   PoliticalStatus,
   SearchParams,
@@ -88,9 +87,16 @@ describe('[Function] sendInitQuery', () => {
       .mockResolvedValueOnce([
         [{ title: 'gov1' }, { title: 'gov2' }, { title: 'gov3' }],
       ])
+      .mockResolvedValueOnce([
+        [
+          { publishing_app: 'app`' },
+          { publishing_app: 'app2' },
+          { publishing_app: 'app3' },
+        ],
+      ])
     const result = await sendInitQuery()
 
-    expect(BigQuery.prototype.query).toHaveBeenCalledTimes(5)
+    expect(BigQuery.prototype.query).toHaveBeenCalledTimes(6)
 
     expect(BigQuery.prototype.query).toHaveBeenNthCalledWith(1, {
       query: `
@@ -139,6 +145,7 @@ describe('[Function] sendInitQuery', () => {
       organisations: ['org1', 'org2', 'org3'],
       documentTypes: ['dt1', 'dt2', 'dt3'],
       governments: ['gov1', 'gov2', 'gov3'],
+      publishingApps: ['app`', 'app2', 'app3'],
     })
   })
 })
@@ -156,7 +163,7 @@ describe('[Function] sendSearchQuery', () => {
       linkSearchUrl: 'link',
       keywordLocation: KeywordLocation.All,
       combinator: Combinator.Any,
-      publishingApplication: PublishingApplication.Any,
+      publishingApp: '',
       caseSensitive: false,
       publishingStatus: PublishingStatus.All,
       politicalStatus: PoliticalStatus.Any,

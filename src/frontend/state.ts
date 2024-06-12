@@ -3,7 +3,6 @@ import {
   SearchType,
   SearchParams,
   Combinator,
-  PublishingApplication,
   PoliticalStatus,
   KeywordLocation,
   UrlParams,
@@ -40,7 +39,7 @@ export const initialSearchParams: SearchParams = {
   phoneNumber: '',
   keywordLocation: KeywordLocation.All,
   combinator: Combinator.All,
-  publishingApplication: PublishingApplication.Any,
+  publishingApp: '',
   caseSensitive: false, // whether the keyword search is case sensitive
   publishingStatus: PublishingStatus.All,
   politicalStatus: PoliticalStatus.Any,
@@ -91,6 +90,7 @@ const initState = () => {
     sorting: defaultSortingState,
     CSVDownloadType: CSVDownloadType.ALL,
     phoneNumberError: false,
+    publishingApps: [], // all the publishing apps listed in the search.publishing_app table
   }
   if (cachedLayout) {
     const { showFiltersPane, showFieldSet } = loadLayoutStateFromCache()
@@ -161,8 +161,8 @@ const setStateSearchParamsFromURL = function (): void {
     'linksExactMatch',
     UrlParams.LinksExactMatch
   )
-  state.searchParams.publishingApplication = getURLParamOrFallback(
-    'publishingApplication',
+  state.searchParams.publishingApp = getURLParamOrFallback(
+    'publishingApp',
     UrlParams.PublishingApplication
   )
   state.searchParams.combinator = getURLParamOrFallback(
@@ -207,7 +207,7 @@ const searchStateIsUnset = function (): boolean {
     state.searchParams.linkSearchUrl === '' &&
     state.searchParams.phoneNumber === '' &&
     state.searchParams.documentType === '' &&
-    state.searchParams.publishingApplication === PublishingApplication.Any &&
+    state.searchParams.publishingApp === '' &&
     state.searchParams.publishingStatus === PublishingStatus.All &&
     state.searchParams.politicalStatus === PoliticalStatus.Any &&
     state.searchParams.government === ''
@@ -251,7 +251,7 @@ const resetSearchState = function (): void {
   state.searchParams.linkSearchUrl = ''
   state.searchParams.phoneNumber = ''
   state.skip = 0 // reset to first page
-  state.searchParams.publishingApplication = PublishingApplication.Any
+  state.searchParams.publishingApp = ''
   state.searchResults = null
   state.waiting = false
   state.searchParams.combinator = Combinator.All

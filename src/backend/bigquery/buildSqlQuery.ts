@@ -1,7 +1,6 @@
 import {
   Combinator,
   KeywordLocation,
-  PublishingApplication,
   PublishingStatus,
   PoliticalStatus,
   SearchParams,
@@ -103,12 +102,8 @@ export const buildSqlQuery = function (
           .join(' OR ') +
         ')'
   let publishingAppClause = ''
-  if (searchParams.publishingApplication === PublishingApplication.Publisher) {
-    publishingAppClause = 'AND publishing_app = "publisher"'
-  } else if (
-    searchParams.publishingApplication === PublishingApplication.Whitehall
-  ) {
-    publishingAppClause = 'AND publishing_app = "whitehall"'
+  if (searchParams.publishingApp !== '') {
+    publishingAppClause = `AND publishing_app = @publishingApp`
   }
 
   let publishingStatusClause = ''

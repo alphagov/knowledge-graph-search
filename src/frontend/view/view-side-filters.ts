@@ -1,14 +1,13 @@
 import {
   Combinator,
   KeywordLocation,
-  PublishingApplication,
   PublishingStatus,
   PoliticalStatus,
   SearchType,
 } from '../../common/types/search-api-types'
 import { state } from '../state'
 import { languageName } from '../../common/utils/lang'
-import { formatDocumentType } from '../utils/formatters'
+import { formatDocumentType, formatPublishingApp } from '../utils/formatters'
 
 const viewEnableCaseSensitive = () => `
 <div class="govuk-form-group side-filter-case-sensitive">
@@ -183,21 +182,19 @@ const viewPublishingApplications = () => `
         <select ${
           state.waiting && 'disabled="disabled"'
         } id="side-filters-publishing-application" class="govuk-select" name="side-filters-publishing-application" style="width: 100%;">
-          <option value="${PublishingApplication.Any}" ${
-  state.searchParams.publishingApplication === PublishingApplication.Any
-    ? 'selected'
-    : ''
-}>All publishing applications</option>
-          <option value="${PublishingApplication.Publisher}" ${
-  state.searchParams.publishingApplication === PublishingApplication.Publisher
-    ? 'selected'
-    : ''
-}>Publisher (mainstream)</option>
-          <option value="${PublishingApplication.Whitehall}" ${
-  state.searchParams.publishingApplication === PublishingApplication.Whitehall
-    ? 'selected'
-    : ''
-}>Whitehall (specialist)</option>
+        <option value="" ${
+          state.searchParams.publishingApp === '' ? 'selected' : ''
+        }>Any</option>
+        ${state.publishingApps
+          .sort()
+          .map(
+            (publishingApp) =>
+              `<option value="${publishingApp}" ${
+                state.searchParams.publishingApp === publishingApp
+                  ? 'selected'
+                  : ''
+              }>${formatPublishingApp(publishingApp)}</option>`
+          )}
         </select>
     </div>`
 

@@ -48,12 +48,6 @@ export enum PublishingStatus {
   All = 'all',
 }
 
-export enum PublishingApplication {
-  Any = 'any',
-  Whitehall = 'whitehall',
-  Publisher = 'publisher',
-}
-
 export enum PoliticalStatus {
   Any = 'any',
   Political = 'political',
@@ -72,7 +66,7 @@ export type SearchParams = {
   phoneNumber: string // the phone number to search for
   keywordLocation: KeywordLocation // what parts of the pages to search in
   combinator: Combinator // all keywords or any keywords
-  publishingApplication: PublishingApplication // whitehall, publisher, both
+  publishingApp: string // publishing app to search for
   caseSensitive: boolean // case sensitive keyword search?
   publishingStatus: PublishingStatus // Withdrawn, not withdrawn etc.
   politicalStatus: PoliticalStatus // page is politial: true, false, null
@@ -89,6 +83,7 @@ export type InitResults = {
   organisations: string[]
   documentTypes: string[]
   governments: string[]
+  publishingApps: string[]
 }
 
 export type Occurrence = {

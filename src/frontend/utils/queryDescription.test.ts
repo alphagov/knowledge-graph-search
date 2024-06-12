@@ -3,7 +3,6 @@ import { Sorting, SortAction } from '../types/state-types'
 import {
   Combinator,
   KeywordLocation,
-  PublishingApplication,
   PublishingStatus,
   PoliticalStatus,
   SearchParams,
@@ -33,7 +32,7 @@ const DEFAULT_SEARCH_PARAMS: SearchParams = {
   phoneNumber: '',
   keywordLocation: KeywordLocation.BodyContent,
   combinator: Combinator.All,
-  publishingApplication: PublishingApplication.Whitehall,
+  publishingApp: 'whitehall',
   caseSensitive: false,
   publishingStatus: PublishingStatus.NotWithdrawn,
   politicalStatus: PoliticalStatus.Any,
@@ -130,7 +129,7 @@ describe('queryDescription', () => {
   it('should handle publishingApplication', () => {
     const params = {
       searchParams: makeParams({
-        publishingApplication: PublishingApplication.Whitehall,
+        publishingApp: 'whitehall',
       }),
       includeMarkup: true,
     }
