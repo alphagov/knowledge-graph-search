@@ -36,6 +36,9 @@ const updateStateFromSideFilters = () => {
   state.searchParams.caseSensitive = (<HTMLInputElement>(
     id('side-filters-case-sensitive')
   ))?.checked
+  state.searchParams.linksExactMatch = (<HTMLInputElement>(
+    id('side-filters-links-exact-match')
+  ))?.checked
   state.searchParams.excludedWords = getFormInputValue(
     'side-filters-excluded-keywords'
   )
@@ -79,6 +82,9 @@ const updateStateFromSearchFilters = () => {
   state.searchParams.selectedWords = getFormInputValue('keyword')
   state.searchParams.caseSensitive = (<HTMLInputElement>(
     id('search-filters-case-sensitive')
+  ))?.checked
+  state.searchParams.linksExactMatch = (<HTMLInputElement>(
+    id('search-filters-links-exact-match')
   ))?.checked
   const newCombinatorValue =
     ((
@@ -216,7 +222,8 @@ const handleEvent: SearchApiCallback = async function (event) {
             event: 'formSubmission',
             formType: 'Search',
             formPosition: 'Page',
-            userOrganisation: state.signonProfileData.user.organisation_slug,
+            userOrganisation:
+              state.signonProfileData?.user?.organisation_slug || '',
           })
 
           updateStateFromSearchFilters()
@@ -360,22 +367,27 @@ const getQueryStringFromSearchParams = function () {
       param: UrlParams.CaseSensitive,
       transform: (v) => v.toString(),
     },
+    linksExactMatch: {
+      condition: (v) => v,
+      param: UrlParams.LinksExactMatch,
+      transform: (v) => v.toString(),
+    },
     publishingOrganisation: {
       condition: (v) => v,
       param: UrlParams.PublishingOrganisation,
     },
     keywordLocation: {
-      condition: (v) => v !== KeywordLocation.All,
+      condition: (v) => v && v !== KeywordLocation.All && v !== '',
       param: UrlParams.KeywordLocation,
     },
     documentType: { condition: (v) => v, param: UrlParams.DocumentType },
     taxon: { condition: (v) => v !== '', param: UrlParams.Taxon },
     publishingApplication: {
-      condition: (v) => v !== PublishingApplication.Any,
+      condition: (v) => v && v !== PublishingApplication.Any && v !== '',
       param: UrlParams.PublishingApplication,
     },
     politicalStatus: {
-      condition: (v) => v !== PoliticalStatus.Any,
+      condition: (v) => v && v !== PoliticalStatus.Any && v !== '',
       param: UrlParams.PoliticalStatus,
     },
     government: { condition: (v) => v, param: UrlParams.Government },
@@ -421,6 +433,7 @@ const getQueryStringFromSearchParams = function () {
   const fields = [
     'selectedWords',
     'caseSensitive',
+    'linksExactMatch',
     'combinator',
     'excludedWords',
     'linkSearchUrl',

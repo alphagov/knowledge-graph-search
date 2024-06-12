@@ -29,6 +29,8 @@ const makeURLfromSearchParams = function (searchParams: SearchParams): string {
     usp.set(UrlParams.Language, languageCode(searchParams.language))
   if (searchParams.caseSensitive)
     usp.set(UrlParams.CaseSensitive, searchParams.caseSensitive.toString())
+  if (searchParams.linksExactMatch)
+    usp.set(UrlParams.LinksExactMatch, searchParams.linksExactMatch.toString())
   if (searchParams.keywordLocation !== KeywordLocation.All) {
     usp.set(UrlParams.KeywordLocation, searchParams.keywordLocation)
   }

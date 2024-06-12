@@ -15,6 +15,7 @@ export enum UrlParams {
   Language = 'language',
   PoliticalStatus = 'political-status',
   Government = 'government',
+  LinksExactMatch = 'links-exact-match',
 }
 
 export enum SearchType {
@@ -76,6 +77,7 @@ export type SearchParams = {
   publishingStatus: PublishingStatus // Withdrawn, not withdrawn etc.
   politicalStatus: PoliticalStatus // page is politial: true, false, null
   government: string // government that published the page.
+  linksExactMatch: boolean // links to match exactly
 }
 
 // a search can return a variable number of records of any type

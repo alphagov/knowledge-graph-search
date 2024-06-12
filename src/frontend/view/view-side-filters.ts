@@ -28,6 +28,24 @@ const viewEnableCaseSensitive = () => `
 </div>
 `
 
+const viewLinksExactMatchSelector = () => `
+<div class="govuk-form-group">
+  <div class="govuk-checkboxes govuk-checkboxes--small">
+    <div class="govuk-checkboxes__item">
+      <input
+          class="govuk-checkboxes__input"
+          ${state.waiting && 'disabled="disabled"'}
+          type="checkbox"
+          id="side-filters-links-exact-match"
+          name="side-filters-links-exact-match"
+          ${state.searchParams.linksExactMatch ? 'checked' : ''}
+      />
+      <label for="side-filters-links-exact-match" class="govuk-label govuk-checkboxes__label">Exact matches only</label>
+    </div>
+  </div>
+</div>  
+`
+
 const viewCombinatorRadios = () => `
   <fieldset class="govuk-fieldset side-filter-fieldset">
     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
@@ -311,8 +329,7 @@ export const viewSideFilters = () => {
       <button id="side-filters-submit-btn" class="govuk-button" data-module="govuk-button" style="width: auto;">Apply filters</button>
     `
   const viewClearFilters = () =>
-    `<a href="javascript:void(0)" id="clear-side-filters-link" class="govuk-link">Clear filters</a>`
-
+    `<a href="javascript:void(0)" id="clear-side-filters-link " class="govuk-link">Clear filters</a>`
   return `
     <div class="side-filters">
       <h2 class="govuk-heading-m">Filters</h2>
@@ -328,6 +345,7 @@ export const viewSideFilters = () => {
           ? viewSelectKeywordLocation()
           : ''
       }
+      ${searchType === SearchType.Link ? viewLinksExactMatchSelector() : ''}
       ${viewSelectPublishingOrganisations()}
       ${viewDocumentTypeSelector()}
       ${viewPublishingApplications()}

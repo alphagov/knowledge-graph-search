@@ -21,6 +21,7 @@ export const getParams = (req: express.Request): SearchParams => {
     (req.query[UrlParams.PublishingOrganisation] as string) || ''
   const language = (req.query[UrlParams.Language] as string) || ''
   const caseSensitive = req.query[UrlParams.CaseSensitive] === 'true'
+  const linksExactMatch = req.query[UrlParams.LinksExactMatch] === 'true'
   const combinator = <Combinator>(
     ((req.query[UrlParams.Combinator] as string) || Combinator.All)
   )
@@ -62,6 +63,7 @@ export const getParams = (req: express.Request): SearchParams => {
     publishingStatus,
     politicalStatus,
     government,
+    linksExactMatch,
   }
 }
 

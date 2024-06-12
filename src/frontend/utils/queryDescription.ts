@@ -63,10 +63,17 @@ export const queryDescription = ({
     clauses.push(
       `are in ${makeBold(languageName(searchParams.language), includeMarkup)}`
     )
-  if (searchParams.linkSearchUrl !== '')
-    clauses.push(
-      `link to ${makeBold(searchParams.linkSearchUrl, includeMarkup)}`
-    )
+  if (searchParams.linkSearchUrl !== '') {
+    const isSlug = searchParams.linkSearchUrl.startsWith('/')
+    const formattedLink = isSlug
+      ? `https://www.gov.uk${searchParams.linkSearchUrl}`
+      : searchParams.linkSearchUrl
+    let clause = `link to ${makeBold(formattedLink, includeMarkup)}`
+    if (searchParams.linksExactMatch) {
+      clause = `${clause} (exact match)`
+    }
+    clauses.push(clause)
+  }
   if (searchParams.phoneNumber !== '')
     clauses.push(
       `mention the phone number ${makeBold(
@@ -84,7 +91,10 @@ export const queryDescription = ({
         includeMarkup
       )}`
     )
-  if (searchParams.politicalStatus !== PoliticalStatus.Any) {
+  if (
+    searchParams.politicalStatus &&
+    searchParams.politicalStatus !== PoliticalStatus.Any
+  ) {
     const status = {
       [PoliticalStatus.Political]: 'political',
       [PoliticalStatus.NotPolitical]: 'not political',

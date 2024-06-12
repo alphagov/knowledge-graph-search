@@ -45,6 +45,7 @@ export const initialSearchParams: SearchParams = {
   publishingStatus: PublishingStatus.All,
   politicalStatus: PoliticalStatus.Any,
   government: '',
+  linksExactMatch: false,
 }
 
 const defaultShowFields = {
@@ -155,6 +156,10 @@ const setStateSearchParamsFromURL = function (): void {
   state.searchParams.caseSensitive = getURLParamOrFallback(
     'caseSensitive',
     UrlParams.CaseSensitive
+  )
+  state.searchParams.linksExactMatch = getURLParamOrFallback(
+    'linksExactMatch',
+    UrlParams.LinksExactMatch
   )
   state.searchParams.publishingApplication = getURLParamOrFallback(
     'publishingApplication',

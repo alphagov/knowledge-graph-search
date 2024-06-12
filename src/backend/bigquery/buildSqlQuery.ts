@@ -150,13 +150,28 @@ export const buildSqlQuery = function (
   let linkClause = ''
   if (searchParams.linkSearchUrl !== '') {
     // Link search: look for url as substring
-    linkClause = `
-      AND EXISTS
-        (
-          SELECT 1 FROM UNNEST (hyperlinks) AS link
-          WHERE CONTAINS_SUBSTR(link.link_url, @link)
-        )
-    `
+    if (searchParams.linksExactMatch) {
+      linkClause = `
+        AND EXISTS
+          (
+            SELECT 1 FROM UNNEST (hyperlinks) AS link
+            WHERE
+            @link = link.link_url
+            OR CONCAT('http://www.gov.uk', @link) = link.link_url
+            OR CONCAT('http://www.gov.uk/', @link) = link.link_url
+            OR CONCAT('https://www.gov.uk', @link) = link.link_url
+            OR CONCAT('https://www.gov.uk/', @link) = link.link_url
+          )
+      `
+    } else {
+      linkClause = `
+        AND EXISTS
+          (
+            SELECT 1 FROM UNNEST (hyperlinks) AS link
+            WHERE CONTAINS_SUBSTR(link.link_url, @link)
+          )
+      `
+    }
   }
 
   let phoneNumberClause = ''

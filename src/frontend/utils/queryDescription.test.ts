@@ -38,6 +38,7 @@ const DEFAULT_SEARCH_PARAMS: SearchParams = {
   publishingStatus: PublishingStatus.NotWithdrawn,
   politicalStatus: PoliticalStatus.Any,
   government: '',
+  linksExactMatch: false,
 }
 
 const makeParams = (overrides: PartialSearchParams = {}): SearchParams => {
