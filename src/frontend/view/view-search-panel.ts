@@ -21,6 +21,7 @@ const viewSearchPanel = () => {
     [SearchType.Language]: viewLanguageSearchPanel,
     [SearchType.Advanced]: viewAdvancedSearchPanel,
     [SearchType.Results]: viewAdvancedSearchPanel,
+    [SearchType.Person]: viewPersonSearchPanel,
   }
 
   if (!(searchType in mapping)) {
@@ -181,6 +182,44 @@ const viewTaxonSearchPanel = () => `
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
           ${viewTaxonSelector()}
+          ${
+            state.searchResults
+              ? ''
+              : `<details class="govuk-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+              <span class="govuk-details__summary-text">
+                Search filters
+              </span>
+            </summary>
+            <div class="govuk-details__text">
+              <div class="search-filters-container">
+                <div class="search-filters-left-col taxon-search">
+                  ${viewPublishingOrganisation()}
+                  ${viewPublishingStatusSelector()}
+                  ${viewLanguageSelector()}
+                </div>
+                <div class="search-filters-right-col taxon-search">
+                  ${viewDocumentType()}
+                  ${viewPublishingAppSelector()}
+                  ${viewPoliticalStatusSelector()}
+                  ${viewGovernmentSelector()}
+                </div>
+              </div>
+            </div>
+          </details>`
+          }
+          ${viewSearchButton()}
+        </div>
+      </form>
+    `
+
+
+
+
+const viewPersonSearchPanel = () => `
+      <form id="search-form" class="search-panel govuk-form">
+        <div class="search-mode-panel">
+          ${viewPersonSelector()}
           ${
             state.searchResults
               ? ''
@@ -448,6 +487,29 @@ const viewTaxonSelector = () => `
             `<option value="${taxon}" ${
               state.searchParams.taxon === taxon ? 'selected' : ''
             }>${taxon}</option>`
+        )
+        .join('')}
+        </select>
+    </div>`
+
+
+
+const viewPersonSelector = () => `
+    <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+      <label class="govuk-label govuk-label--s" for="search-filters-person">
+       Search for pages associated with a person 
+      </label>
+      <select ${
+        state.waiting && 'disabled="disabled"'
+      } id="search-filters-person" class="autocomplete__input autocomplete__input--default" name="search-filters-person">
+      <option value=""></option>
+      ${[...new Set(state.persons)]
+        .sort()
+        .map(
+          (person) =>
+            `<option value="${person}" ${
+              state.searchParams.associatedPerson === person ? 'selected' : ''
+            }>${person}</option>`
         )
         .join('')}
         </select>

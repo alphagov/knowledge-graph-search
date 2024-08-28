@@ -140,6 +140,7 @@ const tabs = [
     label: 'Languages',
     searchType: SearchType.Language,
   },
+  {id: 'search-persons', label: 'Persons', searchType: SearchType.Person},
   {
     id: 'search-adv',
     label: 'Advanced',

@@ -56,4 +56,5 @@ export interface State {
   phoneNumberError: boolean | null
   signonProfileData?: SignonProfileData
   publishingApps: string[]
+  persons: string[]
 }

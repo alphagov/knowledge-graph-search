@@ -139,6 +139,7 @@ const resetFilters = () => {
       [SearchType.Organisation]: 'publishingOrganisation',
       [SearchType.Taxon]: 'taxon',
       [SearchType.Language]: 'language',
+      [SearchType.Person]: 'associatedPerson',
     }
 
     return {
@@ -177,6 +178,7 @@ const handleSearchTabClick = (id: string) => {
     'search-taxons': SearchType.Taxon,
     'search-orgs': SearchType.Organisation,
     'search-langs': SearchType.Language,
+    'search-persons': SearchType.Person,
     'search-adv': SearchType.Advanced,
   }
   state.searchParams.searchType = mapping[id] || SearchType.Keyword

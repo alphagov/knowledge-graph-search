@@ -28,6 +28,7 @@ export enum SearchType {
   Language = 'language',
   Advanced = 'advanced',
   Results = 'results',
+  Person = 'person',
 }
 
 export enum Combinator {

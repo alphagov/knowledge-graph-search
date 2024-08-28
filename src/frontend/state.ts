@@ -92,6 +92,7 @@ const initState = () => {
     CSVDownloadType: CSVDownloadType.ALL,
     phoneNumberError: false,
     publishingApps: [], // all the publishing apps listed in the search.publishing_app table
+    persons: [], // all the persons listed in the search.people table
   }
   if (cachedLayout) {
     const { showFiltersPane, showFieldSet } = loadLayoutStateFromCache()
