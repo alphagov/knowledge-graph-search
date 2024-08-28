@@ -45,6 +45,7 @@ export const initialSearchParams: SearchParams = {
   politicalStatus: PoliticalStatus.Any,
   government: '',
   linksExactMatch: false,
+  associatedPerson: '',
 }
 
 const defaultShowFields = {

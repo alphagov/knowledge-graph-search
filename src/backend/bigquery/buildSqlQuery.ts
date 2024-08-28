@@ -202,6 +202,17 @@ export const buildSqlQuery = function (
     `
   }
 
+  let associatedPersonClause = ''
+  if (searchParams.associatedPerson !== '') {
+    associatedPersonClause = `
+      AND EXISTS
+        (
+          SELECT 1 FROM UNNEST (people) AS person
+          WHERE person = @associatedPerson
+        )
+    `
+  }
+
   return `
     SELECT
       url,
@@ -220,6 +231,7 @@ export const buildSqlQuery = function (
       organisations AS all_organisations,
       government,
       is_political,
+      people,
       ${occurrences}
     FROM search.page
 
@@ -235,6 +247,8 @@ export const buildSqlQuery = function (
     ${documentTypeClause}
     ${politicalStatusClause}
     ${governmentClause}
+    ${associatedPersonClause}
+
     ORDER BY page_views DESC
     LIMIT 10000
   `

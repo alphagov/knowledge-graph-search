@@ -64,6 +64,9 @@ export const bigQuery = async function (userQuery: string, options?: any) {
     if (options.publishingApp) {
       params.publishingApp = options.publishingApp
     }
+    if (options.associatedPerson) {
+      params.associatedPerson = options.associatedPerson
+    }
   }
 
   const bqOptions = {
@@ -159,6 +162,7 @@ const sendSearchQuery = async function (
   const government = searchParams.government
   const politicalStatus = searchParams.politicalStatus
   const publishingApp = searchParams.publishingApp
+  const associatedPerson = searchParams.associatedPerson
   const queries = [
     bigQuery(query, {
       keywords,
@@ -172,6 +176,7 @@ const sendSearchQuery = async function (
       government,
       politicalStatus,
       publishingApp,
+      associatedPerson
     }),
   ]
 
