@@ -212,7 +212,8 @@ const searchStateIsUnset = function (): boolean {
     state.searchParams.publishingApp === '' &&
     state.searchParams.publishingStatus === PublishingStatus.All &&
     state.searchParams.politicalStatus === PoliticalStatus.Any &&
-    state.searchParams.government === ''
+    state.searchParams.government === '' &&
+    state.searchParams.associatedPerson === ''
   )
 }
 

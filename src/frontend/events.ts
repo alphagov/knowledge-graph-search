@@ -128,6 +128,7 @@ const updateStateFromSearchFilters = () => {
       'search-filters-publishing-status'
     ) as PublishingStatus) || PublishingStatus.All
   state.searchParams.language = getFormInputValue('search-filters-language')
+  state.searchParams.associatedPerson = getFormInputValue("search-filters-person")
 }
 
 const resetFilters = () => {
@@ -235,7 +236,6 @@ const handleEvent: SearchApiCallback = async function (event) {
           break
         case 'new-search-btn':
           resetSearchState()
-          console.log('searchParams:', getQueryStringFromSearchParams())
           break
         case 'button-next-page':
           state.skip = state.skip + state.pagination.resultsPerPage
@@ -417,6 +417,10 @@ const getQueryStringFromSearchParams = function () {
       condition: (v) => v !== SearchType.Keyword,
       param: UrlParams.SearchType,
     },
+    associatedPerson: {
+      condition: (v) => v !== '',
+      param: UrlParams.AssociatedPerson,
+    }
   }
 
   const updateSearchParams = (field) => {
@@ -448,6 +452,7 @@ const getQueryStringFromSearchParams = function () {
     'politicalStatus',
     'language',
     'searchType',
+    'associatedPerson'
   ]
 
   fields.forEach(updateSearchParams)

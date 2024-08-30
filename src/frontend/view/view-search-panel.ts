@@ -93,6 +93,7 @@ export const viewAdvancedSearchPanel = (onTheSide = true) => {
           ${viewTaxonSelector()}
           ${viewPublishingStatusSelector()}
           ${viewLanguageSelector()}
+          ${viewPersonSelector()}
           ${viewPoliticalStatusSelector()}
           ${viewGovernmentSelector()}
           ${viewSearchButton()}

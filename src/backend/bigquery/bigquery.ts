@@ -69,6 +69,7 @@ export const bigQuery = async function (userQuery: string, options?: any) {
     }
   }
 
+
   const bqOptions = {
     query: userQuery,
     location: 'europe-west2',
