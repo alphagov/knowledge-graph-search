@@ -279,7 +279,7 @@ describe('buildSqlQuery', () => {
       publishingOrganisation: 'whatever',
       linkSearchUrl: link,
       government: '2015 Conservative government',
-      associatedPerson: 'hello'
+      associatedPerson: 'hello',
     })
     const keywords: string[] = ['test1', 'test2']
     const excludedKeywords: string[] = ['excluded1', 'excluded2']

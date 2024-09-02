@@ -47,7 +47,7 @@ describe('getParams', () => {
       politicalStatus: 'political',
       government: 'some government',
       linksExactMatch: false,
-      associatedPerson: ""
+      associatedPerson: '',
     })
   })
 
@@ -69,11 +69,10 @@ describe('getParams', () => {
         'publishing-status': '',
         'is-political': '',
         government: '',
-        'associated-person': ''
-
+        'associated-person': '',
       },
     } as unknown as Request
-    console.log({"getParams(req)": getParams(req)})
+    console.log({ 'getParams(req)': getParams(req) })
 
     expect(getParams(req)).toStrictEqual({
       publishingApp: '',
@@ -93,7 +92,7 @@ describe('getParams', () => {
       politicalStatus: 'any',
       government: '',
       linksExactMatch: false,
-      associatedPerson: ''
+      associatedPerson: '',
     })
   })
 })

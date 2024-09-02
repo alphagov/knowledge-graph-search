@@ -94,11 +94,7 @@ describe('[Function] sendInitQuery', () => {
           { publishing_app: 'app3' },
         ],
       ])
-      .mockResolvedValueOnce([
-        [
-          { title: 'Mr Something' },
-        ],
-      ])
+      .mockResolvedValueOnce([[{ title: 'Mr Something' }]])
     const result = await sendInitQuery()
 
     expect(BigQuery.prototype.query).toHaveBeenCalledTimes(7)

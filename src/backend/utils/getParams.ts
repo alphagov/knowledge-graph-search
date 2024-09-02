@@ -46,7 +46,7 @@ export const getParams = (req: express.Request): SearchParams => {
   const associatedPerson =
     (req.query[UrlParams.AssociatedPerson] as string) || ''
 
-    console.log({associatedPerson})
+  console.log({ associatedPerson })
 
   return {
     searchType,
