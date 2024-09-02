@@ -25,6 +25,9 @@ export default function govukPostInitScripts() {
       'side-filters-taxon': 'a topic tag',
       'search-filters-taxon': 'a topic tag',
       'search-filters-person': 'a person',
+      'side-filters-person': 'a person',
+      'side-filters-government': 'a government',
+      'search-filters-government': 'a government',
     }
 
     var getPlaceholder = (id) => 'Start typing ' + placeholderMapping[id] || "a " + id
