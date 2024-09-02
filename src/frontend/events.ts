@@ -62,6 +62,8 @@ const updateStateFromSideFilters = () => {
     'side-filters-political-status'
   ) as PoliticalStatus
 
+  state.searchParams.associatedPerson = getFormInputValue("side-filters-person")
+
   state.searchParams.government = getFormInputValue('side-filters-government')
 
   const newCombinatorValue = (
