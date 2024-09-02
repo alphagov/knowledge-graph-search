@@ -222,7 +222,7 @@ const viewTaxonSelector = () => `
 const viewPersonSelector = () => `
     <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
       <label class="govuk-label govuk-label--s" for="side-filters-person">
-       Search for pages associated with a person 
+      Associated Person 
       </label>
       <select ${
         state.waiting && 'disabled="disabled"'

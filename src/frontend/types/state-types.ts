@@ -20,6 +20,7 @@ export type Field =
   | 'occurrences'
   | 'government'
   | 'is_political'
+  | 'people'
 
 export enum SortAction {
   DESC = 'desc',
@@ -41,6 +42,7 @@ export interface State {
   userErrors: string[]
   searchResults: any[] | null
   skip: number
+
   pagination: {
     currentPage: number
     resultsPerPage: number
