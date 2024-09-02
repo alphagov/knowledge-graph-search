@@ -62,7 +62,7 @@ const updateStateFromSideFilters = () => {
     'side-filters-political-status'
   ) as PoliticalStatus
 
-  state.searchParams.associatedPerson = getFormInputValue("side-filters-person")
+  state.searchParams.associatedPerson = getFormInputValue('side-filters-person')
 
   state.searchParams.government = getFormInputValue('side-filters-government')
 
@@ -130,7 +130,9 @@ const updateStateFromSearchFilters = () => {
       'search-filters-publishing-status'
     ) as PublishingStatus) || PublishingStatus.All
   state.searchParams.language = getFormInputValue('search-filters-language')
-  state.searchParams.associatedPerson = getFormInputValue("search-filters-person")
+  state.searchParams.associatedPerson = getFormInputValue(
+    'search-filters-person'
+  )
 }
 
 const resetFilters = () => {
@@ -422,7 +424,7 @@ const getQueryStringFromSearchParams = function () {
     associatedPerson: {
       condition: (v) => v !== '',
       param: UrlParams.AssociatedPerson,
-    }
+    },
   }
 
   const updateSearchParams = (field) => {
@@ -454,7 +456,7 @@ const getQueryStringFromSearchParams = function () {
     'politicalStatus',
     'language',
     'searchType',
-    'associatedPerson'
+    'associatedPerson',
   ]
 
   fields.forEach(updateSearchParams)

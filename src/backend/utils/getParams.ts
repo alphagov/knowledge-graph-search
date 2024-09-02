@@ -43,8 +43,8 @@ export const getParams = (req: express.Request): SearchParams => {
     ((req.query[UrlParams.PoliticalStatus] as string) || PoliticalStatus.Any)
   )
   const government = (req.query[UrlParams.Government] as string) || ''
-  const associatedPerson = (req.query[UrlParams.AssociatedPerson] as string) || ''
-
+  const associatedPerson =
+    (req.query[UrlParams.AssociatedPerson] as string) || ''
 
   return {
     searchType,

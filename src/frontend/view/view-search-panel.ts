@@ -214,9 +214,6 @@ const viewTaxonSearchPanel = () => `
       </form>
     `
 
-
-
-
 const viewPersonSearchPanel = () => `
       <form id="search-form" class="search-panel govuk-form">
         <div class="search-mode-panel">
@@ -492,8 +489,6 @@ const viewTaxonSelector = () => `
         .join('')}
         </select>
     </div>`
-
-
 
 const viewPersonSelector = () => `
     <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">

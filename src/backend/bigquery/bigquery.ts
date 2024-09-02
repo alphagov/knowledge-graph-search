@@ -69,7 +69,6 @@ export const bigQuery = async function (userQuery: string, options?: any) {
     }
   }
 
-
   const bqOptions = {
     query: userQuery,
     location: 'europe-west2',
@@ -150,9 +149,7 @@ const sendInitQuery = async function (): Promise<InitResults> {
     publishingApps: bqPublishingApps.map(
       (publishingApp: any) => publishingApp.publishing_app
     ),
-    persons: bqPersons.map(
-      (persons: any) => persons.title
-    ),
+    persons: bqPersons.map((persons: any) => persons.title),
   }
 }
 
@@ -186,7 +183,7 @@ const sendSearchQuery = async function (
       government,
       politicalStatus,
       publishingApp,
-      associatedPerson
+      associatedPerson,
     }),
   ]
 
