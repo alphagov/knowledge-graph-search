@@ -149,7 +149,7 @@ const sendInitQuery = async function (): Promise<InitResults> {
     publishingApps: bqPublishingApps.map(
       (publishingApp: any) => publishingApp.publishing_app
     ),
-    persons: bqPersons.map((persons: any) => persons.title),
+    persons: bqPersons.map((person: any) => person.title),
   }
 }
 

@@ -38,6 +38,7 @@ const DEFAULT_SEARCH_PARAMS: SearchParams = {
   politicalStatus: PoliticalStatus.Any,
   government: '',
   linksExactMatch: false,
+  associatedPerson: ''
 }
 
 const makeParams = (overrides: PartialSearchParams = {}): SearchParams => {
