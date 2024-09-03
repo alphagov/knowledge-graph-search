@@ -16,6 +16,7 @@ export enum UrlParams {
   PoliticalStatus = 'political-status',
   Government = 'government',
   LinksExactMatch = 'links-exact-match',
+  AssociatedPerson = 'associated-person',
 }
 
 export enum SearchType {
@@ -27,6 +28,7 @@ export enum SearchType {
   Language = 'language',
   Advanced = 'advanced',
   Results = 'results',
+  Person = 'person',
 }
 
 export enum Combinator {
@@ -72,6 +74,7 @@ export type SearchParams = {
   politicalStatus: PoliticalStatus // page is politial: true, false, null
   government: string // government that published the page.
   linksExactMatch: boolean // links to match exactly
+  associatedPerson: string // person associated with the page
 }
 
 // a search can return a variable number of records of any type
@@ -84,6 +87,7 @@ export type InitResults = {
   documentTypes: string[]
   governments: string[]
   publishingApps: string[]
+  persons: string[]
 }
 
 export type Occurrence = {

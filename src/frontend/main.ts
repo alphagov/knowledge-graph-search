@@ -47,6 +47,7 @@ const fetchInitialData = async function () {
     state.documentTypes = dbInitResults.documentTypes
     state.governments = dbInitResults.governments
     state.publishingApps = dbInitResults.publishingApps
+    state.persons = dbInitResults.persons
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') {
       state.systemErrorText = 'It looks like the backend is not responding.'

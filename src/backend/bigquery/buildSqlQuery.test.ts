@@ -27,6 +27,7 @@ const prefix = (keywords?: string[], link?: string) => `
     organisations AS all_organisations,
     government,
     is_political,
+    people,
     [${
       keywords?.length
         ? `STRUCT(
@@ -52,8 +53,7 @@ const prefix = (keywords?: string[], link?: string) => `
 }] AS occurrences,
     FROM search.pageWHERE TRUE`
 
-const SUFFIX = `
-  ORDER BY page_views DESC
+const SUFFIX = `ORDER BY page_views DESC
   LIMIT 10000`
 
 const expectedQuery = (clauses: string, keywords?: string[], link?: string) =>
@@ -86,6 +86,7 @@ const makeParams = (opts = {}) =>
     publishingStatus: PublishingStatus.All,
     government: '',
     politicalStatus: PoliticalStatus.Any,
+    associatedPerson: '',
     ...opts,
   } as SearchParams)
 
@@ -222,8 +223,7 @@ describe('buildSqlQuery', () => {
     (
       SELECT 1 FROM UNNEST (taxons) AS taxon
       WHERE taxon = @taxon
-    )
-    `
+    )`
     const expected = expectedQuery(expectedClauses, keywords)
 
     expect(queryFmt(query)).toEqual(queryFmt(expected))
@@ -242,8 +242,7 @@ describe('buildSqlQuery', () => {
     (
       SELECT 1 FROM UNNEST (organisations) AS link
       WHERE link = @organisation
-    )
-    `
+    )`
     const expected = expectedQuery(expectedClauses, keywords)
 
     expect(queryFmt(query)).toEqual(queryFmt(expected))
@@ -263,8 +262,7 @@ describe('buildSqlQuery', () => {
     (
       SELECT 1 FROM UNNEST (hyperlinks) AS link
       WHERE CONTAINS_SUBSTR(link.link_url, @link)
-    )
-    `
+    )`
     const expected = expectedQuery(expectedClauses, keywords, link)
 
     expect(queryFmt(query)).toEqual(queryFmt(expected))
@@ -281,6 +279,7 @@ describe('buildSqlQuery', () => {
       publishingOrganisation: 'whatever',
       linkSearchUrl: link,
       government: '2015 Conservative government',
+      associatedPerson: 'hello',
     })
     const keywords: string[] = ['test1', 'test2']
     const excludedKeywords: string[] = ['excluded1', 'excluded2']
@@ -309,7 +308,11 @@ describe('buildSqlQuery', () => {
     )
   AND is_political = (@politicalStatus = 'political')
   AND government = @government
-  `
+   AND EXISTS
+    (
+      SELECT 1 FROM UNNEST (people) AS person
+      WHERE person = @associatedPerson
+    )`
     const expected = expectedQuery(expectedClauses, keywords, link)
 
     expect(queryFmt(query)).toEqual(queryFmt(expected))
