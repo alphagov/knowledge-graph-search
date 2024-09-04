@@ -75,7 +75,7 @@ const view = () => {
     dispatchCustomGAEvent('formSubmission', {
       formType: 'Search',
       formPosition: 'Page',
-      userOrganisation: state.signonProfileData.user.organisation_slug,
+      userOrganisation: state.signonProfileData?.user?.organisation_slug || '',
     })
     handleEvent({ type: EventType.Dom, id: 'search' })
   })
@@ -140,6 +140,7 @@ const tabs = [
     label: 'Languages',
     searchType: SearchType.Language,
   },
+  { id: 'search-persons', label: 'Persons', searchType: SearchType.Person },
   {
     id: 'search-adv',
     label: 'Advanced',

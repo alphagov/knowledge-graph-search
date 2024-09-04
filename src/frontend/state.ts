@@ -3,7 +3,6 @@ import {
   SearchType,
   SearchParams,
   Combinator,
-  PublishingApplication,
   PoliticalStatus,
   KeywordLocation,
   UrlParams,
@@ -40,11 +39,13 @@ export const initialSearchParams: SearchParams = {
   phoneNumber: '',
   keywordLocation: KeywordLocation.All,
   combinator: Combinator.All,
-  publishingApplication: PublishingApplication.Any,
+  publishingApp: '',
   caseSensitive: false, // whether the keyword search is case sensitive
   publishingStatus: PublishingStatus.All,
   politicalStatus: PoliticalStatus.Any,
   government: '',
+  linksExactMatch: false,
+  associatedPerson: '',
 }
 
 const defaultShowFields = {
@@ -90,6 +91,8 @@ const initState = () => {
     sorting: defaultSortingState,
     CSVDownloadType: CSVDownloadType.ALL,
     phoneNumberError: false,
+    publishingApps: [], // all the publishing apps listed in the search.publishing_app table
+    persons: [], // all the persons listed in the search.people table
   }
   if (cachedLayout) {
     const { showFiltersPane, showFieldSet } = loadLayoutStateFromCache()
@@ -156,8 +159,12 @@ const setStateSearchParamsFromURL = function (): void {
     'caseSensitive',
     UrlParams.CaseSensitive
   )
-  state.searchParams.publishingApplication = getURLParamOrFallback(
-    'publishingApplication',
+  state.searchParams.linksExactMatch = getURLParamOrFallback(
+    'linksExactMatch',
+    UrlParams.LinksExactMatch
+  )
+  state.searchParams.publishingApp = getURLParamOrFallback(
+    'publishingApp',
     UrlParams.PublishingApplication
   )
   state.searchParams.combinator = getURLParamOrFallback(
@@ -202,10 +209,11 @@ const searchStateIsUnset = function (): boolean {
     state.searchParams.linkSearchUrl === '' &&
     state.searchParams.phoneNumber === '' &&
     state.searchParams.documentType === '' &&
-    state.searchParams.publishingApplication === PublishingApplication.Any &&
+    state.searchParams.publishingApp === '' &&
     state.searchParams.publishingStatus === PublishingStatus.All &&
     state.searchParams.politicalStatus === PoliticalStatus.Any &&
-    state.searchParams.government === ''
+    state.searchParams.government === '' &&
+    state.searchParams.associatedPerson === ''
   )
 }
 
@@ -246,7 +254,7 @@ const resetSearchState = function (): void {
   state.searchParams.linkSearchUrl = ''
   state.searchParams.phoneNumber = ''
   state.skip = 0 // reset to first page
-  state.searchParams.publishingApplication = PublishingApplication.Any
+  state.searchParams.publishingApp = ''
   state.searchResults = null
   state.waiting = false
   state.searchParams.combinator = Combinator.All

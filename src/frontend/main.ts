@@ -10,7 +10,6 @@ import { fetchWithTimeout, queryBackend } from './search-api'
 import config from './config'
 import { defaultAllLanguagesOption } from '../common/utils/lang'
 import {
-  PublishingApplication,
   PublishingStatus,
   PoliticalStatus,
 } from '../common/types/search-api-types'
@@ -47,6 +46,8 @@ const fetchInitialData = async function () {
     state.locales = dbInitResults.locales
     state.documentTypes = dbInitResults.documentTypes
     state.governments = dbInitResults.governments
+    state.publishingApps = dbInitResults.publishingApps
+    state.persons = dbInitResults.persons
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') {
       state.systemErrorText = 'It looks like the backend is not responding.'
@@ -72,7 +73,7 @@ const fetchInitialData = async function () {
       state.searchParams.linkSearchUrl !== '' ||
       state.searchParams.phoneNumber !== '' ||
       state.searchParams.documentType !== '' ||
-      state.searchParams.publishingApplication !== PublishingApplication.Any ||
+      state.searchParams.publishingApp !== '' ||
       state.searchParams.publishingStatus !== PublishingStatus.All ||
       state.searchParams.politicalStatus !== PoliticalStatus.Any ||
       state.searchParams.government !== ''

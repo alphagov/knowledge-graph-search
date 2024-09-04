@@ -1,14 +1,13 @@
 import {
   Combinator,
   KeywordLocation,
-  PublishingApplication,
   PublishingStatus,
   PoliticalStatus,
   SearchType,
 } from '../../common/types/search-api-types'
 import { state } from '../state'
 import { languageName } from '../../common/utils/lang'
-import { formatDocumentType } from '../utils/formatters'
+import { formatDocumentType, formatPublishingApp } from '../utils/formatters'
 
 const viewEnableCaseSensitive = () => `
 <div class="govuk-form-group side-filter-case-sensitive">
@@ -26,6 +25,24 @@ const viewEnableCaseSensitive = () => `
     </div>
   </div>
 </div>
+`
+
+const viewLinksExactMatchSelector = () => `
+<div class="govuk-form-group">
+  <div class="govuk-checkboxes govuk-checkboxes--small">
+    <div class="govuk-checkboxes__item">
+      <input
+          class="govuk-checkboxes__input"
+          ${state.waiting && 'disabled="disabled"'}
+          type="checkbox"
+          id="side-filters-links-exact-match"
+          name="side-filters-links-exact-match"
+          ${state.searchParams.linksExactMatch ? 'checked' : ''}
+      />
+      <label for="side-filters-links-exact-match" class="govuk-label govuk-checkboxes__label">Exact matches only</label>
+    </div>
+  </div>
+</div>  
 `
 
 const viewCombinatorRadios = () => `
@@ -165,21 +182,19 @@ const viewPublishingApplications = () => `
         <select ${
           state.waiting && 'disabled="disabled"'
         } id="side-filters-publishing-application" class="govuk-select" name="side-filters-publishing-application" style="width: 100%;">
-          <option value="${PublishingApplication.Any}" ${
-  state.searchParams.publishingApplication === PublishingApplication.Any
-    ? 'selected'
-    : ''
-}>All publishing applications</option>
-          <option value="${PublishingApplication.Publisher}" ${
-  state.searchParams.publishingApplication === PublishingApplication.Publisher
-    ? 'selected'
-    : ''
-}>Publisher (mainstream)</option>
-          <option value="${PublishingApplication.Whitehall}" ${
-  state.searchParams.publishingApplication === PublishingApplication.Whitehall
-    ? 'selected'
-    : ''
-}>Whitehall (specialist)</option>
+        <option value="" ${
+          state.searchParams.publishingApp === '' ? 'selected' : ''
+        }>Any</option>
+        ${state.publishingApps
+          .sort()
+          .map(
+            (publishingApp) =>
+              `<option value="${publishingApp}" ${
+                state.searchParams.publishingApp === publishingApp
+                  ? 'selected'
+                  : ''
+              }>${formatPublishingApp(publishingApp)}</option>`
+          )}
         </select>
     </div>`
 
@@ -199,6 +214,27 @@ const viewTaxonSelector = () => `
             `<option value="${taxon}" ${
               state.searchParams.taxon === taxon ? 'selected' : ''
             }>${taxon}</option>`
+        )
+        .join('')}
+        </select>
+    </div>`
+
+const viewPersonSelector = () => `
+    <div class="govuk-form-group" data-state="${state.waiting && 'disabled'}">
+      <label class="govuk-label govuk-label--s" for="side-filters-person">
+      Associated Person 
+      </label>
+      <select ${
+        state.waiting && 'disabled="disabled"'
+      } id="side-filters-person" class="autocomplete__input autocomplete__input--default" name="side-filters-person">
+      <option value=""></option>
+      ${[...new Set(state.persons)]
+        .sort()
+        .map(
+          (person) =>
+            `<option value="${person}" ${
+              state.searchParams.associatedPerson === person ? 'selected' : ''
+            }>${person}</option>`
         )
         .join('')}
         </select>
@@ -311,8 +347,7 @@ export const viewSideFilters = () => {
       <button id="side-filters-submit-btn" class="govuk-button" data-module="govuk-button" style="width: auto;">Apply filters</button>
     `
   const viewClearFilters = () =>
-    `<a href="javascript:void(0)" id="clear-side-filters-link" class="govuk-link">Clear filters</a>`
-
+    `<a href="javascript:void(0)" id="clear-side-filters-link " class="govuk-link">Clear filters</a>`
   return `
     <div class="side-filters">
       <h2 class="govuk-heading-m">Filters</h2>
@@ -328,11 +363,13 @@ export const viewSideFilters = () => {
           ? viewSelectKeywordLocation()
           : ''
       }
+      ${searchType === SearchType.Link ? viewLinksExactMatchSelector() : ''}
       ${viewSelectPublishingOrganisations()}
       ${viewDocumentTypeSelector()}
       ${viewPublishingApplications()}
       ${viewTaxonSelector()}
       ${viewLanguageSelector()}
+      ${viewPersonSelector()}
       ${viewPublishingStatusSelector()}
       ${viewPoliticalStatusSelector()}
       ${viewGovernmentSelector()}

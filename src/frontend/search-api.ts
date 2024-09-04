@@ -1,7 +1,6 @@
 import {
   SearchParams,
   SearchType,
-  PublishingApplication,
   PoliticalStatus,
   Combinator,
   SearchResults,
@@ -29,6 +28,8 @@ const makeURLfromSearchParams = function (searchParams: SearchParams): string {
     usp.set(UrlParams.Language, languageCode(searchParams.language))
   if (searchParams.caseSensitive)
     usp.set(UrlParams.CaseSensitive, searchParams.caseSensitive.toString())
+  if (searchParams.linksExactMatch)
+    usp.set(UrlParams.LinksExactMatch, searchParams.linksExactMatch.toString())
   if (searchParams.keywordLocation !== KeywordLocation.All) {
     usp.set(UrlParams.KeywordLocation, searchParams.keywordLocation)
   }
@@ -36,8 +37,8 @@ const makeURLfromSearchParams = function (searchParams: SearchParams): string {
   if (searchParams.documentType)
     usp.set(UrlParams.DocumentType, searchParams.documentType)
 
-  if (searchParams.publishingApplication !== PublishingApplication.Any) {
-    usp.set(UrlParams.PublishingApplication, searchParams.publishingApplication)
+  if (searchParams.publishingApp !== '') {
+    usp.set(UrlParams.PublishingApplication, searchParams.publishingApp)
   }
   if (searchParams.combinator !== Combinator.All)
     usp.set(UrlParams.Combinator, searchParams.combinator)
@@ -51,6 +52,9 @@ const makeURLfromSearchParams = function (searchParams: SearchParams): string {
   }
   if (searchParams.government !== '') {
     usp.set(UrlParams.Government, searchParams.government)
+  }
+  if (searchParams.associatedPerson !== '') {
+    usp.set(UrlParams.AssociatedPerson, searchParams.associatedPerson)
   }
   return usp.toString()
 }

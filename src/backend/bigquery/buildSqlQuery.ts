@@ -1,7 +1,6 @@
 import {
   Combinator,
   KeywordLocation,
-  PublishingApplication,
   PublishingStatus,
   PoliticalStatus,
   SearchParams,
@@ -103,12 +102,8 @@ export const buildSqlQuery = function (
           .join(' OR ') +
         ')'
   let publishingAppClause = ''
-  if (searchParams.publishingApplication === PublishingApplication.Publisher) {
-    publishingAppClause = 'AND publishing_app = "publisher"'
-  } else if (
-    searchParams.publishingApplication === PublishingApplication.Whitehall
-  ) {
-    publishingAppClause = 'AND publishing_app = "whitehall"'
+  if (searchParams.publishingApp !== '') {
+    publishingAppClause = `AND publishing_app = @publishingApp`
   }
 
   let publishingStatusClause = ''
@@ -150,13 +145,28 @@ export const buildSqlQuery = function (
   let linkClause = ''
   if (searchParams.linkSearchUrl !== '') {
     // Link search: look for url as substring
-    linkClause = `
-      AND EXISTS
-        (
-          SELECT 1 FROM UNNEST (hyperlinks) AS link
-          WHERE CONTAINS_SUBSTR(link.link_url, @link)
-        )
-    `
+    if (searchParams.linksExactMatch) {
+      linkClause = `
+        AND EXISTS
+          (
+            SELECT 1 FROM UNNEST (hyperlinks) AS link
+            WHERE
+            @link = link.link_url
+            OR CONCAT('http://www.gov.uk', @link) = link.link_url
+            OR CONCAT('http://www.gov.uk/', @link) = link.link_url
+            OR CONCAT('https://www.gov.uk', @link) = link.link_url
+            OR CONCAT('https://www.gov.uk/', @link) = link.link_url
+          )
+      `
+    } else {
+      linkClause = `
+        AND EXISTS
+          (
+            SELECT 1 FROM UNNEST (hyperlinks) AS link
+            WHERE CONTAINS_SUBSTR(link.link_url, @link)
+          )
+      `
+    }
   }
 
   let phoneNumberClause = ''
@@ -192,6 +202,17 @@ export const buildSqlQuery = function (
     `
   }
 
+  let associatedPersonClause = ''
+  if (searchParams.associatedPerson !== '') {
+    associatedPersonClause = `
+      AND EXISTS
+        (
+          SELECT 1 FROM UNNEST (people) AS person
+          WHERE person = @associatedPerson
+        )
+    `
+  }
+
   return `
     SELECT
       url,
@@ -210,6 +231,7 @@ export const buildSqlQuery = function (
       organisations AS all_organisations,
       government,
       is_political,
+      people,
       ${occurrences}
     FROM search.page
 
@@ -225,6 +247,8 @@ export const buildSqlQuery = function (
     ${documentTypeClause}
     ${politicalStatusClause}
     ${governmentClause}
+    ${associatedPersonClause}
+
     ORDER BY page_views DESC
     LIMIT 10000
   `

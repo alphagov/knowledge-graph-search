@@ -12,7 +12,6 @@ import { queryBackend } from './search-api'
 import { EventType, SearchApiCallback } from './types/event-types'
 import {
   SearchType,
-  PublishingApplication,
   PoliticalStatus,
   Combinator,
   KeywordLocation,
@@ -36,6 +35,9 @@ const updateStateFromSideFilters = () => {
   state.searchParams.caseSensitive = (<HTMLInputElement>(
     id('side-filters-case-sensitive')
   ))?.checked
+  state.searchParams.linksExactMatch = (<HTMLInputElement>(
+    id('side-filters-links-exact-match')
+  ))?.checked
   state.searchParams.excludedWords = getFormInputValue(
     'side-filters-excluded-keywords'
   )
@@ -52,13 +54,15 @@ const updateStateFromSideFilters = () => {
     'side-filters-publishing-status'
   ) as PublishingStatus
 
-  state.searchParams.publishingApplication = getFormInputValue(
+  state.searchParams.publishingApp = getFormInputValue(
     'side-filters-publishing-application'
-  ) as PublishingApplication
+  ) as string
 
   state.searchParams.politicalStatus = getFormInputValue(
     'side-filters-political-status'
   ) as PoliticalStatus
+
+  state.searchParams.associatedPerson = getFormInputValue('side-filters-person')
 
   state.searchParams.government = getFormInputValue('side-filters-government')
 
@@ -79,6 +83,9 @@ const updateStateFromSearchFilters = () => {
   state.searchParams.selectedWords = getFormInputValue('keyword')
   state.searchParams.caseSensitive = (<HTMLInputElement>(
     id('search-filters-case-sensitive')
+  ))?.checked
+  state.searchParams.linksExactMatch = (<HTMLInputElement>(
+    id('search-filters-links-exact-match')
   ))?.checked
   const newCombinatorValue =
     ((
@@ -110,9 +117,9 @@ const updateStateFromSearchFilters = () => {
     getFormInputValue('search-filters-document-type').charAt(0).toLowerCase() +
     getFormInputValue('search-filters-document-type').slice(1)
   ).replace(/ /g, '_')
-  state.searchParams.publishingApplication = getFormInputValue(
+  state.searchParams.publishingApp = getFormInputValue(
     'search-filters-publishing-application'
-  ) as PublishingApplication
+  ) as string
   state.searchParams.politicalStatus = getFormInputValue(
     'search-filters-political-status'
   ) as PoliticalStatus
@@ -123,6 +130,9 @@ const updateStateFromSearchFilters = () => {
       'search-filters-publishing-status'
     ) as PublishingStatus) || PublishingStatus.All
   state.searchParams.language = getFormInputValue('search-filters-language')
+  state.searchParams.associatedPerson = getFormInputValue(
+    'search-filters-person'
+  )
 }
 
 const resetFilters = () => {
@@ -134,6 +144,7 @@ const resetFilters = () => {
       [SearchType.Organisation]: 'publishingOrganisation',
       [SearchType.Taxon]: 'taxon',
       [SearchType.Language]: 'language',
+      [SearchType.Person]: 'associatedPerson',
     }
 
     return {
@@ -147,7 +158,7 @@ const resetFilters = () => {
     combinator: initialSearchParams.combinator,
     excludedWords: initialSearchParams.excludedWords,
     keywordLocation: initialSearchParams.keywordLocation,
-    publishingApplication: initialSearchParams.publishingApplication,
+    publishingApp: initialSearchParams.publishingApp,
     politicalStatus: initialSearchParams.politicalStatus,
     publishingOrganisation: initialSearchParams.publishingOrganisation,
     documentType: initialSearchParams.documentType,
@@ -172,6 +183,7 @@ const handleSearchTabClick = (id: string) => {
     'search-taxons': SearchType.Taxon,
     'search-orgs': SearchType.Organisation,
     'search-langs': SearchType.Language,
+    'search-persons': SearchType.Person,
     'search-adv': SearchType.Advanced,
   }
   state.searchParams.searchType = mapping[id] || SearchType.Keyword
@@ -216,7 +228,8 @@ const handleEvent: SearchApiCallback = async function (event) {
             event: 'formSubmission',
             formType: 'Search',
             formPosition: 'Page',
-            userOrganisation: state.signonProfileData.user.organisation_slug,
+            userOrganisation:
+              state.signonProfileData?.user?.organisation_slug || '',
           })
 
           updateStateFromSearchFilters()
@@ -227,7 +240,6 @@ const handleEvent: SearchApiCallback = async function (event) {
           break
         case 'new-search-btn':
           resetSearchState()
-          console.log('searchParams:', getQueryStringFromSearchParams())
           break
         case 'button-next-page':
           state.skip = state.skip + state.pagination.resultsPerPage
@@ -360,22 +372,27 @@ const getQueryStringFromSearchParams = function () {
       param: UrlParams.CaseSensitive,
       transform: (v) => v.toString(),
     },
+    linksExactMatch: {
+      condition: (v) => v,
+      param: UrlParams.LinksExactMatch,
+      transform: (v) => v.toString(),
+    },
     publishingOrganisation: {
       condition: (v) => v,
       param: UrlParams.PublishingOrganisation,
     },
     keywordLocation: {
-      condition: (v) => v !== KeywordLocation.All,
+      condition: (v) => v && v !== KeywordLocation.All && v !== '',
       param: UrlParams.KeywordLocation,
     },
     documentType: { condition: (v) => v, param: UrlParams.DocumentType },
     taxon: { condition: (v) => v !== '', param: UrlParams.Taxon },
-    publishingApplication: {
-      condition: (v) => v !== PublishingApplication.Any,
+    publishingApp: {
+      condition: (v) => v && v !== 'any' && v !== '',
       param: UrlParams.PublishingApplication,
     },
     politicalStatus: {
-      condition: (v) => v !== PoliticalStatus.Any,
+      condition: (v) => v && v !== PoliticalStatus.Any && v !== '',
       param: UrlParams.PoliticalStatus,
     },
     government: { condition: (v) => v, param: UrlParams.Government },
@@ -404,6 +421,10 @@ const getQueryStringFromSearchParams = function () {
       condition: (v) => v !== SearchType.Keyword,
       param: UrlParams.SearchType,
     },
+    associatedPerson: {
+      condition: (v) => v !== '',
+      param: UrlParams.AssociatedPerson,
+    },
   }
 
   const updateSearchParams = (field) => {
@@ -421,6 +442,7 @@ const getQueryStringFromSearchParams = function () {
   const fields = [
     'selectedWords',
     'caseSensitive',
+    'linksExactMatch',
     'combinator',
     'excludedWords',
     'linkSearchUrl',
@@ -428,12 +450,13 @@ const getQueryStringFromSearchParams = function () {
     'keywordLocation',
     'publishingOrganisation',
     'documentType',
-    'publishingApplication',
+    'publishingApp',
     'taxon',
     'publishingStatus',
     'politicalStatus',
     'language',
     'searchType',
+    'associatedPerson',
   ]
 
   fields.forEach(updateSearchParams)
