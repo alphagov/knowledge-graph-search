@@ -64,6 +64,9 @@ export const bigQuery = async function (userQuery: string, options?: any) {
     if (options.publishingApp) {
       params.publishingApp = options.publishingApp
     }
+    if (options.associatedPerson) {
+      params.associatedPerson = options.associatedPerson
+    }
   }
 
   const bqOptions = {
@@ -85,7 +88,8 @@ const sendInitQuery = async function (): Promise<InitResults> {
     bqOrganisations: any,
     bqDocumentTypes: any,
     bqGovernments: any,
-    bqPublishingApps: any
+    bqPublishingApps: any,
+    bqPersons: any
   try {
     ;[
       bqLocales,
@@ -94,6 +98,7 @@ const sendInitQuery = async function (): Promise<InitResults> {
       bqDocumentTypes,
       bqGovernments,
       bqPublishingApps,
+      bqPersons,
     ] = await Promise.all([
       bigQuery(`
         SELECT DISTINCT locale
@@ -119,6 +124,10 @@ const sendInitQuery = async function (): Promise<InitResults> {
         SELECT DISTINCT publishing_app
         FROM \`search.publishing_app\`
         `),
+      bigQuery(`
+        SELECT DISTINCT title 
+        FROM \`search.person\`
+        `),
     ])
   } catch (error) {
     log.error(error, 'Error in sendInitQueryError')
@@ -140,6 +149,7 @@ const sendInitQuery = async function (): Promise<InitResults> {
     publishingApps: bqPublishingApps.map(
       (publishingApp: any) => publishingApp.publishing_app
     ),
+    persons: bqPersons.map((person: any) => person.title),
   }
 }
 
@@ -159,6 +169,7 @@ const sendSearchQuery = async function (
   const government = searchParams.government
   const politicalStatus = searchParams.politicalStatus
   const publishingApp = searchParams.publishingApp
+  const associatedPerson = searchParams.associatedPerson
   const queries = [
     bigQuery(query, {
       keywords,
@@ -172,6 +183,7 @@ const sendSearchQuery = async function (
       government,
       politicalStatus,
       publishingApp,
+      associatedPerson,
     }),
   ]
 

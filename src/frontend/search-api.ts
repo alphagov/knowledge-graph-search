@@ -53,6 +53,9 @@ const makeURLfromSearchParams = function (searchParams: SearchParams): string {
   if (searchParams.government !== '') {
     usp.set(UrlParams.Government, searchParams.government)
   }
+  if (searchParams.associatedPerson !== '') {
+    usp.set(UrlParams.AssociatedPerson, searchParams.associatedPerson)
+  }
   return usp.toString()
 }
 

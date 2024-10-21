@@ -107,6 +107,15 @@ export const queryDescription = ({
     )
   }
 
+  if (searchParams.associatedPerson !== '') {
+    clauses.push(
+      `are associated with the person ${makeBold(
+        searchParams.associatedPerson,
+        includeMarkup
+      )}`
+    )
+  }
+
   const joinedClauses =
     clauses.length === 1
       ? clauses[0]

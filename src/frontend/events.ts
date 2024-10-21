@@ -62,6 +62,8 @@ const updateStateFromSideFilters = () => {
     'side-filters-political-status'
   ) as PoliticalStatus
 
+  state.searchParams.associatedPerson = getFormInputValue('side-filters-person')
+
   state.searchParams.government = getFormInputValue('side-filters-government')
 
   const newCombinatorValue = (
@@ -128,6 +130,9 @@ const updateStateFromSearchFilters = () => {
       'search-filters-publishing-status'
     ) as PublishingStatus) || PublishingStatus.All
   state.searchParams.language = getFormInputValue('search-filters-language')
+  state.searchParams.associatedPerson = getFormInputValue(
+    'search-filters-person'
+  )
 }
 
 const resetFilters = () => {
@@ -139,6 +144,7 @@ const resetFilters = () => {
       [SearchType.Organisation]: 'publishingOrganisation',
       [SearchType.Taxon]: 'taxon',
       [SearchType.Language]: 'language',
+      [SearchType.Person]: 'associatedPerson',
     }
 
     return {
@@ -177,6 +183,7 @@ const handleSearchTabClick = (id: string) => {
     'search-taxons': SearchType.Taxon,
     'search-orgs': SearchType.Organisation,
     'search-langs': SearchType.Language,
+    'search-persons': SearchType.Person,
     'search-adv': SearchType.Advanced,
   }
   state.searchParams.searchType = mapping[id] || SearchType.Keyword
@@ -233,7 +240,6 @@ const handleEvent: SearchApiCallback = async function (event) {
           break
         case 'new-search-btn':
           resetSearchState()
-          console.log('searchParams:', getQueryStringFromSearchParams())
           break
         case 'button-next-page':
           state.skip = state.skip + state.pagination.resultsPerPage
@@ -415,6 +421,10 @@ const getQueryStringFromSearchParams = function () {
       condition: (v) => v !== SearchType.Keyword,
       param: UrlParams.SearchType,
     },
+    associatedPerson: {
+      condition: (v) => v !== '',
+      param: UrlParams.AssociatedPerson,
+    },
   }
 
   const updateSearchParams = (field) => {
@@ -446,6 +456,7 @@ const getQueryStringFromSearchParams = function () {
     'politicalStatus',
     'language',
     'searchType',
+    'associatedPerson',
   ]
 
   fields.forEach(updateSearchParams)

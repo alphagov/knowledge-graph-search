@@ -24,7 +24,7 @@ class SearchAPIController {
     const { phoneNumber, error } = parsePhoneNumber(params.phoneNumber)
     if (error) {
       const errorMessage = 'The phone number could not be parsed'
-      log.error({ phoneNumber: params.phoneNumber }, errorMessage)
+      log.error({ phoneNumber }, errorMessage)
       res.status(400).send(errorMessage)
       return
     }

@@ -45,6 +45,7 @@ export const initialSearchParams: SearchParams = {
   politicalStatus: PoliticalStatus.Any,
   government: '',
   linksExactMatch: false,
+  associatedPerson: '',
 }
 
 const defaultShowFields = {
@@ -91,6 +92,7 @@ const initState = () => {
     CSVDownloadType: CSVDownloadType.ALL,
     phoneNumberError: false,
     publishingApps: [], // all the publishing apps listed in the search.publishing_app table
+    persons: [], // all the persons listed in the search.people table
   }
   if (cachedLayout) {
     const { showFiltersPane, showFieldSet } = loadLayoutStateFromCache()
@@ -210,7 +212,8 @@ const searchStateIsUnset = function (): boolean {
     state.searchParams.publishingApp === '' &&
     state.searchParams.publishingStatus === PublishingStatus.All &&
     state.searchParams.politicalStatus === PoliticalStatus.Any &&
-    state.searchParams.government === ''
+    state.searchParams.government === '' &&
+    state.searchParams.associatedPerson === ''
   )
 }
 

@@ -94,9 +94,10 @@ describe('[Function] sendInitQuery', () => {
           { publishing_app: 'app3' },
         ],
       ])
+      .mockResolvedValueOnce([[{ title: 'Mr Something' }]])
     const result = await sendInitQuery()
 
-    expect(BigQuery.prototype.query).toHaveBeenCalledTimes(6)
+    expect(BigQuery.prototype.query).toHaveBeenCalledTimes(7)
 
     expect(BigQuery.prototype.query).toHaveBeenNthCalledWith(1, {
       query: `
@@ -146,6 +147,7 @@ describe('[Function] sendInitQuery', () => {
       documentTypes: ['dt1', 'dt2', 'dt3'],
       governments: ['gov1', 'gov2', 'gov3'],
       publishingApps: ['app`', 'app2', 'app3'],
+      persons: ['Mr Something'],
     })
   })
 })
