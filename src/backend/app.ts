@@ -18,6 +18,7 @@ import { errorMiddleware } from './middleware/errorMiddleware'
 import { allowGoogleAnalytics } from './middleware/allowGoogleAnalytics'
 import { showCookieMessage } from './middleware/showCookieMessage'
 import { hideFeedbackSurvey } from './middleware/hideFeedbackSurvey'
+import { showNotificationBanner } from './middleware/showNotificationBanner'
 import log, { httpLogger } from './utils/logging'
 import cookieParser from 'cookie-parser'
 
@@ -78,6 +79,7 @@ class App {
     this.app.use(allowGoogleAnalytics)
     this.app.use(showCookieMessage)
     this.app.use(hideFeedbackSurvey)
+    this.app.use(showNotificationBanner)
     this.initializeLogin()
     this.app.use(httpLogger)
   }

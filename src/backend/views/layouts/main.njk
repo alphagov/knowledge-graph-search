@@ -74,6 +74,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       {% else %}
       {% include "../partials/feedbackMasthead.njk" %}
       {% endif %}
+      {% if showNotificationBanner === true %}
+      {% include "../partials/notificationBanner.njk" %}
+      {% endif %}
       {% block content %}{% endblock %}
     </main>
   </div>
