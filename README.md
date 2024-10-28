@@ -33,7 +33,7 @@ Docs](https://docs.data-community.publishing.service.gov.uk).
 
 - Start the server with `npm run dev`.
 
-- Point your browser to `https://localhost:8080` (the port can be changed using the `PORT` environment variable)
+- Point your browser to `http://localhost:8080` (the port can be changed using the `PORT` environment variable)
 
 # Developing
 
