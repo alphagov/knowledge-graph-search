@@ -121,7 +121,7 @@ Production deployments have to be triggered manually for security reasons.
 
 ## Deployment Steps
 
-1. Go to production site https://govgraphsearch.dev/ and view the source.
+1. Go to production site https://gov-search.service.gov.uk/ and view the source.
 2. Look for the line beginning `<!-- Google Tag Manager (noscript) --><noscript><iframe src="https://www.googletagmanager.com/ns.html?` and note the values of the URL parameters `id` and `gtm_auth`. They look like `GTM-XXXXXXX` and `aWEg5ABBXXXXXXXXXXXXXXXXX`.
 3. Run the script `deploy-to-gcp.sh` located at the root directory
 4. Enter the value of `id` as in step 2 as the GTM tracking ID.
