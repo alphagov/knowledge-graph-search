@@ -40,7 +40,7 @@
     "@types/google-libphonenumber": "^7.4.30",
     "@types/node": "^18.11.14",
     "accessible-autocomplete": "^2.0.4",
-    "axios": "^1.6.0",
+    "axios": "^1.7.4",
     "connect-redis": "^7.1.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
