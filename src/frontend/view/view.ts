@@ -193,6 +193,9 @@ const viewMainLayout = () => {
       result.push(viewSearchResults())
     }
   } else {
+    if (state.searchResults) {
+      result.push(viewSearchResults())
+    } else {
     result.push(`
       <div class="govuk-grid-row simple-search">
         <div class="govuk-grid-column-two-thirds">
@@ -201,6 +204,7 @@ const viewMainLayout = () => {
       </div>
       ${viewSearchResults()}
     `)
+    }
   }
   result.push(`</div>`)
   return result.join('')
