@@ -196,7 +196,7 @@ const viewMainLayout = () => {
     if (state.searchResults) {
       result.push(viewSearchResults())
     } else {
-    result.push(`
+      result.push(`
       <div class="govuk-grid-row simple-search">
         <div class="govuk-grid-column-two-thirds">
           ${viewSearchPanel()}
