@@ -45,6 +45,7 @@
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "csv-stringify": "^6.2.4",
+    "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "express-session": "^1.18.1",
     "google-libphonenumber": "^3.2.33",
@@ -64,6 +65,7 @@
   "devDependencies": {
     "@types/cookie-parser": "^1.4.3",
     "@types/cors": "^2.8.13",
+    "@types/dotenv": "^8.2.3",
     "@types/express-session": "^1.17.7",
     "@types/jest": "^29.5.2",
     "@types/nunjucks": "^3.2.2",
