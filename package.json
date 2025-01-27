@@ -46,7 +46,7 @@
     "cors": "^2.8.5",
     "csv-stringify": "^6.2.4",
     "dotenv": "^16.4.5",
-    "express": "^4.21.1",
+    "express": "^4.21.2",
     "express-session": "^1.18.1",
     "google-libphonenumber": "^3.2.33",
     "got": "^12.5.0",
