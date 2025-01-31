@@ -18,35 +18,6 @@ export class URLCellRenderer {
     this.eGui.innerHTML = `<a class="govuk-link" key=${this.getUniqueKey()} href="${
       params.value
     }">${params.value}</a>`
-    this.registerEventsListeners()
-  }
-
-  registerEventsListeners() {
-    document.addEventListener('keydown', (event) => {
-      if (
-        !['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(
-          event.key
-        )
-      ) {
-        return
-      }
-      const {
-        colDef: { field },
-        rowIndex,
-      } = this.params
-      const focusedCell = this.params.api.getFocusedCell()
-      if (
-        focusedCell?.column.getColId() === field &&
-        focusedCell?.rowIndex === rowIndex
-      ) {
-        const innerLink = document.querySelector(
-          `a[key="${this.getUniqueKey()}"]`
-        )
-        if (innerLink instanceof HTMLElement) {
-          innerLink.focus()
-        }
-      }
-    })
   }
 
   getUniqueKey = () => {
