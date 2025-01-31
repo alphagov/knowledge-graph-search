@@ -183,3 +183,7 @@ log.error(error, 'error')
 // If you want to log an object:
 log.info({ a: 123, b: 456 }, 'This is a log')
 ```
+
+## Web analytics
+
+[Analytics dashboard](https://analytics.google.com/analytics/web/#/p303522524/reports/reportinghub)
