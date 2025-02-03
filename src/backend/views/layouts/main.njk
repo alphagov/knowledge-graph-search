@@ -27,8 +27,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@31.3.2/dist/ag-grid-community.min.js" integrity="sha256-ULzU4/8xnTp9F6pbUw2GByUtsteCMTKi2W0+QNGuzwA=" crossorigin="anonymous"></script>
 
 <!--[if !IE 8]><!-->
-<link href="/main.css" rel="stylesheet" />
-<link href="/assets/aaccessible-autocomplete.min.css" rel="stylesheet">
+<link href="/stylesheets/main.css" rel="stylesheet" />
+<link href="/stylesheets/accessible-autocomplete.min.css" rel="stylesheet">
 <!--<![endif]-->
 
 <!--[if IE 8]>
@@ -95,11 +95,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 {% endblock %}
 {% block bodyEnd %}
   {% block scripts %}
-  <script src="/assets/all.js"></script>
-  <script src="/assets/accessible-autocomplete.min.js"></script>
-  <script>
+  <script type="module" src="/javascripts/govuk-frontend.min.js"></script>
+  <script src="/javascripts/accessible-autocomplete.min.js"></script>
+  <script type="module">
+    import { initAll } from '/javascripts/govuk-frontend.min.js'
     window.havePostScriptsRun = false;
-    window.GOVUKFrontend.initAll();
+    initAll()
   </script>
 
     {% block pageScripts %}{% endblock %}
